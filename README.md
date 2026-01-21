@@ -31,18 +31,20 @@ Every product processed by our compiler exists simultaneously as:
 
 ## Documentation
 
+All project documentation is organized in the `docs/` folder.
+
 | Document | Description |
 |----------|-------------|
-| [00-DOCUMENT-INDEX](./00-DOCUMENT-INDEX.md) | Overview of all project documents |
-| [01-PROJECT-CHARTER](./01-PROJECT-CHARTER.md) | Vision, objectives, scope, and governance |
-| [02-TECHNICAL-ARCHITECTURE](./02-TECHNICAL-ARCHITECTURE.md) | System design and component architecture |
-| [03-PRODUCT-REQUIREMENTS](./03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Functional and non-functional requirements |
-| [04-DEVELOPMENT-ROADMAP](./04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown and milestones |
-| [05-RISK-ASSESSMENT](./05-RISK-ASSESSMENT.md) | Risk analysis and mitigation strategies |
-| [06-BUDGET-PROJECTIONS](./06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning and cost breakdown |
-| [07-SYSTEM-DIAGRAMS](./07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
+| [00-DOCUMENT-INDEX](./docs/00-DOCUMENT-INDEX.md) | Overview of all project documents |
+| [01-PROJECT-CHARTER](./docs/01-PROJECT-CHARTER.md) | Vision, objectives, scope, and governance |
+| [02-TECHNICAL-ARCHITECTURE](./docs/02-TECHNICAL-ARCHITECTURE.md) | System design and component architecture |
+| [03-PRODUCT-REQUIREMENTS](./docs/03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Functional and non-functional requirements |
+| [04-DEVELOPMENT-ROADMAP](./docs/04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown and milestones |
+| [05-RISK-ASSESSMENT](./docs/05-RISK-ASSESSMENT.md) | Risk analysis and mitigation strategies |
+| [06-BUDGET-PROJECTIONS](./docs/06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning and cost breakdown |
+| [07-SYSTEM-DIAGRAMS](./docs/07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
 
-PDF versions of all documents are available in this repository.
+PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder.
 
 ---
 
