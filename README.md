@@ -52,7 +52,7 @@ PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder.
 
 | Component | Technology |
 |-----------|------------|
-| Commerce Compiler | Rust (Python MVP) |
+| Commerce Compiler | Rust (MVP) |
 | Binary Format | FlatBuffers |
 | Semantic Vectors | CLIP (ViT-B/32) |
 | Cryptographic Signing | Ed25519 |
