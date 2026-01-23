@@ -594,7 +594,7 @@ things-that-matter/
 │   │   ├── Cargo.toml
 │   │   └── README.md
 │   │
-│   ├── matter-ffi/           # FFI bindings (C/C++/Python/Node)
+│   ├── matter-ffi/           # FFI bindings (C/C++/Node)
 │   │   ├── bindings/
 │   │   ├── Cargo.toml
 │   │   └── README.md
