@@ -11,6 +11,10 @@ repository = "https://github.com/thingsthatmatter/things-that-matter"
 name = "matter_core"
 crate-type = ["cdylib", "rlib"]
 
+[[bin]]
+name = "steg-test"
+path = "src/bin/steg-test.rs"
+
 [dependencies]
 # Serialization
 serde = { version = "1.0", features = ["derive"] }
@@ -23,8 +27,8 @@ sha2 = "0.10"
 
 # Image processing
 image = "0.24"
-# Note: exif crate will be added when needed for XMP metadata
-# For now, we'll use image crate's metadata support or a different approach
+# XMP metadata handling - using manual injection for better control
+# Alternative: rexiv2 (requires system library) or exif (limited XMP support)
 
 # Compression
 zstd = "0.13"
@@ -47,6 +51,7 @@ validator = { version = "0.18", features = ["derive"] }
 base64 = "0.21"
 hex = "0.4"
 url = "2.5"
+regex = "1.10"
 
 [dev-dependencies]
 tokio-test = "0.4"
