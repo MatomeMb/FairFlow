@@ -62,6 +62,17 @@ Every product processed by our compiler exists simultaneously as:
 5. **Read the Setup Guide:**
    See [SETUP.md](./SETUP.md) for detailed instructions.
 
+6. **Configure API Keys:**
+   See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md) for step-by-step API keys setup.
+
+**Quick Setup Verification:**
+```bash
+# Windows
+.\scripts\test-setup.ps1
+
+# Test all API keys are configured
+```
+
 ---
 
 ## Documentation
@@ -78,6 +89,13 @@ All project documentation is organized in the `docs/` folder.
 | [05-RISK-ASSESSMENT](./docs/05-RISK-ASSESSMENT.md) | Risk analysis and mitigation strategies |
 | [06-BUDGET-PROJECTIONS](./docs/06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning and cost breakdown |
 | [07-SYSTEM-DIAGRAMS](./docs/07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
+| [08-CTO-NEXT-STEPS](./docs/08-CTO-NEXT-STEPS.md) | CTO action plan and immediate priorities |
+| [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Complete guide for setting up API keys |
+
+**Setup & Configuration:**
+- [SETUP.md](./SETUP.md) - Detailed development environment setup
+- [SETUP_COMPLETE.md](./SETUP_COMPLETE.md) - Setup completion summary and status
+- [docs/RUST_WINDOWS_SETUP.md](./docs/RUST_WINDOWS_SETUP.md) - Rust installation on Windows
 
 PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder.
 
@@ -146,14 +164,17 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Timeline
 
-| Milestone | Target Date |
-|-----------|-------------|
-| Phase 0 (Validation) | Feb 2026 |
-| Foundation Complete | Apr 2026 |
-| Core Complete (50%) | Jul 2026 |
-| Browser Extension (75%) | Aug 2026 |
-| Beta Launch | Oct 2026 |
-| Public Launch | Dec 2026 |
+| Milestone | Target Date | Status |
+|-----------|-------------|--------|
+| Sprint 0 (Setup) | Feb 2, 2026 | ✅ Complete |
+| Phase 0 (Validation) | Feb 28, 2026 | ⏳ In Progress |
+| Foundation Complete | Apr 2026 | ⏳ Pending |
+| Core Complete (50%) | Jul 2026 | ⏳ Pending |
+| Browser Extension (75%) | Aug 2026 | ⏳ Pending |
+| Beta Launch | Oct 2026 | ⏳ Pending |
+| Public Launch | Dec 2026 | ⏳ Pending |
+
+**Current Status:** Sprint 0 complete - Development environment fully configured and ready for Phase 0 validation.
 
 ---
 
@@ -163,10 +184,20 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 
 ---
 
+## Helper Scripts
+
+| Script | Purpose |
+|--------|---------|
+| `scripts/setup-check.ps1` | Verify development environment setup |
+| `scripts/test-setup.ps1` | Test API keys configuration |
+| `scripts/setup-api-keys.ps1` | Interactive API keys setup helper |
+| `scripts/generate-ed25519-keys.py` | Generate Ed25519 cryptographic keys |
+
 ## Contact
 
 - **Company**: .things that Matter
 - **Website**: [thingsthatmatter.com](https://thingsthatmatter.com) *(coming soon)*
+- **Repository**: [GitHub](https://github.com/MatomeMb/.Things-That-Matter)
 
 ---
 
