@@ -1,0 +1,57 @@
+[package]
+name = "matter-core"
+version = "0.1.0"
+edition = "2021"
+authors = ["Matome Mboweni <matome@thingsthatmatter.com>"]
+description = "Commerce Compiler - Transforms product data into Universal Commerce Containers (.thing files)"
+license = "MIT"
+repository = "https://github.com/thingsthatmatter/things-that-matter"
+
+[lib]
+name = "matter_core"
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+flatbuffers = "24.3"
+
+# Cryptography
+ed25519-dalek = { version = "2.1", features = ["rand_core"] }
+sha2 = "0.10"
+
+# Image processing
+image = "0.24"
+# Note: exif crate will be added when needed for XMP metadata
+# For now, we'll use image crate's metadata support or a different approach
+
+# Compression
+zstd = "0.13"
+
+# HTTP client for CLIP API
+reqwest = { version = "0.11", features = ["json"] }
+tokio = { version = "1", features = ["full"] }
+
+# Async runtime
+async-trait = "0.1"
+
+# Error handling
+anyhow = "1.0"
+thiserror = "1.0"
+
+# Validation
+validator = { version = "0.18", features = ["derive"] }
+
+# Utilities
+base64 = "0.21"
+hex = "0.4"
+url = "2.5"
+
+[dev-dependencies]
+tokio-test = "0.4"
+
+[profile.release]
+opt-level = 3
+lto = true
+codegen-units = 1

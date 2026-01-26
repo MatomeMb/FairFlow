@@ -1,0 +1,44 @@
+/**
+ * Content Script Styles
+ * 
+ * Styles for product overlay UI
+ */
+
+.matter-overlay {
+  position: absolute;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  padding: 16px;
+  max-width: 300px;
+  z-index: 10000;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.matter-overlay h3 {
+  margin: 0 0 8px 0;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.matter-overlay .price {
+  font-size: 20px;
+  font-weight: 700;
+  color: #2563eb;
+  margin: 8px 0;
+}
+
+.matter-overlay .buy-button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 600;
+  width: 100%;
+}
+
+.matter-overlay .buy-button:hover {
+  background: #1d4ed8;
+}
