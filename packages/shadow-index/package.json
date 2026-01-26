@@ -22,8 +22,9 @@
   "author": "Matome Mboweni <matome@thingsthatmatter.com>",
   "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0",
     "@aws-sdk/client-s3": "^3.490.0",
+    "@hono/node-server": "^1.19.9",
+    "@supabase/supabase-js": "^2.39.0",
     "hono": "^4.0.0",
     "zod": "^3.22.4"
   },
