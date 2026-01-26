@@ -6,12 +6,13 @@
  */
 
 import { Hono } from 'hono';
+import { serve } from '@hono/node-server';
 
 const app = new Hono();
 
 // Health check endpoint
 app.get('/health', (c) => {
-  return c.json({ status: 'ok', service: 'shadow-index' });
+  return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
 });
 
 // Compile endpoint - transforms product data into .thing file
@@ -40,4 +41,14 @@ app.post('/batch', async (c) => {
   return c.json({ error: 'Not implemented yet' }, 501);
 });
 
+// Development server - always start in dev mode
+const port = Number(process.env.PORT) || 3000;
+console.log(`🚀 Shadow Index API starting on http://localhost:${port}`);
+console.log(`📡 Health check: http://localhost:${port}/health`);
+serve({
+  fetch: app.fetch,
+  port,
+});
+
+// Export for Vercel Edge Functions
 export default app;
