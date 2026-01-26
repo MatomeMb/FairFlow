@@ -29,6 +29,41 @@ Every product processed by our compiler exists simultaneously as:
 
 ---
 
+## Quick Start
+
+### Development Setup
+
+1. **Install Prerequisites:**
+   - [Rust](https://rustup.rs/) (1.70+)
+   - [Node.js](https://nodejs.org/) (18+)
+   - [Git](https://git-scm.com/)
+
+2. **Verify Setup:**
+   ```bash
+   # Windows
+   .\scripts\setup-check.ps1
+   
+   # Linux/Mac
+   bash scripts/setup-check.sh
+   ```
+
+3. **Configure Environment:**
+   ```bash
+   cp .env.example .env
+   # Edit .env with your API keys
+   ```
+
+4. **Install Dependencies:**
+   ```bash
+   cd packages/shadow-index
+   pnpm install  # or npm install
+   ```
+
+5. **Read the Setup Guide:**
+   See [SETUP.md](./SETUP.md) for detailed instructions.
+
+---
+
 ## Documentation
 
 All project documentation is organized in the `docs/` folder.
