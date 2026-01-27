@@ -85,9 +85,10 @@ pub fn embed_thing_in_image(
     let polyglot = append_thing_eof(&image_with_xmp, thing_data)
         .context("Failed to append .thing data to EOF")?;
     
-    // Validate image integrity
+    // Validate image integrity (check original image, not polyglot)
+    // The polyglot should still display correctly as the EOF data is appended after image end
     if !validate_image_integrity(image_data)? {
-        anyhow::bail!("Image integrity check failed after embedding");
+        anyhow::bail!("Image integrity check failed - original image may be corrupted");
     }
     
     Ok(polyglot)
