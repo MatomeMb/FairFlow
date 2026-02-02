@@ -32,7 +32,7 @@
 2. [Phase 0: Platform Validation Testing - Complete Workflow](#2-phase-0-platform-validation-testing---complete-workflow)
 3. [Decision Framework & Criteria](#3-decision-framework--criteria)
 4. [Post-Phase 0 Roadmap](#4-post-phase-0-roadmap)
-5. [Professional Project Management Practices](#5-professional-project-management-practices)
+5. [Scrum Operating Model (MVP-first)](#5-scrum-operating-model-mvp-first)
 6. [Technical Implementation Standards](#6-technical-implementation-standards)
 7. [Risk Management & Mitigation](#7-risk-management--mitigation)
 8. [Communication Protocols](#8-communication-protocols)
@@ -578,65 +578,59 @@ When making the Go/No-Go decision, create `PHASE0_DECISION.md`:
 
 ---
 
-## 5. Professional Project Management Practices
+## 5. Scrum Operating Model (MVP-first)
 
-### 5.1 Weekly Routine
+### 5.1 Goal
 
-#### Monday Morning (2 hours)
-- [ ] Review previous week's progress
-- [ ] Update project status document
-- [ ] Plan week ahead (prioritize tasks)
-- [ ] Weekly sync with CEO (30 min)
-- [ ] Identify blockers early
+Deliver the simplest working MVP quickly, then iterate in short cycles using a **Build → Evaluate → Test → Ship** loop every sprint.
 
-#### Tuesday-Thursday (20 hours)
-- [ ] Core development work
-- [ ] Focus on high-priority tasks
-- [ ] Learning (Rust, new technologies)
-- [ ] Documentation updates
-- [ ] Code reviews (self-review)
+### 5.2 Roles (Solo Scrum)
 
-#### Friday (3 hours)
-- [ ] Code review & cleanup
-- [ ] Commit all work to git
-- [ ] Update documentation
-- [ ] Progress tracking
-- [ ] Next week preparation
-- [ ] Weekly report to CEO
+- **Product Owner:** CEO (prioritizes value and MVP scope)
+- **Scrum Master:** CTO (process owner, removes blockers)
+- **Developers:** CTO (builds, tests, ships)
 
-#### Weekend (Optional)
-- [ ] Light reading/research
-- [ ] Experimentation
-- [ ] Rest (important for sustainability)
+### 5.3 Cadence (2-week sprints)
 
-**Total:** ~30 hours/week
+- **Day 1:** Sprint Planning (60-90 min)
+- **Daily:** 10 min standup (self-check)
+- **Mid-sprint:** Backlog Refinement (30 min)
+- **Last Day:** Sprint Review (demo) + Retrospective (30-45 min)
+- **Release:** Ship the increment at sprint end
 
-### 5.2 Task Management
+### 5.4 Artifacts & Source of Truth
 
-#### Task Prioritization
+- **Product Backlog:** `docs/10-MVP-BACKLOG.md`
+- **Current Sprint Plan:** `docs/11-SPRINT-1-PLAN.md`
+- **Definition of Done:** below
+- **Release Notes:** update `docs/CTO-EXECUTION-GUIDE.md` and `docs/04-DEVELOPMENT-ROADMAP.md` when scope changes
 
-1. **P0 - Critical:** Blocks other work or timeline
-2. **P1 - High:** Important for current sprint
-3. **P2 - Medium:** Nice to have, can defer
-4. **P3 - Low:** Future consideration
+### 5.5 Definition of Done (DoD)
 
-#### Task Documentation
+- Build succeeds locally with no errors
+- Tests for the changed areas pass
+- Acceptance criteria met for each story
+- Docs updated (README or relevant `docs/`)
+- Release checklist completed
+- Increment is deployable or shipped
 
-For each task, document:
-- **Description:** What needs to be done
-- **Acceptance Criteria:** How to know it's done
-- **Dependencies:** What must be done first
-- **Estimated Time:** How long it will take
-- **Status:** Not Started / In Progress / Blocked / Complete
+### 5.6 Build → Evaluate → Test → Ship Loop
 
-#### Daily Standup (Self)
+1. **Build:** Implement the smallest vertical slice for the sprint goal.
+2. **Evaluate:** Validate against MVP acceptance criteria and stakeholder feedback.
+3. **Test:** Run unit/integration checks; record results.
+4. **Ship:** Deploy or tag a release; document the increment.
 
-Every morning, ask:
-1. What did I complete yesterday?
-2. What will I work on today?
-3. Are there any blockers?
+### 5.7 Release Checklist (Sprint End)
 
-### 5.3 Version Control Practices
+- [ ] Sprint goal achieved and demoable
+- [ ] Tests run and passing
+- [ ] Release notes captured
+- [ ] Roadmap updated (if scope changed)
+- [ ] Stakeholder demo completed
+- [ ] Next sprint backlog refined
+
+### 5.8 Version Control Practices
 
 #### Git Workflow
 

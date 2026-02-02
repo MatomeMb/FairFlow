@@ -1,0 +1,86 @@
+param(
+  [string]$ApiBaseUrl = "http://localhost:3000",
+  [string]$OutputPath = "demo/matter-demo.html"
+)
+
+$product = @{
+  title = "Demo Product"
+  price = 14999
+  currency = "USD"
+  image_url = "https://example.com/demo.jpg"
+  checkout_url = "https://example.com/buy"
+}
+
+$response = Invoke-RestMethod `
+  -Method Post `
+  -Uri "$ApiBaseUrl/compile" `
+  -ContentType "application/json" `
+  -Body ($product | ConvertTo-Json)
+
+$matterUri = $response.matter_uri
+
+$html = @"
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Matter MVP Demo</title>
+    <style>
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        margin: 32px;
+        color: #111827;
+      }
+      .card {
+        max-width: 520px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+      }
+      h1 {
+        margin: 0 0 12px 0;
+        font-size: 22px;
+      }
+      p {
+        margin: 0 0 12px 0;
+        color: #4b5563;
+      }
+      a {
+        color: #2563eb;
+        font-weight: 600;
+        text-decoration: none;
+      }
+      a:hover {
+        text-decoration: underline;
+      }
+      .hint {
+        margin-top: 16px;
+        font-size: 12px;
+        color: #6b7280;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <h1>Matter MVP Demo</h1>
+      <p>Click the link to trigger the Lens overlay.</p>
+      <p>
+        Link:
+        <a href="$matterUri">$matterUri</a>
+      </p>
+      <p class="hint">Generated from Shadow Index: $ApiBaseUrl</p>
+    </div>
+  </body>
+</html>
+"@
+
+$dir = Split-Path -Parent $OutputPath
+if ($dir -and -not (Test-Path $dir)) {
+  New-Item -ItemType Directory -Path $dir | Out-Null
+}
+
+Set-Content -Path $OutputPath -Value $html -Encoding UTF8
+Write-Host "Demo page written to $OutputPath"
+Write-Host "Matter URI: $matterUri"
