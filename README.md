@@ -91,6 +91,10 @@ All project documentation is organized in the `docs/` folder.
 | [07-SYSTEM-DIAGRAMS](./docs/07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
 | [08-CTO-NEXT-STEPS](./docs/08-CTO-NEXT-STEPS.md) | CTO action plan and immediate priorities |
 | [**CTO Execution Guide**](./docs/CTO-EXECUTION-GUIDE.md) | **Comprehensive step-by-step professional execution guide** |
+| [**Scrum Master Plan for CEO**](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | **Complete 8-sprint roadmap, execution framework, and success criteria** |
+| [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
+| [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
+| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Initial sprint plan (Feb 3-16, 2026) |
 | [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Complete guide for setting up API keys |
 
 **Setup & Configuration:**
@@ -146,15 +150,37 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## Key Metrics (Phase 1 Targets)
+## Key Metrics & Success Criteria
 
+**Sprint 1 (MVP v0):**
 | Metric | Target |
 |--------|--------|
-| .thing files created | 10,000+ |
-| Compile latency | <500ms |
-| Steganography survival rate | ≥50% |
-| Browser extension users | 100+ |
+| Compile → Resolve → Display pipeline | Fully functional end-to-end |
+| E2E test coverage | 100% of MVP path |
+| Demo readiness | Zero workarounds |
+
+**Sprint 4 (MVP v2 Complete):**
+| Metric | Target |
+|--------|--------|
+| .thing files batch compilation | 100+ per request |
+| Compile latency | <500ms average |
+| Steganography detection (XMP) | ≥90% accuracy |
+
+**Sprint 6 (Beta Launch):**
+| Metric | Target |
+|--------|--------|
 | Merchants onboarded | 5-10 |
+| Products in beta | 100+ |
+| Steganography survival rate | ≥95% across platforms |
+| API uptime | 99.5% |
+
+**Sprint 8 (Production):**
+| Metric | Target |
+|--------|--------|
+| API uptime | 99.9% |
+| Compile latency (p99) | <500ms |
+| Support quality | <2 tickets/day |
+| Merchants live | 10+ production partners |
 
 ---
 
@@ -167,19 +193,21 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## Timeline
+## 8-Sprint Delivery Timeline (Feb - May 2026)
 
-| Milestone | Target Date | Status |
-|-----------|-------------|--------|
-| Sprint 0 (Setup) | Feb 2, 2026 | ✅ Complete |
-| Phase 0 (Validation) | Feb 28, 2026 | ✅ Implementation Complete, ⏳ Testing In Progress |
-| Foundation Complete | Apr 2026 | ⏳ Pending |
-| Core Complete (50%) | Jul 2026 | ⏳ Pending |
-| Browser Extension (75%) | Aug 2026 | ⏳ Pending |
-| Beta Launch | Oct 2026 | ⏳ Pending |
-| Public Launch | Dec 2026 | ⏳ Pending |
+| Sprint | Period | Goal | Status |
+|--------|--------|------|--------|
+| **Sprint 0** | Jan-Feb 2, 2026 | Setup & Architecture | Complete |
+| **Sprint 1** | Feb 3-16, 2026 | MVP v0: Compile-Resolve-Display | In Progress |
+| **Sprint 2** | Feb 17-Mar 2, 2026 | MVP v0 Polish + XMP Basics | Planned |
+| **Sprint 3** | Mar 3-9, 2026 | MVP v1: Batch & Tools | Planned |
+| **Sprint 4** | Mar 10-23, 2026 | MVP v2: Dashboard & Analytics | Planned |
+| **Sprint 5** | Mar 24-Apr 6, 2026 | Performance & Beta Prep | Planned |
+| **Sprint 6** | Apr 7-20, 2026 | Beta Launch | Planned |
+| **Sprint 7** | Apr 21-May 4, 2026 | Beta Fixes & Hardening | Planned |
+| **Sprint 8** | May 5-18, 2026 | Production Launch | Planned |
 
-**Current Status:** Phase 0 steganography implementation complete - XMP metadata injection/extraction and EOF binary append/extraction are fully implemented. Platform validation testing is in progress to measure survival rates across 20+ platforms. See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for details.
+**Current Status:** Scrum framework established. Sprint 1 (MVP vertical slice) begins Feb 3, 2026. Phase 0 steganography implementation complete - XMP metadata injection/extraction and EOF binary append/extraction are fully implemented. Platform validation testing is in progress to measure survival rates across 20+ platforms. See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) and [Scrum Master Plan](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) for details.
 
 ---
 
