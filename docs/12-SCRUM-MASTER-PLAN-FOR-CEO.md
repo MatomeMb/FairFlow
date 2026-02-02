@@ -88,13 +88,13 @@ Each sprint follows a **"Build → Evaluate → Test → Ship"** loop:
 
 All work must meet these criteria before marking **Done**:
 
-- ✅ **Code:** Builds without errors, no warnings (or documented technical debt)
-- ✅ **Tests:** Unit + integration tests written and passing (>80% coverage for MVP)
-- ✅ **Acceptance Criteria:** Story meets all defined criteria (confirmed by CEO)
-- ✅ **Documentation:** Code comments, API docs, or user docs updated
-- ✅ **Deployment:** Increment is deployable or shipped to staging/production
-- ✅ **No Known Defects:** Critical bugs fixed before sprint end
-- ✅ **Demo-Ready:** Can be shown to stakeholders without "work in progress" caveats
+- [X] **Code:** Builds without errors, no warnings (or documented technical debt)
+- [X] **Tests:** Unit + integration tests written and passing (>80% coverage for MVP)
+- [X] **Acceptance Criteria:** Story meets all defined criteria (confirmed by CEO)
+- [X] **Documentation:** Code comments, API docs, or user docs updated
+- [X] **Deployment:** Increment is deployable or shipped to staging/production
+- [X] **No Known Defects:** Critical bugs fixed before sprint end
+- [X] **Demo-Ready:** Can be shown to stakeholders without "work in progress" caveats
 
 ---
 
@@ -232,7 +232,7 @@ Each sprint:
 | Launch monitoring | 2 days | Metrics tracked, support on-call |
 | Post-launch metrics review | 1 day | KPIs vs. targets, retro notes |
 
-**Friday Release:** 🚀 **Public Launch**
+**Friday Release:** **Public Launch**
 
 ---
 
@@ -324,28 +324,28 @@ Each sprint:
 For each phase to close, ALL of these must be met:
 
 ### MVP v0 (End of Sprint 1)
-- ✅ Compile + resolve + display works end-to-end
-- ✅ All tests passing
-- ✅ CEO can demo to advisors without workarounds
-- ✅ No P0 bugs open
+- [X] Compile + resolve + display works end-to-end
+- [X] All tests passing
+- [X] CEO can demo to advisors without workarounds
+- [X] No P0 bugs open
 
 ### MVP v1–v2 (End of Sprint 4)
-- ✅ All MVP features (batch, auth, detection, analytics) working
-- ✅ Merchant onboarding flow validated
-- ✅ Performance targets met (< 500ms latency, > 99.5% uptime in staging)
-- ✅ No P0 bugs, < 3 P1 bugs open
+- [X] All MVP features (batch, auth, detection, analytics) working
+- [X] Merchant onboarding flow validated
+- [X] Performance targets met (< 500ms latency, > 99.5% uptime in staging)
+- [X] No P0 bugs, < 3 P1 bugs open
 
 ### Beta (End of Sprint 6)
-- ✅ 5–10 merchants successfully onboarded
-- ✅ At least 100 products compiled and resolved
-- ✅ Steganography detected in > 90% of beta images
-- ✅ Zero security vulnerabilities found
+- [X] 5–10 merchants successfully onboarded
+- [X] At least 100 products compiled and resolved
+- [X] Steganography detected in > 90% of beta images
+- [X] Zero security vulnerabilities found
 
 ### Production (End of Sprint 8)
-- ✅ Public API live, documented
-- ✅ 99.9% uptime on production
-- ✅ Support runbook tested and staffed
-- ✅ First cohort of merchants live, positive feedback
+- [X] Public API live, documented
+- [X] 99.9% uptime on production
+- [X] Support runbook tested and staffed
+- [X] First cohort of merchants live, positive feedback
 
 ---
 
