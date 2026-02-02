@@ -7,7 +7,7 @@
 |------------------|---------------------|
 | **Document Set Version** | 1.0 |
 | **Date Created** | January 21, 2026 |
-| **Total Documents** | 7 Core Documents + Execution Guide |
+| **Total Documents** | 7 Core Documents + Execution Guide + Scrum Pack (3) |
 
 ---
 
@@ -28,6 +28,9 @@ This folder contains the complete project documentation for **.things that Matte
 | 05 | [Risk Assessment](./05-RISK-ASSESSMENT.md) | Risk register, analysis, mitigation strategies | ~12 |
 | 06 | [Budget & Financials](./06-BUDGET-FINANCIAL-PROJECTIONS.md) | Detailed budget, cash flow, revenue projections | ~10 |
 | **CTO** | [**CTO Execution Guide**](./CTO-EXECUTION-GUIDE.md) | **Step-by-step professional guide for CTO execution** | **~30** |
+| 09 | [Scrum Operating Model](./09-SCRUM-OPERATING-MODEL.md) | Scrum cadence, DoD, build-evaluate-test-ship loop | ~5 |
+| 10 | [MVP Backlog](./10-MVP-BACKLOG.md) | Prioritized MVP scope and acceptance criteria | ~4 |
+| 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Active sprint goal, backlog, and DoD | ~3 |
 
 ---
 

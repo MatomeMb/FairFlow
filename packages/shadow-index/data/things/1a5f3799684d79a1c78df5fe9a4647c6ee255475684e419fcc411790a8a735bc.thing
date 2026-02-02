@@ -1,0 +1,9 @@
+{
+  "hash": "1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
+  "title": "Demo Product",
+  "price": 14999,
+  "currency": "USD",
+  "image_url": "https://example.com/demo.jpg",
+  "checkout_url": "https://example.com/buy",
+  "created_at": "2026-02-01T03:22:12.889Z"
+}

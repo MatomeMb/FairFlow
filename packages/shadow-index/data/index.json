@@ -1,0 +1,32 @@
+{
+  "1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc": {
+    "hash": "1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
+    "matter_uri": "matter://1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
+    "thing_url": "http://localhost:3000/thing/1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
+    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc.thing",
+    "image_url": "https://example.com/demo.jpg",
+    "checkout_url": "https://example.com/buy",
+    "gist": {
+      "title": "Demo Product",
+      "price": 14999,
+      "currency": "USD",
+      "image_url": "https://example.com/demo.jpg"
+    },
+    "created_at": "2026-02-01T03:22:12.889Z"
+  },
+  "212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4": {
+    "hash": "212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
+    "matter_uri": "matter://212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
+    "thing_url": "http://localhost:3000/thing/212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
+    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4.thing",
+    "image_url": "https://example.com/demo.jpg",
+    "checkout_url": "https://example.com/buy",
+    "gist": {
+      "title": "Demo Product",
+      "price": 14999,
+      "currency": "USD",
+      "image_url": "https://example.com/demo.jpg"
+    },
+    "created_at": "2026-02-01T03:23:56.468Z"
+  }
+}

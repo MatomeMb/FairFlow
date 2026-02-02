@@ -57,6 +57,8 @@ Phase 0 ─┼──────┼──────┤      │      │      
 | Distribution | 8 weeks | CDN, API, browser extension |
 | Launch | 8 weeks | Beta merchants, public release |
 
+**Scrum Cadence Note:** The roadmap remains the long-range view, but execution now follows **2-week Scrum sprints** with a shippable increment at each sprint end. The active sprint plan lives in `docs/11-SPRINT-1-PLAN.md` and the product backlog in `docs/10-MVP-BACKLOG.md`.
+
 ---
 
 ## 2. Detailed Sprint Breakdown

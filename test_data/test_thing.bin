@@ -1,0 +1,7 @@
+﻿MATTER_THING_V1
+This is a test .thing file for Phase 0 platform validation testing.
+It contains dummy data to test steganography survival across platforms.
+Product: Test Product
+Price: 2999
+Currency: USD
+Hash: test_hash_12345
