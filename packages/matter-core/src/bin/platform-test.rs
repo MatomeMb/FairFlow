@@ -50,10 +50,15 @@ fn main() -> Result<()> {
         }
         "test-extraction" => {
             if args.len() < 3 {
-                eprintln!("Usage: test-extraction <polyglot-image>");
+                eprintln!("Usage: test-extraction <polyglot-image> [--output <results.json>]");
                 std::process::exit(1);
             }
-            test_extraction(&args[2])?;
+            let polyglot_path = &args[2];
+            let output_path = args
+                .iter()
+                .position(|a| a == "--output")
+                .and_then(|i| args.get(i + 1).map(String::as_str));
+            test_extraction(polyglot_path, output_path)?;
         }
         "generate-report" => {
             if args.len() < 3 {
@@ -79,8 +84,8 @@ fn print_usage() {
     println!("  create-test-images <image> <thing-file> <output-dir>");
     println!("    Create test polyglot images for platform testing");
     println!();
-    println!("  test-extraction <polyglot-image>");
-    println!("    Test extraction from downloaded image");
+    println!("  test-extraction <polyglot-image> [--output <results.json>]");
+    println!("    Test extraction from downloaded image; optionally write JSON results");
     println!();
     println!("  generate-report <results-json>");
     println!("    Generate Phase 0 validation report");
@@ -161,18 +166,22 @@ fn create_test_images(image_path: &str, thing_path: &str, output_dir: &str) -> R
     Ok(())
 }
 
-fn test_extraction(polyglot_path: &str) -> Result<()> {
+fn test_extraction(polyglot_path: &str, output_path: Option<&str>) -> Result<()> {
     println!("Testing extraction from: {}", polyglot_path);
     println!();
-    
+
     let image_data = fs::read(polyglot_path)
         .with_context(|| format!("Failed to read image: {}", polyglot_path))?;
-    
+
+    let mut xmp_survives = false;
+    let mut eof_survives = false;
+
     // Test XMP extraction
     println!("Testing XMP extraction (Layer A)...");
     match matter_core::steg::extract_xmp_beacon(&image_data)? {
         Some(xmp) => {
             println!("  ✓ XMP metadata found");
+            xmp_survives = true;
             match matter_core::steg::parse_xmp_metadata(&xmp) {
                 Ok((hash, gist_json)) => {
                     println!("    Hash: {}", hash);
@@ -187,19 +196,43 @@ fn test_extraction(polyglot_path: &str) -> Result<()> {
             println!("  ✗ XMP metadata NOT found (platform may have stripped it)");
         }
     }
-    
+
     println!();
     println!("Testing EOF extraction (Layer B)...");
     match matter_core::steg::extract_thing_from_image(&image_data)? {
         Some(thing_data) => {
             println!("  ✓ .thing binary found at EOF");
             println!("    Size: {} bytes", thing_data.len());
+            eof_survives = true;
         }
         None => {
             println!("  ✗ .thing binary NOT found at EOF (platform may have stripped it)");
         }
     }
-    
+
+    if let Some(path) = output_path {
+        let name: String = PathBuf::from(polyglot_path)
+            .file_name()
+            .and_then(|n| n.to_str())
+            .unwrap_or("unknown")
+            .to_string();
+        let results = serde_json::json!({
+            "platforms": [
+                {
+                    "name": name,
+                    "file": polyglot_path,
+                    "xmp_survives": xmp_survives,
+                    "eof_survives": eof_survives
+                }
+            ],
+            "timestamp": chrono::Utc::now().to_rfc3339(),
+        });
+        fs::write(path, serde_json::to_string_pretty(&results)?)
+            .with_context(|| format!("Failed to write results to: {}", path))?;
+        println!();
+        println!("✓ Wrote results to: {}", path);
+    }
+
     Ok(())
 }
 

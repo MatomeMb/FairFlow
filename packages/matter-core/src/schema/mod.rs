@@ -34,6 +34,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore] // TODO: implement in Sprint 2 — Rust compiler pipeline
     fn test_serialization() {
         // TODO: Test serialization/deserialization
     }

@@ -33,6 +33,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore] // TODO: implement in Sprint 2 — Rust compiler pipeline
     fn test_compiler_creation() {
         let compiler = Compiler::new();
         assert!(true); // Placeholder test

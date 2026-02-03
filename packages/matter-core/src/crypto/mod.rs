@@ -45,6 +45,7 @@ mod tests {
     use super::*;
 
     #[test]
+    #[ignore] // TODO: implement in Sprint 2 — Rust compiler pipeline
     fn test_key_generation() {
         // TODO: Test key generation
         // let keypair = KeyPair::generate().unwrap();

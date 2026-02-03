@@ -30,7 +30,13 @@ This folder contains the complete project documentation for **.things that Matte
 | **CTO** | [**CTO Execution Guide**](./CTO-EXECUTION-GUIDE.md) | **Step-by-step professional guide for CTO execution** | **~30** |
 | 09 | [Scrum Operating Model](./09-SCRUM-OPERATING-MODEL.md) | Scrum cadence, DoD, build-evaluate-test-ship loop | ~5 |
 | 10 | [MVP Backlog](./10-MVP-BACKLOG.md) | Prioritized MVP scope and acceptance criteria | ~4 |
-| 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Active sprint goal, backlog, and DoD | ~3 |
+| 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Sprint 1 goal, backlog, and DoD | ~3 |
+| 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
+| — | [**Progress and Version**](./PROGRESS-AND-VERSION.md) | **Code version, sprint state, P1 stage** | ~2 |
+| — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | **Post–Sprint 1 actions and Sprint 2 readiness** | ~2 |
+| 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (P2) goal, backlog, scope to confirm | ~2 |
+| — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
+| — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
 
 ---
 

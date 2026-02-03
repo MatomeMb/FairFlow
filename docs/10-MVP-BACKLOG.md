@@ -78,3 +78,7 @@
 - Review and reprioritize each sprint planning
 - Split or re-scope any story > 2 days
 - Keep acceptance criteria crisp and testable
+
+---
+
+Last reviewed: Sprint 1 closeout (Feb 2026). No scope changes.
