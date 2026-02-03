@@ -94,7 +94,11 @@ All project documentation is organized in the `docs/` folder.
 | [**Scrum Master Plan for CEO**](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | **Complete 8-sprint roadmap, execution framework, and success criteria** |
 | [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
 | [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
-| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Initial sprint plan (Feb 3-16, 2026) |
+| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 plan (Feb 3-16, 2026) — **Complete, v0.1.0** |
+| [**Sprint 2 Plan**](./docs/12-SPRINT-2-PLAN.md) | **Sprint 2 P1 scope (Feb 17 – Mar 2, 2026) — Complete, v0.2.0** |
+| [**Sprint 2 Closeout**](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout memo: test commands, E2E sign-off, CEO sync points** |
+| [**Sprint 3 Plan**](./docs/13-SPRINT-3-PLAN.md) | **Sprint 3 P2 scope (Mar 3–16, 2026) — Planning phase** |
+| [**CEO Sync (Sprint 2)**](./docs/CEO-SYNC-SPRINT-2.md) | **One-pager: Sprint 2 features delivered, demo flow, Sprint 3 scope** |
 | [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Complete guide for setting up API keys |
 
 **Setup & Configuration:**
@@ -195,19 +199,41 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## 8-Sprint Delivery Timeline (Feb - May 2026)
 
-| Sprint | Period | Goal | Status |
-|--------|--------|------|--------|
-| **Sprint 0** | Jan-Feb 2, 2026 | Setup & Architecture | Complete |
-| **Sprint 1** | Feb 3-16, 2026 | MVP v0: Compile-Resolve-Display | In Progress |
-| **Sprint 2** | Feb 17-Mar 2, 2026 | MVP v0 Polish + XMP Basics | Planned |
-| **Sprint 3** | Mar 3-9, 2026 | MVP v1: Batch & Tools | Planned |
-| **Sprint 4** | Mar 10-23, 2026 | MVP v2: Dashboard & Analytics | Planned |
-| **Sprint 5** | Mar 24-Apr 6, 2026 | Performance & Beta Prep | Planned |
-| **Sprint 6** | Apr 7-20, 2026 | Beta Launch | Planned |
-| **Sprint 7** | Apr 21-May 4, 2026 | Beta Fixes & Hardening | Planned |
-| **Sprint 8** | May 5-18, 2026 | Production Launch | Planned |
+| Sprint | Period | Goal | Version | Status |
+|--------|--------|------|---------|--------|
+| **Sprint 0** | Jan-Feb 2, 2026 | Setup & Architecture | — | ✅ Complete |
+| **Sprint 1** | Feb 3-16, 2026 | MVP v0: Compile-Resolve-Display | **v0.1.0** | ✅ **Complete** |
+| **Sprint 2** | Feb 17-Mar 2, 2026 | MVP v0.1: XMP + Auth + Logging | **v0.2.0** | ✅ **Complete** |
+| **Sprint 3** | Mar 3-16, 2026 | MVP v1: Batch & Catalog | v0.3.0 | ⏳ Planning |
+| **Sprint 4** | Mar 17-30, 2026 | MVP v2: Dashboard & Analytics | v0.4.0 | ⏳ Planned |
+| **Sprint 5** | Mar 31-Apr 13, 2026 | Performance & Beta Prep | v0.5.0 | ⏳ Planned |
+| **Sprint 6** | Apr 14-27, 2026 | Beta Launch & Merchant Onboarding | v1.0.0-beta | ⏳ Planned |
+| **Sprint 7** | Apr 28-May 11, 2026 | Beta Fixes & Hardening | v1.0.0-rc | ⏳ Planned |
+| **Sprint 8** | May 12-25, 2026 | Production Launch | v1.0.0 | ⏳ Planned |
 
-**Current Status:** Scrum framework established. Sprint 1 (MVP vertical slice) begins Feb 3, 2026. Phase 0 steganography implementation complete - XMP metadata injection/extraction and EOF binary append/extraction are fully implemented. Platform validation testing is in progress to measure survival rates across 20+ platforms. See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) and [Scrum Master Plan](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) for details.
+**Current Status (Feb 3, 2026):**
+
+✅ **Sprint 2 Complete** — All P1 items shipped and tested.
+- **v0.1.0 (Sprint 1):** Core vertical slice (compile → resolve → display)
+- **v0.2.0 (Sprint 2):** XMP beacon detection, platform-test JSON logging, auth/rate limits, error handling
+
+**Features Delivered (Sprint 2):**
+- XMP beacon extraction from JPEG (APP1) and PNG (iTXt)
+- Image-click overlay trigger for embedded commerce metadata
+- Platform survival rate testing with JSON output
+- Optional API key authentication (x-api-key / Bearer token)
+- Rate limiting (100 req/min per IP)
+- Standardized error responses ({ code, message, details? })
+
+**Test Status:**
+- Vitest: 12/12 tests pass ✅
+- Cargo (Rust): 8/11 pass, 3 deferred ✅
+- Manual E2E: PASS (overlay displays correctly) ✅
+- Git tag: v0.2.0 pushed to origin ✅
+
+**Next:** Sprint 3 scope confirmation with CEO; batch compilation and merchant catalog import planned for Mar 3 start.
+
+See [CODEBASE-ANALYSIS.md](./CODEBASE-ANALYSIS.md) for exhaustive implementation details, test status, and production readiness assessment.
 
 ---
 
