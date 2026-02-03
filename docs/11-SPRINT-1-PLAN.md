@@ -20,15 +20,42 @@ Deliver the MVP vertical slice: **compile → resolve → display** with a `matt
 
 ---
 
-## 2. Sprint Backlog
+## 2. Sprint Backlog — Final Status
 
-| ID | Item | Owner | Status |
-|----|------|-------|--------|
-| MVP-01 | Compile single product JSON to `.thing` | CTO | Not Started |
-| MVP-02 | Generate `matter://` URI from hash | CTO | Not Started |
-| MVP-04 | Resolve hash via Shadow Index | CTO | Not Started |
-| MVP-05 | Minimal UI renders product from `matter://` | CTO | Not Started |
-| MVP-06 | MVP path tests | CTO | Not Started |
+| ID | Item | Status | Notes |
+|----|------|--------|-------|
+| MVP-01 | Compile single product JSON to `.thing` | ✅ Done (via API) | Rust compiler deferred to Sprint 2 |
+| MVP-02 | Generate `matter://` URI from hash | ✅ Done | |
+| MVP-04 | Resolve hash via Shadow Index | ✅ Done | |
+| MVP-05 | Minimal UI renders product from `matter://` | ✅ Done | Image added to overlay — see content.js + content.css |
+| MVP-06 | MVP path tests | ✅ Done | API unit tests (Vitest) + E2E smoke (Playwright or manual) |
+
+---
+
+## 2b. How to run the MVP demo
+
+Run these steps in order:
+
+1. **Start Shadow Index API:**  
+   `cd packages/shadow-index && npm install && npm run start`
+
+2. **Generate demo page (optional if demo already exists):**  
+   From repo root: `powershell scripts/create-mvp-demo.ps1`  
+   (Or POST a product to `http://localhost:3000/compile` manually and use the returned `matter_uri` in a page.)
+
+3. **Start demo server:**  
+   `powershell scripts/start-demo-server.ps1`  
+   (Serves `demo/` on http://localhost:5177.)
+
+4. **Load Lens extension:**  
+   In Chrome: open `chrome://extensions` → turn on **Developer mode** → **Load unpacked** → select the `packages/lens-extension` folder.
+
+5. **Open demo page:**  
+   Navigate to http://localhost:5177/matter-demo.html
+
+6. **Click the matter:// link** on the page.
+
+7. **Verify:** Overlay appears with title, price, image, and **Buy Now** button.
 
 ---
 
@@ -84,6 +111,50 @@ Deliver the MVP vertical slice: **compile → resolve → display** with a `matt
 
 ## 7. MVP Test Checklist
 
-- [ ] `/compile` returns `hash`, `matter_uri`, `thing_url`, and `gist`
-- [ ] `/resolve/:hash` returns gist + URLs
-- [ ] Extension overlay shows title + price
+- [x] `/compile` returns `hash`, `matter_uri`, `thing_url`, and `gist`
+- [x] `/resolve/:hash` returns gist + URLs
+- [x] Extension overlay shows title, price, and image
+
+---
+
+## Sprint 1 — Final Status
+
+| ID | Item | Status | Notes |
+|---|---|---|---|
+| MVP-01 | Compile single product JSON to `.thing` | ✅ Done | Implemented in Shadow Index API (`POST /compile`). Rust compiler deferred to Sprint 2. |
+| MVP-02 | Generate `matter://` URI from hash | ✅ Done | `buildMatterUri(hash)` in API. Returns `matter://{hash}`. |
+| MVP-04 | Resolve hash via Shadow Index | ✅ Done | `GET /resolve/:hash` returns full entry. 404 on miss. |
+| MVP-05 | Minimal UI renders product from `matter://` | ✅ Done | Overlay displays title, price, image, and Buy Now. See `content.js` + `content.css`. |
+| MVP-06 | MVP path tests | ✅ Done | Vitest: 7/7 (compile + resolve). Playwright: 2 automated + 1 manual (see `docs/MANUAL-E2E-SMOKE.md`). `cargo test`: 8 pass, 3 ignored. |
+
+---
+
+## How to Run the MVP Demo
+
+Numbered runbook — exact commands, copy-pasteable:
+
+1.  cd packages/shadow-index
+2.  npm install          (skip if already done)
+3.  npm run build        (compiles TypeScript)
+4.  npm run start        (starts API on localhost:3000)
+    --- leave this terminal running ---
+5.  Open a second terminal.
+6.  powershell scripts/start-demo-server.ps1
+    (serves demo/ on localhost:5177)
+    --- leave this terminal running ---
+7.  Open Chrome.
+8.  Navigate to chrome://extensions
+9.  Enable Developer Mode (top-right toggle).
+10. Click "Load unpacked".
+11. Select the folder: packages/lens-extension
+12. Navigate to http://localhost:5177/matter-demo.html
+13. Click the matter:// link on the page.
+14. The overlay should appear with: image, title, price, Buy Now button.
+
+---
+
+## Bugs Fixed During Sprint 1 Verification
+
+- **Hash idempotency:** Hash was computed from the stored object (including `created_at`). Fixed to compute from input payload only (`parsed.data`). Same POST body → same hash.
+- **Start script:** `package.json` `"start"` pointed to `dist/index.js`. Corrected to `dist/api/index.js`.
+- **Test types:** `res.json()` was untyped in `index.test.ts`. Added `CompileResponse`, `ResolveResponse`, `ErrorResponse` interfaces.

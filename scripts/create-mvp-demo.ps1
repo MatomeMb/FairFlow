@@ -7,7 +7,7 @@ $product = @{
   title = "Demo Product"
   price = 14999
   currency = "USD"
-  image_url = "https://example.com/demo.jpg"
+  image_url = "https://picsum.photos/seed/matter-demo/300/200"
   checkout_url = "https://example.com/buy"
 }
 

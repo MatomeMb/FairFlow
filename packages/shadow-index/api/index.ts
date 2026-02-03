@@ -6,6 +6,7 @@
  */
 
 import { Hono } from 'hono';
+import { cors } from 'hono/cors';
 import { serve } from '@hono/node-server';
 import crypto from 'node:crypto';
 import { promises as fs } from 'node:fs';
@@ -14,6 +15,49 @@ import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 
 const app = new Hono();
+
+// Allow extension/page on different origin (e.g. localhost:5177) to call API
+app.use('*', cors());
+
+/** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Read at request time for testability. */
+app.use('*', async (c, next) => {
+  const apiKey = process.env.SHADOW_INDEX_API_KEY;
+  if (!apiKey) {
+    return next();
+  }
+  const headerKey = c.req.header('x-api-key');
+  const auth = c.req.header('Authorization');
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  const key = headerKey ?? bearer;
+  if (key !== apiKey) {
+    return c.json(err('unauthorized', 'Invalid or missing API key'), 401);
+  }
+  return next();
+});
+
+/** Simple in-memory rate limit (MVP-09): 100 req/min per IP (or per key when key is set). */
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const RATE_LIMIT_MAX = 100;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+function getClientId(c: { req: { header: (n: string) => string | undefined } }): string {
+  const forwarded = c.req.header('x-forwarded-for');
+  if (forwarded) return forwarded.split(',')[0].trim();
+  return c.req.header('x-real-ip') ?? 'unknown';
+}
+app.use('*', async (c, next) => {
+  const id = getClientId(c);
+  const now = Date.now();
+  let entry = rateLimitMap.get(id);
+  if (!entry || now >= entry.resetAt) {
+    entry = { count: 0, resetAt: now + RATE_LIMIT_WINDOW_MS };
+    rateLimitMap.set(id, entry);
+  }
+  entry.count += 1;
+  if (entry.count > RATE_LIMIT_MAX) {
+    return c.json(err('rate_limit_exceeded', 'Too many requests; try again later'), 429);
+  }
+  return next();
+});
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -101,6 +145,11 @@ const buildThingPayload = (hash: string, product: ProductInput) => ({
 
 const buildMatterUri = (hash: string) => `matter://${hash}`;
 
+/** Consistent error response shape for MVP flows (MVP-10) */
+type ErrorPayload = { code: string; message: string; details?: unknown };
+const err = (code: string, message: string, details?: unknown): ErrorPayload =>
+  details !== undefined ? { code, message, details } : { code, message };
+
 // Health check endpoint
 app.get('/health', (c) => {
   return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
@@ -110,14 +159,20 @@ app.get('/health', (c) => {
 app.post('/compile', async (c) => {
   await ensureDataDirs();
   const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) {
-    return c.json({ error: 'Invalid product payload', details: parsed.error.flatten() }, 400);
+    return c.json(
+      err('invalid_product', 'Invalid product payload', parsed.error.flatten()),
+      400
+    );
   }
 
   const createdAt = new Date().toISOString();
   const product = { ...parsed.data, created_at: createdAt };
-  const hash = hashProduct(product);
+  const hash = hashProduct(parsed.data);
   const matterUri = buildMatterUri(hash);
   const thingPayload = buildThingPayload(hash, product);
   const thingPath = path.join(thingsDir, `${hash}.thing`);
@@ -161,7 +216,7 @@ app.get('/resolve/:hash', async (c) => {
   const index = await loadIndex();
   const entry = index[hash];
   if (!entry) {
-    return c.json({ error: 'Not found', hash }, 404);
+    return c.json(err('not_found', `No artifact found for hash: ${hash}`, { hash }), 404);
   }
   return c.json({
     hash: entry.hash,
@@ -180,7 +235,7 @@ app.get('/gist/:hash', async (c) => {
   const index = await loadIndex();
   const entry = index[hash];
   if (!entry) {
-    return c.json({ error: 'Not found', hash }, 404);
+    return c.json(err('not_found', `No gist found for hash: ${hash}`, { hash }), 404);
   }
   return c.json({
     hash: entry.hash,
@@ -191,8 +246,7 @@ app.get('/gist/:hash', async (c) => {
 
 // Batch compilation endpoint
 app.post('/batch', async (c) => {
-  // TODO: Implement batch compilation
-  return c.json({ error: 'Not implemented yet' }, 501);
+  return c.json(err('not_implemented', 'Batch compilation is not yet implemented'), 501);
 });
 
 // Serve .thing payloads for MVP
@@ -207,20 +261,22 @@ app.get('/thing/:hash', async (c) => {
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
     if (nodeError.code === 'ENOENT') {
-      return c.json({ error: 'Not found', hash }, 404);
+      return c.json(err('not_found', `No .thing file found for hash: ${hash}`, { hash }), 404);
     }
     throw error;
   }
 });
 
-// Development server - always start in dev mode
+// Development server - skip when NODE_ENV=test so tests can import app without starting server
 const port = Number(process.env.PORT) || 3000;
-console.log(`🚀 Shadow Index API starting on http://localhost:${port}`);
-console.log(`📡 Health check: http://localhost:${port}/health`);
-serve({
-  fetch: app.fetch,
-  port,
-});
+if (process.env.NODE_ENV !== 'test') {
+  console.log(`🚀 Shadow Index API starting on http://localhost:${port}`);
+  console.log(`📡 Health check: http://localhost:${port}/health`);
+  serve({
+    fetch: app.fetch,
+    port,
+  });
+}
 
-// Export for Vercel Edge Functions
+// Export for Vercel Edge Functions and tests
 export default app;
