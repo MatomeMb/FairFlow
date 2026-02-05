@@ -28,5 +28,32 @@
       "image_url": "https://example.com/demo.jpg"
     },
     "created_at": "2026-02-01T03:23:56.468Z"
+  },
+  "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96": {
+    "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+    "matter_uri": "matter://bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+    "thing_url": "http://localhost:3000/thing/bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96.thing",
+    "image_url": "https://example.com/demo.jpg",
+    "checkout_url": "https://example.com/buy",
+    "gist": {
+      "title": "Vitest Demo Product",
+      "price": 9999,
+      "currency": "USD",
+      "image_url": "https://example.com/demo.jpg"
+    },
+    "created_at": "2026-02-05T07:04:24.371Z"
+  },
+  "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0": {
+    "hash": "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
+    "matter_uri": "matter://659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
+    "thing_url": "http://localhost:3000/thing/659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
+    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0.thing",
+    "gist": {
+      "title": "Resolve Test",
+      "price": 1999,
+      "currency": "USD"
+    },
+    "created_at": "2026-02-05T07:04:24.398Z"
   }
 }

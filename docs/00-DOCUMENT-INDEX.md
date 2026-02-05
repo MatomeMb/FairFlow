@@ -34,9 +34,11 @@ This folder contains the complete project documentation for **.things that Matte
 | 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
 | — | [**Progress and Version**](./PROGRESS-AND-VERSION.md) | **Code version, sprint state, P1 stage** | ~2 |
 | — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | **Post–Sprint 1 actions and Sprint 2 readiness** | ~2 |
-| 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (P2) goal, backlog, scope to confirm | ~2 |
+| 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
+| — | [**Next Steps (Sprint 3)**](./NEXT-STEPS-SPRINT-3.md) | **Step-by-step R2 setup, .env, verify-r2, Day 2 API wiring (with links)** | ~4 |
 | — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
 | — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
+| — | [**Project State Clarification**](./PROJECT-STATE-CLARIFICATION.md) | **Verification results, date paradox resolution, Sprint 1 checklist** | ~2 |
 
 ---
 

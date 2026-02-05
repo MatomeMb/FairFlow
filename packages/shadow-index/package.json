@@ -7,8 +7,9 @@
   "scripts": {
     "dev": "tsx watch api/index.ts",
     "build": "tsc",
-    "start": "node dist/api/index.js",
+    "start": "node run-with-env.mjs",
     "test": "vitest",
+    "verify-r2": "node scripts/verify-r2.mjs",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\""

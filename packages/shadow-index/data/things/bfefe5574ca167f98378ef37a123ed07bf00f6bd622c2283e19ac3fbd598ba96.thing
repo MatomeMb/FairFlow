@@ -1,0 +1,9 @@
+{
+  "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+  "title": "Vitest Demo Product",
+  "price": 9999,
+  "currency": "USD",
+  "image_url": "https://example.com/demo.jpg",
+  "checkout_url": "https://example.com/buy",
+  "created_at": "2026-02-05T07:04:24.371Z"
+}

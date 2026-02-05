@@ -1,11 +1,16 @@
 /**
  * Shadow Index API — MVP path tests (compile + resolve + health).
- * Prerequisites: run 'npm run start' in packages/shadow-index before running tests.
+ * Uses app.request() so no server required; all tests run in-process.
  */
 
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
+import app from './index';
 
-const BASE = 'http://localhost:3000';
+const BASE = 'http://localhost';
+
+async function request(path: string, init?: RequestInit): Promise<Response> {
+  return app.request(new Request(`${BASE}${path}`, init));
+}
 
 type CompileResponse = {
   hash: string;
@@ -36,7 +41,7 @@ describe('POST /compile', () => {
   };
 
   it('valid product body → 200', async () => {
-    const res = await fetch(`${BASE}/compile`, {
+    const res = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(validProduct),
@@ -53,7 +58,7 @@ describe('POST /compile', () => {
   });
 
   it('invalid JSON body → 400', async () => {
-    const res = await fetch(`${BASE}/compile`, {
+    const res = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: 'not json',
@@ -64,7 +69,7 @@ describe('POST /compile', () => {
   });
 
   it('missing required field → 400', async () => {
-    const res = await fetch(`${BASE}/compile`, {
+    const res = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ price: 100, currency: 'USD' }),
@@ -76,7 +81,7 @@ describe('POST /compile', () => {
   });
 
   it('invalid price type → 400', async () => {
-    const res = await fetch(`${BASE}/compile`, {
+    const res = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -89,12 +94,12 @@ describe('POST /compile', () => {
   });
 
   it('idempotent hash — same body twice returns same hash', async () => {
-    const res1 = await fetch(`${BASE}/compile`, {
+    const res1 = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(validProduct),
     });
-    const res2 = await fetch(`${BASE}/compile`, {
+    const res2 = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(validProduct),
@@ -109,7 +114,7 @@ describe('POST /compile', () => {
 
 describe('GET /resolve/:hash', () => {
   it('known hash → 200', async () => {
-    const compileRes = await fetch(`${BASE}/compile`, {
+    const compileRes = await request('/compile', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -120,7 +125,7 @@ describe('GET /resolve/:hash', () => {
     });
     const compileBody = (await compileRes.json()) as CompileResponse;
     const { hash } = compileBody;
-    const res = await fetch(`${BASE}/resolve/${hash}`);
+    const res = await request(`/resolve/${hash}`);
     expect(res.status).toBe(200);
     const body = (await res.json()) as ResolveResponse;
     expect(body.hash).toBe(hash);
@@ -131,8 +136,8 @@ describe('GET /resolve/:hash', () => {
   });
 
   it('unknown hash → 404', async () => {
-    const res = await fetch(
-      `${BASE}/resolve/0000000000000000000000000000000000000000000000000000000000000000`
+    const res = await request(
+      '/resolve/0000000000000000000000000000000000000000000000000000000000000000'
     );
     expect(res.status).toBe(404);
   });
@@ -140,21 +145,21 @@ describe('GET /resolve/:hash', () => {
 
 describe('GET /health', () => {
   it('returns 200', async () => {
-    const res = await fetch(`${BASE}/health`);
+    const res = await request('/health');
     expect(res.status).toBe(200);
   });
 });
 
-// MVP-09: Auth (optional API key). Uses app.request() so no server required; env set before import.
+// MVP-09: Auth (optional API key). Uses app.request(); env set before import.
 describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
-  let app: { request: (req: Request) => Response | Promise<Response> };
+  let appWithKey: typeof app;
 
   beforeAll(async () => {
     (globalThis as unknown as { __saved_api_key?: string }).__saved_api_key =
       process.env.SHADOW_INDEX_API_KEY;
     process.env.SHADOW_INDEX_API_KEY = 'testkey';
     const mod = await import('./index');
-    app = mod.default;
+    appWithKey = mod.default;
   });
 
   afterAll(() => {
@@ -164,8 +169,8 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
   });
 
   it('returns 401 when API key is missing', async () => {
-    const res = await app.request(
-      new Request('http://localhost/health', {
+    const res = await appWithKey.request(
+      new Request(`${BASE}/health`, {
         headers: { 'x-forwarded-for': 'test-auth-1' },
       })
     );
@@ -175,8 +180,8 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
   });
 
   it('returns 401 when API key is wrong', async () => {
-    const res = await app.request(
-      new Request('http://localhost/health', {
+    const res = await appWithKey.request(
+      new Request(`${BASE}/health`, {
         headers: { 'x-api-key': 'wrong', 'x-forwarded-for': 'test-auth-2' },
       })
     );
@@ -186,8 +191,8 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
   });
 
   it('returns 200 when x-api-key is valid', async () => {
-    const res = await app.request(
-      new Request('http://localhost/health', {
+    const res = await appWithKey.request(
+      new Request(`${BASE}/health`, {
         headers: { 'x-api-key': 'testkey', 'x-forwarded-for': 'test-auth-3' },
       })
     );
@@ -195,8 +200,8 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
   });
 
   it('returns 200 when Authorization Bearer is valid', async () => {
-    const res = await app.request(
-      new Request('http://localhost/health', {
+    const res = await appWithKey.request(
+      new Request(`${BASE}/health`, {
         headers: { Authorization: 'Bearer testkey', 'x-forwarded-for': 'test-auth-4' },
       })
     );

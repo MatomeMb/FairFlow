@@ -19,6 +19,6 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["api/**/*", "src/**/*"],
+  "include": ["api/**/*", "lib/**/*", "src/**/*"],
   "exclude": ["node_modules", "dist"]
 }
