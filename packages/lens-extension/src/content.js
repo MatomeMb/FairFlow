@@ -6,8 +6,24 @@
 
 console.log('Lens extension content script loaded');
 
-const SHADOW_INDEX_BASE_URL = 'http://localhost:3000';
 let activeOverlay = null;
+
+/** Resolve hash via background (cache-first). Returns resolve payload or throws. */
+const resolveHash = (hash) =>
+  new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ type: 'resolve', hash }, (response) => {
+      if (chrome.runtime.lastError) {
+        reject(new Error(chrome.runtime.lastError.message || 'Extension error'));
+        return;
+      }
+      if (response && response.ok === true && response.data) {
+        resolve(response.data);
+        return;
+      }
+      const err = (response && typeof response.error === 'string') ? response.error : 'Resolve failed';
+      reject(new Error(err));
+    });
+  });
 
 // MVP-07: XMP beacon detection — extract Matter hash + gist from image bytes
 const XMP_JPEG_NS = new TextEncoder().encode('http://ns.adobe.com/xap/1.0/\0');
@@ -135,16 +151,6 @@ const renderOverlay = (target, data) => {
   activeOverlay = overlay;
 };
 
-const fetchResolve = async (hash) => {
-  const response = await fetch(`${SHADOW_INDEX_BASE_URL}/resolve/${hash}`);
-  if (!response.ok) {
-    const errBody = await response.json().catch(() => ({}));
-    const message = errBody.message && typeof errBody.message === 'string' ? errBody.message : 'Resolve failed';
-    throw new Error(message);
-  }
-  return response.json();
-};
-
 const handleMatterLink = async (link) => {
   const href = link.getAttribute('href');
   if (!href || !href.startsWith('matter://')) {
@@ -157,7 +163,7 @@ const handleMatterLink = async (link) => {
 
   renderOverlay(link, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
   try {
-    const data = await fetchResolve(hash);
+    const data = await resolveHash(hash);
     renderOverlay(link, data);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to load';
@@ -190,7 +196,7 @@ const handleImageClick = async (img) => {
   if (!beacon) return;
   renderOverlay(img, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
   try {
-    const data = await fetchResolve(beacon.hash);
+    const data = await resolveHash(beacon.hash);
     renderOverlay(img, data);
   } catch (error) {
     let gist = { title: 'Unknown', price: 0, currency: 'USD' };

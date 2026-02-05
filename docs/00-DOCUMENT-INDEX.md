@@ -40,6 +40,7 @@ This folder contains the complete project documentation for **.things that Matte
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
 | 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
 | 16 | [**Weekly Work Plan**](./16-WEEKLY-WORK-PLAN.md) | **Day-by-day work for each week; realistic hour estimates; Sprints 5–8 daily tasks** | ~10 |
+| 17 | [**MVP-13 Acceptance & Schema**](./17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | **Extension caching: acceptance criteria and IndexedDB schema (Sprint 2)** | ~4 |
 | — | [**Next Steps (Sprint 3)**](./NEXT-STEPS-SPRINT-3.md) | **Step-by-step R2 setup, .env, verify-r2, Day 2 API wiring (with links)** | ~4 |
 | — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
 | — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
