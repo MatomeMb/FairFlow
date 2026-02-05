@@ -120,33 +120,54 @@ const renderOverlay = (target, data) => {
   const imageUrl = data?.image_url || data?.gist?.image_url;
   const title = data?.gist?.title || 'Unknown Product';
 
-  overlay.innerHTML = `
-    <h3>${title}</h3>
-    <div class="price">${formatPrice(data?.gist?.price, data?.gist?.currency)}</div>
-    <button class="buy-button">Buy Now</button>
-  `;
+  // Build DOM with DocumentFragment to minimize reflows
+  const fragment = document.createDocumentFragment();
 
+  // Lazy-load image: only if URL is valid
   if (imageUrl && typeof imageUrl === 'string' && imageUrl.trim() !== '') {
     const img = document.createElement('img');
     img.className = 'matter-overlay-image';
-    img.src = imageUrl;
     img.alt = title;
+    // Set loading="lazy" for better performance
+    img.setAttribute('loading', 'lazy');
+    img.src = imageUrl;
     img.onerror = () => {
       img.style.display = 'none';
     };
-    overlay.insertBefore(img, overlay.firstChild);
+    fragment.appendChild(img);
   }
 
-  const button = overlay.querySelector('.buy-button');
-  button.addEventListener('click', () => {
-    if (data?.checkout_url) {
-      window.open(data.checkout_url, '_blank', 'noopener');
-    }
-  });
+  // Add title
+  const titleEl = document.createElement('h3');
+  titleEl.textContent = title; // Use textContent instead of innerHTML for safety
+  fragment.appendChild(titleEl);
 
+  // Add price
+  const priceEl = document.createElement('div');
+  priceEl.className = 'price';
+  priceEl.textContent = formatPrice(data?.gist?.price, data?.gist?.currency);
+  fragment.appendChild(priceEl);
+
+  // Add button
+  const button = document.createElement('button');
+  button.className = 'buy-button';
+  button.textContent = 'Buy Now';
+  if (data?.checkout_url) {
+    button.addEventListener('click', () => {
+      window.open(data.checkout_url, '_blank', 'noopener');
+    });
+  }
+  fragment.appendChild(button);
+
+  // Append fragment (single reflow) instead of individual elements
+  overlay.appendChild(fragment);
+
+  // Position after all DOM operations to minimize reflows
   const rect = target.getBoundingClientRect();
   overlay.style.top = `${rect.bottom + window.scrollY + 8}px`;
   overlay.style.left = `${rect.left + window.scrollX}px`;
+  
+  // Append to DOM once at the end
   document.body.appendChild(overlay);
   activeOverlay = overlay;
 };
