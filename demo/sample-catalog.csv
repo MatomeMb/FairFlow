@@ -1,0 +1,4 @@
+title,price,currency,image_url,checkout_url
+Demo Widget,1999,USD,https://picsum.photos/200/200,https://example.com/buy/widget
+Quick Gadget,499,EUR,,https://example.com/buy/gadget
+Test Product,100,USD,https://picsum.photos/200/201,

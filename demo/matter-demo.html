@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -38,17 +38,46 @@
         font-size: 12px;
         color: #6b7280;
       }
+      input {
+        width: 100%;
+        padding: 10px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        font-size: 14px;
+        margin-bottom: 12px;
+      }
+      .click-link {
+        display: inline-block;
+        margin-top: 8px;
+      }
     </style>
   </head>
   <body>
     <div class="card">
       <h1>Matter MVP Demo</h1>
-      <p>Click the link to trigger the Lens overlay.</p>
+      <p>Paste a <code>matter://</code> URI below, then click the link to trigger the Lens overlay.</p>
+      <label for="uri">Matter URI</label>
+      <input
+        type="text"
+        id="uri"
+        placeholder="matter://36276c34c92ab5c91ac5ee9bf1d0b4995a3a6bba4a4c82241e8c40bc8acfab9c"
+        value="matter://36276c34c92ab5c91ac5ee9bf1d0b4995a3a6bba4a4c82241e8c40bc8acfab9c"
+      />
       <p>
-        Link:
-        <a href="matter://45c2bee2699cf3bbf3cae468d27bad04a3bf516afa9cb3bd1235eaaa2c106495">matter://45c2bee2699cf3bbf3cae468d27bad04a3bf516afa9cb3bd1235eaaa2c106495</a>
+        Link: <a href="#" id="link" class="click-link">Click here</a>
       </p>
-      <p class="hint">Generated from Shadow Index: http://localhost:3000</p>
+      <p class="hint">Uses Shadow Index: http://localhost:3000. Install the Lens extension to see the overlay.</p>
     </div>
+    <script>
+      const input = document.getElementById('uri');
+      const link = document.getElementById('link');
+      function update() {
+        const v = (input.value || '').trim();
+        link.href = v.startsWith('matter://') ? v : 'matter://' + v;
+        link.textContent = link.href;
+      }
+      input.addEventListener('input', update);
+      update();
+    </script>
   </body>
 </html>

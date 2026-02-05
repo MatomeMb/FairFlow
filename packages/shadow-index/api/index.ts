@@ -142,43 +142,81 @@ const hashProduct = (product: Record<string, unknown>): string => {
   return crypto.createHash('sha256').update(payload).digest('hex');
 };
 
-const buildThingPayload = (hash: string, product: ProductInput) => ({
-  hash,
-  ...product,
-});
-
 const buildMatterUri = (hash: string) => `matter://${hash}`;
+
+/** Configurable batch size cap (Sprint 4 — MVP-11). Default 100. */
+const BATCH_MAX_SIZE = Math.min(
+  Math.max(1, parseInt(process.env.BATCH_MAX_SIZE ?? '100', 10) || 100),
+  500
+);
 
 /** Consistent error response shape for MVP flows (MVP-10) */
 type ErrorPayload = { code: string; message: string; details?: unknown };
 const err = (code: string, message: string, details?: unknown): ErrorPayload =>
   details !== undefined ? { code, message, details } : { code, message };
 
-// Health check endpoint
-app.get('/health', (c) => {
-  return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
-});
+/** Parse CSV body to array of product-like objects. Header: title,price,currency,image_url,checkout_url (order flexible). */
+function parseCsvToProducts(csvBody: string): {
+  products: Array<Record<string, unknown>>;
+  rowErrors: Array<{ row: number; message: string }>;
+} {
+  const rowErrors: Array<{ row: number; message: string }> = [];
+  const lines = csvBody.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+  if (lines.length < 2) {
+    return { products: [], rowErrors: lines.length === 0 ? [{ row: 0, message: 'Empty file' }] : [{ row: 1, message: 'No data rows' }] };
+  }
+  const headerLine = lines[0].toLowerCase();
+  const headers = headerLine.split(',').map((h) => h.trim().toLowerCase());
+  const titleIdx = headers.indexOf('title');
+  const priceIdx = headers.indexOf('price');
+  const currencyIdx = headers.indexOf('currency');
+  const imageUrlIdx = headers.indexOf('image_url');
+  const checkoutUrlIdx = headers.indexOf('checkout_url');
+  if (titleIdx === -1 || priceIdx === -1 || currencyIdx === -1) {
+    return { products: [], rowErrors: [{ row: 0, message: 'CSV must have header: title, price, currency' }] };
+  }
+  const products: Array<Record<string, unknown>> = [];
+  for (let i = 1; i < lines.length; i++) {
+    const row = lines[i];
+    const values = row.split(',').map((v) => v.trim());
+    const title = values[titleIdx] ?? '';
+    const priceRaw = values[priceIdx] ?? '';
+    const price = parseInt(priceRaw, 10);
+    const currency = (values[currencyIdx] ?? '').toUpperCase().slice(0, 3);
+    const image_url = imageUrlIdx >= 0 ? (values[imageUrlIdx] ?? undefined) : undefined;
+    const checkout_url = checkoutUrlIdx >= 0 ? (values[checkoutUrlIdx] ?? undefined) : undefined;
+    if (!title) {
+      rowErrors.push({ row: i + 1, message: 'Missing title' });
+      continue;
+    }
+    if (Number.isNaN(price) || price < 0) {
+      rowErrors.push({ row: i + 1, message: `Invalid price: ${priceRaw}` });
+      continue;
+    }
+    if (!currency || currency.length !== 3) {
+      rowErrors.push({ row: i + 1, message: `Invalid currency: ${values[currencyIdx] ?? ''}` });
+      continue;
+    }
+    const obj: Record<string, unknown> = { title, price, currency };
+    if (image_url) obj.image_url = image_url;
+    if (checkout_url) obj.checkout_url = checkout_url;
+    products.push(obj);
+  }
+  return { products, rowErrors };
+}
 
-// Compile endpoint - transforms product data into .thing file
-app.post('/compile', async (c) => {
+/** Single-product compile and persist. Shared by POST /compile and POST /batch (Sprint 4). */
+async function compileAndPersistProduct(product: ProductInput): Promise<{
+  hash: string;
+  matter_uri: string;
+  thing_url: string;
+  gist: StoredThing['gist'];
+}> {
   await ensureDataDirs();
-  const body = await c.req.json().catch(() => null);
-  if (body === null || body === undefined) {
-    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
-  }
-  const parsed = productSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(
-      err('invalid_product', 'Invalid product payload', parsed.error.flatten()),
-      400
-    );
-  }
-
   const createdAt = new Date().toISOString();
-  const product = { ...parsed.data, created_at: createdAt };
-  const hash = hashProduct(parsed.data);
+  const hash = hashProduct(product);
   const matterUri = buildMatterUri(hash);
-  const thingPayload = buildThingPayload(hash, product);
+  const thingPayload = { hash, ...product, created_at: createdAt };
   const thingPath = path.join(thingsDir, `${hash}.thing`);
 
   let thingUrl: string;
@@ -198,24 +236,49 @@ app.post('/compile', async (c) => {
     matter_uri: matterUri,
     thing_url: thingUrl,
     thing_path: useR2 ? thingUrl : thingPath,
-    image_url: parsed.data.image_url,
-    checkout_url: parsed.data.checkout_url,
+    image_url: product.image_url,
+    checkout_url: product.checkout_url,
     gist: {
-      title: parsed.data.title,
-      price: parsed.data.price,
-      currency: parsed.data.currency,
-      image_url: parsed.data.image_url,
+      title: product.title,
+      price: product.price,
+      currency: product.currency,
+      image_url: product.image_url,
     },
     created_at: createdAt,
   };
   await saveIndex(index);
 
-  return c.json({
+  return {
     hash,
     matter_uri: matterUri,
     thing_url: thingUrl,
-    image_url: parsed.data.image_url,
     gist: index[hash].gist,
+  };
+}
+
+// Health check endpoint
+app.get('/health', (c) => {
+  return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
+});
+
+// Compile endpoint - transforms product data into .thing file (uses shared compileAndPersistProduct)
+app.post('/compile', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+  const parsed = productSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(
+      err('invalid_product', 'Invalid product payload', parsed.error.flatten()),
+      400
+    );
+  }
+
+  const result = await compileAndPersistProduct(parsed.data);
+  return c.json({
+    ...result,
+    image_url: parsed.data.image_url,
     checkout_url: parsed.data.checkout_url,
   });
 });
@@ -254,9 +317,135 @@ app.get('/gist/:hash', async (c) => {
   });
 });
 
-// Batch compilation endpoint
+// Batch compilation endpoint (Sprint 4 — MVP-11)
+const batchBodySchema = z.object({ products: z.array(z.unknown()) });
 app.post('/batch', async (c) => {
-  return c.json(err('not_implemented', 'Batch compilation is not yet implemented'), 501);
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+  const parsed = batchBodySchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(
+      err('invalid_batch', 'Request body must be { products: Product[] }', parsed.error.flatten()),
+      400
+    );
+  }
+
+  const products = parsed.data.products as Array<Record<string, unknown>>;
+  if (products.length > BATCH_MAX_SIZE) {
+    return c.json(
+      err('batch_too_large', `Maximum batch size is ${BATCH_MAX_SIZE}`, {
+        max: BATCH_MAX_SIZE,
+        received: products.length,
+      }),
+      400
+    );
+  }
+  if (products.length === 0) {
+    return c.json(
+      err('empty_batch', 'products array must not be empty'),
+      400
+    );
+  }
+
+  const results: Array<{ hash: string; matter_uri: string; thing_url: string; gist: StoredThing['gist'] }> = [];
+  const errors: Array<{ index: number; code: string; message: string }> = [];
+
+  for (let i = 0; i < products.length; i++) {
+    const product = products[i];
+    const validated = productSchema.safeParse(product);
+    if (!validated.success) {
+      const msg = validated.error.errors.map((e) => e.message).join('; ');
+      errors.push({ index: i, code: 'invalid_product', message: msg });
+      continue;
+    }
+    try {
+      const result = await compileAndPersistProduct(validated.data);
+      results.push(result);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      errors.push({ index: i, code: 'compile_failed', message });
+    }
+  }
+
+  const status = errors.length > 0 && results.length > 0 ? 207 : errors.length > 0 ? 400 : 200;
+  return c.json({ results, errors }, status);
+});
+
+// Catalog import (Sprint 4 — MVP-12): JSON array or CSV
+app.post('/catalog/import', async (c) => {
+  const contentType = c.req.header('Content-Type') ?? '';
+  let products: Array<Record<string, unknown>>;
+  const importErrors: Array<{ index: number; code: string; message: string }> = [];
+
+  if (contentType.includes('text/csv')) {
+    const raw = await c.req.text();
+    const { products: parsed, rowErrors } = parseCsvToProducts(raw);
+    products = parsed;
+    rowErrors.forEach((e) => importErrors.push({ index: e.row, code: 'invalid_row', message: e.message }));
+  } else if (contentType.includes('application/json')) {
+    const body = await c.req.json().catch(() => null);
+    if (body === null || body === undefined) {
+      return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+    }
+    const parsed = z.object({ products: z.array(z.unknown()) }).safeParse(body);
+    if (!parsed.success) {
+      return c.json(
+        err('invalid_body', 'Body must be { products: Product[] }', parsed.error.flatten()),
+        400
+      );
+    }
+    products = parsed.data.products as Array<Record<string, unknown>>;
+  } else {
+    return c.json(
+      err('unsupported_media', 'Content-Type must be application/json or text/csv'),
+      400
+    );
+  }
+
+  if (products.length > BATCH_MAX_SIZE) {
+    return c.json(
+      err('batch_too_large', `Maximum batch size is ${BATCH_MAX_SIZE}`, {
+        max: BATCH_MAX_SIZE,
+        received: products.length,
+      }),
+      400
+    );
+  }
+  if (products.length === 0 && importErrors.length === 0) {
+    return c.json(err('empty_import', 'No valid products to import'), 400);
+  }
+
+  const results: Array<{ hash: string; matter_uri: string; thing_url: string; gist: StoredThing['gist'] }> = [];
+  const errors: Array<{ index: number; code: string; message: string }> = [...importErrors];
+
+  for (let i = 0; i < products.length; i++) {
+    const validated = productSchema.safeParse(products[i]);
+    if (!validated.success) {
+      const msg = validated.error.errors.map((e) => e.message).join('; ');
+      errors.push({ index: i, code: 'invalid_product', message: msg });
+      continue;
+    }
+    try {
+      const result = await compileAndPersistProduct(validated.data);
+      results.push(result);
+    } catch (e) {
+      const message = e instanceof Error ? e.message : String(e);
+      errors.push({ index: i, code: 'compile_failed', message });
+    }
+  }
+
+  const status = errors.length > 0 && results.length > 0 ? 207 : errors.length > 0 ? 400 : 200;
+  return c.json(
+    {
+      results,
+      errors,
+      imported: results.length,
+      failed: errors.length,
+    },
+    status
+  );
 });
 
 // Serve .thing payloads for MVP (from R2 or local)
