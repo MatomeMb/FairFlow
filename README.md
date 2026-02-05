@@ -77,7 +77,7 @@ Every product processed by our compiler exists simultaneously as:
 
 ## Documentation
 
-All project documentation is organized in the `docs/` folder.
+All project documentation is in the `docs/` folder. **Current plan and status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md) (single source of truth), [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) (revised 8-sprint schedule), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) (day-by-day estimates).
 
 | Document | Description |
 |----------|-------------|
@@ -160,35 +160,9 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Sprint 1 (MVP v0):**
-| Metric | Target |
-|--------|--------|
-| Compile → Resolve → Display pipeline | Fully functional end-to-end |
-| E2E test coverage | 100% of MVP path |
-| Demo readiness | Zero workarounds |
+**Delivered (Sprints 1–4):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits. See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
 
-**Sprint 4 (MVP v2 Complete):**
-| Metric | Target |
-|--------|--------|
-| .thing files batch compilation | 100+ per request |
-| Compile latency | <500ms average |
-| Steganography detection (XMP) | ≥90% accuracy |
-
-**Sprint 6 (Beta Launch):**
-| Metric | Target |
-|--------|--------|
-| Merchants onboarded | 5-10 |
-| Products in beta | 100+ |
-| Steganography survival rate | ≥95% across platforms |
-| API uptime | 99.5% |
-
-**Sprint 8 (Production):**
-| Metric | Target |
-|--------|--------|
-| API uptime | 99.9% |
-| Compile latency (p99) | <500ms |
-| Support quality | <2 tickets/day |
-| Merchants live | 10+ production partners |
+**Planned (Sprints 5–8, Feb–May 2026):** Extension caching (MVP-13), analytics (MVP-14), beta readiness, beta launch prep. Full metrics, day-by-day plan, and revised milestones: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
 
 ---
 
@@ -201,21 +175,23 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## 8-Sprint Delivery Timeline (Feb – May 2026)
+## 8-Sprint Delivery Timeline (Revised Plan — Feb–May 2026)
+
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
 
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
 | Sprint 0 | Jan–Feb 2, 2026 | Setup and architecture | — | Complete |
-| Sprint 1 | Feb 3–16, 2026 | MVP v0: Compile–resolve–display | v0.1.0 | Complete |
-| Sprint 2 | Feb 17–Mar 2, 2026 | P1: XMP, auth, logging, errors | v0.2.0 | Complete |
+| Sprint 1 | Feb 3–16, 2026 | MVP vertical slice: compile–resolve–display | v0.1.0 | Complete |
+| Sprint 2 | Feb 17–Mar 2, 2026 | P1: XMP beacon, auth, rate limit, error shape | v0.2.0 | Complete |
 | Sprint 3 | Mar 3–16, 2026 | R2 storage, Rust compiler, matter CLI | v0.3.0 | Complete |
-| Sprint 4 | Mar 17–30, 2026 | Batch, catalog import, catalog-upload demo | v0.4.0 | Complete |
-| Sprint 5 | Mar 31–Apr 13, 2026 | Extension caching (MVP-13), polish | v0.5.0 | Planned |
+| Sprint 4 | Mar 17–30, 2026 | Batch (MVP-11), catalog import (MVP-12), catalog-upload demo | v0.4.0 | Complete |
+| Sprint 5 | Mar 31–Apr 13, 2026 | Extension caching (MVP-13), overlay polish | v0.5.0 | Planned |
 | Sprint 6 | Apr 14–27, 2026 | Analytics (MVP-14), observability | — | Planned |
-| Sprint 7 | Apr 28–May 11, 2026 | Beta readiness | — | Planned |
-| Sprint 8 | May 12–25, 2026 | Beta launch prep | — | Planned |
+| Sprint 7 | Apr 28–May 11, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
+| Sprint 8 | May 12–25, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
 
-**Current status (March 2026):** Sprints 1–4 complete. Release **v0.4.0** (shadow-index: batch, catalog import; lens-extension v0.2.0; matter-core v0.3.0). End-to-end flow: compile to R2 or local, resolve, matter:// link, extension overlay. Next: Sprint 5 (MVP-13 IndexedDB caching). For day-by-day work and milestones see [docs/16-WEEKLY-WORK-PLAN.md](./docs/16-WEEKLY-WORK-PLAN.md) and [docs/15-DELIVERY-TIMELINE.md](./docs/15-DELIVERY-TIMELINE.md). Single source of truth for version and sprint state: [docs/PROGRESS-AND-VERSION.md](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprints 1–4 complete; **v0.4.0** released (shadow-index batch/catalog, lens-extension v0.2.0, matter-core v0.3.0). Next: Sprint 5 (MVP-13 IndexedDB caching). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
