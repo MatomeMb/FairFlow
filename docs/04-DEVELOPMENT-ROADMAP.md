@@ -378,7 +378,7 @@ Phase 0 ─┼──────┼──────┤      │      │      
 | | Developer documentation | SDK docs |
 | | API documentation | API reference |
 | | Support documentation | FAQ, troubleshooting |
-| Week 41-42 | Public launch | 🚀 Live! |
+| Week 41-42 | Public launch | Live |
 | | Monitor adoption | Analytics |
 | | Support incoming users | User support |
 | | Bug fixes | Patch releases |

@@ -22,8 +22,8 @@ Single source of truth for **code version**, **sprint state**, and **P1 (next sp
 
 | Sprint | Window | Status | Goal |
 |--------|--------|--------|------|
-| **Sprint 1** | Feb 3 – Feb 16, 2026 | ✅ **Complete** | MVP vertical slice: compile → resolve → display with `matter://` |
-| **Sprint 2** | Feb 17 – Mar 2, 2026 | ✅ **Complete** | P1: XMP beacon, platform results logging, auth/rate limits, error handling |
+| **Sprint 1** | Feb 3 – Feb 16, 2026 | **Complete** | MVP vertical slice: compile → resolve → display with `matter://` |
+| **Sprint 2** | Feb 17 – Mar 2, 2026 | **Complete** | P1: XMP beacon, platform results logging, auth/rate limits, error handling |
 
 **Definition of Done (Sprint 1):** All MVP-01, MVP-02, MVP-04, MVP-05, MVP-06 done. Build passes, tests pass (Vitest 7/7, Playwright 2 automated + 1 manual, `cargo test` 8 pass / 3 ignored). Demo runbook and manual E2E doc in place.
 
@@ -51,10 +51,10 @@ P1 items for **Sprint 2** (Feb 17 – Mar 2, 2026) are **all done**. See [12-SPR
 
 | ID | Story | Status | Acceptance criteria (from backlog) |
 |----|--------|--------|-------------------------------------|
-| **MVP-07** | XMP beacon detection (basic) | ✅ Done | Extension parses XMP from JPEG/PNG; click on image with beacon shows overlay |
-| **MVP-08** | Platform test harness results logging | ✅ Done | `platform-test test-extraction --output <file>` writes JSON; `generate-report` consumes it |
-| **MVP-09** | Basic auth and rate limits | ✅ Done | Optional `SHADOW_INDEX_API_KEY`; 100 req/min per IP; Vitest auth tests |
-| **MVP-10** | Error handling polish | ✅ Done | API `{ code, message, details? }`; overlay shows API error message |
+| **MVP-07** | XMP beacon detection (basic) | Done | Extension parses XMP from JPEG/PNG; click on image with beacon shows overlay |
+| **MVP-08** | Platform test harness results logging | Done | `platform-test test-extraction --output <file>` writes JSON; `generate-report` consumes it |
+| **MVP-09** | Basic auth and rate limits | Done | Optional `SHADOW_INDEX_API_KEY`; 100 req/min per IP; Vitest auth tests |
+| **MVP-10** | Error handling polish | Done | API `{ code, message, details? }`; overlay shows API error message |
 
 **Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md) — P1 section.
 
