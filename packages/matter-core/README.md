@@ -2,6 +2,22 @@
 
 Commerce Compiler - Rust library for transforming product data into Universal Commerce Containers (.thing files).
 
+## Status
+
+**Version:** 0.3.0 (Sprint 1 complete, Feb 5, 2026)
+
+**Delivered:**
+- ✅ Product data validation and processing
+- ✅ CLIP semantic vectors (ViT-B/32)
+- ✅ FlatBuffers binary serialization
+- ✅ Ed25519 cryptographic signing
+- ✅ Steganographic embedding in JPEG/PNG images (MVP-07)
+- ✅ XMP beacon extraction and validation
+- ✅ Matter compiler binary with matter:// hash support
+- ✅ Matter CLI for product compilation
+
+**Sprint 2 (Feb 6–19):** Extension caching (MVP-13) — no compiler changes. Focus on extension IndexedDB caching.
+
 ## Overview
 
 This is the core compiler library that:
@@ -10,6 +26,7 @@ This is the core compiler library that:
 - Serializes to FlatBuffers binary format
 - Signs with Ed25519 cryptography
 - Embeds into polyglot images (steganography)
+- Extracts XMP beacons from images
 
 ## Building
 
@@ -18,7 +35,7 @@ cargo build
 cargo test
 ```
 
-### Compiler & CLI (Sprint 3)
+### Compiler & CLI
 
 The compiler turns product JSON into `.thing` files; the hash matches the Shadow Index API.
 

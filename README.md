@@ -95,7 +95,11 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
 | [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
 | [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Feb 3–16, 2026) — MVP vertical slice |
-| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 17–Mar 2, 2026) — P1 scope |
+| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
+| [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
+| [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
+| [Sprint 2 Completion Checklist](./docs/SPRINT-2-COMPLETION-CHECKLIST.md) | AC gates, quality checkpoints, DoD, demo prep, risk mitigation |
+| [Verify MVP-13 Cache](./docs/VERIFY-MVP-13-CACHE.md) | Manual verification steps: cache hit/miss, IndexedDB inspection |
 | [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |
 | [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) — R2 storage, Rust compiler, matter CLI |
 | [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) — Batch, catalog import, catalog-upload demo |
@@ -182,8 +186,8 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
 | Sprint 0 | By Jan 19, 2026 | Setup and architecture | — | Complete |
-| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | Complete |
-| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13), overlay polish | v0.5.0 | Planned |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | **Complete** ✅ |
+| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.3.0 (lens) | **In Progress** ⏳ |
 | Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — | Planned |
 | Sprint 4 | Mar 6–19, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
@@ -191,7 +195,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
 | Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
 
-**Current status:** Sprint 1 complete by Feb 5, 2026; **v0.4.0** released. Next: Sprint 2 (Feb 6 – Feb 19, MVP-13 IndexedDB caching). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 1 **complete** (Feb 5, 2026); **v0.4.0** released. **Sprint 2 begins Feb 6** (MVP-13 extension caching). Acceptance criteria, schema, cross-browser compatibility, and completion checklist ready. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
