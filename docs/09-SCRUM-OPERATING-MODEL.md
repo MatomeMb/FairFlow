@@ -7,15 +7,15 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Scrum Operating Model |
-| **Version** | 1.0 |
-| **Date** | February 1, 2026 |
+| **Version** | 1.1 |
+| **Date** | March 2026 |
 | **Author** | Matome Mboweni, CTO |
 
 ---
 
 ## 1. Purpose
 
-Shift execution to Scrum so every sprint delivers a **working, testable, shippable** increment. The focus is the **simplest MVP**, then iterative improvement.
+Shift execution to Scrum so every sprint delivers a **working, testable, shippable** increment. The focus is the **simplest MVP**, then iterative improvement. This project is a **real product** driving innovation in Object-Oriented Commerce; the operating model supports predictable delivery and stakeholder visibility via **day-level work plans** and **realistic estimates** (see [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md)).
 
 ---
 
@@ -29,12 +29,12 @@ Shift execution to Scrum so every sprint delivers a **working, testable, shippab
 
 ## 3. Sprint Cadence
 
-- **Sprint Length:** 2 weeks
-- **Planning (Day 1):** 60-90 min
-- **Daily Standup:** 10 min
-- **Refinement (Mid-sprint):** 30 min
-- **Review + Retro (Last day):** 45-60 min
-- **Release:** Ship at sprint end
+- **Sprint Length:** 2 weeks (10 working days)
+- **Planning (Day 1):** 60–90 min — confirm goal, pull stories, align with [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md)
+- **Daily Standup:** 10 min — what did I do, what will I do, any blockers (solo: log in doc or task list)
+- **Refinement (Mid-sprint):** 30 min — adjust remaining days if scope or priority changed
+- **Review + Retro (Last day):** 45–60 min — demo to CEO; what went well, what to improve; release checklist
+- **Release:** Tag and/or deploy at sprint end; update [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md)
 
 ---
 
@@ -96,6 +96,16 @@ Shift execution to Scrum so every sprint delivers a **working, testable, shippab
 
 ---
 
-## 10. Next Action
+## 10. Work Estimation Guidelines
 
-Use `docs/10-MVP-BACKLOG.md` to keep priorities current and `docs/11-SPRINT-1-PLAN.md` to track the active sprint.
+- **Capacity per sprint:** ~56–60 hours deliverable (6h/day × 10 days, minus ceremonies and buffer). See [16-WEEKLY-WORK-PLAN.md §2](./16-WEEKLY-WORK-PLAN.md#2-work-estimate-assumptions).
+- **Stories:** If a story is >16h, split it. Prefer tasks in 4–6h chunks for daily tracking.
+- **Daily:** Start with the planned task and estimated hours from the weekly work plan; note slippage or scope change for re-planning.
+
+---
+
+## 11. Next Action
+
+- **Backlog:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md) — keep priorities and status current.
+- **Active sprint:** See [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) and [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md) for current sprint and release.
+- **Day-by-day:** [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md) — use for daily focus and stakeholder “what’s being worked on.”

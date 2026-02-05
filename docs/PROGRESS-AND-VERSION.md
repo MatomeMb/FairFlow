@@ -4,6 +4,20 @@ Single source of truth for **code version**, **sprint state**, and **P1 (next sp
 
 ---
 
+## Current status (as of March 2026)
+
+| Area | Status | Notes |
+|------|--------|-------|
+| **Product** | **MVP path live** | End-to-end flow works: compile → store (R2/local) → resolve → matter:// → extension overlay. Batch and catalog import operational. |
+| **Releases** | **v0.4.0** | shadow-index 0.4.0 (batch, catalog); lens-extension 0.2.0; matter-core 0.3.0. Tag `v0.4.0` created and pushed. |
+| **Next** | **Sprint 5** | MVP-13 extension caching (IndexedDB), overlay polish, cross-browser check. Start: Mar 31, 2026. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). |
+| **Risks** | **None** | No known blockers. R2 and API keys configured; tests passing. |
+| **Stakeholder** | **CEO** | Weekly sync; demo available via catalog-upload and matter-demo pages. |
+
+**References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Revised milestones and timeline → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+
+---
+
 ## Code version (current)
 
 | Package | Version | Notes |
@@ -24,8 +38,8 @@ Single source of truth for **code version**, **sprint state**, and **P1 (next sp
 |--------|--------|--------|------|
 | **Sprint 1** | Feb 3 – Feb 16, 2026 | **Complete** | MVP vertical slice: compile → resolve → display with `matter://` |
 | **Sprint 2** | Feb 17 – Mar 2, 2026 | **Complete** | P1: XMP beacon, platform results logging, auth/rate limits, error handling |
-| **Sprint 3** | Feb 17 – Mar 2, 2026 | **Complete** | R2 storage (MVP-03), Rust Compiler::compile(), matter CLI; see [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) |
-| **Sprint 4** | Mar 3 – Mar 16, 2026 | **Complete** | Bulk ingestion & merchant tooling: POST /batch (MVP-11), POST /catalog/import (MVP-12), catalog-upload demo; see [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md) |
+| **Sprint 3** | Mar 3 – Mar 16, 2026 | **Complete** | R2 storage (MVP-03), Rust Compiler::compile(), matter CLI; see [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) |
+| **Sprint 4** | Mar 17 – Mar 30, 2026 | **Complete** | Bulk ingestion & merchant tooling: POST /batch (MVP-11), POST /catalog/import (MVP-12), catalog-upload demo; see [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md) |
 
 **Definition of Done (Sprint 1):** All MVP-01, MVP-02, MVP-04, MVP-05, MVP-06 done. Build passes, tests pass (Vitest 7/7, Playwright 2 automated + 1 manual, `cargo test` 8 pass / 3 ignored). Demo runbook and manual E2E doc in place.
 
@@ -63,7 +77,7 @@ P1 items for **Sprint 2** (Feb 17 – Mar 2, 2026) are **all done**. See [12-SPR
 
 **Sprint 3 (complete):** MVP-03 (R2 storage), Rust Compiler::compile(), matter CLI delivered. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md), [RUST-COMPILER-CTO-GUIDE.md](./RUST-COMPILER-CTO-GUIDE.md).
 
-**Sprint 4 (in progress):** P2 bulk ingestion and merchant tooling. MVP-11 (POST /batch), MVP-12 (POST /catalog/import), optional lite merchant dashboard. See [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md).
+**Sprint 4 (complete):** P2 bulk ingestion and merchant tooling. MVP-11 (POST /batch), MVP-12 (POST /catalog/import), catalog-upload demo. See [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md).
 
 ---
 

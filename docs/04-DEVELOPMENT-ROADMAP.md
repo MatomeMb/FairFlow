@@ -59,6 +59,30 @@ Phase 0 ─┼──────┼──────┤      │      │      
 
 **Scrum Cadence Note:** The roadmap remains the long-range view, but execution now follows **2-week Scrum sprints** with a shippable increment at each sprint end. The active sprint plan lives in `docs/11-SPRINT-1-PLAN.md` and the product backlog in `docs/10-MVP-BACKLOG.md`.
 
+### 1.3 Actual Execution (2026) & Revised Milestones
+
+**Single source of truth for dates:** [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) — 8-Sprint Delivery Timeline (Feb–May 2026).
+
+| Period | Delivered (actual) | Notes |
+|--------|--------------------|-------|
+| **Sprint 1** (Feb 3 – Feb 16) | MVP vertical slice | compile → resolve → matter:// → overlay; tests |
+| **Sprint 2** (Feb 17 – Mar 2) | P1: XMP, platform test, auth, rate limit, error shape | MVP-07–MVP-10 |
+| **Sprint 3** (Mar 3 – Mar 16) | R2 storage, Rust compiler, matter CLI | MVP-03; hash-aligned API |
+| **Sprint 4** (Mar 17 – Mar 30) | Batch API, catalog import, catalog-upload demo | MVP-11, MVP-12; v0.4.0 |
+
+**Revised milestone dates (realistic):**
+
+| Milestone | Original estimate | Revised (actual or planned) |
+|-----------|-------------------|-----------------------------|
+| Phase 0 / MVP slice | Mar 2, 2026 | **Feb 16, 2026** (done) |
+| Foundation / 30% (R2 + Rust) | Apr 27, 2026 | **Mar 16, 2026** (done) |
+| Core / 50% (batch, catalog) | Jul 20, 2026 | **Mar 30, 2026** (done) |
+| 75% (caching, analytics, beta prep) | Aug 17, 2026 | **May 25, 2026** (Sprint 8) |
+| Beta launch | Oct 26, 2026 | **Sep 30, 2026** |
+| Public launch | Dec 15, 2026 | **Dec 15, 2026** (unchanged) |
+
+Sections 2.1–2.6 below remain the **original** detailed breakdown; use them for task-level reference and align sprint numbers with the 2-week Scrum sprints (Sprint 1–4 = delivered; Sprint 5–8 = remaining). **Day-by-day work and realistic hour estimates** for Sprints 5–8: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
+
 ---
 
 ## 2. Detailed Sprint Breakdown
@@ -398,17 +422,20 @@ Phase 0 ─┼──────┼──────┤      │      │      
 
 ---
 
-## 3. Milestone Summary
+## 3. Milestone Summary (Revised)
 
-| Milestone | Date | Completion | Key Deliverable |
-|-----------|------|------------|-----------------|
-| Contract Signed | Jan 21, 2026 | 0% | New company agreement |
-| Phase 0 Complete | Mar 2, 2026 | 15% | Steganography validation |
-| Foundation Complete | Apr 27, 2026 | 30% | Rust compiler MVP |
-| Core Complete | Jul 20, 2026 | 50% | Full pipeline working |
-| 75% Milestone | Aug 17, 2026 | 75% | Browser extension functional |
-| Beta Launch | Oct 26, 2026 | 90% | Merchants onboarded |
-| Public Launch | Dec 15, 2026 | 100% | Chrome Web Store live |
+| Milestone | Date | Completion | Key Deliverable | Status |
+|-----------|------|------------|-----------------|--------|
+| Contract Signed | Jan 21, 2026 | 0% | New company agreement | Done |
+| Phase 0 / MVP slice | Feb 16, 2026 | 15% | compile → resolve → overlay | Done |
+| P1 hardening | Mar 2, 2026 | 20% | XMP, auth, rate limit, errors | Done |
+| R2 + Rust (Foundation) | Mar 16, 2026 | 30% | R2 storage, matter CLI | Done |
+| Batch + catalog (Core) | Mar 30, 2026 | 50% | POST /batch, /catalog/import, demo | Done |
+| Caching + analytics | May 25, 2026 | 75% | MVP-13, MVP-14; beta prep | Planned |
+| Beta Launch | Sep 30, 2026 | 90% | 5–10 merchants onboarded | Planned |
+| Public Launch | Dec 15, 2026 | 100% | Chrome Web Store live | Planned |
+
+*For 8-sprint Feb–May detail and dependencies, see [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).*
 
 ---
 

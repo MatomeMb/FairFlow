@@ -13,7 +13,9 @@
 
 ## Document Overview
 
-This folder contains the complete project documentation for **.things that Matter**, a new company building infrastructure for Object-Oriented Commerce.
+This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
+
+**Current status (March 2026):** Sprints 1–4 complete. MVP path live: compile → R2/local storage → resolve → matter:// → extension overlay; batch and catalog import (POST /batch, POST /catalog/import) and lite merchant demo (catalog-upload.html) delivered. Release **v0.4.0** tagged. Next: **Sprint 5** (MVP-13 extension caching). Day-by-day work and realistic estimates: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -36,6 +38,8 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | **Post–Sprint 1 actions and Sprint 2 readiness** | ~2 |
 | 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
+| 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
+| 16 | [**Weekly Work Plan**](./16-WEEKLY-WORK-PLAN.md) | **Day-by-day work for each week; realistic hour estimates; Sprints 5–8 daily tasks** | ~10 |
 | — | [**Next Steps (Sprint 3)**](./NEXT-STEPS-SPRINT-3.md) | **Step-by-step R2 setup, .env, verify-r2, Day 2 API wiring (with links)** | ~4 |
 | — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
 | — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
@@ -66,17 +70,18 @@ This folder contains the complete project documentation for **.things that Matte
 | Target Merchants | 5-10 beta |
 | Target Products | 10,000 compiled |
 
-### Key Milestones
+### Key Milestones (Revised — see [15-DELIVERY-TIMELINE](./15-DELIVERY-TIMELINE.md))
 
-| Date | Milestone |
-|------|-----------|
-| Jan 21, 2026 | Contract signed |
-| Mar 2, 2026 | Phase 0 complete (steganography validated) |
-| Apr 27, 2026 | Rust compiler MVP (30%) |
-| Jul 20, 2026 | Core complete (50%) |
-| Aug 17, 2026 | Browser extension functional (75%) |
-| Oct 26, 2026 | Beta launch (90%) |
-| Dec 15, 2026 | Public launch (100%) |
+| Date | Milestone | Status |
+|------|-----------|--------|
+| Jan 21, 2026 | Contract signed | Done |
+| Feb 16, 2026 | Phase 0 / MVP slice (compile → overlay) | Done |
+| Mar 2, 2026 | P1 hardening (XMP, auth, errors) | Done |
+| Mar 16, 2026 | R2 + Rust compiler (30%) | Done |
+| Mar 30, 2026 | Batch + catalog (50%) | Done |
+| May 25, 2026 | Caching, analytics, beta prep (75%) | Planned |
+| Sep 30, 2026 | Beta launch (90%) | Planned |
+| Dec 15, 2026 | Public launch (100%) | Planned |
 
 ---
 
@@ -126,15 +131,16 @@ This folder contains the complete project documentation for **.things that Matte
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
 | 1.0 | Jan 21, 2026 | M. Mboweni | Initial creation |
+| 1.1 | Mar 2026 | M. Mboweni | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
+| 1.2 | Mar 2026 | M. Mboweni | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
 
 ---
 
 ## Next Steps
 
-1. **Review all documents** with CEO
-2. **Sign new company contract** (Jan 21, 2026)
-3. **Approve budget** (R72,000)
-4. **Begin Phase 0** (Feb 2026)
+1. **Sprint 5 planning** (MVP-13 caching, extension polish) — see [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+2. **Align budget and roadmap** with revised milestone dates (Phase 1 to Dec 2026).
+3. **CEO sync** on revised timeline and beta target (Sep 2026).
 
 ---
 

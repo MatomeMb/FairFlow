@@ -56,13 +56,13 @@ Every product processed by our compiler exists simultaneously as:
 
 ### 2.1 Primary Objectives
 
-| Objective | Target | Timeline |
-|-----------|--------|----------|
-| Build functional Commerce Compiler | MVP operational | August 2026 |
-| Launch browser extension | Chrome Web Store | December 2026 |
-| Onboard beta merchants | 5-10 merchants | Q4 2026 |
-| Process product catalog | 10,000+ products | Q4 2026 |
-| Achieve technical proof-of-concept | End-to-end demo | August 2026 |
+| Objective | Target | Timeline | Status |
+|-----------|--------|----------|--------|
+| Build functional Commerce Compiler | MVP operational | Mar 2026 (achieved) | Done (Sprint 3–4) |
+| Launch browser extension | Chrome Web Store | December 2026 | Planned |
+| Onboard beta merchants | 5-10 merchants | Q4 2026 | Planned |
+| Process product catalog | 10,000+ products | Q4 2026 | Planned |
+| Achieve technical proof-of-concept | End-to-end demo | Mar 2026 (achieved) | Done |
 
 ### 2.2 Success Criteria
 
