@@ -1,23 +1,22 @@
-# Codebase Analysis — Sprint 2 Complete (v0.2.0)
+# Codebase Analysis — Historical Snapshot (Sprint 2)
 
-**Current Date:** February 3, 2026  
-**Current Version:** 0.2.0  
-**Release Status:** Sprint 2 P1 complete, merged to main, tag pushed  
-**Last Updated:** Sprint 2 closeout
+**Deprecated:** Kept for reference only. For current status, version, and sprint state use [docs/PROGRESS-AND-VERSION.md](docs/PROGRESS-AND-VERSION.md) and [docs/15-DELIVERY-TIMELINE.md](docs/15-DELIVERY-TIMELINE.md).
+
+**Snapshot date:** February 3, 2026. **Version at snapshot:** 0.2.0.
 
 ---
 
-## Executive Summary
+## Executive Summary (Sprint 2)
 
-✅ **Sprint 2 (P1) is complete** with all four MVP items implemented, tested, and shipped. The codebase represents a fully functional vertical slice: compile → resolve → display with **XMP beacon detection**, **platform-test logging**, **auth/rate limits**, and **error handling**.
+**Sprint 2 (P1) was complete** with all four MVP items implemented, tested, and shipped. The codebase represents a fully functional vertical slice: compile → resolve → display with **XMP beacon detection**, **platform-test logging**, **auth/rate limits**, and **error handling**.
 
 | Component | Status | Version | Tests | Notes |
 |-----------|--------|---------|-------|-------|
-| **Shadow Index API** | ✅ Complete | 0.2.0 | 12/12 pass | Compile, resolve, gist, health; auth (MVP-09); rate limit; error shape (MVP-10) |
-| **Lens Extension** | ✅ Complete | 0.2.0 | E2E pass | MV3, matter:// intercept, overlay; XMP beacon detection (MVP-07) |
-| **Matter-core** | ✅ Complete | 0.2.0 | 8/11 pass | Platform-test JSON logging (MVP-08); steg (XMP/EOF) |
-| **Tests** | ✅ Complete | — | 20+ | Vitest (API + auth), Playwright (E2E), cargo (Rust) |
-| **Docs** | ✅ Complete | — | — | Sprint plans, closeout memos, progress tracking |
+| **Shadow Index API** | Complete | 0.2.0 | 12/12 pass | Compile, resolve, gist, health; auth (MVP-09); rate limit; error shape (MVP-10) |
+| **Lens Extension** | Complete | 0.2.0 | E2E pass | MV3, matter:// intercept, overlay; XMP beacon detection (MVP-07) |
+| **Matter-core** | Complete | 0.2.0 | 8/11 pass | Platform-test JSON logging (MVP-08); steg (XMP/EOF) |
+| **Tests** | Complete | — | 20+ | Vitest (API + auth), Playwright (E2E), cargo (Rust) |
+| **Docs** | Complete | — | — | Sprint plans, closeout memos, progress tracking |
 
 ---
 
@@ -31,14 +30,14 @@
 
 | MVP | Feature | Implementation | Status |
 |-----|---------|-----------------|--------|
-| MVP-01 | Compile endpoint | `POST /compile` — transforms product data to hash, .thing file, matter:// URI | ✅ Done |
-| MVP-02 | Resolve endpoint | `GET /resolve/:hash` — retrieves artifact by hash | ✅ Done |
-| MVP-04 | Health check | `GET /health` — service status | ✅ Done |
-| MVP-05 | Gist endpoint | `GET /gist/:hash` — minimal product data | ✅ Done |
-| MVP-06 | .thing retrieval | `GET /thing/:hash` — binary .thing file download | ✅ Done |
-| MVP-09 | Auth | `SHADOW_INDEX_API_KEY` env; `x-api-key` and `Authorization: Bearer` support; 401 on invalid key | ✅ Done |
-| MVP-09 | Rate limiting | 100 req/min per IP; 429 on overflow; in-memory store | ✅ Done |
-| MVP-10 | Error shape | Consistent `{ code, message, details? }` error responses | ✅ Done |
+| MVP-01 | Compile endpoint | `POST /compile` — transforms product data to hash, .thing file, matter:// URI | Done |
+| MVP-02 | Resolve endpoint | `GET /resolve/:hash` — retrieves artifact by hash | Done |
+| MVP-04 | Health check | `GET /health` — service status | Done |
+| MVP-05 | Gist endpoint | `GET /gist/:hash` — minimal product data | Done |
+| MVP-06 | .thing retrieval | `GET /thing/:hash` — binary .thing file download | Done |
+| MVP-09 | Auth | `SHADOW_INDEX_API_KEY` env; `x-api-key` and `Authorization: Bearer` support; 401 on invalid key | Done |
+| MVP-09 | Rate limiting | 100 req/min per IP; 429 on overflow; in-memory store | Done |
+| MVP-10 | Error shape | Consistent `{ code, message, details? }` error responses | Done |
 
 #### API Endpoints
 
@@ -71,11 +70,11 @@ POST /batch                     # Batch compile (not implemented, returns 501)
 
 | Test Suite | Count | Status | Notes |
 |-----------|-------|--------|-------|
-| POST /compile | 3 tests | ✅ PASS | Valid product, invalid JSON, missing field |
-| Error handling | 2 tests | ✅ PASS | 400 error bodies return code + message shape |
-| MVP-09 Auth | 4 tests | ✅ PASS | 401 missing key, 401 wrong key, 200 with x-api-key, 200 with Bearer |
-| Integration tests | 3 tests | ⏳ Requires running API | fetch(BASE) tests for full end-to-end |
-| **Total** | **12 tests** | **✅ 12/12 PASS** | Run with: `NODE_ENV=test npm run start` then `NODE_ENV=test npx vitest run` |
+| POST /compile | 3 tests | PASS | Valid product, invalid JSON, missing field |
+| Error handling | 2 tests | PASS | 400 error bodies return code + message shape |
+| MVP-09 Auth | 4 tests | PASS | 401 missing key, 401 wrong key, 200 with x-api-key, 200 with Bearer |
+| Integration tests | 3 tests | Planned Requires running API | fetch(BASE) tests for full end-to-end |
+| **Total** | **12 tests** | ** 12/12 PASS** | Run with: `NODE_ENV=test npm run start` then `NODE_ENV=test npx vitest run` |
 
 #### Build & Run
 
@@ -86,7 +85,7 @@ cd packages/shadow-index
 npm install
 
 # Build (TypeScript → JavaScript)
-npm run build  # ✅ PASS
+npm run build  # PASS
 
 # Development
 npm run dev    # Watch mode (tsx watch)
@@ -95,7 +94,7 @@ npm run dev    # Watch mode (tsx watch)
 npm run start  # Starts on http://localhost:3000
 
 # Test
-NODE_ENV=test npx vitest run  # ✅ 12/12 PASS (with running API for integration tests)
+NODE_ENV=test npx vitest run  #  12/12 PASS (with running API for integration tests)
 ```
 
 #### Configuration
@@ -116,11 +115,11 @@ NODE_ENV=test npx vitest run  # ✅ 12/12 PASS (with running API for integration
 
 | MVP | Feature | Implementation | Status |
 |-----|---------|-----------------|--------|
-| MVP-05 | matter:// protocol handler | Content script intercepts `<a href="matter://...">` clicks | ✅ Done |
-| MVP-05 | Overlay display | Shows product image, title, price, Buy Now button | ✅ Done |
-| MVP-07 | XMP beacon detection | Parses JPEG APP1 (0xFF 0xE1) and PNG iTXt chunks for `<matter:hash>` | ✅ Done |
-| MVP-07 | Image click handler | Fetches image bytes, extracts XMP, resolves hash, shows overlay | ✅ Done |
-| MVP-10 | Error handling | Overlay shows API error message on resolve failure; falls back to gist | ✅ Done |
+| MVP-05 | matter:// protocol handler | Content script intercepts `<a href="matter://...">` clicks | Done |
+| MVP-05 | Overlay display | Shows product image, title, price, Buy Now button | Done |
+| MVP-07 | XMP beacon detection | Parses JPEG APP1 (0xFF 0xE1) and PNG iTXt chunks for `<matter:hash>` | Done |
+| MVP-07 | Image click handler | Fetches image bytes, extracts XMP, resolves hash, shows overlay | Done |
+| MVP-10 | Error handling | Overlay shows API error message on resolve failure; falls back to gist | Done |
 
 #### Extension Structure
 
@@ -184,10 +183,10 @@ packages/lens-extension/
 
 | Scenario | Status | Notes |
 |----------|--------|-------|
-| Manual E2E | ✅ PASS | matter:// link overlay verified (Feb 3, 2026) |
-| Extension load | ✅ PASS | MV3 manifest valid, loads in Chrome |
-| Overlay rendering | ✅ PASS | Image, title ($149.99), price, Buy Now appear |
-| XMP extraction | ⏳ Manual | Click image with beacon → overlay (optional test) |
+| Manual E2E | PASS | matter:// link overlay verified (Feb 3, 2026) |
+| Extension load | PASS | MV3 manifest valid, loads in Chrome |
+| Overlay rendering | PASS | Image, title ($149.99), price, Buy Now appear |
+| XMP extraction | Planned Manual | Click image with beacon → overlay (optional test) |
 
 #### How to Load & Test
 
@@ -210,11 +209,11 @@ packages/lens-extension/
 
 | MVP | Feature | Module | Status |
 |-----|---------|--------|--------|
-| MVP-08 | Platform test tool | `src/bin/platform-test.rs` | ✅ Done |
-| MVP-08 | XMP injection | `src/steg/xmp.rs` | ✅ Done |
-| MVP-08 | EOF binary embedding | `src/steg/eof.rs` | ✅ Done |
-| MVP-08 | JSON result logging | `test-extraction --output file.json` | ✅ Done |
-| Phase 0 | Steganography validation | `src/steg/mod.rs` | ✅ Done |
+| MVP-08 | Platform test tool | `src/bin/platform-test.rs` | Done |
+| MVP-08 | XMP injection | `src/steg/xmp.rs` | Done |
+| MVP-08 | EOF binary embedding | `src/steg/eof.rs` | Done |
+| MVP-08 | JSON result logging | `test-extraction --output file.json` | Done |
+| Phase 0 | Steganography validation | `src/steg/mod.rs` | Done |
 
 #### Binary Targets
 
@@ -242,13 +241,13 @@ cargo run --bin steg-test -- full-embed image.jpg thing.bin <hash> <gist-json> o
 
 | Module | Purpose | Status |
 |--------|---------|--------|
-| `steg/` | Steganography (XMP, EOF) | ✅ Complete |
-| `steg/xmp.rs` | XMP metadata injection/extraction | ✅ Complete |
-| `steg/eof.rs` | EOF binary append/extract | ✅ Complete |
-| `compiler/` | Compile product → .thing | ⏳ Deferred (stub) |
-| `crypto/` | Ed25519 signing | ⏳ Deferred (stub) |
-| `schema/` | .thing file format | ⏳ Deferred (stub) |
-| `clip/` | Semantic vectorization (CLIP) | ⏳ Deferred (stub; tests verify stub works) |
+| `steg/` | Steganography (XMP, EOF) | Complete |
+| `steg/xmp.rs` | XMP metadata injection/extraction | Complete |
+| `steg/eof.rs` | EOF binary append/extract | Complete |
+| `compiler/` | Compile product → .thing | Planned Deferred (stub) |
+| `crypto/` | Ed25519 signing | Planned Deferred (stub) |
+| `schema/` | .thing file format | Planned Deferred (stub) |
+| `clip/` | Semantic vectorization (CLIP) | Planned Deferred (stub; tests verify stub works) |
 
 #### Tests
 
@@ -256,17 +255,17 @@ cargo run --bin steg-test -- full-embed image.jpg thing.bin <hash> <gist-json> o
 
 | Test | Module | Status | Purpose |
 |------|--------|--------|---------|
-| `test_detect_jpeg` | steg | ✅ PASS | Verify JPEG magic bytes (0xFF 0xD8) |
-| `test_detect_png` | steg | ✅ PASS | Verify PNG magic bytes (0x89 50 4E 47) |
-| `test_xmp_generation` | steg::xmp | ✅ PASS | XMP XML generation |
-| `test_eof_append_and_extract` | steg::eof | ✅ PASS | EOF binary append + extract roundtrip |
-| `test_extract_none_when_no_marker` | steg::eof | ✅ PASS | Returns None when no marker present |
-| `test_product_gist_json` | steg | ✅ PASS | Product gist JSON format |
-| `test_version` | lib | ✅ PASS | Package version check |
-| `test_vectorization` | clip | ✅ PASS | CLIP stub works (deferred implementation) |
-| *(ignored)* `test_compiler_creation` | compiler | ⏳ Ignored | Compiler stub (deferred for Sprint 3) |
-| *(ignored)* `test_key_generation` | crypto | ⏳ Ignored | Crypto stub (deferred for Sprint 3) |
-| *(ignored)* `test_serialization` | schema | ⏳ Ignored | Schema stub (deferred for Sprint 3) |
+| `test_detect_jpeg` | steg | PASS | Verify JPEG magic bytes (0xFF 0xD8) |
+| `test_detect_png` | steg | PASS | Verify PNG magic bytes (0x89 50 4E 47) |
+| `test_xmp_generation` | steg::xmp | PASS | XMP XML generation |
+| `test_eof_append_and_extract` | steg::eof | PASS | EOF binary append + extract roundtrip |
+| `test_extract_none_when_no_marker` | steg::eof | PASS | Returns None when no marker present |
+| `test_product_gist_json` | steg | PASS | Product gist JSON format |
+| `test_version` | lib | PASS | Package version check |
+| `test_vectorization` | clip | PASS | CLIP stub works (deferred implementation) |
+| *(ignored)* `test_compiler_creation` | compiler | Planned Ignored | Compiler stub (deferred for Sprint 3) |
+| *(ignored)* `test_key_generation` | crypto | Planned Ignored | Crypto stub (deferred for Sprint 3) |
+| *(ignored)* `test_serialization` | schema | Planned Ignored | Schema stub (deferred for Sprint 3) |
 
 **Test Results:**
 ```
@@ -280,7 +279,7 @@ test result: ok. 8 passed; 0 failed; 3 ignored; 0 measured
 cd packages/matter-core
 
 # Test
-cargo test              # ✅ 8/11 pass, 3 ignored
+cargo test              #  8/11 pass, 3 ignored
 
 # Build binaries
 cargo build --release  # Optimized build
@@ -309,10 +308,10 @@ cargo run --bin steg-test -- extract-xmp image.jpg
 
 | Framework | Location | Count | Status |
 |-----------|----------|-------|--------|
-| **Vitest** | `packages/shadow-index/api/index.test.ts` | 12 | ✅ 12/12 PASS |
-| **Cargo (Rust)** | `packages/matter-core/src/lib.rs` | 11 | ✅ 8 PASS, 3 ignored |
-| **Playwright** | `tests/e2e/mvp-smoke.spec.ts` | 2+ | ✅ Manual E2E PASS |
-| **Manual E2E** | `docs/MANUAL-E2E-SMOKE.md` | 1 | ✅ PASS (Feb 3, 2026) |
+| **Vitest** | `packages/shadow-index/api/index.test.ts` | 12 |  12/12 PASS |
+| **Cargo (Rust)** | `packages/matter-core/src/lib.rs` | 11 | 8 PASS, 3 ignored |
+| **Playwright** | `tests/e2e/mvp-smoke.spec.ts` | 2+ | Manual E2E PASS |
+| **Manual E2E** | `docs/MANUAL-E2E-SMOKE.md` | 1 | PASS (Feb 3, 2026) |
 
 ### Run All Tests
 
@@ -320,15 +319,15 @@ cargo run --bin steg-test -- extract-xmp image.jpg
 # Shadow Index tests (requires running API)
 cd packages/shadow-index
 npm install
-npm run build                          # ✅ TypeScript build
+npm run build                          # TypeScript build
 npm run start &                        # Start API in background
 sleep 2
-NODE_ENV=test npx vitest run           # ✅ 12/12 PASS
+NODE_ENV=test npx vitest run           #  12/12 PASS
 kill %1                                # Stop API
 
 # Matter-core tests
 cd packages/matter-core
-cargo test                             # ✅ 8 pass, 3 ignored
+cargo test                             #  8 pass, 3 ignored
 
 # Playwright E2E (manual setup required)
 cd /path/to/repo
@@ -343,31 +342,31 @@ npx playwright test tests/e2e/
 
 | MVP | Feature | Status | Notes |
 |-----|---------|--------|-------|
-| MVP-01 | Compile | ✅ Done | POST /compile → hash, matter:// URI, .thing file |
-| MVP-02 | Resolve | ✅ Done | GET /resolve/:hash → artifact details |
-| MVP-04 | Health | ✅ Done | GET /health → { status: "ok" } |
-| MVP-05 | Display overlay | ✅ Done | Extension shows image, title, price, Buy Now |
-| MVP-06 | .thing retrieval | ✅ Done | GET /thing/:hash → binary download |
+| MVP-01 | Compile | Done | POST /compile → hash, matter:// URI, .thing file |
+| MVP-02 | Resolve | Done | GET /resolve/:hash → artifact details |
+| MVP-04 | Health | Done | GET /health → { status: "ok" } |
+| MVP-05 | Display overlay | Done | Extension shows image, title, price, Buy Now |
+| MVP-06 | .thing retrieval | Done | GET /thing/:hash → binary download |
 
 ### Sprint 2 (Complete)
 
 | MVP | Feature | Status | Notes |
 |-----|---------|--------|-------|
-| MVP-07 | XMP beacon detection | ✅ Done | Parses JPEG APP1 / PNG iTXt; image click → overlay |
-| MVP-08 | Platform-test JSON logging | ✅ Done | test-extraction --output results.json; xmp/eof survival rates |
-| MVP-09 | Auth + rate limit | ✅ Done | SHADOW_INDEX_API_KEY env; x-api-key / Bearer; 100 req/min |
-| MVP-10 | Error handling | ✅ Done | { code, message, details? } shape; overlay shows errors |
+| MVP-07 | XMP beacon detection | Done | Parses JPEG APP1 / PNG iTXt; image click → overlay |
+| MVP-08 | Platform-test JSON logging | Done | test-extraction --output results.json; xmp/eof survival rates |
+| MVP-09 | Auth + rate limit | Done | SHADOW_INDEX_API_KEY env; x-api-key / Bearer; 100 req/min |
+| MVP-10 | Error handling | Done | { code, message, details? } shape; overlay shows errors |
 
 ### Sprint 3+ (Deferred)
 
 | MVP | Feature | Status | Notes |
 |-----|---------|--------|-------|
-| MVP-11 | Batch compilation | ⏳ Planned | POST /batch for 100+ products (returns 501 for now) |
-| MVP-12 | Catalog import | ⏳ Planned | CSV/JSON merchant catalog ingestion |
-| MVP-13 | Extension caching | ⏳ Planned | IndexedDB cache for resolve/gist results |
-| MVP-14 | Analytics | ⏳ Planned | Track views, clicks, conversions |
-| Rust compiler | Compile in matter-core | ⏳ Deferred | Currently all compilation goes through API |
-| R2 Storage | Artifact persistence | ⏳ Deferred | Cloudflare R2 integration for .thing files |
+| MVP-11 | Batch compilation | Planned Planned | POST /batch for 100+ products (returns 501 for now) |
+| MVP-12 | Catalog import | Planned Planned | CSV/JSON merchant catalog ingestion |
+| MVP-13 | Extension caching | Planned Planned | IndexedDB cache for resolve/gist results |
+| MVP-14 | Analytics | Planned Planned | Track views, clicks, conversions |
+| Rust compiler | Compile in matter-core | Planned Deferred | Currently all compilation goes through API |
+| R2 Storage | Artifact persistence | Planned Deferred | Cloudflare R2 integration for .thing files |
 
 ---
 
@@ -413,14 +412,14 @@ docs/
 
 | Metric | Target | Actual | Status |
 |--------|--------|--------|--------|
-| **Compile latency** | <1s | ~100ms (local) | ✅ Exceeds |
-| **Resolve latency** | <100ms | ~10ms (local) | ✅ Exceeds |
-| **Auth check overhead** | <5ms | <1ms | ✅ Exceeds |
-| **Rate limit accuracy** | 100 req/min ±5% | 100 req/min exact | ✅ Meets |
-| **XMP extraction (JPEG)** | <50ms | <10ms | ✅ Exceeds |
-| **XMP extraction (PNG)** | <50ms | <10ms | ✅ Exceeds |
-| **Overlay render latency** | <200ms | <50ms | ✅ Exceeds |
-| **E2E flow (link to overlay)** | <500ms | ~300ms | ✅ Exceeds |
+| **Compile latency** | <1s | ~100ms (local) |  Exceeds |
+| **Resolve latency** | <100ms | ~10ms (local) |  Exceeds |
+| **Auth check overhead** | <5ms | <1ms |  Exceeds |
+| **Rate limit accuracy** | 100 req/min ±5% | 100 req/min exact | Meets |
+| **XMP extraction (JPEG)** | <50ms | <10ms |  Exceeds |
+| **XMP extraction (PNG)** | <50ms | <10ms |  Exceeds |
+| **Overlay render latency** | <200ms | <50ms |  Exceeds |
+| **E2E flow (link to overlay)** | <500ms | ~300ms |  Exceeds |
 
 ---
 
@@ -474,12 +473,11 @@ docs/
 - Error handling polish (MVP-10)
 
 **Test Status:**
-- Vitest: 12/12 ✅
-- Cargo: 8/11 ✅ (3 deferred)
-- E2E: ✅ PASS (Feb 3)
-- Manual: ✅ PASS (Feb 3)
+- Vitest: 12/12 - Cargo: 8/11  (3 deferred)
+- E2E: PASS (Feb 3)
+- Manual: PASS (Feb 3)
 
-**Backwards Compatibility:** ✅ Yes (v0.1.0 → v0.2.0 is additive; all Sprint 1 features remain)
+**Backwards Compatibility:** Yes (v0.1.0 → v0.2.0 is additive; all Sprint 1 features remain)
 
 ---
 

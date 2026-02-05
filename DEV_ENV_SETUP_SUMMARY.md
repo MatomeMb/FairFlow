@@ -1,6 +1,6 @@
 # Development Environment Setup - Summary
 
-## ✅ What Was Set Up
+## Done What Was Set Up
 
 ### 1. Project Structure
 Created the complete monorepo structure as specified in the Technical Architecture:
@@ -8,22 +8,22 @@ Created the complete monorepo structure as specified in the Technical Architectu
 ```
 .Things-That-Matter/
 ├── packages/
-│   ├── matter-core/          # Rust compiler library ✅
-│   ├── matter-ffi/           # FFI bindings (placeholder) ✅
-│   ├── shadow-index/         # Node.js API service ✅
-│   └── lens-extension/       # Browser extension ✅
-├── docs/                     # Existing documentation ✅
-├── scripts/                  # Setup and utility scripts ✅
-├── .gitignore               # Git ignore rules ✅
-├── SETUP.md                 # Detailed setup guide ✅
-└── README.md                # Updated with quick start ✅
+│   ├── matter-core/          # Rust compiler library Done
+│   ├── matter-ffi/           # FFI bindings (placeholder) Done
+│   ├── shadow-index/         # Node.js API service Done
+│   └── lens-extension/       # Browser extension Done
+├── docs/                     # Existing documentation Done
+├── scripts/                  # Setup and utility scripts Done
+├── .gitignore               # Git ignore rules Done
+├── SETUP.md                 # Detailed setup guide Done
+└── README.md                # Updated with quick start Done
 ```
 
 ### 2. Rust Project (matter-core)
-- ✅ `Cargo.toml` with all required dependencies
-- ✅ Module structure (compiler, crypto, schema, steg, clip)
-- ✅ Placeholder implementations with TODOs
-- ✅ README with build instructions
+- Done `Cargo.toml` with all required dependencies
+- Done Module structure (compiler, crypto, schema, steg, clip)
+- Done Placeholder implementations with TODOs
+- Done README with build instructions
 
 **Dependencies configured:**
 - `flatbuffers` - Binary serialization
@@ -34,12 +34,12 @@ Created the complete monorepo structure as specified in the Technical Architectu
 - And more...
 
 ### 3. Node.js API (shadow-index)
-- ✅ `package.json` with TypeScript setup
-- ✅ `tsconfig.json` configuration
-- ✅ Basic API structure using Hono framework
-- ✅ Health check endpoint
-- ✅ Placeholder endpoints (compile, resolve, gist, batch)
-- ✅ README with API documentation
+- Done `package.json` with TypeScript setup
+- Done `tsconfig.json` configuration
+- Done Basic API structure using Hono framework
+- Done Health check endpoint
+- Done Placeholder endpoints (compile, resolve, gist, batch)
+- Done README with API documentation
 
 **Dependencies configured:**
 - `hono` - Web framework (Vercel Edge compatible)
@@ -49,24 +49,24 @@ Created the complete monorepo structure as specified in the Technical Architectu
 - TypeScript tooling
 
 ### 4. Browser Extension (lens-extension)
-- ✅ `manifest.json` (Chrome Extension Manifest V3)
-- ✅ `package.json` with build setup
-- ✅ Content script structure
-- ✅ Background service worker
-- ✅ CSS for product overlay
-- ✅ README with loading instructions
+- Done `manifest.json` (Chrome Extension Manifest V3)
+- Done `package.json` with build setup
+- Done Content script structure
+- Done Background service worker
+- Done CSS for product overlay
+- Done README with loading instructions
 
 ### 5. Configuration Files
-- ✅ `.gitignore` - Comprehensive ignore rules
-- ✅ `.env.example` - Environment variable template
-- ✅ Setup verification scripts (PowerShell + Bash)
+- Done `.gitignore` - Comprehensive ignore rules
+- Done `.env.example` - Environment variable template
+- Done Setup verification scripts (PowerShell + Bash)
 
 ### 6. Documentation
-- ✅ `SETUP.md` - Complete setup guide
-- ✅ Updated `README.md` with quick start section
-- ✅ Individual READMEs for each package
+- Done `SETUP.md` - Complete setup guide
+- Done Updated `README.md` with quick start section
+- Done Individual READMEs for each package
 
-## 🚀 Next Steps
+## Next Steps
 
 ### Immediate Actions:
 
@@ -121,7 +121,7 @@ Created the complete monorepo structure as specified in the Technical Architectu
    - [ ] Replicate API account
    - [ ] Generate Ed25519 key pair
 
-## 📋 Infrastructure Setup Checklist
+## Infrastructure Setup Checklist
 
 Based on `docs/08-CTO-NEXT-STEPS.md`:
 
@@ -132,7 +132,7 @@ Based on `docs/08-CTO-NEXT-STEPS.md`:
 - [ ] **Ed25519 Keys**: Generate signing key pair
 - [ ] **GitHub**: Create organization `thingsthatmatter` (if not done)
 
-## 🔧 Development Workflow
+## Development Workflow
 
 ### Rust Development
 ```bash
@@ -164,7 +164,7 @@ pnpm build
 - **CTO Next Steps**: [docs/08-CTO-NEXT-STEPS.md](./docs/08-CTO-NEXT-STEPS.md)
 - **Development Roadmap**: [docs/04-DEVELOPMENT-ROADMAP.md](./docs/04-DEVELOPMENT-ROADMAP.md)
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **Environment Variables**: Never commit `.env` files. They're in `.gitignore`.
 
@@ -174,16 +174,16 @@ pnpm build
 
 4. **WASM Build**: The Rust code will need to be compiled to WASM for the browser extension. This is configured but not yet implemented.
 
-## 🎯 Current Status
+## Current Status
 
-**Sprint 0 (Setup Phase)** - Week 1
-- ✅ Development environment structure created
-- ✅ All packages initialized
-- ⏳ Infrastructure accounts (pending)
-- ⏳ Environment variables (pending)
-- ⏳ Rust learning (in progress)
+**Sprint 0 (Setup Phase)** — Week 1
+- Development environment structure created
+- All packages initialized
+- Infrastructure accounts: pending
+- Environment variables: pending
+- Rust learning: in progress
 
-## 🐛 Troubleshooting
+## Troubleshooting
 
 If you encounter issues:
 

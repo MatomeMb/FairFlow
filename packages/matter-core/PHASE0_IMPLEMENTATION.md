@@ -6,31 +6,31 @@ Phase 0 steganography validation tools have been implemented in `matter-core`. T
 
 ## Implementation Status
 
-✅ **Complete** - All Phase 0 validation tools implemented and tested.
+**Complete** - All Phase 0 validation tools implemented and tested.
 
 ### Implemented Features
 
 1. **XMP Metadata Injection (Layer A)**
-   - ✅ JPEG XMP injection (`inject_xmp_jpeg`)
-   - ✅ PNG XMP injection (`inject_xmp_png`)
-   - ✅ XMP metadata generation with hash + gist
-   - ✅ XMP extraction from both formats
+   - Done JPEG XMP injection (`inject_xmp_jpeg`)
+   - Done PNG XMP injection (`inject_xmp_png`)
+   - Done XMP metadata generation with hash + gist
+   - Done XMP extraction from both formats
 
 2. **EOF Binary Append (Layer B)**
-   - ✅ EOF marker-based binary append
-   - ✅ Length-prefixed payload storage
-   - ✅ Backward search extraction
-   - ✅ Image integrity validation
+   - Done EOF marker-based binary append
+   - Done Length-prefixed payload storage
+   - Done Backward search extraction
+   - Done Image integrity validation
 
 3. **Full Polyglot Embedding**
-   - ✅ Combined XMP + EOF embedding
-   - ✅ Format detection (JPEG/PNG)
-   - ✅ ProductGist serialization
+   - Done Combined XMP + EOF embedding
+   - Done Format detection (JPEG/PNG)
+   - Done ProductGist serialization
 
 4. **CLI Testing Tool**
-   - ✅ `steg-test` binary for validation testing
-   - ✅ Individual operation commands
-   - ✅ Full embedding workflow
+   - Done `steg-test` binary for validation testing
+   - Done Individual operation commands
+   - Done Full embedding workflow
 
 ## Module Structure
 
@@ -122,11 +122,11 @@ cargo test --lib steg
 ```
 
 Test coverage:
-- ✅ XMP generation
-- ✅ EOF append/extract
-- ✅ Format detection
-- ✅ ProductGist serialization
-- ✅ Integration tests
+- Done XMP generation
+- Done EOF append/extract
+- Done Format detection
+- Done ProductGist serialization
+- Done Integration tests
 
 ## Next Steps for Phase 0
 
@@ -169,5 +169,5 @@ All operations are fast enough for <500ms compile target.
 ---
 
 **Implementation Date:** January 26, 2026  
-**Status:** ✅ Complete and tested  
+**Status:** Complete and tested  
 **Ready for:** Platform validation testing

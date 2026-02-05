@@ -96,10 +96,10 @@ src/
 │   ├── matter.rs       # CLI: matter compile <input.json>
 │   ├── steg-test.rs    # Steganography testing tool
 │   └── platform-test.rs # Platform validation testing tool
-├── compiler/           # Compilation pipeline ✅ Hash matches API
+├── compiler/           # Compilation pipeline (hash matches API)
 ├── crypto/             # Ed25519 signing (in progress)
 ├── schema/             # FlatBuffers definitions (in progress)
-├── steg/               # Steganography engine ✅ Complete
+├── steg/               # Steganography engine (complete)
 │   ├── mod.rs          # Main steganography API
 │   ├── xmp.rs          # XMP metadata injection/extraction
 │   └── eof.rs          # EOF binary append/extraction
@@ -116,13 +116,13 @@ src/
 
 ## Status
 
-✅ **Phase 0 Implementation Complete** - Steganography module fully implemented with XMP metadata injection/extraction and EOF binary append/extraction. Ready for platform validation testing.
+**Phase 0 implementation complete.** Steganography module: XMP metadata injection/extraction and EOF binary append/extraction. Ready for platform validation testing.
 
-**Implemented Features:**
-- ✅ XMP metadata injection/extraction (JPEG & PNG)
-- ✅ EOF binary append/extraction
-- ✅ Polyglot image embedding (combined XMP + EOF)
-- ✅ Image format detection
-- ✅ Testing binaries (`steg-test`, `platform-test`)
+**Implemented:**
+- XMP metadata injection/extraction (JPEG and PNG)
+- EOF binary append/extraction
+- Polyglot image embedding (combined XMP + EOF)
+- Image format detection
+- Testing binaries (`steg-test`, `platform-test`)
 
 See [PHASE0_IMPLEMENTATION.md](./PHASE0_IMPLEMENTATION.md) for complete implementation details.

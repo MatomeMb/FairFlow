@@ -25,7 +25,7 @@ This document outlines immediate next steps, priorities, and action items for th
 
 ## Immediate Priorities (This Week: Jan 21-27, 2026)
 
-### 🎯 Priority 1: Complete Sprint 0 Setup Tasks
+### Priority 1: Complete Sprint 0 Setup Tasks
 
 | Task | Status | Deadline | Owner | Notes |
 |------|--------|----------|-------|-------|
@@ -38,12 +38,12 @@ This document outlines immediate next steps, priorities, and action items for th
 | Set up Cloudflare R2 bucket | -- Pending | Jan 30, 2026 | CTO | Artifact storage |
 | Begin Rust learning | -- In Progress | Ongoing | CTO | Chapters 1-5 |
 
-### 🔧 Priority 2: Infrastructure Accounts Setup
+### Priority 2: Infrastructure Accounts Setup
 
 **Action Items:**
 
 1. **Create accounts** (if not already done):
-   - ✅ GitHub Organization: `thingsthatmatter`
+   - Done: GitHub Organization: `thingsthatmatter`
    - -- Supabase account (free tier)
    - -- Vercel account (hobby tier)
    - -- Cloudflare account (R2 storage)
@@ -72,7 +72,7 @@ This document outlines immediate next steps, priorities, and action items for th
 - [ ] Rust toolchain installed (`rustup`, `cargo`)
 - [ ] Rust Book: Completed Chapters 1-5
 
-### 🚀 Phase 0 Preparation
+### Phase 0 Preparation
 
 **Begin planning for Phase 0: Validation (Feb 3 - Mar 2)**
 
@@ -154,7 +154,7 @@ Product JSON → Compiler → .thing File → Polyglot Image → Platform Upload
 
 | Survival Rate | Decision | Action Plan |
 |---------------|----------|-------------|
-| ≥70% | ✅ **GO** | Full steganography approach |
+| ≥70% | **GO** | Full steganography approach |
 | 50-69% | ⚠️ **HYBRID** | Steg + matter:// URIs |
 | <50% | 🔄 **PIVOT** | matter:// as primary, steg secondary |
 
@@ -280,7 +280,7 @@ Product JSON → Compiler → .thing File → Polyglot Image → Platform Upload
 ### Immediate Risk Mitigations:
 
 1. **Cursor Pro Limits:**
-   - ✅ Document created (you're reading it)
+   - Document created (you're reading it)
    - -- Batch work requests when possible
    - -- Use slower requests for non-critical tasks
    - -- Plan ahead to minimize back-and-forth
@@ -352,12 +352,12 @@ Product JSON → Compiler → .thing File → Polyglot Image → Platform Upload
 |--------|--------|---------|--------|
 | Infrastructure accounts | 6/6 | ? | -- |
 | Development environment | 100% | ? | -- |
-| GitHub org created | ✅ | ? | -- |
+| GitHub org created | Done | ? | -- |
 | Rust Chapters completed | 5/5 | ? | -- |
-| Monorepo structure | ✅ | ? | -- |
-| Supabase project | ✅ | ? | -- |
-| Vercel deployment | ✅ | ? | -- |
-| R2 bucket | ✅ | ? | -- |
+| Monorepo structure | Done | ? | -- |
+| Supabase project | Done | ? | -- |
+| Vercel deployment | Done | ? | -- |
+| R2 bucket | Done | ? | -- |
 
 ---
 

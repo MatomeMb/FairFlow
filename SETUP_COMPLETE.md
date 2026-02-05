@@ -1,50 +1,50 @@
-# Development Environment Setup - COMPLETE ✅
+# Development Environment Setup — Complete
 
 ## Summary
 
 Your development environment for `.things that Matter` is fully configured and ready for development!
 
-## ✅ What's Been Set Up
+## What Has Been Set Up
 
 ### 1. Project Structure
-- ✅ Monorepo structure with all packages
-- ✅ Rust project (matter-core) - compiles successfully
-- ✅ Node.js API (shadow-index) - dependencies installed
-- ✅ Browser extension (lens-extension) - structure created
+- Done Monorepo structure with all packages
+- Done Rust project (matter-core) - compiles successfully
+- Done Node.js API (shadow-index) - dependencies installed
+- Done Browser extension (lens-extension) - structure created
 
 ### 2. Development Tools
-- ✅ Rust 1.93.0 installed and working
-- ✅ Node.js v23.10.0 installed
-- ✅ pnpm v10.28.1 installed
-- ✅ Git configured
+- Done Rust 1.93.0 installed and working
+- Done Node.js v23.10.0 installed
+- Done pnpm v10.28.1 installed
+- Done Git configured
 
 ### 3. API Keys & Services
-- ✅ **Supabase** - Database configured
+- Done **Supabase** - Database configured
   - URL: `https://uxvmiyeulgenvxzaobdw.supabase.co`
   - Anon Key: Configured
   - Service Key: Configured
 
-- ✅ **Cloudflare R2** - Storage configured
+- Done **Cloudflare R2** - Storage configured
   - Account ID: `8a88a5da59b06e6f59debaa8fb68cf7c`
   - Access Key ID: Configured
   - Secret Access Key: Configured
   - Bucket: `matter-artifacts`
   - S3 Endpoint: Configured
 
-- ✅ **Replicate** - CLIP API configured
+- Done **Replicate** - CLIP API configured
   - API Key: Configured
 
-- ✅ **Ed25519 Keys** - Cryptographic signing
+- Done **Ed25519 Keys** - Cryptographic signing
   - Private Key: Generated and configured
   - Public Key: Generated and configured
 
 ### 4. Configuration Files
-- ✅ `.env` file with all API keys
-- ✅ `.gitignore` configured
-- ✅ Setup documentation created
-- ✅ Helper scripts created
+- Done `.env` file with all API keys
+- Done `.gitignore` configured
+- Done Setup documentation created
+- Done Helper scripts created
 
-## 🚀 Next Steps
+## Next Steps
 
 ### Immediate Actions
 
@@ -90,7 +90,7 @@ pnpm build        # Build extension
 # Load dist/ folder in Chrome/Firefox
 ```
 
-## 📋 Testing Checklist
+## Testing Checklist
 
 - [ ] API server starts successfully
 - [ ] Health endpoint responds (`/health`)
@@ -106,29 +106,29 @@ pnpm build        # Build extension
 - **Technical Architecture:** `docs/02-TECHNICAL-ARCHITECTURE.md`
 - **CTO Next Steps:** `docs/08-CTO-NEXT-STEPS.md`
 
-## 🔧 Helper Scripts
+## Helper Scripts
 
 - `scripts/setup-check.ps1` - Verify environment setup
 - `scripts/test-setup.ps1` - Test API keys configuration
 - `scripts/setup-api-keys.ps1` - API keys setup helper
 - `scripts/generate-ed25519-keys.py` - Generate signing keys
 
-## ⚠️ Important Notes
+## Important Notes
 
 1. **Never commit `.env` file** - It's in `.gitignore`
 2. **Keep service keys secret** - Especially Supabase service key and R2 secret
 3. **Monitor API usage** - Set up billing alerts for Cloudflare R2 and Replicate
 4. **Backup Ed25519 private key** - If lost, you'll need to regenerate
 
-## 🎯 Current Status
+## Current Status
 
-**Sprint 0 (Setup Phase)** - ✅ **COMPLETE**
+**Sprint 0 (Setup Phase)** — Complete
 
-- ✅ Development environment operational
-- ✅ All infrastructure accounts created
-- ✅ All API keys configured
-- ✅ Project structure established
-- ✅ Dependencies installed
+- Development environment operational
+- All infrastructure accounts created
+- All API keys configured
+- Project structure established
+- Dependencies installed
 
 **Ready for:** Phase 0 - Validation (Steganography testing)
 
@@ -139,4 +139,4 @@ pnpm build        # Build extension
 
 ---
 
-🎉 **Congratulations! Your development environment is ready. Time to build!** 🚀
+Development environment is ready. See [docs/PROGRESS-AND-VERSION.md](./docs/PROGRESS-AND-VERSION.md) for current sprint and next steps.
