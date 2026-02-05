@@ -13,6 +13,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
 
 const app = new Hono();
 
@@ -65,6 +66,9 @@ const __dirname = path.dirname(__filename);
 const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
 const indexFile = path.join(dataRoot, 'index.json');
+
+const storageMode = process.env.STORAGE_MODE || 'local';
+const useR2 = storageMode === 'r2' && isR2Configured();
 
 const productSchema = z.object({
   id: z.string().optional(),
@@ -176,18 +180,24 @@ app.post('/compile', async (c) => {
   const matterUri = buildMatterUri(hash);
   const thingPayload = buildThingPayload(hash, product);
   const thingPath = path.join(thingsDir, `${hash}.thing`);
-  await fs.writeFile(thingPath, JSON.stringify(thingPayload, null, 2), 'utf8');
 
-  const port = Number(process.env.PORT) || 3000;
-  const baseUrl = `http://localhost:${port}`;
-  const thingUrl = `${baseUrl}/thing/${hash}`;
+  let thingUrl: string;
+  if (useR2) {
+    const buffer = Buffer.from(JSON.stringify(thingPayload, null, 2), 'utf8');
+    thingUrl = await uploadThing(hash, buffer);
+  } else {
+    await fs.writeFile(thingPath, JSON.stringify(thingPayload, null, 2), 'utf8');
+    const port = Number(process.env.PORT) || 3000;
+    const baseUrl = `http://localhost:${port}`;
+    thingUrl = `${baseUrl}/thing/${hash}`;
+  }
 
   const index = await loadIndex();
   index[hash] = {
     hash,
     matter_uri: matterUri,
     thing_url: thingUrl,
-    thing_path: thingPath,
+    thing_path: useR2 ? thingUrl : thingPath,
     image_url: parsed.data.image_url,
     checkout_url: parsed.data.checkout_url,
     gist: {
@@ -249,13 +259,22 @@ app.post('/batch', async (c) => {
   return c.json(err('not_implemented', 'Batch compilation is not yet implemented'), 501);
 });
 
-// Serve .thing payloads for MVP
+// Serve .thing payloads for MVP (from R2 or local)
 app.get('/thing/:hash', async (c) => {
   const hash = c.req.param('hash');
+  if (useR2) {
+    const data = await getThing(hash);
+    if (data === null) {
+      return c.json(err('not_found', `No .thing file found for hash: ${hash}`, { hash }), 404);
+    }
+    return c.body(new Uint8Array(data), 200, {
+      'Content-Type': 'application/octet-stream',
+    });
+  }
   const filePath = path.join(thingsDir, `${hash}.thing`);
   try {
     const data = await fs.readFile(filePath);
-    return c.body(data, 200, {
+    return c.body(new Uint8Array(data), 200, {
       'Content-Type': 'application/octet-stream',
     });
   } catch (error) {
@@ -272,6 +291,7 @@ const port = Number(process.env.PORT) || 3000;
 if (process.env.NODE_ENV !== 'test') {
   console.log(`🚀 Shadow Index API starting on http://localhost:${port}`);
   console.log(`📡 Health check: http://localhost:${port}/health`);
+  if (useR2) console.log('📦 R2 storage enabled');
   serve({
     fetch: app.fetch,
     port,

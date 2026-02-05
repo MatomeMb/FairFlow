@@ -97,7 +97,7 @@ All project documentation is organized in the `docs/` folder.
 | [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 plan (Feb 3-16, 2026) — **Complete, v0.1.0** |
 | [**Sprint 2 Plan**](./docs/12-SPRINT-2-PLAN.md) | **Sprint 2 P1 scope (Feb 17 – Mar 2, 2026) — Complete, v0.2.0** |
 | [**Sprint 2 Closeout**](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout memo: test commands, E2E sign-off, CEO sync points** |
-| [**Sprint 3 Plan**](./docs/13-SPRINT-3-PLAN.md) | **Sprint 3 P2 scope (Mar 3–16, 2026) — Planning phase** |
+| [**Sprint 3 Plan**](./docs/13-SPRINT-3-PLAN.md) | **Sprint 3 (Feb 17 – Mar 2, 2026) — Complete, v0.3.0 (R2, Rust compiler, matter CLI)** |
 | [**CEO Sync (Sprint 2)**](./docs/CEO-SYNC-SPRINT-2.md) | **One-pager: Sprint 2 features delivered, demo flow, Sprint 3 scope** |
 | [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Complete guide for setting up API keys |
 
@@ -211,11 +211,12 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | **Sprint 7** | Apr 28-May 11, 2026 | Beta Fixes & Hardening | v1.0.0-rc | ⏳ Planned |
 | **Sprint 8** | May 12-25, 2026 | Production Launch | v1.0.0 | ⏳ Planned |
 
-**Current Status (Feb 3, 2026):**
+**Current Status:**
 
-✅ **Sprint 2 Complete** — All P1 items shipped and tested.
+✅ **Sprint 3 Complete** — R2 storage, Rust compiler, and matter CLI shipped.
 - **v0.1.0 (Sprint 1):** Core vertical slice (compile → resolve → display)
 - **v0.2.0 (Sprint 2):** XMP beacon detection, platform-test JSON logging, auth/rate limits, error handling
+- **v0.3.0 (Sprint 3):** R2 storage (MVP-03), Rust Compiler::compile(), matter CLI (`matter compile <file.json>`)
 
 **Features Delivered (Sprint 2):**
 - XMP beacon extraction from JPEG (APP1) and PNG (iTXt)
@@ -229,7 +230,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 - Vitest: 12/12 tests pass ✅
 - Cargo (Rust): 8/11 pass, 3 deferred ✅
 - Manual E2E: PASS (overlay displays correctly) ✅
-- Git tag: v0.2.0 pushed to origin ✅
+- Git tag: v0.2.0 (Sprint 2). v0.3.0 (Sprint 3) — R2 + Rust compiler + matter CLI.
 
 **Next:** Sprint 3 scope confirmation with CEO; batch compilation and merchant catalog import planned for Mar 3 start.
 

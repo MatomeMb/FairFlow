@@ -18,6 +18,17 @@ cargo build
 cargo test
 ```
 
+### Compiler & CLI (Sprint 3)
+
+The compiler turns product JSON into `.thing` files; the hash matches the Shadow Index API.
+
+```bash
+cargo test compiler
+cargo build --release --bin matter
+./target/release/matter compile product.json
+# → Writes {hash}.thing and prints matter://{hash}
+```
+
 ## Building for WASM
 
 ```bash
@@ -82,9 +93,10 @@ See [../../docs/PHASE0_PLATFORM_TESTING.md](../../docs/PHASE0_PLATFORM_TESTING.m
 src/
 ├── lib.rs              # Main library entry point
 ├── bin/
+│   ├── matter.rs       # CLI: matter compile <input.json>
 │   ├── steg-test.rs    # Steganography testing tool
 │   └── platform-test.rs # Platform validation testing tool
-├── compiler/           # Compilation pipeline (in progress)
+├── compiler/           # Compilation pipeline ✅ Hash matches API
 ├── crypto/             # Ed25519 signing (in progress)
 ├── schema/             # FlatBuffers definitions (in progress)
 ├── steg/               # Steganography engine ✅ Complete

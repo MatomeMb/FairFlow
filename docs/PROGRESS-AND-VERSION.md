@@ -8,13 +8,13 @@ Single source of truth for **code version**, **sprint state**, and **P1 (next sp
 
 | Package | Version | Notes |
 |---------|---------|--------|
-| **shadow-index** | 0.2.0 | Auth (MVP-09), rate limit, error shape (MVP-10) |
+| **shadow-index** | 0.3.0 | R2 storage (MVP-03), STORAGE_MODE, run-with-env; auth, rate limit |
 | **lens-extension** | 0.2.0 | XMP beacon detection (MVP-07) |
-| **matter-core** | 0.2.0 | Platform-test JSON logging (MVP-08) |
+| **matter-core** | 0.3.0 | Rust Compiler::compile(), matter CLI, hash matches API |
 
-**Release label:** `v0.2.0` / Sprint 2 P1 complete
+**Release label:** `v0.3.0` / Sprint 3 complete
 
-**Reproducing this state:** Use git tag `v0.2.0` (Sprint 2 P1 complete). See [Sprint 2 Closeout](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) or [How to Run the MVP Demo](./11-SPRINT-1-PLAN.md#how-to-run-the-mvp-demo) to run the full flow (Sprint 1 + Sprint 2 features).
+**Reproducing this state:** Use git tag `v0.3.0` (Sprint 3 complete). See [Sprint 3 Plan](./13-SPRINT-3-PLAN.md), [RUST-COMPILER-CTO-GUIDE](./RUST-COMPILER-CTO-GUIDE.md), and [How to Run the MVP Demo](./11-SPRINT-1-PLAN.md#how-to-run-the-mvp-demo). R2: set STORAGE_MODE=r2 and CLOUDFLARE_R2_* in packages/shadow-index/.env.
 
 ---
 
@@ -24,6 +24,7 @@ Single source of truth for **code version**, **sprint state**, and **P1 (next sp
 |--------|--------|--------|------|
 | **Sprint 1** | Feb 3 – Feb 16, 2026 | **Complete** | MVP vertical slice: compile → resolve → display with `matter://` |
 | **Sprint 2** | Feb 17 – Mar 2, 2026 | **Complete** | P1: XMP beacon, platform results logging, auth/rate limits, error handling |
+| **Sprint 3** | Feb 17 – Mar 2, 2026 | **Complete** | R2 storage (MVP-03), Rust Compiler::compile(), matter CLI; see [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) |
 
 **Definition of Done (Sprint 1):** All MVP-01, MVP-02, MVP-04, MVP-05, MVP-06 done. Build passes, tests pass (Vitest 7/7, Playwright 2 automated + 1 manual, `cargo test` 8 pass / 3 ignored). Demo runbook and manual E2E doc in place.
 
@@ -58,7 +59,7 @@ P1 items for **Sprint 2** (Feb 17 – Mar 2, 2026) are **all done**. See [12-SPR
 
 **Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md) — P1 section.
 
-**Sprint 3 scope:** To be planned. Recommended next items: Rust compiler (MVP-11) and R2 storage (MVP-03).
+**Sprint 3 (complete):** MVP-03 (R2 storage), Rust Compiler::compile(), matter CLI delivered. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md), [RUST-COMPILER-CTO-GUIDE.md](./RUST-COMPILER-CTO-GUIDE.md). P2 (MVP-11–14) deferred to Sprint 4.
 
 ---
 
@@ -70,4 +71,4 @@ P1 items for **Sprint 2** (Feb 17 – Mar 2, 2026) are **all done**. See [12-SPR
 
 ---
 
-*Last updated: Sprint 2 closeout (Mar 2026). Sprint 2 P1 items complete; tag `v0.2.0` = Sprint 2 P1 complete; Sprint 1 demo flow remains stable and integrated.*
+*Last updated: Sprint 3 closeout (Mar 2026). Tag `v0.3.0` = Sprint 3 complete (R2 storage, Rust compiler, matter CLI). Sprint 1 and 2 demo flow remains stable.*
