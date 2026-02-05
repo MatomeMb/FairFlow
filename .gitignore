@@ -26,6 +26,7 @@ build/
 *.wasm.map
 
 # IDE
+.cursor/
 .vscode/
 .idea/
 *.swp
