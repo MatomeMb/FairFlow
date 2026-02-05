@@ -75,6 +75,51 @@ Every product processed by our compiler exists simultaneously as:
 
 ---
 
+## Current Sprint (Sprint 2: Feb 6–19, 2026)
+
+**Goal:** MVP-13 Extension Caching — IndexedDB cache, overlay performance, cross-browser validation  
+**Capacity:** 10 working days × 5 hours = 50 hours  
+**Target Version:** lens-extension v0.3.0
+
+### Daily Breakdown (5-Hour Work Days)
+
+**Week 1: Planning & Implementation (Feb 6–12)**
+
+| Day | Date | Focus | Subtasks (5h each) | Status |
+|-----|------|-------|-------------------|--------|
+| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | ⏳ |
+| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | ⏳ |
+| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | ⏳ |
+| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | ⏳ |
+| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Remove old code (0.5h) → Overlay optimization (1h) → E2E test (1.5h) → Verify IndexedDB (1h) | ⏳ |
+
+**Week 2: Cross-Browser, Polish, Release (Feb 13–19)**
+
+| Day | Date | Focus | Subtasks (5h each) | Status |
+|-----|------|-------|-------------------|--------|
+| Fri | Feb 13 | Cross-Browser Test | Chrome 110+ (1h) → Edge 110+ (1h) → Brave 1.62+ (1h) → Document quirks (1h) → Update docs (1h) | ⏳ |
+| Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | ⏳ |
+| Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | ⏳ |
+| Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | ⏳ |
+| Thu | Feb 19 | Sprint Review & Release | Demo prep (1h) → Demo/recording (1h) → Git tag v0.3.0 (1h) → Update progress (1h) → Retrospective (1h) | ⏳ |
+
+### Key Deliverables
+
+- **Feb 6:** Sprint plan + IndexedDB schema finalized
+- **Feb 9:** AC1 + AC2 tests passing (cache-on-read, cache-on-success)
+- **Feb 10:** AC3 + AC4 tests passing (no cache on error, TTL enforcement)
+- **Feb 11:** Cache functions in background.js (`cacheGet`, `cacheSet`)
+- **Feb 12:** Content script integration + overlay optimization + E2E manual test
+- **Feb 13:** Chrome/Edge/Brave cross-browser validation
+- **Feb 16:** Test suite finalized + docs updated
+- **Feb 17:** Performance baselines (cache hit <20ms, overlay render <50ms)
+- **Feb 18:** All bugs fixed + regression test passing
+- **Feb 19:** v0.3.0 tagged + demo delivered to CEO
+
+**Detailed daily breakdown:** [docs/SPRINT-2-DAILY-BREAKDOWN.md](./docs/SPRINT-2-DAILY-BREAKDOWN.md)
+
+---
+
 ## Documentation
 
 All project documentation is in the `docs/` folder. **Current plan and status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md) (single source of truth), [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) (revised 8-sprint schedule), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) (day-by-day estimates).
