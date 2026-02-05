@@ -61,27 +61,25 @@ Phase 0 ─┼──────┼──────┤      │      │      
 
 ### 1.3 Actual Execution (2026) & Revised Milestones
 
-**Single source of truth for dates:** [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) — 8-Sprint Delivery Timeline (Feb–May 2026).
+**Single source of truth for dates:** [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md). **Timeline as of Feb 5, 2026:** all delivered work is in Sprint 1 (Jan 20 – Feb 5); Sprints 2–8 run Feb 6 – May 14, 2026.
 
 | Period | Delivered (actual) | Notes |
 |--------|--------------------|-------|
-| **Sprint 1** (Feb 3 – Feb 16) | MVP vertical slice | compile → resolve → matter:// → overlay; tests |
-| **Sprint 2** (Feb 17 – Mar 2) | P1: XMP, platform test, auth, rate limit, error shape | MVP-07–MVP-10 |
-| **Sprint 3** (Mar 3 – Mar 16) | R2 storage, Rust compiler, matter CLI | MVP-03; hash-aligned API |
-| **Sprint 4** (Mar 17 – Mar 30) | Batch API, catalog import, catalog-upload demo | MVP-11, MVP-12; v0.4.0 |
+| **Sprint 0** (by Jan 19) | Setup | Environment, contracts, monorepo |
+| **Sprint 1** (Jan 20 – Feb 5) | Full MVP through batch/catalog | MVP slice; P1 (XMP, auth, errors); R2; Rust compiler; POST /batch, /catalog/import; catalog-upload demo; v0.4.0 |
 
 **Revised milestone dates (realistic):**
 
-| Milestone | Original estimate | Revised (actual or planned) |
-|-----------|-------------------|-----------------------------|
-| Phase 0 / MVP slice | Mar 2, 2026 | **Feb 16, 2026** (done) |
-| Foundation / 30% (R2 + Rust) | Apr 27, 2026 | **Mar 16, 2026** (done) |
-| Core / 50% (batch, catalog) | Jul 20, 2026 | **Mar 30, 2026** (done) |
-| 75% (caching, analytics, beta prep) | Aug 17, 2026 | **May 25, 2026** (Sprint 8) |
-| Beta launch | Oct 26, 2026 | **Sep 30, 2026** |
-| Public launch | Dec 15, 2026 | **Dec 15, 2026** (unchanged) |
+| Milestone | Revised (actual or planned) |
+|-----------|-----------------------------|
+| Phase 0 / MVP through batch & catalog | **Feb 5, 2026** (done, Sprint 1) |
+| Extension caching + analytics (75%) | **Mar 5, 2026** (Sprint 3) |
+| Beta readiness | **Mar 19, 2026** (Sprint 4) |
+| Beta launch prep | **Apr 2, 2026** (Sprint 5) |
+| Beta program | **Apr 30, 2026** (Sprint 7) |
+| Public launch | **Dec 15, 2026** (unchanged) |
 
-Sections 2.1–2.6 below remain the **original** detailed breakdown; use them for task-level reference and align sprint numbers with the 2-week Scrum sprints (Sprint 1–4 = delivered; Sprint 5–8 = remaining). **Day-by-day work and realistic hour estimates** for Sprints 5–8: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
+**Day-by-day work** for Sprints 2–8: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
 
 ---
 

@@ -15,7 +15,7 @@
 
 This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
 
-**Current status (March 2026):** Sprints 1–4 complete. MVP path live: compile → R2/local storage → resolve → matter:// → extension overlay; batch and catalog import (POST /batch, POST /catalog/import) and lite merchant demo (catalog-upload.html) delivered. Release **v0.4.0** tagged. Next: **Sprint 5** (MVP-13 extension caching). Day-by-day work and realistic estimates: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+**Current status (Feb 5, 2026):** Sprint 1 complete (Jan 20 – Feb 5). MVP path live: compile → R2/local storage → resolve → matter:// → extension overlay; batch and catalog import and lite merchant demo delivered; **v0.4.0** tagged. Next: **Sprint 2** (Feb 6 – Feb 19, MVP-13 extension caching). Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -75,11 +75,8 @@ This folder contains the complete project documentation for **.things that Matte
 | Date | Milestone | Status |
 |------|-----------|--------|
 | Jan 21, 2026 | Contract signed | Done |
-| Feb 16, 2026 | Phase 0 / MVP slice (compile → overlay) | Done |
-| Mar 2, 2026 | P1 hardening (XMP, auth, errors) | Done |
-| Mar 16, 2026 | R2 + Rust compiler (30%) | Done |
-| Mar 30, 2026 | Batch + catalog (50%) | Done |
-| May 25, 2026 | Caching, analytics, beta prep (75%) | Planned |
+| Feb 5, 2026 | MVP through batch & catalog (Sprint 1) | Done |
+| Mar 5, 2026 | Caching, analytics (75%) | Planned (Sprint 3) |
 | Sep 30, 2026 | Beta launch (90%) | Planned |
 | Dec 15, 2026 | Public launch (100%) | Planned |
 

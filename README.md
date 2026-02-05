@@ -175,23 +175,23 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## 8-Sprint Delivery Timeline (Revised Plan — Feb–May 2026)
+## 8-Sprint Delivery Timeline (Realistic Dates — As of Feb 5, 2026)
 
 *Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
 
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
-| Sprint 0 | Jan–Feb 2, 2026 | Setup and architecture | — | Complete |
-| Sprint 1 | Feb 3–16, 2026 | MVP vertical slice: compile–resolve–display | v0.1.0 | Complete |
-| Sprint 2 | Feb 17–Mar 2, 2026 | P1: XMP beacon, auth, rate limit, error shape | v0.2.0 | Complete |
-| Sprint 3 | Mar 3–16, 2026 | R2 storage, Rust compiler, matter CLI | v0.3.0 | Complete |
-| Sprint 4 | Mar 17–30, 2026 | Batch (MVP-11), catalog import (MVP-12), catalog-upload demo | v0.4.0 | Complete |
-| Sprint 5 | Mar 31–Apr 13, 2026 | Extension caching (MVP-13), overlay polish | v0.5.0 | Planned |
-| Sprint 6 | Apr 14–27, 2026 | Analytics (MVP-14), observability | — | Planned |
-| Sprint 7 | Apr 28–May 11, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
-| Sprint 8 | May 12–25, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
+| Sprint 0 | By Jan 19, 2026 | Setup and architecture | — | Complete |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | Complete |
+| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13), overlay polish | v0.5.0 | Planned |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — | Planned |
+| Sprint 4 | Mar 6–19, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
+| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
+| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — | Planned |
+| Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
+| Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
 
-**Current status:** Sprints 1–4 complete; **v0.4.0** released (shadow-index batch/catalog, lens-extension v0.2.0, matter-core v0.3.0). Next: Sprint 5 (MVP-13 IndexedDB caching). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 1 complete by Feb 5, 2026; **v0.4.0** released. Next: Sprint 2 (Feb 6 – Feb 19, MVP-13 IndexedDB caching). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
