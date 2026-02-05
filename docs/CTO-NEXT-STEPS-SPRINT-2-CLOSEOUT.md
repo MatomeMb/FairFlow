@@ -94,11 +94,24 @@ Sprint 3 window: **Mar 3 – Mar 16, 2026** (or per CEO/CTO alignment).
 
 | # | Action | Owner | Status |
 |---|--------|--------|--------|
-| 1 | Run test commands (cargo test, build, vitest) | CTO | ✅ Done |
-| 2 | Execute manual E2E smoke test; sign-off in MANUAL-E2E-SMOKE | CTO | ⏳ Action (run steps in § 2; sign-off in MANUAL-E2E-SMOKE § 5) |
-| 3 | Create git tag v0.2.0 | CTO | ✅ Done |
-| 4 | Brief CEO sync on features delivered | CTO / CEO | ⏳ Action (use [CEO-SYNC-SPRINT-2.md](./CEO-SYNC-SPRINT-2.md)) |
-| 5 | Plan Sprint 3 scope; publish 13-SPRINT-3-PLAN.md | CTO | ✅ Done |
+| 1 | Run test commands (cargo test, build, vitest) | CTO | Done |
+| 2 | Execute manual E2E smoke test; sign-off in MANUAL-E2E-SMOKE | CTO | Done (Sprint 2 row signed off in MANUAL-E2E-SMOKE § 5) or re-run steps in § 2 and sign off if not yet done. |
+| 3 | Create git tag v0.2.0 | CTO | Done |
+| 4 | Brief CEO sync on features delivered | CTO / CEO | Action (use [CEO-SYNC-SPRINT-2.md](./CEO-SYNC-SPRINT-2.md)) |
+| 5 | Plan Sprint 3 scope; publish 13-SPRINT-3-PLAN.md | CTO | Done |
+
+---
+
+---
+
+## 7. Remaining actions for you
+
+1. **Manual E2E (if not already signed off):** Run the steps in § 2; if the overlay shows image, title, price, and Buy Now with no errors, fill in the Sprint 2 row in [MANUAL-E2E-SMOKE.md](./MANUAL-E2E-SMOKE.md) § 5 (Verified by, Date, Result: PASS/FAIL).
+
+2. **CEO sync:** Use [CEO-SYNC-SPRINT-2.md](./CEO-SYNC-SPRINT-2.md) to brief the CEO on Sprint 2 features (XMP beacon, platform-test JSON, auth/rate limit, error handling) and Sprint 3 scope.
+
+3. **Push tag when ready:**  
+   `git push origin v0.2.0`
 
 ---
 

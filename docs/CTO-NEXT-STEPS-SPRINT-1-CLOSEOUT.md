@@ -17,9 +17,9 @@ Sprint 1 (Feb 3–16, 2026) delivered the MVP vertical slice: **compile → reso
 
 | # | Action | Status | Notes |
 |---|--------|--------|--------|
-| 1.1 | **Tag the release** | ✅ Done | Git tag `v0.1.0` created (Sprint 1 MVP). |
-| 1.2 | **Sign off manual E2E** | ✅ Done | `docs/MANUAL-E2E-SMOKE.md` signed off — full flow verified (overlay: image, title, price, Buy Now). |
-| 1.3 | **CEO sync** | ⏳ Action | Brief demo of the flow, confirm Sprint 1 complete, align on Sprint 2 timing and priorities. |
+| 1.1 | **Tag the release** | Done | Git tag `v0.1.0` created (Sprint 1 MVP). |
+| 1.2 | **Sign off manual E2E** | Done | `docs/MANUAL-E2E-SMOKE.md` signed off — full flow verified (overlay: image, title, price, Buy Now). |
+| 1.3 | **CEO sync** | Action | Brief demo of the flow, confirm Sprint 1 complete, align on Sprint 2 timing and priorities. |
 
 Sprint 2 planning (2.1–2.4) has been started: Sprint 2 window set (Feb 17 – Mar 2, 2026), `docs/12-SPRINT-2-PLAN.md` created, and `docs/PROGRESS-AND-VERSION.md` updated. P1 scope is in the Sprint 2 backlog; CTO/CEO can reprioritise or defer items as needed.
 
@@ -41,10 +41,10 @@ Complete the following before considering Sprint 1 fully closed:
 
 | # | Action | Status | Notes |
 |---|--------|--------|--------|
-| 2.1 | **Set Sprint 2 window** | ✅ Done | Feb 17 – Mar 2, 2026 (2 weeks). |
-| 2.2 | **Select P1 scope** | ✅ Done | All four P1 items in Sprint 2 backlog; CTO/CEO can trim or defer. |
-| 2.3 | **Publish Sprint 2 plan** | ✅ Done | `docs/12-SPRINT-2-PLAN.md` created (goal, backlog, DoD, demo reference). |
-| 2.4 | **Update progress tracking** | ✅ Done | `docs/PROGRESS-AND-VERSION.md` updated: Sprint 2 row added; P1 items set to “Planned for Sprint 2”. |
+| 2.1 | **Set Sprint 2 window** | Done | Feb 17 – Mar 2, 2026 (2 weeks). |
+| 2.2 | **Select P1 scope** | Done | All four P1 items in Sprint 2 backlog; CTO/CEO can trim or defer. |
+| 2.3 | **Publish Sprint 2 plan** | Done | `docs/12-SPRINT-2-PLAN.md` created (goal, backlog, DoD, demo reference). |
+| 2.4 | **Update progress tracking** | Done | `docs/PROGRESS-AND-VERSION.md` updated: Sprint 2 row added; P1 items set to “Planned for Sprint 2”. |
 
 **Reference — Sprint 2 planning (original):**
 

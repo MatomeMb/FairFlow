@@ -479,7 +479,7 @@
 │  Premium Wireless Headphones            │
 │  $149.99 USD                            │
 │                                         │
-│  [✓ Verified by .things that Matter]    │
+│  [x Verified by .things that Matter]    │
 │                                         │
 │  ┌─────────────────────────────────┐    │
 │  │         BUY NOW                 │    │

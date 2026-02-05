@@ -24,11 +24,11 @@ Deliver the MVP vertical slice: **compile → resolve → display** with a `matt
 
 | ID | Item | Status | Notes |
 |----|------|--------|-------|
-| MVP-01 | Compile single product JSON to `.thing` | ✅ Done (via API) | Rust compiler deferred to Sprint 2 |
-| MVP-02 | Generate `matter://` URI from hash | ✅ Done | |
-| MVP-04 | Resolve hash via Shadow Index | ✅ Done | |
-| MVP-05 | Minimal UI renders product from `matter://` | ✅ Done | Image added to overlay — see content.js + content.css |
-| MVP-06 | MVP path tests | ✅ Done | API unit tests (Vitest) + E2E smoke (Playwright or manual) |
+| MVP-01 | Compile single product JSON to `.thing` | Done (via API) | Rust compiler deferred to Sprint 2 |
+| MVP-02 | Generate `matter://` URI from hash | Done | |
+| MVP-04 | Resolve hash via Shadow Index | Done | |
+| MVP-05 | Minimal UI renders product from `matter://` | Done | Image added to overlay — see content.js + content.css |
+| MVP-06 | MVP path tests | Done | API unit tests (Vitest) + E2E smoke (Playwright or manual) |
 
 ---
 
@@ -121,11 +121,11 @@ Run these steps in order:
 
 | ID | Item | Status | Notes |
 |---|---|---|---|
-| MVP-01 | Compile single product JSON to `.thing` | ✅ Done | Implemented in Shadow Index API (`POST /compile`). Rust compiler deferred to Sprint 2. |
-| MVP-02 | Generate `matter://` URI from hash | ✅ Done | `buildMatterUri(hash)` in API. Returns `matter://{hash}`. |
-| MVP-04 | Resolve hash via Shadow Index | ✅ Done | `GET /resolve/:hash` returns full entry. 404 on miss. |
-| MVP-05 | Minimal UI renders product from `matter://` | ✅ Done | Overlay displays title, price, image, and Buy Now. See `content.js` + `content.css`. |
-| MVP-06 | MVP path tests | ✅ Done | Vitest: 7/7 (compile + resolve). Playwright: 2 automated + 1 manual (see `docs/MANUAL-E2E-SMOKE.md`). `cargo test`: 8 pass, 3 ignored. |
+| MVP-01 | Compile single product JSON to `.thing` | Done | Implemented in Shadow Index API (`POST /compile`). Rust compiler deferred to Sprint 2. |
+| MVP-02 | Generate `matter://` URI from hash | Done | `buildMatterUri(hash)` in API. Returns `matter://{hash}`. |
+| MVP-04 | Resolve hash via Shadow Index | Done | `GET /resolve/:hash` returns full entry. 404 on miss. |
+| MVP-05 | Minimal UI renders product from `matter://` | Done | Overlay displays title, price, image, and Buy Now. See `content.js` + `content.css`. |
+| MVP-06 | MVP path tests | Done | Vitest: 7/7 (compile + resolve). Playwright: 2 automated + 1 manual (see `docs/MANUAL-E2E-SMOKE.md`). `cargo test`: 8 pass, 3 ignored. |
 
 ---
 

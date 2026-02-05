@@ -36,7 +36,7 @@ You need accounts and API keys from the following services:
 2. You'll find:
    - **Project URL:** `https://xxxxx.supabase.co`
    - **anon/public key:** `eyJhbGc...` (starts with `eyJ`)
-   - **service_role key:** `eyJhbGc...` (⚠️ Keep this secret!)
+   - **service_role key:** `eyJhbGc...` ([Warning] Keep this secret!)
 
 3. Copy these values to your `.env` file:
    ```
@@ -75,8 +75,8 @@ You need accounts and API keys from the following services:
 3. Fill in:
    - **Token name:** `matter-artifacts-token`
    - **Permissions:** 
-     - ✅ Object Read & Write
-     - ✅ Admin Read (optional, for bucket management)
+     - [OK] Object Read & Write
+     - [OK] Admin Read (optional, for bucket management)
    - **TTL:** Leave blank (no expiration) or set expiration date
    - **Buckets:** Select `matter-artifacts` bucket
 
@@ -182,7 +182,7 @@ These keys are used for cryptographic signing of .thing files. You need to gener
 
 ### Option 3: Using Online Tool (Temporary - for testing only)
 
-⚠️ **Warning:** Only use for development/testing. Never use online tools for production keys.
+**Warning:** Only use for development/testing. Never use online tools for production keys.
 
 1. Go to: https://8gwifi.org/ed25519functions.jsp
 2. Click "Generate Key"
@@ -221,10 +221,10 @@ print(f"SIGNING_PUBLIC_KEY={public_b64}")
 ```
 
 **Security Notes:**
-- ⚠️ **Never commit private keys to git!**
-- ✅ Private keys are in `.gitignore`
-- ✅ Keep private key secure - if compromised, regenerate keys
-- ✅ Public key can be shared (used for verification)
+- [Warning] **Never commit private keys to git!**
+- [OK] Private keys are in `.gitignore`
+- [OK] Keep private key secure - if compromised, regenerate keys
+- [OK] Public key can be shared (used for verification)
 
 ---
 
@@ -290,12 +290,12 @@ pnpm dev
 
 ## Security Best Practices
 
-1. ✅ **Never commit `.env` file** - It's in `.gitignore`
-2. ✅ **Use different keys for development and production**
-3. ✅ **Rotate keys periodically** (especially if exposed)
-4. ✅ **Use environment variables in production** (not .env files)
-5. ✅ **Keep service keys secret** (Supabase service key, R2 secret key)
-6. ✅ **Monitor API usage** to avoid unexpected charges
+1. [OK] **Never commit `.env` file** - It's in `.gitignore`
+2. [OK] **Use different keys for development and production**
+3. [OK] **Rotate keys periodically** (especially if exposed)
+4. [OK] **Use environment variables in production** (not .env files)
+5. [OK] **Keep service keys secret** (Supabase service key, R2 secret key)
+6. [OK] **Monitor API usage** to avoid unexpected charges
 
 ---
 
@@ -303,7 +303,7 @@ pnpm dev
 
 | Service | Free Tier | Estimated Cost (10K products) |
 |---------|-----------|-------------------------------|
-| Supabase | ✅ Free | R0/month |
+| Supabase | [OK] Free | R0/month |
 | Cloudflare R2 | 10 GB free | ~R630/month |
 | Replicate | $10 credit | ~R540/month |
 | **Total** | | **~R1,170/month** |

@@ -55,12 +55,12 @@ Then select "C++ build tools" workload during installation.
 ## What to Select During Installation
 
 **For Build Tools:**
-- ✅ **C++ build tools** (workload)
-- ✅ Windows 10/11 SDK (usually auto-selected)
-- ✅ MSVC v143 compiler toolset (usually auto-selected)
+- [OK] **C++ build tools** (workload)
+- [OK] Windows 10/11 SDK (usually auto-selected)
+- [OK] MSVC v143 compiler toolset (usually auto-selected)
 
 **For Visual Studio Community:**
-- ✅ **Desktop development with C++** (workload)
+- [OK] **Desktop development with C++** (workload)
 - This includes everything needed
 
 ## After Installation

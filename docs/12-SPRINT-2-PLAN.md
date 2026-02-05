@@ -24,10 +24,10 @@ Extend the MVP with P1 capabilities: **XMP beacon detection**, **platform test r
 
 | ID | Item | Owner | Status |
 |----|------|-------|--------|
-| MVP-07 | XMP beacon detection (basic) | CTO | ✅ Done |
-| MVP-08 | Platform test harness results logging | CTO | ✅ Done |
-| MVP-09 | Basic auth and rate limits | CTO | ✅ Done |
-| MVP-10 | Error handling polish | CTO | ✅ Done |
+| MVP-07 | XMP beacon detection (basic) | CTO | Done |
+| MVP-08 | Platform test harness results logging | CTO | Done |
+| MVP-09 | Basic auth and rate limits | CTO | Done |
+| MVP-10 | Error handling polish | CTO | Done |
 
 **Source:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md) — P1 section.
 

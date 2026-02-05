@@ -33,8 +33,8 @@ cargo run --bin platform-test -- test-extraction discord_downloaded.jpg
 ```
 
 This will test:
-- ✓ XMP extraction (Layer A)
-- ✓ EOF extraction (Layer B)
+- XMP extraction (Layer A)
+- EOF extraction (Layer B)
 
 ### Step 4: Record Results
 
@@ -71,36 +71,36 @@ cargo run --bin platform-test -- generate-report results.json
 
 | Platform | Expected XMP | Expected EOF | Test Status |
 |----------|--------------|--------------|-------------|
-| Discord | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Telegram | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Twitter/X | ❌ No | ❌ No | ⏳ Pending |
-| Instagram | ❌ No | ❌ No | ⏳ Pending |
-| Facebook | ❌ No | ❌ No | ⏳ Pending |
-| LinkedIn | ⚠️ Partial | ❌ No | ⏳ Pending |
-| Reddit | ⚠️ Partial | ❌ No | ⏳ Pending |
-| Pinterest | ❌ No | ❌ No | ⏳ Pending |
-| Tumblr | ⚠️ Partial | ❌ No | ⏳ Pending |
+| Discord | Yes | Yes | Pending |
+| Telegram | Yes | Yes | Pending |
+| Twitter/X | No | No | Pending |
+| Instagram | No | No | Pending |
+| Facebook | No | No | Pending |
+| LinkedIn | Partial | No | Pending |
+| Reddit | Partial | No | Pending |
+| Pinterest | No | No | Pending |
+| Tumblr | Partial | No | Pending |
 
 ### Messaging Platforms
 
 | Platform | Expected XMP | Expected EOF | Test Status |
 |----------|--------------|--------------|-------------|
-| WhatsApp | ⚠️ Partial | ❌ No | ⏳ Pending |
-| Signal | ✅ Yes | ✅ Yes | ⏳ Pending |
-| iMessage | ⚠️ Partial | ❌ No | ⏳ Pending |
-| Slack | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Microsoft Teams | ✅ Yes | ✅ Yes | ⏳ Pending |
+| WhatsApp | Partial | No | Pending |
+| Signal | Yes | Yes | Pending |
+| iMessage | Partial | No | Pending |
+| Slack | Yes | Yes | Pending |
+| Microsoft Teams | Yes | Yes | Pending |
 
 ### Other Platforms
 
 | Platform | Expected XMP | Expected EOF | Test Status |
 |----------|--------------|--------------|-------------|
-| Email (Gmail) | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Email (Outlook) | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Google Drive | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Dropbox | ✅ Yes | ✅ Yes | ⏳ Pending |
-| GitHub | ✅ Yes | ✅ Yes | ⏳ Pending |
-| Direct Download | ✅ Yes | ✅ Yes | ⏳ Pending |
+| Email (Gmail) | Yes | Yes | Pending |
+| Email (Outlook) | Yes | Yes | Pending |
+| Google Drive | Yes | Yes | Pending |
+| Dropbox | Yes | Yes | Pending |
+| GitHub | Yes | Yes | Pending |
+| Direct Download | Yes | Yes | Pending |
 
 ## Decision Matrix
 
@@ -108,9 +108,9 @@ Based on survival rates:
 
 | Survival Rate | Decision | Action Plan |
 |---------------|----------|-------------|
-| ≥70% | ✅ **GO** | Full steganography approach |
-| 50-69% | ⚠️ **HYBRID** | Steg + matter:// URIs |
-| <50% | 🔄 **PIVOT** | matter:// as primary, steg secondary |
+| ≥70% | **GO** | Full steganography approach |
+| 50-69% | **HYBRID** | Steg + matter:// URIs |
+| <50% | **PIVOT** | matter:// as primary, steg secondary |
 
 ## Testing Checklist
 

@@ -129,7 +129,7 @@ Create or update `test_output/platform_test_results.json`:
 Repeat Step 3 for each platform. Here's the recommended order:
 
 ### Priority 1: High-Value Platforms (Test First)
-1. ✅ Discord (just completed)
+1. Discord (just completed)
 2. Telegram
 3. Email (Gmail)
 4. Email (Outlook)
@@ -240,9 +240,9 @@ Based on survival rates:
 
 | Survival Rate | Decision | Action |
 |---------------|----------|--------|
-| ≥70% | ✅ **GO** | Full steganography approach |
-| 50-69% | ⚠️ **HYBRID** | Steg + matter:// URIs |
-| <50% | 🔄 **PIVOT** | matter:// as primary |
+| ≥70% | **GO** | Full steganography approach |
+| 50-69% | **HYBRID** | Steg + matter:// URIs |
+| <50% | **PIVOT** | matter:// as primary |
 
 Document your decision in `docs/PHASE0_DECISION.md`.
 
@@ -317,4 +317,4 @@ cargo run --bin platform-test -- generate-report ..\..\test_output\platform_test
 
 ---
 
-**Good luck with your testing! 🚀**
+**Good luck with your testing.**

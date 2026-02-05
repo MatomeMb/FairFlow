@@ -29,14 +29,14 @@ This document outlines immediate next steps, priorities, and action items for th
 
 | Task | Status | Deadline | Owner | Notes |
 |------|--------|----------|-------|-------|
-| Sign new company contract | ⏳ Pending | Jan 31, 2026 | CEO + CTO | Legal foundation |
-| Set up development environment | ⏳ In Progress | Feb 2, 2026 | CTO | Cursor Pro, VS Code, Rust |
-| Create GitHub organization | ⏳ Pending | Jan 25, 2026 | CTO | `thingsthatmatter` org |
-| Initialize monorepo structure | ⏳ Pending | Jan 26, 2026 | CTO | `packages/` directory |
-| Set up Supabase project | ⏳ Pending | Jan 28, 2026 | CTO | Database schema |
-| Configure Vercel deployment | ⏳ Pending | Jan 29, 2026 | CTO | CI/CD pipeline |
-| Set up Cloudflare R2 bucket | ⏳ Pending | Jan 30, 2026 | CTO | Artifact storage |
-| Begin Rust learning | ⏳ In Progress | Ongoing | CTO | Chapters 1-5 |
+| Sign new company contract | -- Pending | Jan 31, 2026 | CEO + CTO | Legal foundation |
+| Set up development environment | -- In Progress | Feb 2, 2026 | CTO | Cursor Pro, VS Code, Rust |
+| Create GitHub organization | -- Pending | Jan 25, 2026 | CTO | `thingsthatmatter` org |
+| Initialize monorepo structure | -- Pending | Jan 26, 2026 | CTO | `packages/` directory |
+| Set up Supabase project | -- Pending | Jan 28, 2026 | CTO | Database schema |
+| Configure Vercel deployment | -- Pending | Jan 29, 2026 | CTO | CI/CD pipeline |
+| Set up Cloudflare R2 bucket | -- Pending | Jan 30, 2026 | CTO | Artifact storage |
+| Begin Rust learning | -- In Progress | Ongoing | CTO | Chapters 1-5 |
 
 ### 🔧 Priority 2: Infrastructure Accounts Setup
 
@@ -44,11 +44,11 @@ This document outlines immediate next steps, priorities, and action items for th
 
 1. **Create accounts** (if not already done):
    - ✅ GitHub Organization: `thingsthatmatter`
-   - ⏳ Supabase account (free tier)
-   - ⏳ Vercel account (hobby tier)
-   - ⏳ Cloudflare account (R2 storage)
-   - ⏳ Replicate account (CLIP API)
-   - ⏳ Redis Cloud (free tier)
+   - -- Supabase account (free tier)
+   - -- Vercel account (hobby tier)
+   - -- Cloudflare account (R2 storage)
+   - -- Replicate account (CLIP API)
+   - -- Redis Cloud (free tier)
 
 2. **Set up billing alerts** for all paid services:
    - Cloudflare R2: ~R630/month limit
@@ -62,7 +62,7 @@ This document outlines immediate next steps, priorities, and action items for th
 
 ## Week 2 Priorities (Jan 28 - Feb 2, 2026)
 
-### 📋 Sprint 0 Completion Checklist
+### Sprint 0 Completion Checklist
 
 - [ ] All infrastructure accounts created and verified
 - [ ] Development environment fully operational
@@ -281,26 +281,26 @@ Product JSON → Compiler → .thing File → Polyglot Image → Platform Upload
 
 1. **Cursor Pro Limits:**
    - ✅ Document created (you're reading it)
-   - ⏳ Batch work requests when possible
-   - ⏳ Use slower requests for non-critical tasks
-   - ⏳ Plan ahead to minimize back-and-forth
+   - -- Batch work requests when possible
+   - -- Use slower requests for non-critical tasks
+   - -- Plan ahead to minimize back-and-forth
 
 2. **Rust Learning Curve:**
-   - ⏳ Start early (ongoing in Sprint 0)
-   - ⏳ C/C++ background provides strong foundation
-   - ⏳ Learn Rust as you build (practical approach)
-   - ⏳ Allocate 3 hours/week minimum for learning
+   - -- Start early (ongoing in Sprint 0)
+   - -- C/C++ background provides strong foundation
+   - -- Learn Rust as you build (practical approach)
+   - -- Allocate 3 hours/week minimum for learning
 
 3. **Budget Management:**
-   - ⏳ Set up billing alerts
-   - ⏳ Monitor monthly spend closely
-   - ⏳ Use free tiers wherever possible
-   - ⏳ Keep 27% operating reserve untouched
+   - -- Set up billing alerts
+   - -- Monitor monthly spend closely
+   - -- Use free tiers wherever possible
+   - -- Keep 27% operating reserve untouched
 
 4. **Steganography Validation:**
-   - ⏳ Test early and often
-   - ⏳ Have matter:// URI fallback ready
-   - ⏳ Document all platform behaviors
+   - -- Test early and often
+   - -- Have matter:// URI fallback ready
+   - -- Document all platform behaviors
 
 ---
 
@@ -350,14 +350,14 @@ Product JSON → Compiler → .thing File → Polyglot Image → Platform Upload
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Infrastructure accounts | 6/6 | ? | ⏳ |
-| Development environment | 100% | ? | ⏳ |
-| GitHub org created | ✅ | ? | ⏳ |
-| Rust Chapters completed | 5/5 | ? | ⏳ |
-| Monorepo structure | ✅ | ? | ⏳ |
-| Supabase project | ✅ | ? | ⏳ |
-| Vercel deployment | ✅ | ? | ⏳ |
-| R2 bucket | ✅ | ? | ⏳ |
+| Infrastructure accounts | 6/6 | ? | -- |
+| Development environment | 100% | ? | -- |
+| GitHub org created | ✅ | ? | -- |
+| Rust Chapters completed | 5/5 | ? | -- |
+| Monorepo structure | ✅ | ? | -- |
+| Supabase project | ✅ | ? | -- |
+| Vercel deployment | ✅ | ? | -- |
+| R2 bucket | ✅ | ? | -- |
 
 ---
 
@@ -479,4 +479,4 @@ SIGNING_PRIVATE_KEY=xxx  # Ed25519 private key (base64)
 
 **Remember:** You're building something revolutionary. Take it one step at a time, validate early, and don't be afraid to pivot if needed. The Phase 0 validation is critical—it will determine the entire technical approach.
 
-**Good luck! 🚀**
+**Good luck.**
