@@ -51,12 +51,12 @@ src/
 
 ## Features
 
-- ✅ Image detection (XMP beacons)
-- ✅ matter:// link interception
-- ✅ Product overlay UI
-- ✅ Ed25519 signature verification (WASM)
-- ✅ Local caching (IndexedDB)
+- Image detection (XMP beacons)
+- matter:// link interception
+- Product overlay UI
+- Ed25519 signature verification (WASM)
+- Local caching (IndexedDB; planned Sprint 5)
 
 ## Status
 
-🚧 **In Development** - This extension is currently being set up. Core functionality will be implemented in Distribution sprint.
+Core functionality (matter:// intercept, overlay, XMP beacon) is implemented. Caching (IndexedDB) planned for Sprint 5.

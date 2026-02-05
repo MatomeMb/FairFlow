@@ -1,0 +1,9 @@
+{
+  "hash": "a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f",
+  "title": "Widget",
+  "price": 99,
+  "currency": "USD",
+  "image_url": "https://example.com/w.jpg",
+  "checkout_url": "https://example.com/buy",
+  "created_at": "2026-02-05T09:03:16.785Z"
+}
