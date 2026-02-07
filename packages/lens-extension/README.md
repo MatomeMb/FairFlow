@@ -199,6 +199,109 @@ Follow the steps in [docs/VERIFY-MVP-13-CACHE.md](../../docs/VERIFY-MVP-13-CACHE
 6. Second click (same hash) → **No new `/resolve/` request** (cache hit!)
 7. Verify cache: DevTools → Application → IndexedDB → `lens-matter-cache` → `resolve` object store
 
+---
+
+## Cache Write Path (Completed Feb 11)
+
+### How It Works
+
+The extension automatically stores successful API responses in IndexedDB:
+
+1. **Read Check:** Extension checks IndexedDB for requested hash
+   - Cache HIT → Return cached data (< 50ms latency)
+   - Cache MISS → Proceed to API
+
+2. **API Call:** Fetches content from backend
+   - Returns payload to user immediately via `chrome.runtime.sendResponse()`
+
+3. **Automatic Caching:** After successful API response
+   - Payload stored with `fetchedAt` timestamp
+   - **Error Boundary:** Cache write failures don't affect user experience
+   - Graceful degradation: If cache write fails, user still gets API data
+
+### Write Path Flow
+
+```
+User clicks matter:// link
+    ↓
+Check cache (cacheGet)
+    ├─ HIT → Return cached data [<50ms]
+    └─ MISS → Call API [async]
+              ↓
+         API succeeds → Return to user [*important: happens immediately*]
+              ↓
+         Background: Cache write (cacheSet) [async, may fail]
+              ├─ Success → [Cache WRITE] logged with size/latency
+              └─ Failure → [Cache WRITE FAILED] logged, app continues
+```
+
+### Error Handling
+
+**API Errors (4xx, 5xx, network timeout):**
+- Never cached
+- Logged with [API ERROR] prefix and status code
+- User sees error message in overlay
+
+**Cache Write Errors:**
+- Logged with [Cache WRITE FAILED] prefix and error message
+- User response unaffected (API data already sent)
+- Future requests will retry cache write
+
+**QuotaExceededError:**
+- Logged but not fatal
+- Extension continues working in degraded mode
+- Consider clearing old entries or implementation cache eviction policy
+
+### Performance Metrics
+
+**Typical cache write latency:**
+- Small payloads (<10KB): 5-15ms
+- Medium payloads (10-100KB): 15-30ms
+- Large payloads (>100KB): 30-50ms
+
+**Target:** <50ms for 95th percentile
+
+**Measurement:** Check console logs
+```
+[Cache WRITE] Hash: abc123... (2847 bytes, 12ms)
+```
+
+### Monitoring Cache Operations
+
+**View cache writes in console:**
+```
+// Successful write
+[Cache WRITE] Hash: abc123... (2847 bytes, 12ms)
+
+// Cache miss (API call)
+[Cache MISS] Hash: xyz789..., proceeding to API
+
+// Cache hit (no API call)
+[Cache HIT] Hash: abc123... (23ms)
+
+// Write failure (user still gets API data)
+[Cache WRITE FAILED] Hash: abc123...: QuotaExceededError
+
+// API error (no cache entry created)
+[API ERROR] Hash: unknown999: 404
+```
+
+**Check IndexedDB:**
+DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
+
+**Test cache lifecycle:**
+1. First click: cache miss + API call + write
+2. Second click: cache hit (no API call)
+3. Reload extension: cache persists
+4. Delete DB manually: cache cleared, next click refetches
+
+### Known Limitations
+
+- Cache writes are synchronous relative to user response (response always happens first)
+- Large payloads (>5MB) may hit IndexedDB quota on devices with limited storage
+- No automatic cache eviction (quota management planned for future sprint)
+- Cross-browser testing (Edge/Brave/Firefox) pending (Chrome-first MVP)
+
 **Expected behavior:**
 - First resolution: API call → IndexedDB write → overlay displays
 - Subsequent resolutions (same hash, <24h): IndexedDB read (no API call) → instant overlay

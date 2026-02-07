@@ -16,6 +16,9 @@ const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 const log = {
   cacheHit: (hash, ms = 0) => console.log(`[Cache HIT] Hash: ${hash}${ms ? ` (${ms}ms)` : ''}`),
   cacheMiss: (hash) => console.log(`[Cache MISS] Hash: ${hash}, proceeding to API`),
+  cacheWrite: (hash, bytes, ms = 0) => console.log(`[Cache WRITE] Hash: ${hash} (${bytes} bytes${ms ? `, ${ms}ms` : ''})`),
+  cacheWriteError: (hash, err) => console.error(`[Cache WRITE FAILED] Hash: ${hash}: ${err.message}`),
+  apiError: (hash, status) => console.error(`[API ERROR] Hash: ${hash}: ${status}`),
   error: (msg) => console.error(`[Cache ERROR] ${msg}`),
   init: (msg) => console.log(`[Cache] ${msg}`),
 };
@@ -144,11 +147,31 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       log.cacheMiss(hash);
       const baseUrl = await getApiBaseUrl();
       const data = await fetchResolve(baseUrl, hash);
-      // Note: cacheSet() NOT called yet (Wednesday sprint for write path integration)
+      
+      // Wednesday: Cache write with error boundary
+      const payloadSize = JSON.stringify(data).length;
+      try {
+        const writeStart = performance.now();
+        await cacheSet(hash, data);
+        const writeMs = Math.round(performance.now() - writeStart);
+        log.cacheWrite(hash, payloadSize, writeMs);
+      } catch (cacheErr) {
+        log.cacheWriteError(hash, cacheErr);
+        // Continue — API succeeded, cache write failed (graceful degradation)
+      }
+      
       sendResponse({ ok: true, data });
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
-      log.error(error);
+      
+      // Categorize error type for better logging
+      if (e instanceof TypeError || e.message.includes('fetch') || e.message.includes('Resolve failed')) {
+        const status = e.status || e.statusCode || 'NETWORK';
+        log.apiError(hash, status);
+      } else {
+        log.error(error);
+      }
+      
       sendResponse({ ok: false, error });
     }
   })();

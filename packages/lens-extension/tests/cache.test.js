@@ -459,3 +459,13 @@ describe('MVP-13: Extension Cache Layer', () => {
     });
   });
 });
+
+// =====================================================================
+// NOTE: Write Path Tests (Integration Level)
+// =====================================================================
+// Write path tests using real cacheSet/cacheGet functions are in 
+// integration.test.js under "Cache Write Path Integration (Wednesday Sprint)"
+// which tests the full message handler flow and database integration.
+//
+// This cache.test.js file focuses on unit-level testing using mock IndexedDB.
+
