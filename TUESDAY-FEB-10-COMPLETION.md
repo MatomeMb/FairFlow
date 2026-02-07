@@ -6,7 +6,7 @@ Integrate the IndexedDB cache layer's **read path** into the browser extension's
 
 ## Summary
 
-✅ **Status: COMPLETE** — All Tuesday tasks completed within sprint window
+Status: COMPLETE — All Tuesday tasks completed within sprint window
 
 - **Cache-first read path:** Fully integrated and tested
 - **Logging:** Structured [Cache HIT] / [Cache MISS] logging implemented
@@ -121,7 +121,7 @@ Content Script (page context)
   ├─ Click "matter://abc123" link
   │
   └─ chrome.runtime.sendMessage({ type: 'resolve', hash: 'abc123' })
-        ↓
+        │
 Service Worker (extension context)
   │
   ├─ [Cache] Log: Initialization successful (startup)
@@ -131,16 +131,16 @@ Service Worker (extension context)
   ├─ cacheGet('abc123')
   │   │
   │   ├─ CACHE HIT: Cached entry found + fetchedAt < 24h
-  │   │   └─ [Cache HIT] Hash: abc123 (23ms) ← structured log
+  │   │   └─ [Cache HIT] Hash: abc123 (23ms) <- structured log
   │   │   └─ return cachedEntry (NO API CALL)
   │   │
   │   └─ CACHE MISS: Entry not found OR fetchedAt > 24h
-  │       └─ [Cache MISS] Hash: abc123, proceeding to API ← structured log
+  │       └─ [Cache MISS] Hash: abc123, proceeding to API <- structured log
   │       └─ Fetch GET /resolve/abc123
   │       └─ return apiResponse (cacheSet NOT called yet)
   │
   └─ chrome.runtime.sendResponse({ ok: true, data: {...} })
-        ↓
+        │
 Content Script
   │
   └─ renderOverlay(data) with cached or fresh data
@@ -174,12 +174,12 @@ Content Script
 
 | AC | Requirement | Status | Notes |
 |---|---|---|---|
-| AC1 | Cache-on-read | ✅ Complete | Check cache before API; return cached data without API call |
-| AC2 | Cache-on-success | ⏳ Wednesday | Store after successful API response (deferred) |
-| AC3 | No cache on error | ✅ Complete | Don't cache API failures; errors not persisted |
-| AC4 | TTL enforcement | ✅ Complete | Entries >24h treated as cache miss; 24h boundary tested |
-| AC5 | Overlay unchanged | ✅ Complete | Cached data produces identical overlay shape |
-| AC6 | Cache isolation | ✅ Complete | IndexedDB storage in service worker context |
+| AC1 | Cache-on-read | Complete | Check cache before API; return cached data without API call |
+| AC2 | Cache-on-success | Wednesday | Store after successful API response (deferred) |
+| AC3 | No cache on error | Complete | Don't cache API failures; errors not persisted |
+| AC4 | TTL enforcement | Complete | Entries >24h treated as cache miss; 24h boundary tested |
+| AC5 | Overlay unchanged | Complete | Cached data produces identical overlay shape |
+| AC6 | Cache isolation | Complete | IndexedDB storage in service worker context |
 
 ---
 
@@ -223,26 +223,26 @@ Content Script
 
 ## What's NOT Done (Deferred to Wednesday)
 
-❌ `cacheSet()` integration — Store API responses in cache
-❌ Error path handling — Don't cache on API failure
-❌ Error logging — Log API errors separately
-❌ Manual Chrome testing — Real `matter://` link verification
-❌ Cross-browser smoke test — Edge/Brave/Firefox testing
+Not Done: `cacheSet()` integration — Store API responses in cache
+Not Done: Error path handling — Don't cache on API failure
+Not Done: Error logging — Log API errors separately
+Not Done: Manual Chrome testing — Real `matter://` link verification
+Not Done: Cross-browser smoke test — Edge/Brave/Firefox testing
 
 ---
 
 ## Definition of Done
 
-- ✅ Cache initialization occurs on service worker startup
-- ✅ Resolve handler checks cache before API calls
-- ✅ Cache hits return cached payload without API calls
-- ✅ Cache misses proceed to API (existing flow unchanged)
-- ✅ 16 integration tests all passing (33/33 total)
-- ✅ Structured logging implemented ([Cache HIT]/[Cache MISS])
-- ✅ README and documentation updated
-- ✅ No `cacheSet()` calls in code (Wednesday's work)
-- ✅ All tests passing in CI/CD
-- ✅ Code reviewed and committed to main
+- Complete: Cache initialization occurs on service worker startup
+- Complete: Resolve handler checks cache before API calls
+- Complete: Cache hits return cached payload without API calls
+- Complete: Cache misses proceed to API (existing flow unchanged)
+- Complete: 16 integration tests all passing (33/33 total)
+- Complete: Structured logging implemented ([Cache HIT]/[Cache MISS])
+- Complete: README and documentation updated
+- Complete: No `cacheSet()` calls in code (Wednesday's work)
+- Complete: All tests passing in CI/CD
+- Complete: Code reviewed and committed to main
 
 ---
 

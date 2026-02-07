@@ -219,11 +219,11 @@ Follow the steps in [docs/VERIFY-MVP-13-CACHE.md](../../docs/VERIFY-MVP-13-CACHE
 
 | Browser | Version | Support | Notes |
 |---------|---------|---------|-------|
-| Chrome | 110+ | ✅ Primary | Full MV3 support |
-| Edge | 110+ | ✅ Full | Chromium-based; identical to Chrome |
-| Brave | 1.62+ | ✅ Full | Chromium-based |
-| Firefox | 121+ | ⚠️ Experimental | MV3 support in progress |
-| Safari | 17+ | ❌ Not supported | Uses web extensions API |
+| Chrome | 110+ | Primary | Full MV3 support |
+| Edge | 110+ | Full | Chromium-based; identical to Chrome |
+| Brave | 1.62+ | Full | Chromium-based |
+| Firefox | 121+ | Experimental | MV3 support in progress |
+| Safari | 17+ | Not supported | Uses web extensions API |
 
 See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detailed compatibility notes.
 
@@ -237,7 +237,7 @@ See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detai
 
 ## Status
 
-**MVP-13 (Caching - Read Path): Complete** ✅
+**MVP-13 (Caching - Read Path): Complete**
 
 Completed:
 - Cache module: 5 functions with IndexedDB backend (Monday, Feb 9)
@@ -251,8 +251,8 @@ Deferred to Wednesday:
 - Full end-to-end testing with real matter:// links
 
 **Core Features:**
-- Image detection (XMP beacons) — MVP-07 ✅
-- matter:// link interception — MVP-07 ✅
-- Product overlay UI — MVP-07 ✅
-- Ed25519 signature verification (WASM) — MVP-08 ✅
-- Local caching - read path (IndexedDB) — MVP-13 ✅
+- Image detection (XMP beacons) — MVP-07 [Complete]
+- matter:// link interception — MVP-07 [Complete]
+- Product overlay UI — MVP-07 [Complete]
+- Ed25519 signature verification (WASM) — MVP-08 [Complete]
+- Local caching - read path (IndexedDB) — MVP-13 [Complete]
