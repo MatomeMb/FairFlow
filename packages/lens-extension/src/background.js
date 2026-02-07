@@ -3,6 +3,7 @@
  *
  * - Handles resolve requests from content script with IndexedDB caching (MVP-13).
  * - Cache: store hash -> { gist, thing_url, image_url?, checkout_url?, fetchedAt }.
+ * - Strategy: Cache-first reads (check cache before API), no writes yet (Wednesday sprint).
  */
 
 const DB_NAME = 'lens-matter-cache';
@@ -10,6 +11,14 @@ const DB_VERSION = 1;
 const STORE_NAME = 'resolve';
 const DEFAULT_API_BASE = 'http://localhost:3000';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+// Logging helpers
+const log = {
+  cacheHit: (hash, ms = 0) => console.log(`[Cache HIT] Hash: ${hash}${ms ? ` (${ms}ms)` : ''}`),
+  cacheMiss: (hash) => console.log(`[Cache MISS] Hash: ${hash}, proceeding to API`),
+  error: (msg) => console.error(`[Cache ERROR] ${msg}`),
+  init: (msg) => console.log(`[Cache] ${msg}`),
+};
 
 /** @returns {Promise<IDBDatabase>} */
 function openDb() {
@@ -32,6 +41,7 @@ function openDb() {
  * @returns {Promise<object|null>}
  */
 async function cacheGet(hash) {
+  const start = performance.now();
   const db = await openDb();
   return new Promise((resolve, reject) => {
     const tx = db.transaction(STORE_NAME, 'readonly');
@@ -49,6 +59,7 @@ async function cacheGet(hash) {
         resolve(null);
         return;
       }
+      const ms = Math.round(performance.now() - start);
       resolve(row);
     };
   });
@@ -120,23 +131,41 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
   (async () => {
     try {
+      const start = performance.now();
       const cached = await cacheGet(hash);
+      
       if (cached) {
+        const ms = Math.round(performance.now() - start);
+        log.cacheHit(hash, ms);
         sendResponse({ ok: true, data: cached });
         return;
       }
+      
+      log.cacheMiss(hash);
       const baseUrl = await getApiBaseUrl();
       const data = await fetchResolve(baseUrl, hash);
-      await cacheSet(hash, data);
+      // Note: cacheSet() NOT called yet (Wednesday sprint for write path integration)
       sendResponse({ ok: true, data });
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
+      log.error(error);
       sendResponse({ ok: false, error });
     }
   })();
 
   return true; // keep channel open for async sendResponse
 });
+
+// Initialize cache on service worker startup
+(async () => {
+  try {
+    await openDb();
+    log.init('IndexedDB initialized successfully');
+  } catch (e) {
+    log.error(`Failed to initialize IndexedDB: ${e instanceof Error ? e.message : String(e)}`);
+    // Continue anyway — service worker will work in degraded mode without cache
+  }
+})();
 
 chrome.runtime.onInstalled.addListener(() => {
   console.log('Lens extension installed');
