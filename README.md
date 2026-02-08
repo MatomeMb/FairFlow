@@ -110,7 +110,7 @@ Every product processed by our compiler exists simultaneously as:
 - **Feb 10:** AC3 + AC4 tests passing (no cache on error, TTL enforcement)
 - **Feb 11:** Cache functions in background.js (`cacheGet`, `cacheSet`)
 - **Feb 12:** Content script integration + overlay optimization + E2E manual test
-- **Feb 13:** Chrome/Edge/Brave cross-browser validation
+- **Feb 13:** Chrome, Edge, Brave, Firefox cross-browser validation (7h sprint)
 - **Feb 16:** Test suite finalized + docs updated
 - **Feb 17:** Performance baselines (cache hit <20ms, overlay render <50ms)
 - **Feb 18:** All bugs fixed + regression test passing
@@ -139,7 +139,7 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Scrum Master Plan for CEO](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | 8-sprint roadmap and success criteria |
 | [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
 | [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
-| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Feb 3–16, 2026) — MVP vertical slice |
+| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Jan 20–Feb 5, 2026) — MVP vertical slice |
 | [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
 | [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
 | [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
@@ -165,7 +165,7 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 - [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) - Platform validation testing workflow and decision matrix
 - [matter-core/PHASE0_IMPLEMENTATION.md](./packages/matter-core/PHASE0_IMPLEMENTATION.md) - Phase 0 steganography implementation details
 
-PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder.
+PDF versions are available in [`docs/pdf/`](./docs/pdf/). Historical day reports: [docs/archive/](./docs/archive/README.md).
 
 ---
 
@@ -181,7 +181,7 @@ PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder.
 | API | Node.js / Vercel Edge |
 | Database | PostgreSQL (Supabase) |
 | Storage | Cloudflare R2 |
-| Browser Extension | Vanilla JS + WASM |
+| Browser Extension | Vanilla JS, IndexedDB, MV3 |
 
 ---
 
@@ -211,9 +211,11 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–4):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits. See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
+**Delivered (Sprint 1):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits. MVP-13 IndexedDB cache integrated (Sprint 2, Week 1). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
 
-**Planned (Sprints 5–8, Feb–May 2026):** Extension caching (MVP-13), analytics (MVP-14), beta readiness, beta launch prep. Full metrics, day-by-day plan, and revised milestones: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
+**In progress (Sprint 2):** Cross-browser validation, performance profiling, lens-extension v0.3.0 release (Feb 19 target).
+
+**Planned (Sprints 3–8):** Analytics (MVP-14), beta readiness, beta launch prep. Full metrics and revised milestones: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
 
 ---
 
@@ -226,9 +228,9 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## 8-Sprint Delivery Timeline (Realistic Dates — As of Feb 5, 2026)
+## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 8, 2026.*
 
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
@@ -242,7 +244,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
 | Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
 
-**Current status:** Sprint 1 **complete** (Feb 5, 2026); **v0.4.0** released. **Sprint 2 begins Feb 6** (MVP-13 extension caching). Acceptance criteria, schema, cross-browser compatibility, and completion checklist ready. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 cache integrated; 45/45 tests passing; Friday Feb 13 cross-browser sprint next. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
@@ -261,6 +263,8 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 | `scripts/setup-api-keys.ps1` | Interactive API keys setup helper |
 | `scripts/generate-ed25519-keys.py` | Generate Ed25519 cryptographic keys |
 | `scripts/create-test-data.ps1` | Create test data for platform validation |
+
+---
 
 ## Testing Tools
 
@@ -284,7 +288,9 @@ cargo run --bin platform-test -- test-extraction downloaded_image.jpg
 cargo run --bin platform-test -- generate-report results.json
 ```
 
-See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for complete testing workflow.
+See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for the full workflow.
+
+---
 
 ## Contact
 
