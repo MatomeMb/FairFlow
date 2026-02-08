@@ -1,7 +1,9 @@
-# MONDAY DELIVERY — MVP-13 COMPLETE
+# MONDAY DELIVERY — MVP-13 COMPLETE (Historical)
 
-**Status:** Production Code Implementation Complete  
-**Test Framework:** Vitest configuration ready (setup issue requires investigation)  
+> **Current status:** See [docs/PROGRESS-AND-VERSION.md](docs/PROGRESS-AND-VERSION.md). MVP-13 cache integrated in background.js (Wed Feb 11); E2E validation complete (Thu Feb 12); 45/45 tests passing.
+
+**Status (as of Feb 9):** Production Code Implementation Complete  
+**Test Framework:** Vitest configuration ready (now passing)  
 **Date:** February 9, 2026  
 
 ---

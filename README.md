@@ -83,21 +83,21 @@ Every product processed by our compiler exists simultaneously as:
 
 ### Daily Breakdown (5-Hour Work Days)
 
-**Week 1: Planning & Implementation (Feb 6–12)**
+**Week 1: Planning & Implementation (Feb 6–12)** ✅
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | ⏳ |
-| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | ⏳ |
-| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | ⏳ |
-| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | ⏳ |
-| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Remove old code (0.5h) → Overlay optimization (1h) → E2E test (1.5h) → Verify IndexedDB (1h) | ⏳ |
+| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | ✅ |
+| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | ✅ |
+| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | ✅ |
+| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | ✅ |
+| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Overlay optimization (1h) → E2E validation (1.5h) → Verify IndexedDB (1h) | ✅ |
 
 **Week 2: Cross-Browser, Polish, Release (Feb 13–19)**
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 13 | Cross-Browser Test | Chrome 110+ (1h) → Edge 110+ (1h) → Brave 1.62+ (1h) → Document quirks (1h) → Update docs (1h) | ⏳ |
+| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint); see [FRIDAY-EXECUTION-GUIDE](docs/FRIDAY-EXECUTION-GUIDE.md) | ⏳ |
 | Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | ⏳ |
 | Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | ⏳ |
 | Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | ⏳ |
@@ -143,6 +143,8 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
 | [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
 | [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
+| [Friday Execution Guide](./docs/FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines for Fri Feb 13 cross-browser validation |
+| [Friday Sprint Analysis](./docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | Risk matrix, contingencies, pre-flight checklist |
 | [Sprint 2 Completion Checklist](./docs/SPRINT-2-COMPLETION-CHECKLIST.md) | AC gates, quality checkpoints, DoD, demo prep, risk mitigation |
 | [Verify MVP-13 Cache](./docs/VERIFY-MVP-13-CACHE.md) | Manual verification steps: cache hit/miss, IndexedDB inspection |
 | [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |

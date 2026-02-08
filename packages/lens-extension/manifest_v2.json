@@ -1,0 +1,38 @@
+{
+  "manifest_version": 2,
+  "name": "Lens - .things that Matter",
+  "version": "0.1.0",
+  "description": "Discover and interact with .thing commerce objects across the web",
+  "permissions": ["storage", "activeTab", "scripting", "http://*/*", "https://*/*"],
+  "background": {
+    "scripts": ["src/firefox-compat.js", "src/background.js"],
+    "persistent": false
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["src/firefox-compat.js", "src/content.js"],
+      "css": ["src/content.css"]
+    }
+  ],
+  "browser_action": {
+    "default_popup": "src/popup.html",
+    "default_icon": {
+      "16": "icons/icon16.png",
+      "48": "icons/icon48.png",
+      "128": "icons/icon128.png"
+    }
+  },
+  "icons": {
+    "16": "icons/icon16.png",
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
+  },
+  "web_accessible_resources": ["src/*.wasm", "src/*.js"],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "lens@things-that-matter.local",
+      "strict_min_version": "121.0"
+    }
+  }
+}

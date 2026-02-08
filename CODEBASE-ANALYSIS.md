@@ -2,7 +2,7 @@
 
 **Deprecated:** Kept for reference only. For current status, version, and sprint state use [docs/PROGRESS-AND-VERSION.md](docs/PROGRESS-AND-VERSION.md) and [docs/15-DELIVERY-TIMELINE.md](docs/15-DELIVERY-TIMELINE.md).
 
-**Snapshot date:** February 3, 2026. **Version at snapshot:** 0.2.0.
+**Snapshot date:** February 3, 2026. **Version at snapshot:** 0.2.0. **Current:** See PROGRESS-AND-VERSION.md (lens 0.1.0, MVP-13 integrated Feb 12).
 
 ---
 

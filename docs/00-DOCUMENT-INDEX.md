@@ -15,7 +15,7 @@
 
 This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
 
-**Current status (Feb 5, 2026):** Sprint 1 complete (Jan 20 – Feb 5). MVP path live: compile → R2/local storage → resolve → matter:// → extension overlay; batch and catalog import and lite merchant demo delivered; **v0.4.0** tagged. Next: **Sprint 2** (Feb 6 – Feb 19, MVP-13 extension caching). Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+**Current status (Feb 8, 2026):** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 IndexedDB cache integrated (Thu Feb 12); 45/45 tests passing; Friday cross-browser prep complete (Firefox compat, manifest_v2). Next: Fri Feb 13 cross-browser sprint. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md). Friday sprint: [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
 
 ---
 
@@ -45,6 +45,9 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
 | — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
 | — | [**Project State Clarification**](./PROJECT-STATE-CLARIFICATION.md) | **Verification results, date paradox resolution, Sprint 1 checklist** | ~2 |
+| — | [**Friday Cross-Browser Sprint Analysis**](./FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | **Risk matrix, execution strategy, contingency plans for Edge/Brave/Firefox validation** | ~8 |
+| — | [**Friday Test Report Template**](./FRIDAY-TEST-REPORT-TEMPLATE.md) | **Per-browser test template for real-time recording during sprint** | ~2 |
+| — | [**Friday Execution Guide**](./FRIDAY-EXECUTION-GUIDE.md) | **Sprint flow, decision tree, baselines, contingencies, pre-flight checklist** | ~4 |
 
 ---
 

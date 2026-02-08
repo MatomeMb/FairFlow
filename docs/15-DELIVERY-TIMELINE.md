@@ -1,5 +1,5 @@
 # .things that Matter
-## Delivery Timeline — Realistic Dates (As of Feb 5, 2026)
+## Delivery Timeline — Realistic Dates (As of Feb 8, 2026)
 
 ---
 
@@ -8,7 +8,7 @@
 | **Company Name** | .things that Matter |
 | **Document Type** | Delivery Timeline & Schedule |
 | **Version** | 2.0 |
-| **Date** | February 5, 2026 |
+| **Date** | February 8, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Active — single source of truth for delivery dates |
 
@@ -52,7 +52,7 @@ Sprints are **2 weeks** each. **Sprint 1** ended Feb 5, 2026. **Sprint 2** start
 |--------|--------|--------|-------|-----------------------------------|
 | **Sprint 0** | By Jan 19, 2026 | **Done** | Setup and architecture | Environment, contracts, monorepo, planning |
 | **Sprint 1** | Jan 20 – Feb 5, 2026 | **Done** | Full MVP through batch/catalog | compile → resolve → matter:// → overlay; XMP beacon; auth/rate limit/errors; R2 storage; Rust compiler; POST /batch, POST /catalog/import; catalog-upload & matter-demo; v0.4.0 |
-| **Sprint 2** | Feb 6 – Feb 19, 2026 | Planned | Extension caching & polish | MVP-13: IndexedDB caching; overlay performance; cross-browser check. [16-WEEKLY-WORK-PLAN §5](./16-WEEKLY-WORK-PLAN.md#5-sprint-2-feb-6--feb-19-2026--extension-caching--polish). |
+| **Sprint 2** | Feb 6 – Feb 19, 2026 | **In Progress** | Extension caching & polish | MVP-13: IndexedDB cache integrated (Thu Feb 12); cross-browser Fri Feb 13; Firefox prep complete. [FRIDAY-EXECUTION-GUIDE](./FRIDAY-EXECUTION-GUIDE.md). |
 | **Sprint 3** | Feb 20 – Mar 5, 2026 | Planned | Analytics & observability | MVP-14: view/click events; API logging; export or minimal dashboard. [16-WEEKLY-WORK-PLAN §6](./16-WEEKLY-WORK-PLAN.md#6-sprint-3-feb-20--mar-5-2026--analytics--observability). |
 | **Sprint 4** | Mar 6 – Mar 19, 2026 | Planned | Beta readiness | Merchant onboarding doc; support process; 5–10 beta targets; stability. [16-WEEKLY-WORK-PLAN §7](./16-WEEKLY-WORK-PLAN.md#7-sprint-4-mar-6--mar-19-2026--beta-readiness). |
 | **Sprint 5** | Mar 20 – Apr 2, 2026 | Planned | Beta launch prep | Chrome Web Store assets; landing/demo pages; support workflow; soft beta start. [16-WEEKLY-WORK-PLAN §8](./16-WEEKLY-WORK-PLAN.md#8-sprint-5-mar-20--apr-2-2026--beta-launch-prep). |
@@ -148,5 +148,5 @@ Capacity: 6h/day productive dev, ~56–60h per 2-week sprint. Ceremonies ~4h/spr
 ---
 
 **Document Version:** 2.0  
-**Last Updated:** February 5, 2026  
+**Last Updated:** February 8, 2026  
 **Next Review:** End of Sprint 2 (Feb 19, 2026)
