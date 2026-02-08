@@ -7,7 +7,7 @@ This folder indexes historical day-specific completion reports from Sprint 2 (MV
 | Document | Date | Scope |
 |----------|------|-------|
 | [MONDAY-FEB-9-COMPLETION](../MONDAY-FEB-9-COMPLETION.md) | Feb 9 | Cache module, AC1/AC2 tests |
-| [TUESDAY-FEB-10-COMPLETION](../../TUESDAY-FEB-10-COMPLETION.md) | Feb 10 | AC3/AC4, integration tests (root) |
+| [TUESDAY-FEB-10-COMPLETION](../../TUESDAY-FEB-10-COMPLETION.md) | Feb 10 | AC3/AC4, integration tests |
 | [WEDNESDAY-COMPLETION-SUMMARY](../WEDNESDAY-COMPLETION-SUMMARY.md) | Feb 11 | Cache write path integration |
 | [WEDNESDAY-FEB-11-ANALYSIS](../WEDNESDAY-FEB-11-ANALYSIS.md) | Feb 11 | Write path analysis |
 | [WEDNESDAY-CODE-CHANGE-MANIFEST](../WEDNESDAY-CODE-CHANGE-MANIFEST.md) | Feb 11 | Code changes manifest |
