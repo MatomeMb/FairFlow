@@ -10,12 +10,12 @@
 
 | Browser | Version | Status | Notes |
 |---------|---------|--------|-------|
-| **Chrome** | 110+ | ✅ Primary | Manifest v3, IndexedDB, Service Worker |
-| **Edge** | 110+ | ✅ Full support | Chromium-based; identical API |
-| **Brave** | 1.62+ | ✅ Full support | Chromium-based; privacy-first |
-| **Opera** | 96+ | ✅ Full support | Chromium-based |
-| **Firefox** | 121+ | ⚠️ Partial | MV3 support limited; IndexedDB OK; consider MV2 fallback |
-| **Safari** | 17+ | ❌ Not supported | Uses web extensions (different API) |
+| **Chrome** | 110+ | Primary | Manifest v3, IndexedDB, Service Worker |
+| **Edge** | 110+ | Full support | Chromium-based; identical API |
+| **Brave** | 1.62+ | Full support | Chromium-based; privacy-first |
+| **Opera** | 96+ | Full support | Chromium-based |
+| **Firefox** | 121+ | Partial | MV3 support limited; IndexedDB OK; consider MV2 fallback |
+| **Safari** | 17+ | Not supported | Uses web extensions (different API) |
 
 ---
 
@@ -23,11 +23,11 @@
 
 | API | Chrome 110+ | Edge 110+ | Firefox 121+ | Notes |
 |-----|-------------|----------|-------------|-------|
-| `chrome.runtime.sendMessage()` | ✅ | ✅ | ✅ | Message passing for cache delegation |
-| `chrome.storage.local.get()` | ✅ | ✅ | ✅ | Store API base URL config |
-| `IndexedDB` | ✅ | ✅ | ✅ | Cache store (lens-matter-cache) |
-| Service Worker | ✅ | ✅ | ⚠️ Limited | Background task runner; Firefox has constraints |
-| Manifest v3 | ✅ | ✅ | ⚠️ Gradual rollout | Official support late 2024/early 2025 |
+| `chrome.runtime.sendMessage()` | Yes | Yes | Yes | Message passing for cache delegation |
+| `chrome.storage.local.get()` | Yes | Yes | Yes | Store API base URL config |
+| `IndexedDB` | Yes | Yes | Yes | Cache store (lens-matter-cache) |
+| Service Worker | Yes | Yes | Limited | Background task runner; Firefox has constraints |
+| Manifest v3 | Yes | Yes | Gradual rollout | Official support late 2024/early 2025 |
 
 ---
 

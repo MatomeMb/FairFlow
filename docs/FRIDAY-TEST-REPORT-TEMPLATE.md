@@ -12,10 +12,10 @@
 
 | Check | Pass | Fail | Notes |
 |-------|------|------|-------|
-| Extension loads without errors | ☐ | ☐ | |
-| Content script loads on page | ☐ | ☐ | |
-| Background/Service worker active | ☐ | ☐ | |
-| Console errors observed | ☐ | ☐ | (list if any) |
+| Extension loads without errors | [ ] | [ ] | |
+| Content script loads on page | [ ] | [ ] | |
+| Background/Service worker active | [ ] | [ ] | |
+| Console errors observed | [ ] | [ ] | (list if any) |
 
 **Screenshot:** [ ] Attached
 
@@ -28,8 +28,8 @@
 | Metric | Value | Target |
 |--------|-------|--------|
 | matter:// link clicked | _____________ | |
-| API request visible (Network tab) | ☐ Yes ☐ No | Yes |
-| Overlay renders | ☐ Yes ☐ No | Yes |
+| API request visible (Network tab) | [ ] Yes [ ] No | Yes |
+| Overlay renders | [ ] Yes [ ] No | Yes |
 | Latency (ms) | _____ | <500 |
 
 ### 2.2 Cache Hit (Second Click)
@@ -37,18 +37,18 @@
 | Metric | Value | Target |
 |--------|-------|--------|
 | Same link clicked again | | |
-| No new API request | ☐ Yes ☐ No | Yes |
-| Overlay renders instantly | ☐ Yes ☐ No | Yes |
+| No new API request | [ ] Yes [ ] No | Yes |
+| Overlay renders instantly | [ ] Yes [ ] No | Yes |
 | Latency (ms) | _____ | <50 |
 
 ### 2.3 IndexedDB Validation
 
 | Check | Pass | Fail | Notes |
 |-------|------|------|-------|
-| lens-matter-cache DB exists | ☐ | ☐ | |
-| resolve store has correct structure | ☐ | ☐ | |
-| Cached entry contains hash, gist, fetchedAt | ☐ | ☐ | |
-| TTL (24h) enforced | ☐ | ☐ | |
+| lens-matter-cache DB exists | [ ] | [ ] | |
+| resolve store has correct structure | [ ] | [ ] | |
+| Cached entry contains hash, gist, fetchedAt | [ ] | [ ] | |
+| TTL (24h) enforced | [ ] | [ ] | |
 
 ---
 
@@ -74,9 +74,9 @@
 
 | Scenario | Expected | Actual | Pass/Fail |
 |----------|----------|--------|-----------|
-| Invalid hash (matter://000...) | Error overlay, no cache | | ☐ ☐ |
-| Network offline (cache hit) | Cached data served | | ☐ ☐ |
-| Network offline (cache miss) | Error message | | ☐ ☐ |
+| Invalid hash (matter://000...) | Error overlay, no cache | | [ ] [ ] |
+| Network offline (cache hit) | Cached data served | | [ ] [ ] |
+| Network offline (cache miss) | Error message | | [ ] [ ] |
 
 ---
 
@@ -88,13 +88,13 @@
 
 ### Brave
 - [ ] Shield configuration: ON / OFF / _____________
-- [ ] Shields block content scripts: ☐ Yes ☐ No
+- [ ] Shields block content scripts: [ ] Yes [ ] No
 - [ ] Private window: [ ] Tested [ ] Skipped — _____________
 
 ### Firefox
-- [ ] Manifest: MV3 ☐ | MV2 (manifest_v2.json) ☐
-- [ ] Compatibility layer used: ☐ Yes ☐ No
-- [ ] Message passing: ☐ Works ☐ Broken (document below)
+- [ ] Manifest: MV3 [ ] | MV2 (manifest_v2.json) [ ]
+- [ ] Compatibility layer used: [ ] Yes [ ] No
+- [ ] Message passing: [ ] Works [ ] Broken (document below)
 
 ---
 
@@ -110,7 +110,7 @@
 
 ## 7. Verdict
 
-**Production Ready:** ☐ Yes ☐ No ☐ With workarounds
+**Production Ready:** [ ] Yes [ ] No [ ] With workarounds
 
 **Summary:**
 _____________________________________________________________________________

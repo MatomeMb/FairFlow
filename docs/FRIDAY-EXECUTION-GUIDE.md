@@ -8,15 +8,15 @@
 
 ## IMPLEMENTATION VALIDATION
 
-### 1. Firefox Compatibility Layer ✓
+### 1. Firefox Compatibility Layer
 
 **Approach:** Polyfill-based (`firefox-compat.js`) instead of code refactoring
 
 **Pattern:**
 - Chrome's sendMessage accepts both callback and Promise
 - Firefox's browser.runtime.sendMessage returns Promise
-- Wrapper converts promise → callback interface
-- Result: No changes needed to background.js or content.js ✓
+- Wrapper converts promise to callback interface
+- Result: No changes needed to background.js or content.js
 
 **Strengths:**
 - Minimal changes to existing code
@@ -29,7 +29,7 @@
 
 ---
 
-### 2. Firefox MV2 Manifest ✓
+### 2. Firefox MV2 Manifest
 
 **Critical Differences Implemented:**
 - `manifest_version: 2`
@@ -38,11 +38,11 @@
 - `browser_specific_settings.gecko` (Firefox 121+)
 - `firefox-compat.js` loaded FIRST in all scripts
 
-**Permissions Parity:** storage, activeTab, scripting, http(s) — matches manifest.json ✓
+**Permissions Parity:** storage, activeTab, scripting, http(s) — matches manifest.json
 
 ---
 
-### 3. Test Report Template ✓
+### 3. Test Report Template
 
 Sections: Environment → Test results → Performance metrics → Issues → Verdict  
 Format allows real-time note-taking during execution.
@@ -139,9 +139,9 @@ Does message passing work?
 
 | Browser | Cache Hit | Cache Miss | Verdict |
 |---------|-----------|------------|---------|
-| Edge | <18ms | <200ms | ✓ within 10% of Chrome |
-| Brave | <20ms | <210ms | ✓ shields overhead <10% |
-| Firefox | <60ms | <400ms | ✓ 2.5x slower acceptable |
+| Edge | <18ms | <200ms | Within 10% of Chrome |
+| Brave | <20ms | <210ms | Shields overhead under 10% |
+| Firefox | <60ms | <400ms | 2.5x slower acceptable |
 
 ---
 
@@ -159,15 +159,15 @@ Does message passing work?
 ## FINAL PRE-FLIGHT (Thursday Evening)
 
 ```
-□ Edge loads extension without errors
-□ Brave loads extension without errors
-□ Firefox loads manifest_v2.json without errors
-□ Test pages with matter:// links accessible
-□ Chrome cache operations working
-□ DevTools Console + Storage work in all browsers
-□ Screenshot tool ready (Win+Shift+S)
-□ Calendar blocked 9 AM – 5 PM Friday
-□ This guide available during sprint
+- [ ] Edge loads extension without errors
+- [ ] Brave loads extension without errors
+- [ ] Firefox loads manifest_v2.json without errors
+- [ ] Test pages with matter:// links accessible
+- [ ] Chrome cache operations working
+- [ ] DevTools Console + Storage work in all browsers
+- [ ] Screenshot tool ready (Win+Shift+S)
+- [ ] Calendar blocked 9 AM – 5 PM Friday
+- [ ] This guide available during sprint
 ```
 
 ---

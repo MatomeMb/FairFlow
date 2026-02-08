@@ -7,15 +7,15 @@ Shadow Index API - Fast hash-to-artifact resolution service.
 **Version:** 0.4.0 (Sprint 1 complete, Feb 5, 2026)
 
 **Delivered:**
-- ✅ Product compilation (`POST /compile`)
-- ✅ Hash resolution (`GET /resolve/:hash`)
-- ✅ Gist retrieval (`GET /gist/:hash`)
-- ✅ Batch operations (`POST /batch`)
-- ✅ Catalog import (`POST /catalog/import`)
-- ✅ Cloudflare R2 storage (MVP-03)
-- ✅ API key auth (MVP-09)
-- ✅ Rate limiting (MVP-09)
-- ✅ Error handling with consistent shape (MVP-10)
+- Product compilation (`POST /compile`)
+- Hash resolution (`GET /resolve/:hash`)
+- Gist retrieval (`GET /gist/:hash`)
+- Batch operations (`POST /batch`)
+- Catalog import (`POST /catalog/import`)
+- Cloudflare R2 storage (MVP-03)
+- API key auth (MVP-09)
+- Rate limiting (MVP-09)
+- Error handling with consistent shape (MVP-10)
 
 **Sprint 2 (Feb 6–19):** Extension caching (MVP-13) — no API changes required. API remains stable.
 

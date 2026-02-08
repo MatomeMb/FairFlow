@@ -19,7 +19,14 @@ This folder contains the complete project documentation for **.things that Matte
 
 ---
 
-## Document List
+## Primary Documents (Single Source of Truth)
+
+| Document | Purpose |
+|----------|---------|
+| [Progress and Version](./PROGRESS-AND-VERSION.md) | Code version, sprint state, next sprint |
+| [Delivery Timeline](./15-DELIVERY-TIMELINE.md) | 8-sprint timeline, actuals, milestones |
+
+## Active Documentation
 
 | # | Document | Purpose | Pages |
 |---|----------|---------|-------|
@@ -34,8 +41,7 @@ This folder contains the complete project documentation for **.things that Matte
 | 10 | [MVP Backlog](./10-MVP-BACKLOG.md) | Prioritized MVP scope and acceptance criteria | ~4 |
 | 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Sprint 1 goal, backlog, and DoD | ~3 |
 | 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
-| — | [**Progress and Version**](./PROGRESS-AND-VERSION.md) | **Code version, sprint state, P1 stage** | ~2 |
-| — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | **Post–Sprint 1 actions and Sprint 2 readiness** | ~2 |
+| — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | Post–Sprint 1 actions and Sprint 2 readiness | ~2 |
 | 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
 | 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
@@ -47,7 +53,11 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**Project State Clarification**](./PROJECT-STATE-CLARIFICATION.md) | **Verification results, date paradox resolution, Sprint 1 checklist** | ~2 |
 | — | [**Friday Cross-Browser Sprint Analysis**](./FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | **Risk matrix, execution strategy, contingency plans for Edge/Brave/Firefox validation** | ~8 |
 | — | [**Friday Test Report Template**](./FRIDAY-TEST-REPORT-TEMPLATE.md) | **Per-browser test template for real-time recording during sprint** | ~2 |
-| — | [**Friday Execution Guide**](./FRIDAY-EXECUTION-GUIDE.md) | **Sprint flow, decision tree, baselines, contingencies, pre-flight checklist** | ~4 |
+| — | [**Friday Execution Guide**](./FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines, contingencies, pre-flight checklist | ~4 |
+
+## Historical / Archive
+
+Day-specific completion reports and legacy summaries: [archive/README.md](./archive/README.md)
 
 ---
 
@@ -134,14 +144,15 @@ This folder contains the complete project documentation for **.things that Matte
 | 1.0 | Jan 21, 2026 | M. Mboweni | Initial creation |
 | 1.1 | Mar 2026 | M. Mboweni | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
 | 1.2 | Mar 2026 | M. Mboweni | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
+| 1.3 | Feb 8, 2026 | M. Mboweni | Primary docs structure; archive index; emoji removal; Sprint 2 status; Friday sprint prep |
 
 ---
 
 ## Next Steps
 
-1. **Sprint 5 planning** (MVP-13 caching, extension polish) — see [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
-2. **Align budget and roadmap** with revised milestone dates (Phase 1 to Dec 2026).
-3. **CEO sync** on revised timeline and beta target (Sep 2026).
+1. Friday Feb 13 cross-browser sprint — see [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
+2. Sprint 2 release v0.3.0 (lens-extension) — Feb 19 target.
+3. Align budget and roadmap with revised milestone dates (Phase 1 to Dec 2026).
 
 ---
 

@@ -2,7 +2,7 @@
 
 ---
 
-## ✅ WORK COMPLETE
+## WORK COMPLETE
 
 **Module:** IndexedDB Cache Layer (MVP-13)  
 **Status:** Production-Ready  
@@ -30,7 +30,7 @@ npm install
 npm run test
 ```
 
-**Expected:** ✅ All 17 tests pass
+**Expected:** All 17 tests pass
 
 ---
 

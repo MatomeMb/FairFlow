@@ -83,25 +83,25 @@ Every product processed by our compiler exists simultaneously as:
 
 ### Daily Breakdown (5-Hour Work Days)
 
-**Week 1: Planning & Implementation (Feb 6–12)** ✅
+**Week 1: Planning & Implementation (Feb 6–12)** — Complete
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | ✅ |
-| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | ✅ |
-| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | ✅ |
-| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | ✅ |
-| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Overlay optimization (1h) → E2E validation (1.5h) → Verify IndexedDB (1h) | ✅ |
+| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | Complete |
+| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | Complete |
+| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | Complete |
+| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | Complete |
+| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Overlay optimization (1h) → E2E validation (1.5h) → Verify IndexedDB (1h) | Complete |
 
 **Week 2: Cross-Browser, Polish, Release (Feb 13–19)**
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint); see [FRIDAY-EXECUTION-GUIDE](docs/FRIDAY-EXECUTION-GUIDE.md) | ⏳ |
-| Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | ⏳ |
-| Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | ⏳ |
-| Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | ⏳ |
-| Thu | Feb 19 | Sprint Review & Release | Demo prep (1h) → Demo/recording (1h) → Git tag v0.3.0 (1h) → Update progress (1h) → Retrospective (1h) | ⏳ |
+| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint); see [FRIDAY-EXECUTION-GUIDE](docs/FRIDAY-EXECUTION-GUIDE.md) | Pending |
+| Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | Pending |
+| Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | Pending |
+| Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | Pending |
+| Thu | Feb 19 | Sprint Review & Release | Demo prep (1h) → Demo/recording (1h) → Git tag v0.3.0 (1h) → Update progress (1h) → Retrospective (1h) | Pending |
 
 ### Key Deliverables
 
@@ -233,8 +233,8 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
 | Sprint 0 | By Jan 19, 2026 | Setup and architecture | — | Complete |
-| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | **Complete** ✅ |
-| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.3.0 (lens) | **In Progress** ⏳ |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | Complete |
+| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.3.0 (lens) | In Progress |
 | Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — | Planned |
 | Sprint 4 | Mar 6–19, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
