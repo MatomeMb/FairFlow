@@ -5,157 +5,77 @@
 
 | **Company Name** | .things that Matter |
 |------------------|---------------------|
-| **Document Set Version** | 1.0 |
-| **Date Created** | January 21, 2026 |
-| **Total Documents** | 7 Core Documents + Execution Guide + Scrum Pack (3) |
+| **Document Set Version** | 2.0 |
+| **Date** | February 2026 |
+| **Status** | Production-ready |
 
 ---
 
-## Document Overview
-
-This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
-
-**Current status (Feb 8, 2026):** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 IndexedDB cache integrated (Thu Feb 12); 45/45 tests passing; Friday cross-browser prep complete (Firefox compat, manifest_v2). Next: Fri Feb 13 cross-browser sprint. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md). Friday sprint: [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
-
----
-
-## Primary Documents (Single Source of Truth)
+## Master Documentation
 
 | Document | Purpose |
 |----------|---------|
-| [Progress and Version](./PROGRESS-AND-VERSION.md) | Code version, sprint state, next sprint |
-| [Delivery Timeline](./15-DELIVERY-TIMELINE.md) | 8-sprint timeline, actuals, milestones |
-
-## Active Documentation
-
-| # | Document | Purpose | Pages |
-|---|----------|---------|-------|
-| 01 | [Project Charter](./01-PROJECT-CHARTER.md) | Company vision, objectives, governance, budget summary | ~10 |
-| 02 | [Technical Architecture](./02-TECHNICAL-ARCHITECTURE.md) | System design, components, data flow, security | ~15 |
-| 03 | [Product Requirements (PRD)](./03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | 3-phase strategy, features, user stories, success metrics | ~20 |
-| 04 | [Development Roadmap](./04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown, milestones, timeline, dependencies | ~15 |
-| 05 | [Risk Assessment](./05-RISK-ASSESSMENT.md) | Risk register, analysis, mitigation strategies | ~12 |
-| 06 | [Budget & Financials](./06-BUDGET-FINANCIAL-PROJECTIONS.md) | Detailed budget, cash flow, revenue projections | ~10 |
-| **CTO** | [**CTO Execution Guide**](./CTO-EXECUTION-GUIDE.md) | **Step-by-step professional guide for CTO execution** | **~30** |
-| 09 | [Scrum Operating Model](./09-SCRUM-OPERATING-MODEL.md) | Scrum cadence, DoD, build-evaluate-test-ship loop | ~5 |
-| 10 | [MVP Backlog](./10-MVP-BACKLOG.md) | Prioritized MVP scope and acceptance criteria | ~4 |
-| 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Sprint 1 goal, backlog, and DoD | ~3 |
-| 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
-| — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | Post–Sprint 1 actions and Sprint 2 readiness | ~2 |
-| 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
-| 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
-| 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
-| 16 | [**Weekly Work Plan**](./16-WEEKLY-WORK-PLAN.md) | **Day-by-day work for each week; realistic hour estimates; Sprints 5–8 daily tasks** | ~10 |
-| 17 | [**MVP-13 Acceptance & Schema**](./17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | **Extension caching: acceptance criteria and IndexedDB schema (Sprint 2)** | ~4 |
-| — | [**Next Steps (Sprint 3)**](./NEXT-STEPS-SPRINT-3.md) | **Step-by-step R2 setup, .env, verify-r2, Day 2 API wiring (with links)** | ~4 |
-| — | [**CTO Next Steps (Sprint 2 closeout)**](./CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | **Sprint 2 closeout, test verification, tag, CEO sync, Sprint 3 scope** | ~2 |
-| — | [**CEO Sync (Sprint 2)**](./CEO-SYNC-SPRINT-2.md) | **Brief on Sprint 2 features delivered and Sprint 3 scope** | ~1 |
-| — | [**Project State Clarification**](./PROJECT-STATE-CLARIFICATION.md) | **Verification results, date paradox resolution, Sprint 1 checklist** | ~2 |
-| — | [**Friday Cross-Browser Sprint Analysis**](./FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | **Risk matrix, execution strategy, contingency plans for Edge/Brave/Firefox validation** | ~8 |
-| — | [**Friday Test Report Template**](./FRIDAY-TEST-REPORT-TEMPLATE.md) | **Per-browser test template for real-time recording during sprint** | ~2 |
-| — | [**Friday Execution Guide**](./FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines, contingencies, pre-flight checklist | ~4 |
-
-## Historical / Archive
-
-Day-specific completion reports and legacy summaries: [archive/README.md](./archive/README.md)
+| [**THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION**](../THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION.md) | **Investor-grade technical package** — architecture, roadmap, use cases, financials, risks. Primary document for CEO self-study and investor discussions. PDF: `THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION.pdf` |
 
 ---
 
-## Quick Reference
+## Core Documents
 
-### Company Vision
-**Make commerce portable, viral, and universally accessible — for humans today, AI agents tomorrow, and a decentralized economy in the future.**
-
-### Three Strategic Phases
-
-| Phase | Focus | Moat | Timeline |
-|-------|-------|------|----------|
-| **Phase 1** | Viral Commerce | Accessibility | 2026 |
-| **Phase 2** | Agentic Commerce | Energy Efficiency | 2027 |
-| **Phase 3** | Decentralized Commerce | Decentralization | 2028+ |
-
-### Key Numbers
-
-| Metric | Value |
-|--------|-------|
-| Year 1 Budget | R72,000 |
-| Timeline | 11 months |
-| Team Size | 2 (CEO + CTO) |
-| Target Merchants | 5-10 beta |
-| Target Products | 10,000 compiled |
-
-### Key Milestones (Revised — see [15-DELIVERY-TIMELINE](./15-DELIVERY-TIMELINE.md))
-
-| Date | Milestone | Status |
-|------|-----------|--------|
-| Jan 21, 2026 | Contract signed | Done |
-| Feb 5, 2026 | MVP through batch & catalog (Sprint 1) | Done |
-| Mar 5, 2026 | Caching, analytics (75%) | Planned (Sprint 3) |
-| Sep 30, 2026 | Beta launch (90%) | Planned |
-| Dec 15, 2026 | Public launch (100%) | Planned |
+| # | Document | Purpose |
+|---|----------|---------|
+| 01 | [Project Charter](./01-PROJECT-CHARTER.md) | Vision, objectives, governance, budget summary |
+| 02 | [Technical Architecture](./02-TECHNICAL-ARCHITECTURE.md) | System design, components, data flow |
+| 03 | [Product Requirements (PRD)](./03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Features, user stories, success metrics |
+| 04 | [Development Roadmap](./04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown, milestones, timeline |
+| 05 | [Risk Assessment](./05-RISK-ASSESSMENT.md) | Risk register, mitigation strategies |
+| 06 | [Budget & Financials](./06-BUDGET-FINANCIAL-PROJECTIONS.md) | Budget, cash flow, revenue projections |
+| 07 | [System Diagrams](./07-SYSTEM-DIAGRAMS.md) | UML and system analysis |
+| 08 | [CTO Next Steps](./08-CTO-NEXT-STEPS.md) | CTO action plan and priorities |
 
 ---
 
-## Core Technology Stack
+## Operational Documents
 
-| Component | Technology |
-|-----------|------------|
-| Binary Format | FlatBuffers |
-| Compiler | Rust |
-| Semantic AI | CLIP ViT-B/32 |
-| Cryptography | Ed25519 |
-| Distribution | Steganography + matter:// URI |
-| Storage | Cloudflare R2 |
-| Database | Supabase (PostgreSQL) |
-| API Hosting | Vercel |
-| Browser Extension | Chrome (Manifest v3) |
+| Document | Purpose |
+|----------|---------|
+| [Progress and Version](./PROGRESS-AND-VERSION.md) | Code version, sprint state — single source of truth |
+| [Delivery Timeline](./15-DELIVERY-TIMELINE.md) | 8-sprint timeline, milestones, actuals |
+| [CTO Execution Guide](./CTO-EXECUTION-GUIDE.md) | Step-by-step execution guide |
+| [Scrum Operating Model](./09-SCRUM-OPERATING-MODEL.md) | Scrum cadence, DoD, ceremonies |
+| [MVP Backlog](./10-MVP-BACKLOG.md) | Prioritized scope and acceptance criteria |
+| [Weekly Work Plan](./16-WEEKLY-WORK-PLAN.md) | Day-by-day work and estimates |
 
 ---
 
-## Key Risks
+## Sprint Plans
 
-| Risk | Score | Mitigation |
-|------|-------|------------|
-| Steganography fails | HIGH | Phase 0 validation, hybrid approach |
-| No merchant adoption | HIGH | Developer-first, open source |
-| Budget overrun | HIGH | Weekly tracking, hard limits |
-| Solo developer burnout | HIGH | Sustainable pace, rest policy |
-| Scope creep | HIGH | Feature freeze after Phase 0 |
-
----
-
-## Approval Status
-
-| Document | CTO | CEO |
-|----------|-----|-----|
-| Project Charter | Pending | Pending |
-| Technical Architecture | Pending | - |
-| Product Requirements | Pending | Pending |
-| Development Roadmap | Pending | Pending |
-| Risk Assessment | Pending | Pending |
-| Budget & Financials | Pending | Pending |
+| Sprint | Document |
+|--------|----------|
+| Sprint 1 | [11-SPRINT-1-PLAN.md](./11-SPRINT-1-PLAN.md) |
+| Sprint 2 | [12-SPRINT-2-PLAN.md](./12-SPRINT-2-PLAN.md) |
+| Sprint 3 | [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) |
+| Sprint 4 | [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md) |
 
 ---
 
-## Document Control
+## Technical Guides
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0 | Jan 21, 2026 | M. Mboweni | Initial creation |
-| 1.1 | Mar 2026 | M. Mboweni | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
-| 1.2 | Mar 2026 | M. Mboweni | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
-| 1.3 | Feb 8, 2026 | M. Mboweni | Primary docs structure; archive index; emoji removal; Sprint 2 status; Friday sprint prep |
+| Document | Purpose |
+|----------|---------|
+| [MVP-13 Acceptance & Schema](./17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria |
+| [MVP-13 Implementation](./MVP-13-IMPLEMENTATION.md) | Implementation details |
+| [MVP-13 Cross-Browser](./MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
+| [API Keys Guide](./API_KEYS_GUIDE.md) | API keys setup |
+| [Rust Windows Setup](./RUST_WINDOWS_SETUP.md) | Rust installation on Windows |
+| [Rust Compiler CTO Guide](./RUST-COMPILER-CTO-GUIDE.md) | matter-core compiler usage |
+| [R2 Create API Token](./R2-CREATE-API-TOKEN.md) | Cloudflare R2 setup |
+| [Deployment to Staging](./DEPLOYMENT-TO-STAGING.md) | Staging deployment guide |
+| [Manual E2E Smoke](./MANUAL-E2E-SMOKE.md) | Manual E2E testing |
+| [Thursday Performance Baselines](./THURSDAY-PERFORMANCE-BASELINES.md) | Performance validation results |
+| [Thursday Integration Validation](./THURSDAY-INTEGRATION-VALIDATION.md) | E2E validation results |
 
 ---
 
-## Next Steps
-
-1. Friday Feb 13 cross-browser sprint — see [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
-2. Sprint 2 release v0.3.0 (lens-extension) — Feb 19 target.
-3. Align budget and roadmap with revised milestone dates (Phase 1 to Dec 2026).
-
----
-
-**Prepared by:** Matome Mboweni, CTO  
+**Prepared by:** Matome Mbowene, CTO  
 **For:** Sobuhle Nyambali, CEO  
-**Date:** January 21, 2026
+**Last updated:** February 2026

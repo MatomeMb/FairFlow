@@ -97,7 +97,7 @@ Every product processed by our compiler exists simultaneously as:
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint); see [FRIDAY-EXECUTION-GUIDE](docs/FRIDAY-EXECUTION-GUIDE.md) | Pending |
+| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint) | Pending |
 | Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | Pending |
 | Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | Pending |
 | Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | Pending |
@@ -116,56 +116,29 @@ Every product processed by our compiler exists simultaneously as:
 - **Feb 18:** All bugs fixed + regression test passing
 - **Feb 19:** v0.3.0 tagged + demo delivered to CEO
 
-**Detailed daily breakdown:** [docs/SPRINT-2-DAILY-BREAKDOWN.md](./docs/SPRINT-2-DAILY-BREAKDOWN.md)
+**Detailed daily breakdown:** [docs/16-WEEKLY-WORK-PLAN.md](./docs/16-WEEKLY-WORK-PLAN.md)
 
 ---
 
 ## Documentation
 
-All project documentation is in the `docs/` folder. **Current plan and status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md) (single source of truth), [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) (revised 8-sprint schedule), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) (day-by-day estimates).
+**Master document (investor-grade):** [THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION](./THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION.md) — architecture, roadmap, use cases, financials. PDF: `THINGS-THAT-MATTER-TECHNICAL-DOCUMENTATION.pdf`
+
+**Current status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md) | [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md)
 
 | Document | Description |
 |----------|-------------|
-| [00-DOCUMENT-INDEX](./docs/00-DOCUMENT-INDEX.md) | Overview of all project documents |
-| [01-PROJECT-CHARTER](./docs/01-PROJECT-CHARTER.md) | Vision, objectives, scope, and governance |
-| [02-TECHNICAL-ARCHITECTURE](./docs/02-TECHNICAL-ARCHITECTURE.md) | System design and component architecture |
-| [03-PRODUCT-REQUIREMENTS](./docs/03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Functional and non-functional requirements |
-| [04-DEVELOPMENT-ROADMAP](./docs/04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown and milestones |
-| [05-RISK-ASSESSMENT](./docs/05-RISK-ASSESSMENT.md) | Risk analysis and mitigation strategies |
-| [06-BUDGET-PROJECTIONS](./docs/06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning and cost breakdown |
-| [07-SYSTEM-DIAGRAMS](./docs/07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
-| [08-CTO-NEXT-STEPS](./docs/08-CTO-NEXT-STEPS.md) | CTO action plan and immediate priorities |
+| [Document Index](./docs/00-DOCUMENT-INDEX.md) | Overview of all project documents |
+| [01 Project Charter](./docs/01-PROJECT-CHARTER.md) | Vision, objectives, governance |
+| [02 Technical Architecture](./docs/02-TECHNICAL-ARCHITECTURE.md) | System design, components |
+| [03 Product Requirements](./docs/03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Features, user stories |
+| [04 Development Roadmap](./docs/04-DEVELOPMENT-ROADMAP.md) | Sprint breakdown, milestones |
+| [05 Risk Assessment](./docs/05-RISK-ASSESSMENT.md) | Risk register, mitigation |
+| [06 Budget](./docs/06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning |
 | [CTO Execution Guide](./docs/CTO-EXECUTION-GUIDE.md) | Step-by-step execution guide |
-| [Scrum Master Plan for CEO](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | 8-sprint roadmap and success criteria |
-| [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
-| [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
-| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Jan 20–Feb 5, 2026) — MVP vertical slice |
-| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
-| [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
-| [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
-| [Friday Execution Guide](./docs/FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines for Fri Feb 13 cross-browser validation |
-| [Friday Sprint Analysis](./docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | Risk matrix, contingencies, pre-flight checklist |
-| [Sprint 2 Completion Checklist](./docs/SPRINT-2-COMPLETION-CHECKLIST.md) | AC gates, quality checkpoints, DoD, demo prep, risk mitigation |
-| [Verify MVP-13 Cache](./docs/VERIFY-MVP-13-CACHE.md) | Manual verification steps: cache hit/miss, IndexedDB inspection |
-| [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |
-| [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) — R2 storage, Rust compiler, matter CLI |
-| [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) — Batch, catalog import, catalog-upload demo |
-| [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | 8-sprint Feb–May 2026; current status; revised milestones |
-| [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) | Day-by-day work and realistic estimates (Sprints 5–8) |
-| [Progress and Version](./docs/PROGRESS-AND-VERSION.md) | Code version, sprint state, next sprint (single source of truth) |
-| [CEO Sync (Sprint 2)](./docs/CEO-SYNC-SPRINT-2.md) | Sprint 2 features delivered, demo flow, Sprint 3 scope |
-| [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Guide for setting up API keys |
+| [API Keys Guide](./docs/API_KEYS_GUIDE.md) | API keys setup |
 
-**Setup & Configuration:**
-- [SETUP.md](./SETUP.md) - Detailed development environment setup
-- [SETUP_COMPLETE.md](./SETUP_COMPLETE.md) - Setup completion summary and status
-- [docs/RUST_WINDOWS_SETUP.md](./docs/RUST_WINDOWS_SETUP.md) - Rust installation on Windows
-
-**Phase 0 Implementation:**
-- [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) - Platform validation testing workflow and decision matrix
-- [matter-core/PHASE0_IMPLEMENTATION.md](./packages/matter-core/PHASE0_IMPLEMENTATION.md) - Phase 0 steganography implementation details
-
-PDF versions are available in [`docs/pdf/`](./docs/pdf/). Historical day reports: [docs/archive/](./docs/archive/README.md).
+**Setup:** [SETUP.md](./SETUP.md) | [Rust Windows Setup](./docs/RUST_WINDOWS_SETUP.md)
 
 ---
 
@@ -224,7 +197,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Role | Name | Responsibilities |
 |------|------|------------------|
 | **CEO** | Sobuhle Nyambali | Strategy, partnerships, fundraising |
-| **CTO** | Matome Mboweni | Technical architecture, development |
+| **CTO** | Matome Mbowene | Technical architecture, development |
 
 ---
 
@@ -288,7 +261,7 @@ cargo run --bin platform-test -- test-extraction downloaded_image.jpg
 cargo run --bin platform-test -- generate-report results.json
 ```
 
-See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for the full workflow.
+See [Manual E2E Smoke](./docs/MANUAL-E2E-SMOKE.md) for testing workflows.
 
 ---
 
