@@ -19,6 +19,8 @@ const log = {
   cacheWrite: (hash, bytes, ms = 0) => console.log(`[Cache WRITE] Hash: ${hash} (${bytes} bytes${ms ? `, ${ms}ms` : ''})`),
   cacheWriteError: (hash, err) => console.error(`[Cache WRITE FAILED] Hash: ${hash}: ${err.message}`),
   apiError: (hash, status) => console.error(`[API ERROR] Hash: ${hash}: ${status}`),
+  perf: (hash, ms) => console.log(`[Lens Perf] Hash: ${hash} resolved in ${ms}ms`),
+  invalidHash: (hash) => console.warn(`[Lens] Invalid hash attempted: ${hash}`),
   error: (msg) => console.error(`[Cache ERROR] ${msg}`),
   init: (msg) => console.log(`[Cache] ${msg}`),
 };
@@ -127,8 +129,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   const hash = message.hash.trim();
-  if (!hash) {
-    sendResponse({ ok: false, error: 'Missing hash' });
+  if (!hash || hash.length < 64) { // SHA-256 length
+    log.invalidHash(hash);
+    sendResponse({ ok: false, error: 'Invalid or missing hash' });
     return true;
   }
 
@@ -140,6 +143,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (cached) {
         const ms = Math.round(performance.now() - start);
         log.cacheHit(hash, ms);
+        log.perf(hash, ms);
         sendResponse({ ok: true, data: cached });
         return;
       }
@@ -160,6 +164,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Continue — API succeeded, cache write failed (graceful degradation)
       }
       
+      const totalMs = Math.round(performance.now() - start);
+      log.perf(hash, totalMs);
       sendResponse({ ok: true, data });
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);
