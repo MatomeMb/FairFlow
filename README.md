@@ -181,23 +181,53 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ---
 
-## 8-Sprint Delivery Timeline (As of Feb 19, 2026)
+## Timeline (4-Week Rolling View)
 
 *Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
 
-| Sprint | Period | Goal | Version | Status |
-|--------|--------|------|---------|--------|
-| Sprint 0 | By Jan 19, 2026 | Setup and architecture | — | Complete |
-| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | **Complete** ✅ |
-| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | **Complete** ✅ |
-| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — | **Next** ⏳ |
-| Sprint 4 | Mar 6–19, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
-| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
-| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — | Planned |
-| Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
-| Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
+### Previous 2 Weeks (Feb 6–19, 2026) — Completed
 
-**Current status:** Sprint 2 **complete** (Feb 19, 2026); **v0.5.0** released (lens v0.3.0). **Sprint 3 begins Feb 20** (MVP-14 analytics). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+| Task | Status |
+|------|--------|
+| MVP-13 IndexedDB cache integrated | Done |
+| Cross-browser validation (Chrome, Edge, Brave, Firefox) | Done |
+| Performance instrumentation ([Lens Perf] logs, lazy-load) | Done |
+| SHA-256 validation, controlled error overlay | Done |
+| Regression test pass, console hygiene | Done |
+| Sprint 2 demo script and retrospective | Done |
+| v0.5.0 tagged (lens v0.3.0, shadow-index v0.5.0) | Done |
+
+### Now (Feb 19–20, 2026)
+
+Sprint 2 closed. Sprint 3 planning. Tag v0.5.0 on main. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+
+### Next 2 Weeks (Feb 20 – Mar 5, 2026) — Sprint 3
+
+| Task | Status |
+|------|--------|
+| MVP-14 event schema (view, click) | Planned |
+| API: POST /events or internal log | Planned |
+| Extension: fire view when overlay shown; fire click on Buy Now | Planned |
+| Event storage (file or DB), retention policy | Planned |
+| Export endpoint or minimal dashboard | Planned |
+| API request logging, error observability | Planned |
+| Sprint 3 review, tag (e.g. shadow-index v0.6.0) | Planned |
+
+---
+
+### Full 8-Sprint Overview
+
+| Sprint | Period | Goal | Version |
+|--------|--------|------|---------|
+| Sprint 0 | By Jan 19, 2026 | Setup and architecture | — |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 |
+| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — |
+| Sprint 4 | Mar 6–19, 2026 | Beta readiness | — |
+| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep | — |
+| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — |
+| Sprint 7 | Apr 17–30, 2026 | Beta program | — |
+| Sprint 8 | May 1–14, 2026 | Public launch prep | — |
 
 ---
 
