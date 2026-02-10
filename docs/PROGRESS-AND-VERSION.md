@@ -4,7 +4,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-## Current status (as of Feb 10, 2026)
+## Current status (as of Feb 16, 2026)
 
 | Area | Status | Notes |
 |------|--------|-------|
@@ -52,7 +52,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Lens extension** | Done | MV3, matter:// intercept, overlay; XMP beacon (MVP-07); IndexedDB cache (MVP-13); Firefox compat (background.scripts); cross-browser validated (Chrome, Edge, Brave, Firefox) |
 | **Platform test harness** | Done | JSON output (MVP-08); generate-report integration |
 | **Demo flow** | Done | Demo server; catalog-upload.html; matter-demo.html; E2E and manual validation |
-| **Tests** | Done | Vitest (API, auth, batch, catalog); Playwright (E2E); cargo test (steg) |
+| **Tests** | Done | Vitest (API, auth, batch, catalog; lens-extension 48 tests including full resolve flow); Playwright (E2E); cargo test (steg) |
 | **Rust compiler** | Done | Compiler::compile(), matter CLI |
 | **P1** | Done | MVP-07–MVP-10 complete and tested |
 | **P2 (batch/catalog)** | Done | MVP-11, MVP-12; catalog-upload demo delivered |
@@ -81,4 +81,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 10, 2026. Sprint 2 in progress; MVP-13 cache integrated; cross-browser validation complete (Chrome, Edge, Brave, Firefox). Validated by: Matome Mbowene.*
+*Last updated: Feb 16, 2026. Sprint 2 in progress; MVP-13 cache integrated; cross-browser validation complete; tests & docs finalized (48 lens-extension tests, full resolve flow integration test, README updates). Validated by: Matome Mbowene.*

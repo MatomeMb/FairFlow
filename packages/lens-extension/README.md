@@ -119,7 +119,7 @@ src/
 
 tests/
 ├── cache.test.js       # Cache unit tests (MVP-13, 15 tests)
-└── integration.test.js # Cache integration tests (Tuesday sprint, 16 tests)
+└── integration.test.js # Cache integration tests + full resolve flow (31 tests)
 ```
 
 ## Architecture
@@ -185,15 +185,16 @@ pnpm test:watch
   - AC5: Overlay shape (data consistency)
   - AC6: Cache isolation (IndexedDB persistence)
 
-- **integration.test.js:** 16 tests for resolve handler integration
+- **integration.test.js:** 31 tests for resolve handler integration (includes full resolve flow)
   - Cache hit scenarios (return data without API call)
   - Cache miss scenarios (API fallback)
   - TTL enforcement at boundaries
   - Multiple independent entries
   - Edge cases (empty hash, special characters, large payloads)
   - Data integrity (field preservation, fetchedAt auto-injection)
+  - Full resolve flow: matter:// → cache miss → API → cache write → overlay (cache hit on second click)
 
-**Total:** 33 passing tests covering cache-first read path
+**Total:** 48 passing tests covering cache-first read path and full resolve flow
 
 ### Manual Testing
 
@@ -308,7 +309,7 @@ DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
 - Cache writes are synchronous relative to user response (response always happens first)
 - Large payloads (>5MB) may hit IndexedDB quota on devices with limited storage
 - No automatic cache eviction (quota management planned for future sprint)
-- Cross-browser validation: Friday Feb 13 sprint (Chrome/Edge/Brave/Firefox); prep complete
+- Cross-browser validation complete (Chrome, Edge, Brave, Firefox — Feb 10). See [BROWSER-VALIDATION-RESULTS.md](../../docs/BROWSER-VALIDATION-RESULTS.md)
 
 **Expected behavior:**
 - First resolution: API call → IndexedDB write → overlay displays
@@ -333,7 +334,7 @@ DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
 | Chrome | 110+ | Primary | Full MV3 support |
 | Edge | 110+ | Full | Chromium-based; identical to Chrome |
 | Brave | 1.62+ | Full | Chromium-based |
-| Firefox | 121+ | Experimental | MV3 support in progress |
+| Firefox | 121+ | Full | Manifest includes background.scripts for compatibility |
 | Safari | 17+ | Not supported | Uses web extensions API |
 
 See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detailed compatibility notes.
@@ -356,8 +357,8 @@ Completed:
 - Integration tests: 16 tests for resolve handler
 - Logging: Structured [Cache HIT] / [Cache MISS] logging
 - cacheSet() integration in background.js (Wednesday, Feb 11)
-- E2E validation: 45/45 tests passing (Thursday, Feb 12)
-- Firefox compatibility layer + manifest_v2 fallback (Friday prep)
+- E2E validation: 48/48 tests passing (includes full resolve flow integration tests)
+- Firefox compatibility (background.scripts in manifest); cross-browser validation complete (Feb 10)
 
 **Core Features:**
 - Image detection (XMP beacons) — MVP-07 [Complete]
