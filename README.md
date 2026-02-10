@@ -148,6 +148,17 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Sprint 2 Completion Checklist](./docs/SPRINT-2-COMPLETION-CHECKLIST.md) | AC gates, quality checkpoints, DoD, demo prep, risk mitigation |
 | [Verify MVP-13 Cache](./docs/VERIFY-MVP-13-CACHE.md) | Manual verification steps: cache hit/miss, IndexedDB inspection |
 | [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |
+| [MVP-14 Event Spec](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Analytics event schema and JSONL storage (Sprint 3) |
+| [Analytics Reporting Engine Spec](./docs/ANALYTICS-REPORTING-ENGINE-SPEC.md) | MVP-14 Phase 2: GET /v1/analytics/report aggregation engine (complete spec) |
+| [Analytics Impl Brief](./docs/ANALYTICS-REPORTING-IMPL-BRIEF.md) | MVP-14 phases 1–4 execution plan with 4-phase roadmap |
+| [Analytics Phase 1 Implementation](./docs/ANALYTICS-REPORTING-PHASE1-IMPL-PROMPT.md) | Ready-to-code guide: fixtures, starter template, 60+ test stubs |
+| [Analytics Complete Summary](./docs/ANALYTICS-REPORTING-COMPLETE-SUMMARY.md) | Quick start (8 steps), roadmap, acceptance criteria, test data facts |
+| [Analytics Phase 1 CTO Handoff](./docs/ANALYTICS-PHASE1-CTO-HANDOFF.md) | Phase 1 directive: core aggregation logic (5 days, ready-to-code) |
+| [Analytics Phase 2 CTO Handoff](./docs/ANALYTICS-PHASE2-CTO-HANDOFF.md) | Phase 2 directive: HTTP API route (3–4 days, integration testing) |
+| [Analytics Phase 3 CTO Handoff](./docs/ANALYTICS-PHASE3-CTO-HANDOFF.md) | Phase 3 directive: performance verification (2–3 days, load testing) |
+| [Analytics Performance Baseline](./docs/ANALYTICS-PERFORMANCE-BASELINE.md) | Performance verified: 90-day < 500ms, memory < 500MB, load tests passing |
+| [Analytics Production Readiness](./docs/ANALYTICS-PRODUCTION-READINESS.md) | Final sign-off checklist: phases 1–3 complete, production ready |
+| [Analytics Final Release v0.6.0](./docs/ANALYTICS-FINAL-RELEASE-v0.6.0.md) | Release handoff: git workflow, tag creation, merge to main, next steps |
 | [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) — R2 storage, Rust compiler, matter CLI |
 | [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) — Batch, catalog import, catalog-upload demo |
 | [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | 8-sprint Feb–May 2026; current status; revised milestones |

@@ -44,6 +44,16 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | Post–Sprint 1 actions and Sprint 2 readiness | ~2 |
 | — | [**Sprint 2 Retrospective**](./SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 (MVP-13) goal, results, lessons, and v0.5.0 release | ~3 |
 | — | [**MVP-14 Event Spec**](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | **Conversion tracking: event schema and JSONL storage decision (Sprint 3)** | ~3 |
+| — | [**Analytics Reporting Engine Spec**](./ANALYTICS-REPORTING-ENGINE-SPEC.md) | **MVP-14 Phase 2: GET /v1/analytics/report, aggregation engine, groupBy/sortBy/pagination** | ~10 |
+| — | [**Analytics Reporting Implementation Brief**](./ANALYTICS-REPORTING-IMPL-BRIEF.md) | **MVP-14 phases 1–4 execution plan: tasks, timeline, sign-off checklist** | ~5 |
+| — | [**Analytics Reporting Phase 1 Implementation Prompt**](./ANALYTICS-REPORTING-PHASE1-IMPL-PROMPT.md) | **Ready-to-code guide: fixtures, starter template, 60+ test stubs, hints, debugging** | ~15 |
+| — | [**Analytics Reporting Complete Summary**](./ANALYTICS-REPORTING-COMPLETE-SUMMARY.md) | **Navigation hub: quick start (8 steps), roadmap, acceptance criteria, test data facts** | ~6 |
+| — | [**Analytics Phase 1 CTO Handoff**](./ANALYTICS-PHASE1-CTO-HANDOFF.md) | **Phase 1 directive: core aggregation logic implementation (5 days, ready-to-code)** | ~8 |
+| — | [**Analytics Phase 2 CTO Handoff**](./ANALYTICS-PHASE2-CTO-HANDOFF.md) | **Phase 2 directive: HTTP API route implementation (3–4 days, integration testing)** | ~8 |
+| — | [**Analytics Phase 3 CTO Handoff**](./ANALYTICS-PHASE3-CTO-HANDOFF.md) | **Phase 3 directive: performance verification & load testing (2–3 days, benchmarking)** | ~8 |
+| — | [**Analytics Performance Baseline**](./ANALYTICS-PERFORMANCE-BASELINE.md) | **Performance measurements: 90-day range < 500ms, memory < 500MB, load tests passing** | ~2 |
+| — | [**Analytics Production Readiness**](./ANALYTICS-PRODUCTION-READINESS.md) | **Final sign-off checklist: phases 1–3 complete, production ready, deployment notes** | ~2 |
+| — | [**Analytics Final Release v0.6.0**](./ANALYTICS-FINAL-RELEASE-v0.6.0.md) | **Release handoff: git workflow, tag creation, merge to main, next steps (staging/beta)** | ~4 |
 | 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
 | 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
