@@ -14,6 +14,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
+import { getReport, validateDateRange } from '../lib/analytics-report.js';
 
 const app = new Hono();
 
@@ -65,8 +66,12 @@ const __dirname = path.dirname(__filename);
 
 const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
-const eventsDir = path.join(dataRoot, 'events');
 const indexFile = path.join(dataRoot, 'index.json');
+
+/** Events dir: override via ANALYTICS_EVENTS_DIR for tests */
+function getEventsDir(): string {
+  return process.env.ANALYTICS_EVENTS_DIR || path.join(dataRoot, 'events');
+}
 
 /** MVP-14: Event schemas for analytics ingestion */
 const ViewEventSchema = z.object({
@@ -125,14 +130,14 @@ const ensureDataDirs = async () => {
 };
 
 const ensureEventsDir = async () => {
-  await fs.mkdir(eventsDir, { recursive: true });
+  await fs.mkdir(getEventsDir(), { recursive: true });
 };
 
 /** MVP-14: Append event to daily JSONL file (data/events/YYYY-MM-DD.jsonl) */
 async function appendEvent(payload: z.infer<typeof EventSchema>): Promise<void> {
   await ensureEventsDir();
   const dateStr = new Date().toISOString().slice(0, 10);
-  const filePath = path.join(eventsDir, `${dateStr}.jsonl`);
+  const filePath = path.join(getEventsDir(), `${dateStr}.jsonl`);
   const line = JSON.stringify({
     ...payload,
     timestamp: payload.timestamp ?? new Date().toISOString(),
@@ -316,6 +321,46 @@ app.post('/v1/analytics/event', async (c) => {
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
     return c.json(err('event_store_failed', message), 500);
+  }
+});
+
+/** MVP-14: Report query params (Phase 2) */
+const ReportQuerySchema = z.object({
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  groupBy: z.enum(['day', 'hash', 'both']).optional().default('day'),
+  sortBy: z.enum(['date', 'views', 'clicks']).optional().default('date'),
+  limit: z.coerce.number().int().min(1).max(1000).optional().default(100),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+// MVP-14: Analytics report (GET /v1/analytics/report)
+app.get('/v1/analytics/report', async (c) => {
+  const raw = Object.fromEntries(c.req.url ? new URL(c.req.url).searchParams : []);
+  const parsed = ReportQuerySchema.safeParse(raw);
+  if (!parsed.success) {
+    return c.json(
+      err('invalid_params', 'Invalid query parameters', parsed.error.flatten()),
+      400
+    );
+  }
+  const { from, to, groupBy, sortBy, limit, offset } = parsed.data;
+  const rangeErr = validateDateRange(from, to);
+  if (rangeErr) {
+    return c.json(
+      err('invalid_params', rangeErr === 'from > to' ? 'from must be ≤ to' : rangeErr),
+      400
+    );
+  }
+  try {
+    const result = await getReport(getEventsDir(), from, to, groupBy, sortBy, limit, offset);
+    if (!result.ok) {
+      return c.json(err('invalid_params', result.error ?? 'Invalid parameters'), 400);
+    }
+    return c.json(result, 200);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return c.json(err('report_failed', message), 500);
   }
 });
 

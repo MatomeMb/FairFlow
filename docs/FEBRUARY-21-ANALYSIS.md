@@ -100,10 +100,37 @@ The **Analytics & Observability (MVP-14)** pipeline provides a fire-and-forget m
 
 ---
 
+## Reporting Engine (Phase 1 — Implemented)
+
+**Module:** `packages/shadow-index/lib/analytics-report.ts`
+
+**Functions:**
+- `parseDate(s)` — Parse YYYY-MM-DD; return `{y,m,d}` or null
+- `validateDateRange(from, to)` — Return error or null
+- `listEventFiles(eventsDir, from, to)` — List JSONL paths in range
+- `aggregateFile(filePath)` — Parse JSONL; return byDate, byHash, byBoth maps
+- `mergeAggregates(aggregates)` — Combine multi-file results
+- `getReport(eventsDir, from, to, groupBy, sortBy, limit, offset)` — Full report
+
+**Phase 2 (done):** `GET /v1/analytics/report` route added; wired to `getReport`; Zod validation; 11 integration tests.
+
+### GET /v1/analytics/report API (implemented)
+
+| Param | Type | Required | Default | Description |
+|-------|------|----------|---------|-------------|
+| from | string (YYYY-MM-DD) | yes | — | Start date (inclusive) |
+| to | string (YYYY-MM-DD) | yes | — | End date (inclusive) |
+| groupBy | string | no | day | day \| hash \| both |
+| sortBy | string | no | date | date \| views \| clicks |
+| limit | number | no | 100 | Max rows |
+| offset | number | no | 0 | Pagination offset |
+
+---
+
 ## Next Steps (Sprint 3)
 
-1. **Aggregation Engine:** Scan JSONL by date range; compute daily counts (views, clicks by hash)
-2. **GET /v1/analytics/report:** Query params `from`, `to`, `groupBy=day`
+1. ~~**Aggregation Engine:** Scan JSONL by date range; compute daily counts (views, clicks by hash)~~ — Done
+2. ~~**GET /v1/analytics/report:** Add route; wire `getReport`; Zod validation~~ — Done
 3. **Internal HTML Dashboard:** API health, event counts, recent errors
 4. **Retention Policy:** 90-day rotation; optional cleanup job
 

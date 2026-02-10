@@ -67,11 +67,19 @@
 | [MVP-13 Cross-Browser](./MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
 | [MVP-14 Event Spec & Storage](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema (view/click), storage decision (JSONL), Zod validation |
 | [February 21 Analysis](./FEBRUARY-21-ANALYSIS.md) | MVP-14 pipeline architecture, schema design, storage strategy |
+| [Analytics Reporting Engine](./ANALYTICS-REPORTING-ENGINE-README.md) | Entry point — spec, impl brief, performance, readiness |
+| [Analytics Reporting Engine Spec](./ANALYTICS-REPORTING-ENGINE-SPEC.md) | GET /v1/analytics/report spec, aggregation algorithm |
+| [Analytics Reporting Impl Brief](./ANALYTICS-REPORTING-IMPL-BRIEF.md) | 4-phase execution plan, task checklists |
+| [Analytics Performance Baseline](./ANALYTICS-PERFORMANCE-BASELINE.md) | Measured times by date range; targets < 500ms |
+| [Analytics Production Readiness](./ANALYTICS-PRODUCTION-READINESS.md) | Final checklist, sign-off |
+| [Deployment](./DEPLOYMENT.md) | Staging and production deployment procedures |
 | [API Keys Guide](./API_KEYS_GUIDE.md) | API keys setup |
 | [Rust Windows Setup](./RUST_WINDOWS_SETUP.md) | Rust installation on Windows |
 | [Rust Compiler CTO Guide](./RUST-COMPILER-CTO-GUIDE.md) | matter-core compiler usage |
 | [R2 Create API Token](./R2-CREATE-API-TOKEN.md) | Cloudflare R2 setup |
 | [Deployment to Staging](./DEPLOYMENT-TO-STAGING.md) | Staging deployment guide |
+| [Staging Deployment Notes v0.6.0](./STAGING-DEPLOYMENT-NOTES.md) | v0.6.0-specific verification |
+| [Phase 4 Optimization Plan](./PHASE-4-OPTIMIZATION-PLAN.md) | Internal dashboard, retention, monitoring |
 | [Manual E2E Smoke](./MANUAL-E2E-SMOKE.md) | Manual E2E testing |
 | [Thursday Performance Baselines](./THURSDAY-PERFORMANCE-BASELINES.md) | Performance validation results |
 | [Thursday Integration Validation](./THURSDAY-INTEGRATION-VALIDATION.md) | E2E validation results |

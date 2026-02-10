@@ -65,19 +65,11 @@ pnpm test
 3. Click "Load unpacked"
 4. Select the `packages/lens-extension/` folder
 
-### Firefox
-**Option A — MV3 (manifest.json):** Try first; Firefox 121+ supports MV3 experimentally.
+### Firefox (MV3 support experimental)
 1. Open `about:debugging`
 2. Click "This Firefox"
 3. Click "Load Temporary Add-on"
 4. Select `manifest.json` from `packages/lens-extension/`
-
-**Option B — MV2 fallback (manifest_v2.json):** Use if MV3 fails to load or message passing is broken.
-1. Open `about:debugging` → This Firefox → Load Temporary Add-on
-2. Select `manifest_v2.json` (Firefox accepts any manifest filename)
-3. Includes `firefox-compat.js` (chrome.* polyfill for `browser.*` API)
-
-See [docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md](../../docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) for Firefox risk mitigation.
 
 ## Configuration
 
@@ -119,7 +111,7 @@ src/
 
 tests/
 ├── cache.test.js       # Cache unit tests (MVP-13, 15 tests)
-└── integration.test.js # Cache integration tests + full resolve flow (31 tests)
+└── integration.test.js # Cache integration tests (Tuesday sprint, 16 tests)
 ```
 
 ## Architecture
@@ -185,16 +177,15 @@ pnpm test:watch
   - AC5: Overlay shape (data consistency)
   - AC6: Cache isolation (IndexedDB persistence)
 
-- **integration.test.js:** 31 tests for resolve handler integration (includes full resolve flow)
+- **integration.test.js:** 16 tests for resolve handler integration
   - Cache hit scenarios (return data without API call)
   - Cache miss scenarios (API fallback)
   - TTL enforcement at boundaries
   - Multiple independent entries
   - Edge cases (empty hash, special characters, large payloads)
   - Data integrity (field preservation, fetchedAt auto-injection)
-  - Full resolve flow: matter:// → cache miss → API → cache write → overlay (cache hit on second click)
 
-**Total:** 48 passing tests covering cache-first read path and full resolve flow
+**Total:** 33 passing tests covering cache-first read path
 
 ### Manual Testing
 
@@ -261,14 +252,6 @@ Check cache (cacheGet)
 - Extension continues working in degraded mode
 - Consider clearing old entries or implementation cache eviction policy
 
-### Performance Instrumentation (Feb 17)
-
-On localhost demo page, the extension logs:
-- `[Lens Perf] overlay render: Xms` — DOM build and append time
-- `[Lens Perf] resolve + render total: Xms` — full click-to-overlay time
-
-For DevTools Performance profiling: `performance.measure('lens-overlay-render')` marks the overlay render span. See [THURSDAY-PERFORMANCE-BASELINES.md](../../docs/THURSDAY-PERFORMANCE-BASELINES.md) for baselines and 3G throttle test procedure.
-
 ### Performance Metrics
 
 **Typical cache write latency:**
@@ -317,7 +300,7 @@ DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
 - Cache writes are synchronous relative to user response (response always happens first)
 - Large payloads (>5MB) may hit IndexedDB quota on devices with limited storage
 - No automatic cache eviction (quota management planned for future sprint)
-- Cross-browser validation complete (Chrome, Edge, Brave, Firefox — Feb 10). See [BROWSER-VALIDATION-RESULTS.md](../../docs/BROWSER-VALIDATION-RESULTS.md)
+- Cross-browser testing (Edge/Brave/Firefox) pending (Chrome-first MVP)
 
 **Expected behavior:**
 - First resolution: API call → IndexedDB write → overlay displays
@@ -342,7 +325,7 @@ DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
 | Chrome | 110+ | Primary | Full MV3 support |
 | Edge | 110+ | Full | Chromium-based; identical to Chrome |
 | Brave | 1.62+ | Full | Chromium-based |
-| Firefox | 121+ | Full | Manifest includes background.scripts for compatibility |
+| Firefox | 121+ | Experimental | MV3 support in progress |
 | Safari | 17+ | Not supported | Uses web extensions API |
 
 See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detailed compatibility notes.
@@ -357,16 +340,18 @@ See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detai
 
 ## Status
 
-**MVP-13 (Caching): Complete**
+**MVP-13 (Caching - Read Path): Complete**
 
 Completed:
 - Cache module: 5 functions with IndexedDB backend (Monday, Feb 9)
-- Unit tests: 15 tests covering all acceptance criteria
-- Integration tests: 16 tests for resolve handler
+- Unit tests: 15 tests covering all acceptance criteria (Monday, Feb 9)
+- Integration tests: 16 tests for resolve handler read path (Tuesday, Feb 10)
 - Logging: Structured [Cache HIT] / [Cache MISS] logging
-- cacheSet() integration in background.js (Wednesday, Feb 11)
-- E2E validation: 48/48 tests passing (includes full resolve flow integration tests)
-- Firefox compatibility (background.scripts in manifest); cross-browser validation complete (Feb 10)
+
+Deferred to Wednesday:
+- cacheSet() integration on successful API responses
+- Error path handling (don't cache on API failure)
+- Full end-to-end testing with real matter:// links
 
 **Core Features:**
 - Image detection (XMP beacons) — MVP-07 [Complete]
