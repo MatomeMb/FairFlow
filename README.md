@@ -75,16 +75,16 @@ Every product processed by our compiler exists simultaneously as:
 
 ---
 
-## Current Sprint (Sprint 3: Feb 20 – Mar 5, 2026)
+## Current Sprint (Sprint 4: Mar 6 – Mar 19, 2026)
 
-**Goal:** MVP-14 Analytics & Observability — view/click event tracking, API ingestion, merchant reporting, internal observability dashboard  
-**Target:** Tag v0.6.0
+**Goal:** Beta readiness — internal dashboard, retention policy, staging validation  
+**Target:** v0.6.0 shipped; Sprint 4 deliverables
 
-**Phases:** Infrastructure (sendEvent, overlay hooks, POST /v1/analytics/event) — **Done Feb 21** | Reporting (GET /v1/analytics/report) | Observability (HTML dashboard, E2E) | Release
+**Sprint 3 complete (Feb 2026):** MVP-14 Analytics Reporting Engine — event ingestion (POST /v1/analytics/event), aggregation (GET /v1/analytics/report), 66 tests, performance verified (< 500ms), tag v0.6.0. [Analytics README](./docs/ANALYTICS-REPORTING-ENGINE-README.md) | [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md)
 
-**Sprint 2 complete (Feb 19, 2026):** MVP-13 IndexedDB cache, cross-browser validation (Chrome, Edge, Brave, Firefox); performance instrumentation; lens v0.3.0, tag v0.5.0. [Demo script](./docs/SPRINT-2-DEMO-SCRIPT.md) | [Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md)
+**Sprint 2 complete (Feb 19, 2026):** MVP-13 IndexedDB cache, cross-browser validation (Chrome, Edge, Brave, Firefox); lens v0.3.0, tag v0.5.0. [Demo script](./docs/SPRINT-2-DEMO-SCRIPT.md) | [Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md)
 
-**Full spec:** [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md) | **Implementation:** [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md)
+**Full spec:** [14-SPRINT-4-PLAN.md](./docs/14-SPRINT-4-PLAN.md) | **Status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md)
 
 ---
 
@@ -181,9 +181,9 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–2, partial Sprint 3):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; **MVP-13 IndexedDB cache**; cross-browser validation (Chrome, Edge, Brave, Firefox); performance instrumentation; **MVP-14 event ingestion** (view/click events, POST /v1/analytics/event, JSONL storage). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md).
+**Delivered (Sprints 1–3):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; **MVP-13 IndexedDB cache**; cross-browser validation (Chrome, Edge, Brave, Firefox); **MVP-14 Analytics Reporting Engine** (event ingestion, GET /v1/analytics/report, 66 tests, < 500ms for 90-day queries). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [ANALYTICS-REPORTING-ENGINE-README.md](./docs/ANALYTICS-REPORTING-ENGINE-README.md).
 
-**Planned (Sprint 3–8, Feb–May 2026):** MVP-14 reporting (GET /v1/analytics/report), status dashboard; beta readiness; beta launch prep. Full metrics, day-by-day plan: [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
+**Planned (Sprint 4–8, Mar–May 2026):** Internal dashboard, retention policy; beta readiness; beta launch prep. Full metrics: [14-SPRINT-4-PLAN.md](./docs/14-SPRINT-4-PLAN.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
 
 ---
 
@@ -200,30 +200,31 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 *Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
 
-### Previous 2 Weeks (Feb 6–19, 2026) — Completed
+### Previous 2 Weeks (Feb 20 – Mar 5, 2026) — Sprint 3 Completed
 
-| Task | Status |
-|------|--------|
-| MVP-13 IndexedDB cache integrated | Done |
-| Cross-browser validation (Chrome, Edge, Brave, Firefox) | Done |
-| Performance instrumentation ([Lens Perf] logs, lazy-load) | Done |
-| SHA-256 validation, controlled error overlay | Done |
-| Regression test pass, console hygiene | Done |
-| Sprint 2 demo script and retrospective | Done |
-| v0.5.0 tagged (lens v0.3.0, shadow-index v0.5.0) | Done |
+| Task | Est. | Status |
+|------|------|--------|
+| Event schema + storage decision | 6h | Done |
+| Extension sendEvent + view/click hooks | 11h | Done |
+| POST /v1/analytics/event; JSONL storage | 5h | Done |
+| Aggregation engine; GET /v1/analytics/report | 6h | Done |
+| Performance + load tests; docs refactor | 12h | Done |
+| v0.6.0 tagged (shadow-index 0.6.0) | 5h | Done |
 
-### Now (Feb 20 – Mar 5, 2026)
+### Now (Mar 6 – Mar 19, 2026)
 
-Sprint 3 in progress. Tag v0.5.0 on main. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+Sprint 4 in progress. Tag v0.6.0 on main. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
-### Next 2 Weeks (Feb 20 – Mar 5, 2026) — Sprint 3
+### Next 2 Weeks (Mar 6 – Mar 19, 2026) — Sprint 4
 
-| Phase | Tasks | Status |
-|-------|-------|--------|
-| **Infrastructure** | sendEvent, view/click hooks, POST /v1/analytics/event, JSONL storage | Done (Feb 21) |
-| **Reporting** | Aggregation engine; GET /v1/analytics/report (from, to, groupBy) | Planned |
-| **Observability** | Internal HTML status dashboard; API request logging; E2E: View to DB to Report | Planned |
-| **Release** | Sprint review; demo conversion tracking; tag v0.6.0 | Planned |
+| Phase | Tasks | Est. | Status |
+|-------|-------|------|--------|
+| **Staging** | Deploy v0.6.0; verify analytics endpoints | 4h | Planned |
+| **Dashboard** | Internal HTML status page; event counts | 6h | Planned |
+| **Retention** | 90-day retention policy; cleanup job | 4h | Planned |
+| **Beta prep** | QA validation; merchant onboarding prep | 6h | Planned |
+
+*Day-by-day breakdown with estimates: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
 
 ---
 
@@ -234,8 +235,8 @@ Sprint 3 in progress. Tag v0.5.0 on main. Single source of truth: [Progress and 
 | Sprint 0 | By Jan 19, 2026 | Setup and architecture | — |
 | Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 |
 | Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 |
-| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | v0.6.0 |
-| Sprint 4 | Mar 6–19, 2026 | Beta readiness | — |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14): event ingestion, reporting engine, 66 tests | v0.6.0 |
+| Sprint 4 | Mar 6–19, 2026 | Beta readiness: dashboard, retention, staging | — |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep | — |
 | Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — |
 | Sprint 7 | Apr 17–30, 2026 | Beta program | — |
