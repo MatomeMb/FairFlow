@@ -82,6 +82,25 @@ const productSchema = z.object({
 
 type ProductInput = z.infer<typeof productSchema>;
 
+const viewEventSchema = z.object({
+  event: z.literal('view'),
+  hash: z.string().length(64),
+  timestamp: z.string().datetime(),
+  source_url: z.string().url(),
+  anon_id: z.string().optional(),
+});
+
+const clickEventSchema = z.object({
+  event: z.literal('click'),
+  hash: z.string().length(64),
+  timestamp: z.string().datetime(),
+  source_url: z.string().url(),
+  target_action: z.enum(['checkout_initiated', 'image_expanded', 'external_link']),
+  anon_id: z.string().optional(),
+});
+
+const analyticsEventSchema = z.discriminatedUnion('event', [viewEventSchema, clickEventSchema]);
+
 type StoredThing = {
   hash: string;
   matter_uri: string;
@@ -446,6 +465,33 @@ app.post('/catalog/import', async (c) => {
     },
     status
   );
+});
+
+// Analytics Event Ingestion (MVP-14)
+app.post('/v1/analytics/event', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const parsed = analyticsEventSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(err('invalid_analytics', 'Invalid event payload', parsed.error.flatten()), 400);
+  }
+
+  const event = parsed.data;
+  const date = new Date().toISOString().split('T')[0];
+  const eventsDir = path.join(dataRoot, 'events');
+  const logFile = path.join(eventsDir, `${date}.jsonl`);
+
+  try {
+    await fs.mkdir(eventsDir, { recursive: true });
+    await fs.appendFile(logFile, JSON.stringify(event) + '\n', 'utf8');
+    return c.json({ ok: true }, 201);
+  } catch (error) {
+    console.error(`[Analytics Error] ${error}`);
+    return c.json(err('storage_error', 'Failed to persist analytics event'), 500);
+  }
 });
 
 // Serve .thing payloads for MVP (from R2 or local)

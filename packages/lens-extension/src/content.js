@@ -25,6 +25,18 @@ const resolveHash = (hash) =>
     });
   });
 
+/** Relay events to background for persistence (MVP-14) */
+const fireAnalyticsEvent = (payload) => {
+  chrome.runtime.sendMessage({
+    type: 'analytics:event',
+    payload: {
+      ...payload,
+      timestamp: new Date().toISOString(),
+      source_url: window.location.href,
+    }
+  });
+};
+
 // MVP-07: XMP beacon detection — extract Matter hash + gist from image bytes
 const XMP_JPEG_NS = new TextEncoder().encode('http://ns.adobe.com/xap/1.0/\0');
 const XMP_PNG_KEY = new TextEncoder().encode('XML:com.adobe.xmp\0\0\0\0\0');
@@ -112,7 +124,7 @@ const removeOverlay = () => {
   }
 };
 
-const renderOverlay = (target, data) => {
+const renderOverlay = (target, data, hash = null) => {
   removeOverlay();
   const overlay = document.createElement('div');
   overlay.className = 'matter-overlay';
@@ -154,6 +166,9 @@ const renderOverlay = (target, data) => {
   button.textContent = 'Buy Now';
   if (data?.checkout_url) {
     button.addEventListener('click', () => {
+      if (hash) {
+        fireAnalyticsEvent({ event: 'click', hash, target_action: 'checkout_initiated' });
+      }
       window.open(data.checkout_url, '_blank', 'noopener');
     });
   }
@@ -170,6 +185,11 @@ const renderOverlay = (target, data) => {
   // Append to DOM once at the end
   document.body.appendChild(overlay);
   activeOverlay = overlay;
+
+  // MVP-14 Analytics: fire view event when overlay shows successfully resolved data
+  if (data?.thing_url && hash) {
+    fireAnalyticsEvent({ event: 'view', hash });
+  }
 };
 
 const handleMatterLink = async (link) => {
@@ -182,13 +202,13 @@ const handleMatterLink = async (link) => {
     return;
   }
 
-  renderOverlay(link, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
+  renderOverlay(link, { gist: { title: 'Loading...', price: 0, currency: 'USD' } }, hash);
   try {
     const data = await resolveHash(hash);
-    renderOverlay(link, data);
+    renderOverlay(link, data, hash);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to load';
-    renderOverlay(link, { gist: { title: message, price: 0, currency: 'USD' } });
+    renderOverlay(link, { gist: { title: message, price: 0, currency: 'USD' } }, hash);
   }
 };
 
@@ -215,10 +235,10 @@ const handleImageClick = async (img) => {
   }
   const beacon = extractXmpFromImageBytes(buffer);
   if (!beacon) return;
-  renderOverlay(img, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
+  renderOverlay(img, { gist: { title: 'Loading...', price: 0, currency: 'USD' } }, beacon.hash);
   try {
     const data = await resolveHash(beacon.hash);
-    renderOverlay(img, data);
+    renderOverlay(img, data, beacon.hash);
   } catch (error) {
     let gist = { title: 'Unknown', price: 0, currency: 'USD' };
     try {
@@ -227,7 +247,7 @@ const handleImageClick = async (img) => {
     } catch {
       gist.title = error instanceof Error ? error.message : 'Unable to load';
     }
-    renderOverlay(img, { gist });
+    renderOverlay(img, { gist }, beacon.hash);
   }
 };
 

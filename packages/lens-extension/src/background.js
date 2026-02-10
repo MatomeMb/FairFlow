@@ -110,6 +110,22 @@ async function fetchResolve(baseUrl, hash) {
 }
 
 /**
+ * Send analytics event to Shadow Index.
+ * @param {string} baseUrl
+ * @param {object} payload
+ * @returns {Promise<void>}
+ */
+async function sendEvent(baseUrl, payload) {
+  const url = `${baseUrl.replace(/\/$/, '')}/v1/analytics/event`;
+  // Fire and forget from the extension's perspective
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch((err) => console.error(`[Analytics] Failed to send ${payload.event} event:`, err));
+}
+
+/**
  * Get API base URL from storage or default.
  * @returns {Promise<string>}
  */
@@ -123,6 +139,15 @@ async function getApiBaseUrl() {
 }
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message && message.type === 'analytics:event' && message.payload) {
+    (async () => {
+      const baseUrl = await getApiBaseUrl();
+      await sendEvent(baseUrl, message.payload);
+      sendResponse({ ok: true });
+    })();
+    return true;
+  }
+
   if (!message || message.type !== 'resolve' || typeof message.hash !== 'string') {
     sendResponse({ ok: false, error: 'Invalid message' });
     return true;
