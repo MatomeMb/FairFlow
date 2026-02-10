@@ -78,7 +78,7 @@ Every product processed by our compiler exists simultaneously as:
 ## Current Sprint (Sprint 2: Feb 6–19, 2026)
 
 **Goal:** MVP-13 Extension Caching — IndexedDB cache, overlay performance, cross-browser validation  
-**Capacity:** 10 working days × 5 hours = 50 hours  
+**Status:** IndexedDB cache integrated; cross-browser validation complete (Chrome, Edge, Brave, Firefox — Feb 10). Remaining: performance profiling, v0.3.0 release.  
 **Target Version:** lens-extension v0.3.0
 
 ### Daily Breakdown (5-Hour Work Days)
@@ -97,7 +97,7 @@ Every product processed by our compiler exists simultaneously as:
 
 | Day | Date | Focus | Subtasks (5h each) | Status |
 |-----|------|-------|-------------------|--------|
-| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint) | Pending |
+| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint) | Complete (Feb 10) |
 | Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | Pending |
 | Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | Pending |
 | Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | Pending |
@@ -110,7 +110,7 @@ Every product processed by our compiler exists simultaneously as:
 - **Feb 10:** AC3 + AC4 tests passing (no cache on error, TTL enforcement)
 - **Feb 11:** Cache functions in background.js (`cacheGet`, `cacheSet`)
 - **Feb 12:** Content script integration + overlay optimization + E2E manual test
-- **Feb 13:** Chrome, Edge, Brave, Firefox cross-browser validation (7h sprint)
+- **Feb 13:** Chrome, Edge, Brave, Firefox cross-browser validation — **Complete (Feb 10)** — see [BROWSER-VALIDATION-RESULTS.md](./docs/BROWSER-VALIDATION-RESULTS.md)
 - **Feb 16:** Test suite finalized + docs updated
 - **Feb 17:** Performance baselines (cache hit <20ms, overlay render <50ms)
 - **Feb 18:** All bugs fixed + regression test passing
@@ -137,6 +137,7 @@ Every product processed by our compiler exists simultaneously as:
 | [06 Budget](./docs/06-BUDGET-FINANCIAL-PROJECTIONS.md) | Financial planning |
 | [CTO Execution Guide](./docs/CTO-EXECUTION-GUIDE.md) | Step-by-step execution guide |
 | [API Keys Guide](./docs/API_KEYS_GUIDE.md) | API keys setup |
+| [Browser Validation Results](./docs/BROWSER-VALIDATION-RESULTS.md) | Cross-browser validation (Chrome, Edge, Brave, Firefox) |
 
 **Setup:** [SETUP.md](./SETUP.md) | [Rust Windows Setup](./docs/RUST_WINDOWS_SETUP.md)
 
@@ -186,7 +187,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 **Delivered (Sprint 1):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits. MVP-13 IndexedDB cache integrated (Sprint 2, Week 1). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
 
-**In progress (Sprint 2):** Cross-browser validation, performance profiling, lens-extension v0.3.0 release (Feb 19 target).
+**In progress (Sprint 2):** Cross-browser validation complete (Chrome, Edge, Brave, Firefox). Remaining: performance profiling, lens-extension v0.3.0 release (Feb 19 target).
 
 **Planned (Sprints 3–8):** Analytics (MVP-14), beta readiness, beta launch prep. Full metrics and revised milestones: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
 
@@ -203,7 +204,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 8, 2026.*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 10, 2026.*
 
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
@@ -217,7 +218,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
 | Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
 
-**Current status:** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 cache integrated; 45/45 tests passing; Friday Feb 13 cross-browser sprint next. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 cache integrated; cross-browser validation complete (Chrome, Edge, Brave, Firefox — Feb 10). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md). Validation results: [BROWSER-VALIDATION-RESULTS.md](./docs/BROWSER-VALIDATION-RESULTS.md).
 
 ---
 
@@ -236,6 +237,7 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 | `scripts/setup-api-keys.ps1` | Interactive API keys setup helper |
 | `scripts/generate-ed25519-keys.py` | Generate Ed25519 cryptographic keys |
 | `scripts/create-test-data.ps1` | Create test data for platform validation |
+| `scripts/browser-validation.ps1` | Start services and get extension load instructions for cross-browser validation |
 
 ---
 
