@@ -4,17 +4,17 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-## Current status (as of Feb 8, 2026)
+## Current status (as of Feb 19, 2026)
 
 | Area | Status | Notes |
 |------|--------|-------|
-| **Product** | **MVP path live** | End-to-end flow works: compile → store (R2/local) → resolve → matter:// → extension overlay. Batch and catalog import operational. MVP-13 IndexedDB cache integrated (Thu Feb 12 validation complete). |
-| **Releases** | **v0.4.0** | shadow-index 0.4.0 (batch, catalog); lens-extension 0.1.0 (MVP-13 cache integrated); matter-core 0.3.0. Tag `v0.4.0` created and pushed. |
-| **Next** | **Sprint 2** | Feb 6 – Feb 19, 2026. MVP-13 complete. Cross-browser validation Friday Feb 13. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). |
-| **Risks** | **None** | No known blockers. R2 and API keys configured; 45/45 tests passing; Friday cross-browser prep complete. |
-| **Stakeholder** | **CEO** | Weekly sync; demo available via catalog-upload and matter-demo pages. |
+| **Product** | **Sprint 2 COMPLETE** | MVP-13 IndexedDB cache integrated, validated across browsers. Performance logging and SHA-256 validation added. |
+| **Releases** | **v0.3.0 / v0.5.0** | lens-extension 0.3.0; shadow-index 0.5.0; matter-core 0.3.0. |
+| **Next** | **Sprint 3** | Feb 20 – Mar 5, 2026. Stability, UX polish, and further protocol enhancements. |
+| **Risks** | **None** | 45/45 Lens tests passing. 15/17 Core tests passing (2 expected ignores). |
+| **Stakeholder** | **CEO** | Sprint 2 Review and Release complete. |
 
-**References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md). Friday sprint → [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
+**References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -22,13 +22,13 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 | Package | Version | Notes |
 |---------|---------|--------|
-| **shadow-index** | **0.4.0** | R2 storage (MVP-03), auth, rate limit; batch + catalog import (MVP-11, MVP-12) |
-| **lens-extension** | 0.1.0 | XMP beacon (MVP-07), IndexedDB cache (MVP-13); Firefox compat + manifest_v2 |
-| **matter-core** | 0.3.0 | Rust Compiler::compile(), matter CLI, hash matches API |
+| **shadow-index** | **0.5.0** | R2 storage, catalog import, bug fixes & polish |
+| **lens-extension** | **0.3.0** | MVP-13 cache, performance instrumentation, SHA-256 validation |
+| **matter-core** | **0.3.0** | Rust Compiler, matter CLI binary |
 
-**Release label:** `v0.4.0` (Sprint 1 complete — delivered by Feb 5, 2026). Sprint 2 MVP-13 cache integrated; lens v0.3.0 target Feb 19.
+**Release label:** `v0.3.0` (Lens focus — delivered Feb 19, 2026). Sprint 2 MVP-13 cache complete.
 
-**Reproducing this state:** Use git tag `v0.4.0`. Run API: `cd packages/shadow-index && npm run start`. Demo: `node scripts/demo-server.mjs 5178` then open http://localhost:5178/catalog-upload.html. R2: set STORAGE_MODE=r2 and CLOUDFLARE_R2_* in packages/shadow-index/.env.
+**Reproducing this state:** Use git tag `v0.5.0` (repo sync). Run API: `cd packages/shadow-index && npm run start`. Demo: `node scripts/demo-server.mjs 5178` then open http://localhost:5178/catalog-upload.html.
 
 ---
 
@@ -37,10 +37,11 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | Sprint | Window | Status | Goal |
 |--------|--------|--------|------|
 | **Sprint 0** | By Jan 19, 2026 | **Complete** | Setup and architecture |
-| **Sprint 1** | Jan 20 – Feb 5, 2026 | **Complete** | Full MVP: compile → resolve → display; P1 (XMP, auth, errors); R2 storage; Rust compiler; batch & catalog import; catalog-upload & matter-demo; v0.4.0 |
-| **Sprint 2** | Feb 6 – Feb 19, 2026 | **In Progress** | MVP-13 extension caching (IndexedDB) — cache read/write integrated (Thu Feb 12); cross-browser validation (Fri Feb 13); Firefox prep complete |
+| **Sprint 1** | Jan 20 – Feb 5, 2026 | **Complete** | Full MVP: compile → resolve → display; v0.4.0 |
+| **Sprint 2** | Feb 6 – Feb 19, 2026 | **Complete** | MVP-13 extension caching (IndexedDB), performance polish, validation; v0.5.0 |
+| **Sprint 3** | Feb 20 – Mar 5, 2026 | **Next** | Future protocol enhancements |
 
-**Next:** Friday Feb 13 cross-browser sprint (Chrome/Edge/Brave/Firefox); release v0.3.0 lens Feb 19. See [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
+**Next:** Sprint 3 Kickoff. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md).
 
 ---
 

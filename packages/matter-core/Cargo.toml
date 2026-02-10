@@ -1,6 +1,6 @@
 [package]
 name = "matter-core"
-version = "0.1.0"
+version = "0.3.0"
 edition = "2021"
 authors = ["Matome Mboweni <matome@thingsthatmatter.com>"]
 description = "Commerce Compiler - Transforms product data into Universal Commerce Containers (.thing files)"
