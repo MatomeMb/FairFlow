@@ -52,7 +52,7 @@
 | Sprint | Document |
 |--------|----------|
 | Sprint 1 | [11-SPRINT-1-PLAN.md](./11-SPRINT-1-PLAN.md) |
-| Sprint 2 | [12-SPRINT-2-PLAN.md](./12-SPRINT-2-PLAN.md) |
+| Sprint 2 | [12-SPRINT-2-PLAN.md](./12-SPRINT-2-PLAN.md) • [Demo Script](./SPRINT-2-DEMO-SCRIPT.md) • [Retrospective](./SPRINT-2-RETROSPECTIVE-FEB-19.md) |
 | Sprint 3 | [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) |
 | Sprint 4 | [14-SPRINT-4-PLAN.md](./14-SPRINT-4-PLAN.md) |
 
