@@ -8,6 +8,13 @@ console.log('Lens extension content script loaded');
 
 let activeOverlay = null;
 
+/** MVP-14: Fire analytics event (fire-and-forget). */
+function fireAnalyticsEvent(payload) {
+  try {
+    chrome.runtime.sendMessage({ type: 'analytics:event', payload }, () => {});
+  } catch {}
+}
+
 /** Resolve hash via background (cache-first). Returns resolve payload or throws. */
 const resolveHash = (hash) =>
   new Promise((resolve, reject) => {
@@ -112,18 +119,23 @@ const removeOverlay = () => {
   }
 };
 
-const renderOverlay = (target, data) => {
-  const renderStart = performance.now();
-  if (typeof performance.mark === 'function') {
-    performance.mark('lens-render-start');
-  }
-
+const renderOverlay = (target, data, hash) => {
   removeOverlay();
   const overlay = document.createElement('div');
   overlay.className = 'matter-overlay';
 
   const imageUrl = data?.image_url || data?.gist?.image_url;
   const title = data?.gist?.title || 'Unknown Product';
+  const isRealData = !!data?.thing_url; // Successfully resolved from API
+
+  // MVP-14: Fire view event when overlay shown with real data
+  if (hash && isRealData) {
+    fireAnalyticsEvent({
+      event: 'view',
+      hash,
+      source_url: document.location.href,
+    });
+  }
 
   // Build DOM with DocumentFragment to minimize reflows
   const fragment = document.createDocumentFragment();
@@ -159,6 +171,14 @@ const renderOverlay = (target, data) => {
   button.textContent = 'Buy Now';
   if (data?.checkout_url) {
     button.addEventListener('click', () => {
+      if (hash) {
+        fireAnalyticsEvent({
+          event: 'click',
+          hash,
+          source_url: document.location.href,
+          target_action: 'checkout_initiated',
+        });
+      }
       window.open(data.checkout_url, '_blank', 'noopener');
     });
   }
@@ -175,18 +195,6 @@ const renderOverlay = (target, data) => {
   // Append to DOM once at the end
   document.body.appendChild(overlay);
   activeOverlay = overlay;
-
-  const renderMs = Math.round(performance.now() - renderStart);
-  if (typeof performance.mark === 'function') {
-    performance.mark('lens-render-end');
-    try {
-      performance.measure('lens-overlay-render', 'lens-render-start', 'lens-render-end');
-    } catch (_) { /* ignore if marks missing */ }
-  }
-  // Dev-only perf log (localhost demo page)
-  if (typeof window !== 'undefined' && /localhost|127\.0\.0\.1/.test(window.location?.hostname || '')) {
-    console.log(`[Lens Perf] overlay render: ${renderMs}ms`);
-  }
 };
 
 const handleMatterLink = async (link) => {
@@ -199,15 +207,10 @@ const handleMatterLink = async (link) => {
     return;
   }
 
-  const resolveStart = performance.now();
   renderOverlay(link, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
   try {
     const data = await resolveHash(hash);
-    renderOverlay(link, data);
-    const totalMs = Math.round(performance.now() - resolveStart);
-    if (/localhost|127\.0\.0\.1/.test(window.location?.hostname || '')) {
-      console.log(`[Lens Perf] resolve + render total: ${totalMs}ms`);
-    }
+    renderOverlay(link, data, hash);
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to load';
     renderOverlay(link, { gist: { title: message, price: 0, currency: 'USD' } });
@@ -240,7 +243,7 @@ const handleImageClick = async (img) => {
   renderOverlay(img, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
   try {
     const data = await resolveHash(beacon.hash);
-    renderOverlay(img, data);
+    renderOverlay(img, data, beacon.hash);
   } catch (error) {
     let gist = { title: 'Unknown', price: 0, currency: 'USD' };
     try {

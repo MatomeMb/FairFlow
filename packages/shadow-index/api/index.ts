@@ -65,7 +65,27 @@ const __dirname = path.dirname(__filename);
 
 const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
+const eventsDir = path.join(dataRoot, 'events');
 const indexFile = path.join(dataRoot, 'index.json');
+
+/** MVP-14: Event schemas for analytics ingestion */
+const ViewEventSchema = z.object({
+  event: z.literal('view'),
+  hash: z.string().regex(/^[a-f0-9]{64}$/),
+  timestamp: z.string().datetime().optional(),
+  source_url: z.string().url(),
+});
+const ClickEventSchema = z.object({
+  event: z.literal('click'),
+  hash: z.string().regex(/^[a-f0-9]{64}$/),
+  timestamp: z.string().datetime().optional(),
+  source_url: z.string().url(),
+  target_action: z.enum(['checkout_initiated', 'image_expanded']),
+});
+const EventSchema = z.discriminatedUnion('event', [
+  ViewEventSchema,
+  ClickEventSchema,
+]);
 
 const storageMode = process.env.STORAGE_MODE || 'local';
 const useR2 = storageMode === 'r2' && isR2Configured();
@@ -103,6 +123,22 @@ type IndexStore = Record<string, StoredThing>;
 const ensureDataDirs = async () => {
   await fs.mkdir(thingsDir, { recursive: true });
 };
+
+const ensureEventsDir = async () => {
+  await fs.mkdir(eventsDir, { recursive: true });
+};
+
+/** MVP-14: Append event to daily JSONL file (data/events/YYYY-MM-DD.jsonl) */
+async function appendEvent(payload: z.infer<typeof EventSchema>): Promise<void> {
+  await ensureEventsDir();
+  const dateStr = new Date().toISOString().slice(0, 10);
+  const filePath = path.join(eventsDir, `${dateStr}.jsonl`);
+  const line = JSON.stringify({
+    ...payload,
+    timestamp: payload.timestamp ?? new Date().toISOString(),
+  }) + '\n';
+  await fs.appendFile(filePath, line, 'utf8');
+}
 
 const loadIndex = async (): Promise<IndexStore> => {
   try {
@@ -259,6 +295,28 @@ async function compileAndPersistProduct(product: ProductInput): Promise<{
 // Health check endpoint
 app.get('/health', (c) => {
   return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
+});
+
+// MVP-14: Analytics event ingestion (POST /v1/analytics/event)
+app.post('/v1/analytics/event', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+  const parsed = EventSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(
+      err('invalid_event', 'Invalid event payload', parsed.error.flatten()),
+      400
+    );
+  }
+  try {
+    await appendEvent(parsed.data);
+    return c.json({ ok: true }, 201);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return c.json(err('event_store_failed', message), 500);
+  }
 });
 
 // Compile endpoint - transforms product data into .thing file (uses shared compileAndPersistProduct)

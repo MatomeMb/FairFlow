@@ -120,7 +120,37 @@ async function getApiBaseUrl() {
   });
 }
 
+/**
+ * MVP-14: Send analytics event to Shadow Index API (fire-and-forget).
+ * @param {string} baseUrl - API base URL
+ * @param {object} payload - { event, hash, source_url, target_action? }
+ */
+function sendEvent(baseUrl, payload) {
+  const url = `${baseUrl.replace(/\/$/, '')}/v1/analytics/event`;
+  const body = {
+    ...payload,
+    timestamp: payload.timestamp || new Date().toISOString(),
+  };
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  }).catch(() => {}); // Fire-and-forget; ignore errors
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  // MVP-14: Analytics event (fire-and-forget)
+  if (message && message.type === 'analytics:event') {
+    const { event, hash, source_url, target_action } = message.payload || {};
+    if (event && hash && source_url) {
+      getApiBaseUrl().then((baseUrl) => {
+        sendEvent(baseUrl, { event, hash, source_url, target_action });
+      });
+    }
+    sendResponse({ ok: true });
+    return true;
+  }
+
   if (!message || message.type !== 'resolve' || typeof message.hash !== 'string') {
     sendResponse({ ok: false, error: 'Invalid message' });
     return true;

@@ -66,6 +66,7 @@
 | [MVP-13 Implementation](./MVP-13-IMPLEMENTATION.md) | Implementation details |
 | [MVP-13 Cross-Browser](./MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
 | [MVP-14 Event Spec & Storage](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema (view/click), storage decision (JSONL), Zod validation |
+| [February 21 Analysis](./FEBRUARY-21-ANALYSIS.md) | MVP-14 pipeline architecture, schema design, storage strategy |
 | [API Keys Guide](./API_KEYS_GUIDE.md) | API keys setup |
 | [Rust Windows Setup](./RUST_WINDOWS_SETUP.md) | Rust installation on Windows |
 | [Rust Compiler CTO Guide](./RUST-COMPILER-CTO-GUIDE.md) | matter-core compiler usage |
