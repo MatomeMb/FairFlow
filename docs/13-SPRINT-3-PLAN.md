@@ -1,5 +1,5 @@
 # .things that Matter
-## Sprint 3 Plan — Detailed & Comprehensive
+## Sprint 3 Plan — MVP-14 Analytics & Observability
 
 ---
 
@@ -7,9 +7,9 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Sprint Plan |
-| **Version** | 2.0 (Detailed) |
-| **Date** | February 5, 2026 |
-| **Sprint Window** | Feb 17 – Mar 2, 2026 (immediate start) |
+| **Version** | 3.0 |
+| **Date** | February 19, 2026 |
+| **Sprint Window** | Feb 20 – Mar 5, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Approved for execution |
 
@@ -17,251 +17,195 @@
 
 ## EXECUTIVE SUMMARY
 
-**Sprint Goal:** Establish production readiness by implementing R2 storage infrastructure and Rust compiler pipeline, enabling the system to scale beyond local development.
+**Sprint Goal:** Quantify engagement and ensure system health by implementing view/click event tracking, API ingestion, merchant reporting, and an internal observability dashboard.
 
 **Strategic Rationale:**
-- Current system only stores `.thing` files locally (not production-ready)
-- Compilation only available via Node.js API (not portable)
-- Before onboarding merchants, need: distributed storage, CLI tooling, and batch processing capability
+- Merchants need visibility into matter:// engagement (views, clicks to checkout)
+- System health (request logs, errors) required for production support
+- Bridges functional delivery (Sprint 1–2) and production-ready merchant insights
 
-**Key Decisions Made:**
-1. **Prioritize R2 storage (MVP-03)** over P2 items — foundational for production
-2. **Implement Rust compiler** — enables CLI, portability, and WASM compilation
-3. **Defer P2 items (MVP-11–14)** to Sprint 4 — batch/analytics require storage infrastructure first
+**Key Deliverables:**
+1. **Extension:** Fire "view" when overlay shown; fire "click" on Buy Now; send to API
+2. **API:** POST /v1/analytics/event; persistent storage for high-volume logs
+3. **Reporting:** GET /v1/analytics/report (daily counts, date range)
+4. **Observability:** Internal HTML status dashboard; E2E integration tests
+5. **Release:** Tag v0.6.0
 
-**Expected Outcome:** By end of Sprint 3, the system can compile products via CLI, store artifacts in cloud storage, and serve them via CDN — ready for beta merchant onboarding.
-
----
-
-## 1. SPRINT SCOPE & PRIORITIES
-
-### 1.1 Primary Items (Must Complete)
-
-| ID | Item | Priority | Effort | Owner | Rationale |
-|----|------|----------|--------|-------|-----------|
-| **MVP-03** | Store artifacts in R2 | P0 | 3 days | CTO | Foundational for production; unblocks merchant onboarding |
-| **Rust-Compiler** | Implement Compiler::compile() in matter-core | P0 | 4 days | CTO | Enables CLI tooling; required for WASM; reduces API dependency |
-
-### 1.2 Secondary Items (Nice to Have)
-
-| ID | Item | Priority | Effort | Owner | Rationale |
-|----|------|----------|--------|-------|-----------|
-| **CLI-Tool** | Build `matter` CLI binary | P1 | 2 days | CTO | Merchant-facing tool for local compilation |
-| **MVP-11-Lite** | Basic batch compilation (10 products) | P1 | 1 day | CTO | Validates compiler performance; defers 100+ to Sprint 4 |
-
-### 1.3 Deferred Items (Sprint 4)
-
-| ID | Item | Reason Deferred |
-|----|------|-----------------|
-| MVP-11 (full) | Batch compilation (100+) | Requires R2 storage + Rust compiler first |
-| MVP-12 | Merchant catalog import | Depends on batch compilation |
-| MVP-13 | Extension caching | Lower priority; current performance acceptable |
-| MVP-14 | Analytics events | Not needed until beta merchants onboard |
-
-**Total Committed Effort:** 7 days (primary) + 3 days (secondary) = 10 days  
-**Sprint Duration:** 14 days (Feb 17 – Mar 2)  
-**Buffer:** 4 days for polish, bugs, testing
+**Expected Outcome:** Verified conversion tracking; merchant reporting API; internal performance dashboard.
 
 ---
 
-## 2. DETAILED IMPLEMENTATION PLAN
+## 1. EVENT SCHEMA (Technical Specification)
 
-### 2.1 MVP-03: Store Artifacts in R2
+### 1.1 Event Types
 
-**Acceptance Criteria:**
-- `.thing` files stored in Cloudflare R2 bucket
-- Images (polyglot or source) stored in R2
-- Public CDN URLs accessible (https://cdn.example.com/things/{hash}.thing)
-- Shadow Index API updated to use R2 instead of local file system
-- Existing demo flow works with R2-backed storage
+| Event | Fields | Trigger |
+|-------|--------|---------|
+| **view** | hash, timestamp, source (e.g. overlay), optional referrer | Overlay shown to user |
+| **click** | hash, timestamp, target (e.g. checkout_url) | User clicks "Buy Now" or checkout link |
 
-**Implementation Breakdown:**
+### 1.2 Schema (JSON)
 
-#### Day 1: R2 Setup & SDK Integration
+```json
+{
+  "event": "view",
+  "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+  "timestamp": "2026-02-20T10:15:00.000Z",
+  "source": "overlay",
+  "target": null
+}
+```
 
-**Task list:** [13-SPRINT-3-DAY1-TASKS.md](./13-SPRINT-3-DAY1-TASKS.md)
+```json
+{
+  "event": "click",
+  "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
+  "timestamp": "2026-02-20T10:16:00.000Z",
+  "source": "overlay",
+  "target": "checkout"
+}
+```
 
-**Tasks:**
-1. Create Cloudflare R2 bucket: `matter-artifacts-prod`
-2. Configure CORS for public read access
-3. Set up custom domain: `cdn.thingsthatmatter.com` (or R2.dev subdomain)
-4. Install R2 SDK in Shadow Index:
-   ```bash
-   cd packages/shadow-index
-   npm install @aws-sdk/client-s3  # R2 uses S3-compatible API
-   ```
-5. Create environment variables:
-   ```
-   CLOUDFLARE_R2_ACCOUNT_ID=xxx
-   CLOUDFLARE_R2_ACCESS_KEY_ID=xxx
-   CLOUDFLARE_R2_SECRET_ACCESS_KEY=xxx
-   CLOUDFLARE_R2_BUCKET=matter-artifacts-prod
-   CLOUDFLARE_R2_PUBLIC_URL=https://cdn.thingsthatmatter.com
-   ```
+### 1.3 Privacy & Retention
 
-**File: `packages/shadow-index/lib/storage.ts` (new)**
-
-- S3Client with R2 endpoint and credentials
-- `uploadThing(hash, data)` → PutObject to `things/{hash}.thing`, return public URL
-- `uploadImage(hash, imageData, mimeType)` → PutObject to `images/{hash}.{ext}`, return public URL
-- `getThing(hash)` → GetObject, return Buffer or null on NoSuchKey
-
-**Testing:** Manual upload test via Node script
-
-#### Day 2: Shadow Index API Integration
-
-**Update: `packages/shadow-index/api/index.ts`**
-
-- Add `STORAGE_MODE=r2` | `local` (default: `local`)
-- In POST /compile: if R2, call `uploadThing(hash, thingData)` and use returned URL for thing_url; optionally upload image if UPLOAD_IMAGES_TO_R2=true
-- In GET /thing/:hash: if R2, call `getThing(hash)` and stream response; else keep existing file read
-- In index store: persist thing_url (R2 CDN URL) and image_url (R2 CDN if uploaded)
-- Keep local fallback so existing demo works without R2 credentials
-
-#### Day 3: Testing & Validation
-
-- Upload single product via POST /compile → verify .thing in R2
-- GET /thing/:hash returns data from R2
-- GET /resolve/:hash returns R2 CDN URLs
-- Demo flow works with STORAGE_MODE=r2
-- Vitest: add R2 tests (mock or skip when no credentials)
-- Update runbook in docs/11-SPRINT-1-PLAN.md with R2 setup steps
+- No PII; hash only (no user ID, IP stored in event payload for analytics)
+- Retention: 90 days (configurable)
+- Optional: IP hashed or excluded for privacy
 
 ---
 
-### 2.2 Rust Compiler: Implement Compiler::compile()
+## 2. PHASE BREAKDOWN
 
-**Acceptance Criteria:**
-- Compiler::compile() accepts product JSON string, returns .thing bytes
-- Hash computed using same algorithm as Shadow Index API (stable stringify)
-- .thing format matches API output (JSON for now; FlatBuffers deferred)
-- Unit tests: valid JSON → valid .thing, correct hash, deterministic output
-- Optional: CLI binary `matter compile <file.json>` writes .thing to disk
+### Phase 1: Infrastructure (Feb 20 – 24)
 
-**Implementation Breakdown:**
+| Day | Date | Focus | Tasks | Est. (h) |
+|-----|------|-------|-------|----------|
+| Mon | Feb 20 | Sprint planning; event schema | Define schema; decide storage (file vs Supabase vs SQLite); doc spec | 6 |
+| Tue | Feb 21 | Extension: sendEvent | Implement `sendEvent(event, hash, target?)` in background.js; configurable API base | 6 |
+| Wed | Feb 22 | Extension: hook overlay | Fire "view" when overlay shown; fire "click" on Buy Now; send to API or local buffer | 5 |
+| Thu | Feb 23 | Storage layer | Persist events (file or DB); avoid PII; retention policy (e.g. 90 days); simple query by date range | 6 |
+| Fri | Feb 24 | API ingestion | POST /v1/analytics/event (or /events); validate payload; write to storage; optional batch endpoint | 5 |
 
-#### Day 4: Compiler Core Logic
+### Phase 2: API Ingestion (Feb 25 – 26)
 
-**File: `packages/matter-core/src/compiler/mod.rs`**
+| Day | Date | Focus | Tasks | Est. (h) |
+|-----|------|-------|-------|----------|
+| Mon | Feb 25 | Event endpoint | Finalize POST /v1/analytics/event; rate limit; auth optional; high-volume log handling | 6 |
+| Tue | Feb 26 | Validation & tests | Vitest for event endpoint; schema validation (Zod); error handling | 5 |
 
-- Replace todo!() with: parse ProductInput (title, price, currency, image_url, checkout_url), validate (title non-empty, currency non-empty), compute_hash (stable JSON key order, SHA-256, hex), build ThingFile (hash, created_at ISO), serialize to JSON bytes
-- Dependencies: serde, serde_json, sha2, hex, chrono (already in Cargo.toml where needed)
-- compute_hash: same key order as API (e.g. checkout_url, currency, image_url, price, title) and same stringify so hash matches API
+### Phase 3: Reporting (Feb 27 – Mar 2)
 
-#### Day 5: Unit Tests & Validation
+| Day | Date | Focus | Tasks | Est. (h) |
+|-----|------|-------|-------|----------|
+| Mon | Feb 27 | Aggregation | Build aggregation engine for daily counts (views, clicks by hash, by date) | 6 |
+| Tue | Feb 28 | Report endpoint | GET /v1/analytics/report?from=&to=&groupBy=day | 5 |
+| Wed | Mar 2 | Docs & export | Analytics runbook; event schema; privacy note; optional CSV export | 5 |
 
-**File: `packages/matter-core/src/compiler/mod.rs` (tests)**
+### Phase 4: Observability (Mar 3 – 4)
 
-- test_compile_valid_product: compile JSON → thing bytes, parse back, assert title/price/currency/hash present
-- test_hash_deterministic: same JSON twice → same hash in both thing outputs
-- test_compile_missing_title: invalid/missing field → Err
-- test_compile_empty_title: title "" → Err
-- Remove #[ignore] from compiler tests once implemented
-- Run: cargo test compiler
+| Day | Date | Focus | Tasks | Est. (h) |
+|-----|------|-------|-------|----------|
+| Thu | Mar 3 | Status dashboard | Internal HTML page: API health, event counts, recent errors | 6 |
+| Fri | Mar 4 | E2E integration | View → DB → Report flow; request logging (method, path, status, duration) | 5 |
 
-#### Day 6: CLI Binary (Optional)
+### Phase 5: Release (Mar 5)
 
-**File: `packages/matter-core/src/bin/matter.rs` (new)**
+| Day | Date | Focus | Tasks | Est. (h) |
+|-----|------|-------|-------|----------|
+| Fri | Mar 5 | Sprint Review | Demo conversion tracking to CEO; retrospective; tag v0.6.0; update PROGRESS | 5 |
 
-- Args: compile <input.json>
-- Read JSON from file, call Compiler::compile(), write {hash}.thing to current dir, print "Compiled: {hash}.thing" and "matter://{hash}"
-- Cargo.toml: add [[bin]] name = "matter", path = "src/bin/matter.rs"
-- Build: cargo build --release --bin matter
-- Document in packages/matter-core/README.md and docs/11-SPRINT-1-PLAN.md
-
-#### Day 7: Integration (Optional)
-
-- Optional: Node API calls Rust compiler via napi-rs or subprocess; not required for Sprint 3. API can keep TypeScript compile logic.
+**Total:** ~60h (6h/day × 10 days)
 
 ---
 
-## 3. TESTING STRATEGY
+## 3. IMPLEMENTATION DETAILS
 
-- **Unit:** Vitest (R2 upload/download, compile/resolve with R2); cargo test (Compiler + CLI)
-- **Integration:** E2E flow: CLI compile → API compile same JSON → same hash; GET /resolve returns R2 URLs; overlay loads from R2
-- **Manual:** Demo flow with STORAGE_MODE=r2; sign off in MANUAL-E2E-SMOKE if needed
+### 3.1 Extension: sendEvent
+
+**File:** `packages/lens-extension/src/background.js` (or new `analytics.js`)
+
+- `sendEvent({ event, hash, source, target })` — POST to `${apiBase}/v1/analytics/event`
+- Fire-and-forget; no blocking overlay
+- Optional: retry queue if offline
+- Use existing `shadow_index_base_url` from storage for API base
+
+### 3.2 Overlay Hooks
+
+**File:** `packages/lens-extension/src/content.js`
+
+- When overlay shown (gist received): `sendEvent({ event: 'view', hash, source: 'overlay' })`
+- When "Buy Now" clicked: `sendEvent({ event: 'click', hash, source: 'overlay', target: 'checkout' })`
+
+### 3.3 API: POST /v1/analytics/event
+
+**File:** `packages/shadow-index/api/index.ts`
+
+- Route: POST /v1/analytics/event
+- Body: { event, hash, timestamp?, source?, target? }
+- Validate: event in ['view','click'], hash is 64-char hex
+- Write to storage (JSONL file or DB table)
+- Optional: x-api-key for write auth
+
+### 3.4 Storage Options
+
+| Option | Pros | Cons |
+|--------|------|------|
+| JSONL file | Simple; no DB setup | Scale limits; rotation needed |
+| Supabase | Managed; queryable | Extra dependency |
+| SQLite | Local; no external deps | File-based; backup needed |
+
+**Recommendation:** Start with JSONL + daily rotation; migrate to Supabase if volume grows.
+
+### 3.5 GET /v1/analytics/report
+
+- Query params: from, to (ISO date), groupBy=day
+- Response: { views: number, clicks: number, byHash?: [...], byDate?: [...] }
+- Aggregation: scan events in range; group by date/hash
 
 ---
 
 ## 4. DEFINITION OF DONE
 
-- R2 bucket created; API uploads/serves .thing (and optionally images) from R2; resolve returns R2 CDN URLs
-- Rust Compiler::compile() implemented and tested; hash matches API for same input
-- Optional: matter CLI compile command works
-- All existing tests pass; new R2 and compiler tests added
-- docs/13-SPRINT-3-PLAN.md updated with final status; runbook includes R2 setup; PROGRESS-AND-VERSION.md → v0.3.0
-- Tag v0.3.0 created; .env.example documents R2 and STORAGE_MODE
+- Extension fires view on overlay show; click on Buy Now
+- POST /v1/analytics/event accepts and persists events
+- GET /v1/analytics/report returns aggregated counts
+- Internal status dashboard (HTML) shows API health and event summary
+- E2E: View → DB → Report validated
+- Vitest tests for event endpoints
+- Docs: analytics runbook, event schema, privacy note
+- PROGRESS-AND-VERSION.md updated; tag v0.6.0
 
 ---
 
 ## 5. RISKS & MITIGATIONS
 
 | Risk | Mitigation |
-|------|-------------|
-| R2 setup complexity | Start with R2 first; keep STORAGE_MODE=local default |
-| Rust hash mismatch with API | Same stable stringify; cross-validate with tests |
-| R2 costs | Free tier 10GB; monitor usage |
-| Integration breaks demo | STORAGE_MODE toggle; local remains default |
+|------|------------|
+| High event volume | JSONL rotation; optional sampling |
+| CORS / extension origin | Ensure API allows extension origin |
+| PII leakage | No IP/user in event payload; hash only |
+| Report performance | Pre-aggregate nightly; limit date range |
 
 ---
 
-## 6. TIMELINE & MILESTONES
+## 6. DEMO SCRIPT (End of Sprint 3)
 
-**Week 1 (Feb 17–23):** R2 setup + API integration (Days 1–2); R2 testing (Day 3); Rust compiler core + tests (Days 4–5)  
-**Week 2 (Feb 24 – Mar 2):** CLI binary (Day 6); integration testing, docs, polish (Days 7+); tag v0.3.0, closeout
+1. Show matter-demo; click link → overlay appears
+2. Open report: views incremented
+3. Click "Buy Now" → clicks incremented
+4. Show GET /v1/analytics/report response
+5. Show internal status dashboard
 
-**Milestone 1 (Week 1 EOD):** R2 storage functional; Rust compiler implemented and tested  
-**Milestone 2 (Sprint EOD):** v0.3.0 released; ready for Sprint 4 (batch, catalog import)
-
----
-
-## 7. SUCCESS METRICS
-
-- R2 upload/serve success; hash match (Rust vs API) 100%; demo flow passes with R2; CLI compile &lt;500ms per product; docs and runbook updated
+**Message:** "We can track matter:// engagement and provide merchant reporting — ready for beta insights."
 
 ---
 
-## 8. DEMO SCRIPT (END OF SPRINT 3)
+## 7. NEXT SPRINT PREVIEW (Sprint 4)
 
-1. Show R2 bucket and CDN URLs  
-2. Compile via Rust CLI: matter compile demo-product.json  
-3. Upload via API with STORAGE_MODE=r2  
-4. Resolve and display in Lens overlay (resources from R2 CDN)
-
-**Message:** "We can compile locally via CLI, store in cloud storage, and serve globally via CDN — ready for merchant onboarding."
+**Mar 6 – 19, 2026:** Beta readiness — merchant onboarding doc; support process; 5–10 beta targets; stability fixes.
 
 ---
 
-## 9. NEXT SPRINT PREVIEW (Sprint 4)
-
-**Tentative (Mar 3–16, 2026):** MVP-11 (batch 100+), MVP-12 (catalog import), Merchant dashboard (basic web UI). Prerequisites: R2 + Rust compiler done in Sprint 3.
-
----
-
-## 10. APPENDIX: REFERENCE COMMANDS
-
-- R2: wrangler r2 bucket create; env vars CLOUDFLARE_R2_*
-- Rust: cargo add serde serde_json sha2 hex chrono; cargo test; cargo build --release --bin matter
-- Shadow Index: STORAGE_MODE=r2 + R2 env vars; npm run start; POST /compile, GET /resolve/:hash
-- Verification: curl R2 CDN URL; matter compile vs API compile same JSON → same hash
-
----
-
-## 11. BUDGET IMPACT
-
-R2 free tier (10GB); Class A/B operations low cost; estimated ~R55/year for MVP.
-
----
-
-## 12. SIGN-OFF
-
-**Sprint 3 Approved for Execution:** CTO (Product Owner / Scrum Master / Developer) — Feb 5, 2026.
-
----
-
-**Document Version:** 2.0 (Detailed)  
-**Last Updated:** February 5, 2026  
-**Next Review:** End of Sprint 3 (March 2, 2026)  
+**Document Version:** 3.0  
+**Last Updated:** February 19, 2026  
 **Status:** Ready for execution
-
-*Begin with R2 setup (Day 1) on Monday, February 17, 2026.*

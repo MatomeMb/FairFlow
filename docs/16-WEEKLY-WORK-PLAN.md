@@ -41,9 +41,9 @@ All task estimates below are in **hours (h)** and are intended to be realistic f
 
 ---
 
-## 3. Current Status (As of Feb 10, 2026)
+## 3. Current Status (As of Feb 19, 2026)
 
-**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: MVP path live (v0.4.0); Sprint 2 in progress — MVP-13 IndexedDB cache integrated; **cross-browser validation complete** (Chrome, Edge, Brave, Firefox) Feb 10. See [BROWSER-VALIDATION-RESULTS.md](./BROWSER-VALIDATION-RESULTS.md). No blockers.
+**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: Sprint 2 complete (v0.5.0); MVP-13 IndexedDB cache, cross-browser validation, performance instrumentation delivered. Sprint 3 (MVP-14 Analytics) begins Feb 20. No blockers.
 
 ---
 
@@ -95,30 +95,30 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 ## 6. Sprint 3 (Feb 20 – Mar 5, 2026) — Analytics & Observability
 
-**Goal:** MVP-14 view/click events; API logging; minimal export or dashboard.  
-**Capacity:** ~56h deliverable.
+**Goal:** MVP-14 view/click events; API ingestion; merchant reporting; internal observability dashboard.  
+**Capacity:** ~60h deliverable. **Target:** Tag v0.6.0.
 
-### Week 1 (Feb 20 – Feb 24)
+### Week 1 (Feb 20 – Feb 24) — Infrastructure & Extension
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
 | **Mon** | Feb 20 | Sprint planning; define event schema (view: hash, timestamp, source; click: hash, target e.g. checkout); decide storage (API log vs local file vs Supabase) | 6 | Event spec + storage choice |
-| **Tue** | Apr 15 | API: POST /events or internal log; middleware to record resolve/compile with timestamp; optional batch event endpoint | 6 | Event ingestion path |
+| **Tue** | Feb 21 | Extension: implement sendEvent in background; configurable API base | 6 | sendEvent + config |
 | **Wed** | Feb 22 | Extension: fire “view” when overlay shown; fire “click” on Buy Now; send to API or local buffer | 5 | Extension events |
 | **Thu** | Feb 23 | Persist events (file or DB); avoid PII; retention policy (e.g. 90 days); simple query by date range | 6 | Event storage |
-| **Fri** | Apr 18 | Export endpoint or script: CSV/JSON of events for date range; or minimal dashboard page (counts by day) | 5 | Export or dashboard |
+| **Fri** | Feb 24 | API: POST /v1/analytics/event; validate payload; write to storage | 5 | Event ingestion |
 
-### Week 2 (Feb 27 – Mar 5)
+### Week 2 (Feb 27 – Mar 5) — Reporting & Release
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
-| **Mon** | Feb 27 | API request logging (method, path, status, duration); rotate or size-bound log; no sensitive data | 5 | Request logs |
-| **Tue** | Feb 28 | Error logging and alerting path (e.g. log to file; optional webhook); document runbook for ops | 5 | Error observability |
-| **Wed** | Apr 23 | Vitest tests for event endpoints; manual test event flow end-to-end | 5 | Tests |
-| **Thu** | Mar 2 | Docs: analytics runbook, event schema, privacy note; update PROGRESS and roadmap | 5 | Documentation |
-| **Fri** | Mar 3 | Sprint review, retro; release; tag (e.g. shadow-index v0.5.0 if API changes) | 4 | Sprint 3 closed |
+| **Mon** | Feb 27 | Aggregation engine; GET /v1/analytics/report (from, to, groupBy) | 6 | Report endpoint |
+| **Tue** | Feb 28 | API request logging; error observability; Vitest for event endpoints | 5 | Observability + tests |
+| **Wed** | Mar 2 | Docs: analytics runbook, event schema, privacy note | 5 | Documentation |
+| **Thu** | Mar 3 | Internal HTML status dashboard; E2E: View to DB to Report | 6 | Dashboard + E2E |
+| **Fri** | Mar 5 | Sprint review; demo conversion tracking; tag v0.6.0; update PROGRESS | 5 | Sprint 3 closed |
 
-**Sprint 3 total:** ~52h.
+**Sprint 3 total:** ~60h. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) for full spec.
 
 ---
 
