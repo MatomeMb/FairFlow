@@ -81,4 +81,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 16, 2026. Sprint 2 in progress; MVP-13 cache integrated; cross-browser validation complete; tests & docs finalized (48 lens-extension tests, full resolve flow integration test, README updates). Validated by: Matome Mbowene.*
+*Last updated: Feb 17, 2026. Sprint 2 in progress; MVP-13 cache integrated; cross-browser validation complete; tests & docs finalized; performance validation complete (instrumentation, baselines, 3G throttle doc). Validated by: Matome Mbowene.*

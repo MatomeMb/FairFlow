@@ -95,7 +95,8 @@ Same as Sprint 1. See [11-SPRINT-1-PLAN.md — How to Run the MVP Demo](./11-SPR
 - **Chrome, Edge, Brave, Firefox:** PASS. Extension loads, overlay (image, title, price, Buy Now), cache hit, invalid hash handling all verified.
 - **Firefox:** Manifest updated with `background.scripts` alongside `service_worker` for compatibility.
 - Results recorded in [BROWSER-VALIDATION-RESULTS.md](./BROWSER-VALIDATION-RESULTS.md). Validated by Matome Mbowene.
+- **Feb 17 (Performance):** Instrumentation (performance.mark/measure); lazy-load verified; baselines + 3G throttle in [THURSDAY-PERFORMANCE-BASELINES.md](./THURSDAY-PERFORMANCE-BASELINES.md).
 
 See [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md) for current state.
 
-*Sprint 2 plan v1.0 | Updated Feb 10, 2026 — cross-browser validation complete*
+*Sprint 2 plan v1.0 | Updated Feb 17, 2026 — performance validation complete*

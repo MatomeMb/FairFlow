@@ -113,6 +113,11 @@ const removeOverlay = () => {
 };
 
 const renderOverlay = (target, data) => {
+  const renderStart = performance.now();
+  if (typeof performance.mark === 'function') {
+    performance.mark('lens-render-start');
+  }
+
   removeOverlay();
   const overlay = document.createElement('div');
   overlay.className = 'matter-overlay';
@@ -170,6 +175,18 @@ const renderOverlay = (target, data) => {
   // Append to DOM once at the end
   document.body.appendChild(overlay);
   activeOverlay = overlay;
+
+  const renderMs = Math.round(performance.now() - renderStart);
+  if (typeof performance.mark === 'function') {
+    performance.mark('lens-render-end');
+    try {
+      performance.measure('lens-overlay-render', 'lens-render-start', 'lens-render-end');
+    } catch (_) { /* ignore if marks missing */ }
+  }
+  // Dev-only perf log (localhost demo page)
+  if (typeof window !== 'undefined' && /localhost|127\.0\.0\.1/.test(window.location?.hostname || '')) {
+    console.log(`[Lens Perf] overlay render: ${renderMs}ms`);
+  }
 };
 
 const handleMatterLink = async (link) => {
@@ -182,10 +199,15 @@ const handleMatterLink = async (link) => {
     return;
   }
 
+  const resolveStart = performance.now();
   renderOverlay(link, { gist: { title: 'Loading...', price: 0, currency: 'USD' } });
   try {
     const data = await resolveHash(hash);
     renderOverlay(link, data);
+    const totalMs = Math.round(performance.now() - resolveStart);
+    if (/localhost|127\.0\.0\.1/.test(window.location?.hostname || '')) {
+      console.log(`[Lens Perf] resolve + render total: ${totalMs}ms`);
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Unable to load';
     renderOverlay(link, { gist: { title: message, price: 0, currency: 'USD' } });

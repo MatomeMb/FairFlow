@@ -85,7 +85,7 @@ All work delivered **by Feb 5, 2026** (current sprint):
 | **Fri** | Feb 13 | Cross-browser smoke test (Chrome, Edge, Brave, Firefox) — **DONE Feb 10** | 6 | Compatibility note ✓ |
 | **Tue** | Apr 8 | Overlay performance: reduce reflows; lazy-load image; measure and log slow paths | 5 | Performance improvements |
 | **Mon** | Feb 16 | Tests & Documentation — finalize tests, integration test (full resolve flow), README update, verify docs, progress update | 5 | Tests + docs ✓ |
-| **Tue** | Feb 17 | Extension tests (manual or automated) for cache hit/miss; update README and runbook | 5 | Tests + docs |
+| **Tue** | Feb 17 | Performance Validation — profile render, lazy-load verify, baseline measurements, 3G throttle; document in THURSDAY-PERFORMANCE-BASELINES | 5 | Performance validated ✓ |
 | **Thu** | Apr 10 | Integration test full flow; regression pass; fix bugs from testing | 6 | Stable build |
 | **Thu** | Feb 19 | Sprint review, demo to CEO; retrospective; release checklist; tag (e.g. lens v0.3.0) and update PROGRESS | 5 | Sprint 2 closed |
 

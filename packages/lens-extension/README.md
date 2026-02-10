@@ -261,6 +261,14 @@ Check cache (cacheGet)
 - Extension continues working in degraded mode
 - Consider clearing old entries or implementation cache eviction policy
 
+### Performance Instrumentation (Feb 17)
+
+On localhost demo page, the extension logs:
+- `[Lens Perf] overlay render: Xms` — DOM build and append time
+- `[Lens Perf] resolve + render total: Xms` — full click-to-overlay time
+
+For DevTools Performance profiling: `performance.measure('lens-overlay-render')` marks the overlay render span. See [THURSDAY-PERFORMANCE-BASELINES.md](../../docs/THURSDAY-PERFORMANCE-BASELINES.md) for baselines and 3G throttle test procedure.
+
 ### Performance Metrics
 
 **Typical cache write latency:**
