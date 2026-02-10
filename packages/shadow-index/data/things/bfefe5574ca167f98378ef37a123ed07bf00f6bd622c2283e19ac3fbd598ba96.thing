@@ -3,7 +3,7 @@
   "title": "Vitest Demo Product",
   "price": 9999,
   "currency": "USD",
-  "image_url": "https://example.com/demo.jpg",
+  "image_url": "https://picsum.photos/400/300",
   "checkout_url": "https://example.com/buy",
   "created_at": "2026-02-05T09:03:15.762Z"
 }

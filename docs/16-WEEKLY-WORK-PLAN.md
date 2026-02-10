@@ -41,9 +41,9 @@ All task estimates below are in **hours (h)** and are intended to be realistic f
 
 ---
 
-## 3. Current Status (As of Feb 5, 2026)
+## 3. Current Status (As of Feb 10, 2026)
 
-**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: MVP path live (v0.4.0); all deliverables through Feb 5 complete (Sprint 1). Next: **Sprint 2** (Feb 6 – Feb 19, 2026) — MVP-13 extension caching; no blockers.
+**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: MVP path live (v0.4.0); Sprint 2 in progress — MVP-13 IndexedDB cache integrated; **cross-browser validation complete** (Chrome, Edge, Brave, Firefox) Feb 10. See [BROWSER-VALIDATION-RESULTS.md](./BROWSER-VALIDATION-RESULTS.md). No blockers.
 
 ---
 
@@ -82,7 +82,7 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
-| **Fri** | Feb 13 | Cross-browser smoke test (Chrome, Edge); fix any compatibility issues; document supported browsers | 6 | Compatibility note |
+| **Fri** | Feb 13 | Cross-browser smoke test (Chrome, Edge, Brave, Firefox) — **DONE Feb 10** | 6 | Compatibility note ✓ |
 | **Tue** | Apr 8 | Overlay performance: reduce reflows; lazy-load image; measure and log slow paths | 5 | Performance improvements |
 | **Tue** | Feb 17 | Extension tests (manual or automated) for cache hit/miss; update README and runbook | 5 | Tests + docs |
 | **Thu** | Apr 10 | Integration test full flow; regression pass; fix bugs from testing | 6 | Stable build |

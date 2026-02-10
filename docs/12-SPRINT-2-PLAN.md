@@ -87,8 +87,15 @@ Same as Sprint 1. See [11-SPRINT-1-PLAN.md — How to Run the MVP Demo](./11-SPR
 
 ---
 
-## 7. Status (Sprint 2 complete)
+## 7. Status (Sprint 2 in progress)
 
-All P1 items implemented. Build and tests: `cargo build --bin platform-test`, Vitest (run with optional server for integration tests; MVP-09 auth tests use in-process app). Demo flow unchanged; auth optional (no key = no auth). See [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md) for current state.
+**P1 items:** All implemented. Build and tests: `cargo build --bin platform-test`, Vitest (run with optional server for integration tests; MVP-09 auth tests use in-process app). Demo flow unchanged; auth optional (no key = no auth).
 
-*Sprint 2 plan v1.0 | Updated at Sprint 2 implementation*
+**MVP-13 (extension caching):** IndexedDB cache integrated. Cross-browser validation complete — Feb 10, 2026:
+- **Chrome, Edge, Brave, Firefox:** PASS. Extension loads, overlay (image, title, price, Buy Now), cache hit, invalid hash handling all verified.
+- **Firefox:** Manifest updated with `background.scripts` alongside `service_worker` for compatibility.
+- Results recorded in [BROWSER-VALIDATION-RESULTS.md](./BROWSER-VALIDATION-RESULTS.md). Validated by Matome Mbowene.
+
+See [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md) for current state.
+
+*Sprint 2 plan v1.0 | Updated Feb 10, 2026 — cross-browser validation complete*
