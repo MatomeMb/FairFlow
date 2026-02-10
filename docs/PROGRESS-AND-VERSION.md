@@ -26,9 +26,9 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **lens-extension** | **0.3.0** | MVP-13 cache, performance instrumentation, SHA-256 validation |
 | **matter-core** | **0.3.0** | Rust Compiler, matter CLI binary |
 
-**Release label:** `v0.3.0` (Lens focus — delivered Feb 19, 2026). Sprint 2 MVP-13 cache complete.
+**Release label:** `v0.5.0` (Sprint 2 complete — delivered Feb 19, 2026). lens v0.3.0.
 
-**Reproducing this state:** Use git tag `v0.5.0` (repo sync). Run API: `cd packages/shadow-index && npm run start`. Demo: `node scripts/demo-server.mjs 5178` then open http://localhost:5178/catalog-upload.html.
+**Reproducing this state:** Use git tag `v0.5.0`. Run API: `cd packages/shadow-index && npm run start`. Demo: `node scripts/demo-server.mjs 5178` then open http://localhost:5178/catalog-upload.html.
 
 ---
 
