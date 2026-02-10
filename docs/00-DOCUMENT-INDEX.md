@@ -15,7 +15,7 @@
 
 This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
 
-**Current status (Feb 8, 2026):** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 IndexedDB cache integrated (Thu Feb 12); 45/45 tests passing; Friday cross-browser prep complete (Firefox compat, manifest_v2). Next: Fri Feb 13 cross-browser sprint. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md). Friday sprint: [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
+**Current status (Feb 19, 2026):** Sprint 2 complete (v0.5.0). MVP-13 IndexedDB cache integrated, performance instrumentation added, and 45/45 tests passing. Next: Sprint 3 Kickoff. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -42,6 +42,8 @@ This folder contains the complete project documentation for **.things that Matte
 | 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Sprint 1 goal, backlog, and DoD | ~3 |
 | 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
 | — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | Post–Sprint 1 actions and Sprint 2 readiness | ~2 |
+| — | [**Sprint 2 Retrospective**](./SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 (MVP-13) goal, results, lessons, and v0.5.0 release | ~3 |
+| — | [**MVP-14 Event Spec**](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | **Conversion tracking: event schema and JSONL storage decision (Sprint 3)** | ~3 |
 | 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
 | 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |

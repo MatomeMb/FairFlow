@@ -97,7 +97,33 @@ All work delivered **by Feb 5, 2026** (current sprint):
 **Goal:** MVP-14 view/click events; API logging; minimal export or dashboard.  
 **Capacity:** ~56h deliverable.
 
-### Week 1 (Feb 20 – Feb 24)
+### Week 1 (Feb 20 – Feb 26)
+
+| Day | Date | Planned work | Est. (h) | Deliverable |
+|-----|------|----------------|----------|-------------|
+| **Fri** | Feb 20 | Sprint 3 Planning Meeting; Design event schema; choose storage strategy (Postgres/D1 vs JSON logs) | 6 | Plan + Schema |
+| **Mon** | Feb 23 | Extension: Background script hooks for "overlay:open" event. Unique user ID generation (anon). | 6 | Event dispatch logic |
+| **Tue** | Feb 24 | Content Script: Hook "Buy Now" click events; relay to background; add performance timing to payload. | 6 | Conversion tracking |
+| **Wed** | Feb 25 | API: Implement `POST /v1/analytics/event`. Add Zod validation; CORS check; basic ingestion logic. | 6 | API Ingestion active |
+| **Thu** | Feb 26 | Persistence: Local SQL or JSON-append storage implementation in `shadow-index`. High-volume safety. | 6 | Persistent event logs |
+
+### Week 2 (Feb 27 – Mar 5)
+
+| Day | Date | Planned work | Est. (h) | Deliverable |
+|-----|------|----------------|----------|-------------|
+| **Fri** | Feb 27 | Aggregation: Daily background job (or on-demand) to count views/clicks per hash. | 6 | Aggregated data |
+| **Mon** | Mar 2 | Reporting: API endpoint `GET /v1/analytics/report?hash=...`; unit tests for aggregation correctess. | 6 | Report API endpoint |
+| **Tue** | Mar 3 | Minimal Dashboard: Internal HTML page showing top products and API throughput metrics. | 6 | Internal Dashboard |
+| **Wed** | Mar 4 | E2E Integration: Click product → Verify event in DB → Verify report count update. Buffer for bugs. | 6 | Verified end-to-end |
+| **Thu** | Mar 5 | Sprint review; Demo to CEO; Retrospective; v0.6.0 release; update PROGRESS-AND-VERSION. | 6 | Sprint 3 closed |
+
+**Sprint 3 total:** ~60h.
+
+---
+
+## 7. Sprint 4 (Mar 6 – Mar 19, 2026) — Merchant Platform Polish
+
+---
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|

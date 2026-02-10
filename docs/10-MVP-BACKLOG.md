@@ -60,7 +60,7 @@
 |----|-------|---------------------|--------|
 | MVP-11 | Batch compilation | 100+ products processed | **Done** (Sprint 1) |
 | MVP-12 | Merchant catalog import | CSV/JSON ingestion | **Done** (Sprint 1) |
-| MVP-13 | Extension caching | IndexedDB cache works | **Planned** (Sprint 2) |
+| MVP-13 | Extension caching | IndexedDB cache works | **Done** (Sprint 2) |
 | MVP-14 | Analytics events | Track views and clicks | **Planned** (Sprint 3) |
 
 ---
@@ -81,4 +81,4 @@
 
 ---
 
-Last reviewed: Feb 5, 2026. MVP-01–MVP-12 done (Sprint 1); MVP-13 (Sprint 2), MVP-14 (Sprint 3) planned. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
+Last reviewed: Feb 19, 2026. MVP-01–MVP-13 done; MVP-14 (Sprint 3) planned. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).

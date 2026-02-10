@@ -244,7 +244,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
 | Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
 
-**Current status:** Sprint 1 complete (v0.4.0). Sprint 2 in progress: MVP-13 cache integrated; 45/45 tests passing; Friday Feb 13 cross-browser sprint next. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 2 complete (v0.5.0). Sprint 3 in progress: Analytics & Observability (MVP-14) event specification and storage decision finalized. Next: Implementation of ingestion API and extension hooks. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 

@@ -1,5 +1,5 @@
 # .things that Matter
-## Sprint 3 Plan — Detailed & Comprehensive
+## Sprint 3 Plan — Analytics & Observability
 
 ---
 
@@ -7,9 +7,9 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Sprint Plan |
-| **Version** | 2.0 (Detailed) |
-| **Date** | February 5, 2026 |
-| **Sprint Window** | Feb 17 – Mar 2, 2026 (immediate start) |
+| **Version** | 3.0 |
+| **Date** | February 19, 2026 |
+| **Sprint Window** | Feb 20 – Mar 5, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Approved for execution |
 
@@ -17,19 +17,22 @@
 
 ## EXECUTIVE SUMMARY
 
-**Sprint Goal:** Establish production readiness by implementing R2 storage infrastructure and Rust compiler pipeline, enabling the system to scale beyond local development.
+**Sprint Goal:** Implement conversion tracking (MVP-14) and system observability to quantify the value of `matter://` distribution and ensure system health for the first beta merchants.
 
 **Strategic Rationale:**
-- Current system only stores `.thing` files locally (not production-ready)
-- Compilation only available via Node.js API (not portable)
-- Before onboarding merchants, need: distributed storage, CLI tooling, and batch processing capability
+- We need to prove engagement (views/clicks) to merchants.
+- Distributed nature of "The Lens" requires centralized (or semi-centralized) event collection.
+- Moving from "it works" to "it's healthy" via logging and monitoring.
 
 **Key Decisions Made:**
-1. **Prioritize R2 storage (MVP-03)** over P2 items — foundational for production
-2. **Implement Rust compiler** — enables CLI, portability, and WASM compilation
-3. **Defer P2 items (MVP-11–14)** to Sprint 4 — batch/analytics require storage infrastructure first
+1. **Lightweight Analytics:** Use a simple `POST /analytics/event` pattern to avoid heavy tracking dependencies.
+2. **Aggregated Reports:** Prefer post-processed aggregations over real-time processing to minimize API latency.
+3. **Internal Dashboard:** A simple JSON or minimal HTML view for system status.
 
-**Expected Outcome:** By end of Sprint 3, the system can compile products via CLI, store artifacts in cloud storage, and serve them via CDN — ready for beta merchant onboarding.
+**Expected Outcome:** 
+- Direct visibility into product engagement (views/clicks).
+- Performance baseline for API resolution in a multi-tenant environment.
+- Exportable CSV/JSON reports for early merchant partners.
 
 ---
 
@@ -39,65 +42,66 @@
 
 | ID | Item | Priority | Effort | Owner | Rationale |
 |----|------|----------|--------|-------|-----------|
-| **MVP-03** | Store artifacts in R2 | P0 | 3 days | CTO | Foundational for production; unblocks merchant onboarding |
-| **Rust-Compiler** | Implement Compiler::compile() in matter-core | P0 | 4 days | CTO | Enables CLI tooling; required for WASM; reduces API dependency |
+| **MVP-14** | Analytics Events (Views/Clicks) | P0 | 4 days | CTO | Required for merchant value proposition |
+| **API-Log** | Enhanced API Observability | P1 | 3 days | CTO | Detect bottlenecks and errors early |
+| **RP-01** | Basic Analytics Reporting | P1 | 2 days | CTO | Enables stakeholder feedback |
 
 ### 1.2 Secondary Items (Nice to Have)
 
 | ID | Item | Priority | Effort | Owner | Rationale |
 |----|------|----------|--------|-------|-----------|
-| **CLI-Tool** | Build `matter` CLI binary | P1 | 2 days | CTO | Merchant-facing tool for local compilation |
-| **MVP-11-Lite** | Basic batch compilation (10 products) | P1 | 1 day | CTO | Validates compiler performance; defers 100+ to Sprint 4 |
-
-### 1.3 Deferred Items (Sprint 4)
-
-| ID | Item | Reason Deferred |
-|----|------|-----------------|
-| MVP-11 (full) | Batch compilation (100+) | Requires R2 storage + Rust compiler first |
-| MVP-12 | Merchant catalog import | Depends on batch compilation |
-| MVP-13 | Extension caching | Lower priority; current performance acceptable |
-| MVP-14 | Analytics events | Not needed until beta merchants onboard |
-
-**Total Committed Effort:** 7 days (primary) + 3 days (secondary) = 10 days  
-**Sprint Duration:** 14 days (Feb 17 – Mar 2)  
-**Buffer:** 4 days for polish, bugs, testing
+| **UX-01** | Cache performance logs | P2 | 1 day | CTO | Optimize the MVP-13 caching layer |
+| **EXT-01** | CSV Report Export | P2 | 1 day | CTO | Professionalizes the output |
 
 ---
 
-## 2. DETAILED IMPLEMENTATION PLAN
+## 2. DAILY BREAKDOWN & ALLOCATION
 
-### 2.1 MVP-03: Store Artifacts in R2
+### Week 1: Event Infrastructure
 
-**Acceptance Criteria:**
-- `.thing` files stored in Cloudflare R2 bucket
-- Images (polyglot or source) stored in R2
-- Public CDN URLs accessible (https://cdn.example.com/things/{hash}.thing)
-- Shadow Index API updated to use R2 instead of local file system
-- Existing demo flow works with R2-backed storage
+| Day | Date | Hours | Task | Deliverable |
+|-----|------|-------|------|-------------|
+| **Fri** | Feb 20 | 6 | **Sprint 3 Kickoff & Design:** Finalize event schema (hash, eventType, timestamp, anonID). Design storage strategy in `shadow-index`. | Schema Doc |
+| **Mon** | Feb 23 | 6 | **Extension Event Hooks:** Implement `sendEvent(type, hash)` in [packages/lens-extension/src/background.js](packages/lens-extension/src/background.js). Hook into overlay open. | Event dispatch logic |
+| **Tue** | Feb 24 | 6 | **Conversion Tracking:** Hook event dispatch into "Buy Now" button clicks (content script to background message). | Click tracking active |
+| **Wed** | Feb 25 | 6 | **Analytics API Endpoint:** Implement `POST /v1/analytics/event` in [packages/shadow-index/api/index.ts](packages/shadow-index/api/index.ts). Add Zod validation. | API ingestion live |
+| **Thu** | Feb 26 | 6 | **Storage Persistence:** Wire ingestion to persistent storage (JSON log-append or minimal DB). Handle high-volume buffering. | Durable event logs |
 
-**Implementation Breakdown:**
+### Week 2: Reporting & Observability
 
-#### Day 1: R2 Setup & SDK Integration
+| Day | Date | Hours | Task | Deliverable |
+|-----|------|-------|------|-------------|
+| **Fri** | Feb 27 | 6 | **Aggregation Engine:** Logical layer to aggregate raw events into daily counts per product (hash). | Daily summary logic |
+| **Mon** | Mar 2 | 6 | **Reporting API:** `GET /v1/analytics/report` allowing filtering by hash/date. | Report endpoint |
+| **Tue** | Mar 3 | 6 | **Observability Dashboard:** Simple internal HTML view of API status, error rates, and top 10 products. | Status UI |
+| **Wed** | Mar 4 | 6 | **Integration & Performance:** E2E test full cycle (View → API → Report). Optimize any slow SQL/read paths. | Verified flow |
+| **Thu** | Mar 5 | 6 | **Sprint Review & v0.6.0:** Demo to CEO. Tag release. Update progress docs. | Sprint 3 Closed |
 
-**Task list:** [13-SPRINT-3-DAY1-TASKS.md](./13-SPRINT-3-DAY1-TASKS.md)
+---
 
-**Tasks:**
-1. Create Cloudflare R2 bucket: `matter-artifacts-prod`
-2. Configure CORS for public read access
-3. Set up custom domain: `cdn.thingsthatmatter.com` (or R2.dev subdomain)
-4. Install R2 SDK in Shadow Index:
-   ```bash
-   cd packages/shadow-index
-   npm install @aws-sdk/client-s3  # R2 uses S3-compatible API
-   ```
-5. Create environment variables:
-   ```
-   CLOUDFLARE_R2_ACCOUNT_ID=xxx
-   CLOUDFLARE_R2_ACCESS_KEY_ID=xxx
-   CLOUDFLARE_R2_SECRET_ACCESS_KEY=xxx
-   CLOUDFLARE_R2_BUCKET=matter-artifacts-prod
-   CLOUDFLARE_R2_PUBLIC_URL=https://cdn.thingsthatmatter.com
-   ```
+## 3. TECHNICAL SPECIFICATION
+
+### 3.1 Event Schema & Storage
+Detailed specification: [MVP-14-EVENT-SPEC-AND-STORAGE.md](./MVP-14-EVENT-SPEC-AND-STORAGE.md)
+
+**Key Events:**
+- **View:** `hash`, `source_url`, `timestamp`.
+- **Click:** `hash`, `source_url`, `target_action` (`checkout_initiated`, etc.).
+
+**Storage Strategy:**
+- **Choice:** API Logs (JSONL / append-only).
+- **Location:** `packages/shadow-index/data/events/YYYY-MM-DD.jsonl`.
+- **Logic:** Fast implementation for MVP; aggregation job handles reporting.
+
+---
+
+## 4. DEFINITION OF DONE (D.o.D)
+- [ ] Extension sends view/click events for every `matter://` interaction.
+- [ ] API successfully stores events without impacting resolution latency.
+- [ ] Weekly engagement report can be generated for any given hash.
+- [ ] No regression on resolution tests.
+- [ ] Git tag `v0.6.0` applied.
+
 
 **File: `packages/shadow-index/lib/storage.ts` (new)**
 

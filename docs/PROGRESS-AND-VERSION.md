@@ -39,7 +39,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Sprint 0** | By Jan 19, 2026 | **Complete** | Setup and architecture |
 | **Sprint 1** | Jan 20 – Feb 5, 2026 | **Complete** | Full MVP: compile → resolve → display; v0.4.0 |
 | **Sprint 2** | Feb 6 – Feb 19, 2026 | **Complete** | MVP-13 extension caching (IndexedDB), performance polish, validation; v0.5.0 |
-| **Sprint 3** | Feb 20 – Mar 5, 2026 | **Next** | Future protocol enhancements |
+| **Sprint 3** | Feb 20 – Mar 5, 2026 | **Next** | Analytics & Observability (MVP-14), API logging, reporting; v0.6.0 |
 
 **Next:** Sprint 3 Kickoff. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md).
 
@@ -71,7 +71,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **MVP-11** | Batch compilation | Done |
 | **MVP-12** | Merchant catalog import | Done |
 
-**Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md). **Planned next:** MVP-13 (Sprint 2), MVP-14 (Sprint 3).
+**Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md). **Planned next:** MVP-14 (Sprint 3 Analytics).
 
 ---
 
@@ -82,4 +82,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 8, 2026. Sprint 2 in progress; MVP-13 cache integrated (Thu Feb 12); Friday cross-browser prep complete. Next: Fri Feb 13 cross-browser sprint.*
+*Last updated: Feb 19, 2026. Sprint 2 closed (v0.5.0); MVP-13 cache complete. Next: Sprint 3 Kickoff (Analytics & Observability).*
