@@ -80,11 +80,11 @@ Every product processed by our compiler exists simultaneously as:
 **Goal:** MVP-14 Analytics & Observability — view/click event tracking, API ingestion, merchant reporting, internal observability dashboard  
 **Target:** Tag v0.6.0
 
-**Phases:** Infrastructure (sendEvent, overlay hooks, storage) | API ingestion (POST /v1/analytics/event) | Reporting (GET /v1/analytics/report) | Observability (HTML dashboard, E2E) | Release
+**Phases:** Infrastructure (sendEvent, overlay hooks, POST /v1/analytics/event) — **Done Feb 21** | Reporting (GET /v1/analytics/report) | Observability (HTML dashboard, E2E) | Release
 
 **Sprint 2 complete (Feb 19, 2026):** MVP-13 IndexedDB cache, cross-browser validation (Chrome, Edge, Brave, Firefox); performance instrumentation; lens v0.3.0, tag v0.5.0. [Demo script](./docs/SPRINT-2-DEMO-SCRIPT.md) | [Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md)
 
-**Full spec:** [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md)
+**Full spec:** [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md) | **Implementation:** [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md)
 
 ---
 
@@ -112,6 +112,7 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Sprint 2 Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 closeout, lessons learned, action items |
 | [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Feb 20–Mar 5, 2026) — Analytics & observability (MVP-14); event schema, API ingestion, report endpoint, dashboard |
 | [MVP-14 Event Spec & Storage](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema (view/click), storage decision (JSONL), validation |
+| [February 21 Analysis](./docs/FEBRUARY-21-ANALYSIS.md) | MVP-14 pipeline architecture, implementation summary |
 | [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 6–19, 2026) — Beta readiness |
 | [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria |
 | [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
@@ -170,9 +171,9 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–2):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; **MVP-13 IndexedDB cache**; cross-browser validation (Chrome, Edge, Brave, Firefox); performance instrumentation. See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
+**Delivered (Sprints 1–2, partial Sprint 3):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; **MVP-13 IndexedDB cache**; cross-browser validation (Chrome, Edge, Brave, Firefox); performance instrumentation; **MVP-14 event ingestion** (view/click events, POST /v1/analytics/event, JSONL storage). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md).
 
-**Planned (Sprints 3–8, Feb–May 2026):** MVP-14 analytics (view/click events, POST /v1/analytics/event, GET /v1/analytics/report, status dashboard); beta readiness; beta launch prep. Full metrics, day-by-day plan: [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
+**Planned (Sprint 3–8, Feb–May 2026):** MVP-14 reporting (GET /v1/analytics/report), status dashboard; beta readiness; beta launch prep. Full metrics, day-by-day plan: [13-SPRINT-3-PLAN.md](./docs/13-SPRINT-3-PLAN.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
 
 ---
 
@@ -207,12 +208,12 @@ Sprint 3 in progress. Tag v0.5.0 on main. Single source of truth: [Progress and 
 
 ### Next 2 Weeks (Feb 20 – Mar 5, 2026) — Sprint 3
 
-| Phase | Tasks |
-|-------|-------|
-| **Infrastructure** | Event schema; sendEvent in extension; fire view on overlay show, click on Buy Now; POST /v1/analytics/event |
-| **Reporting** | Aggregation engine; GET /v1/analytics/report (from, to, groupBy) |
-| **Observability** | Internal HTML status dashboard; API request logging; E2E: View to DB to Report |
-| **Release** | Sprint review; demo conversion tracking; tag v0.6.0 |
+| Phase | Tasks | Status |
+|-------|-------|--------|
+| **Infrastructure** | sendEvent, view/click hooks, POST /v1/analytics/event, JSONL storage | Done (Feb 21) |
+| **Reporting** | Aggregation engine; GET /v1/analytics/report (from, to, groupBy) | Planned |
+| **Observability** | Internal HTML status dashboard; API request logging; E2E: View to DB to Report | Planned |
+| **Release** | Sprint review; demo conversion tracking; tag v0.6.0 | Planned |
 
 ---
 
