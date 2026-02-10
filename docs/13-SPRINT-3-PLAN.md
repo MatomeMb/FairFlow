@@ -41,8 +41,10 @@
 
 | Event | Fields | Trigger |
 |-------|--------|---------|
-| **view** | hash, timestamp, source (e.g. overlay), optional referrer | Overlay shown to user |
-| **click** | hash, timestamp, target (e.g. checkout_url) | User clicks "Buy Now" or checkout link |
+| **view** | hash, timestamp, source_url | Overlay shown to user |
+| **click** | hash, timestamp, source_url, target_action | User clicks "Buy Now" or expands image |
+
+**Full spec:** [MVP-14-EVENT-SPEC-AND-STORAGE.md](./MVP-14-EVENT-SPEC-AND-STORAGE.md)
 
 ### 1.2 Schema (JSON)
 
@@ -51,8 +53,7 @@
   "event": "view",
   "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
   "timestamp": "2026-02-20T10:15:00.000Z",
-  "source": "overlay",
-  "target": null
+  "source_url": "https://example.com/catalog"
 }
 ```
 
@@ -61,8 +62,8 @@
   "event": "click",
   "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
   "timestamp": "2026-02-20T10:16:00.000Z",
-  "source": "overlay",
-  "target": "checkout"
+  "source_url": "https://example.com/catalog",
+  "target_action": "checkout_initiated"
 }
 ```
 
@@ -124,7 +125,7 @@
 
 **File:** `packages/lens-extension/src/background.js` (or new `analytics.js`)
 
-- `sendEvent({ event, hash, source, target })` — POST to `${apiBase}/v1/analytics/event`
+- `sendEvent({ event, hash, source_url, target_action? })` — POST to `${apiBase}/v1/analytics/event`
 - Fire-and-forget; no blocking overlay
 - Optional: retry queue if offline
 - Use existing `shadow_index_base_url` from storage for API base
@@ -133,28 +134,26 @@
 
 **File:** `packages/lens-extension/src/content.js`
 
-- When overlay shown (gist received): `sendEvent({ event: 'view', hash, source: 'overlay' })`
-- When "Buy Now" clicked: `sendEvent({ event: 'click', hash, source: 'overlay', target: 'checkout' })`
+- When overlay shown (gist received): `sendEvent({ event: 'view', hash, source_url: document.location.href })`
+- When "Buy Now" clicked: `sendEvent({ event: 'click', hash, source_url: document.location.href, target_action: 'checkout_initiated' })`
 
 ### 3.3 API: POST /v1/analytics/event
 
 **File:** `packages/shadow-index/api/index.ts`
 
 - Route: POST /v1/analytics/event
-- Body: { event, hash, timestamp?, source?, target? }
+- Body: { event, hash, timestamp?, source_url, target_action? }
 - Validate: event in ['view','click'], hash is 64-char hex
 - Write to storage (JSONL file or DB table)
 - Optional: x-api-key for write auth
 
-### 3.4 Storage Options
+### 3.4 Storage Decision
 
-| Option | Pros | Cons |
-|--------|------|------|
-| JSONL file | Simple; no DB setup | Scale limits; rotation needed |
-| Supabase | Managed; queryable | Extra dependency |
-| SQLite | Local; no external deps | File-based; backup needed |
+**Choice:** JSONL file (append-only, daily rotation). See [MVP-14-EVENT-SPEC-AND-STORAGE.md](./MVP-14-EVENT-SPEC-AND-STORAGE.md) for rationale.
 
-**Recommendation:** Start with JSONL + daily rotation; migrate to Supabase if volume grows.
+- Path: `data/events/YYYY-MM-DD.jsonl`
+- Retention: 90 days (configurable)
+- Aggregation: Batch job by date range; migrate to Supabase or managed DB at 1,000+ gists
 
 ### 3.5 GET /v1/analytics/report
 

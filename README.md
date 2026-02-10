@@ -111,6 +111,7 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Sprint 2 Demo Script](./docs/SPRINT-2-DEMO-SCRIPT.md) | Reproducible demo flow for Sprint Review |
 | [Sprint 2 Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 closeout, lessons learned, action items |
 | [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Feb 20–Mar 5, 2026) — Analytics & observability (MVP-14); event schema, API ingestion, report endpoint, dashboard |
+| [MVP-14 Event Spec & Storage](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema (view/click), storage decision (JSONL), validation |
 | [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 6–19, 2026) — Beta readiness |
 | [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria |
 | [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
