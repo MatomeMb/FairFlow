@@ -43,7 +43,7 @@ export async function runAggregationForDate(
     return { ok: false, error: `Event file not found: ${dateStr}.jsonl` };
   }
 
-  const { byDate, byHash, byBoth } = await aggregateFile(eventPath);
+  const { byDate, byHash } = await aggregateFile(eventPath);
   const totals = byDate.get(dateStr) ?? { views: 0, clicks: 0 };
 
   const byHashObj: Record<string, { views: number; clicks: number }> = {};
