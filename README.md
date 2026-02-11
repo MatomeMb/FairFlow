@@ -224,7 +224,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Role | Name | Responsibilities |
 |------|------|------------------|
 | **CEO** | Sobuhle Nyambali | Strategy, partnerships, fundraising |
-| **CTO** | Matome Mboweni | Technical architecture, development |
+| **CTO** | Matome Mbowene | Technical architecture, development |
 
 ---
 
