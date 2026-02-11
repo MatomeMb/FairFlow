@@ -67,18 +67,24 @@ Every product processed by our compiler exists simultaneously as:
 
 **Quick Setup Verification:**
 ```bash
-# Windows
-.\scripts\test-setup.ps1
-
-# Test all API keys are configured
+cd mcj
+npm run demo
 ```
+
+This starts both the API (http://localhost:3000) and demo server (http://localhost:5177/) with:
+- Landing page at http://localhost:5177/
+- Developer demo at http://localhost:5177/index.html
+- Catalog upload at http://localhost:5177/catalog-upload.html
+- Matter demo at http://localhost:5177/matter-demo.html
+
+For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md).
 
 ---
 
-## Current Status (Sprint 6: Feb 12–26, 2026)
+## Current Status (Sprint 6: Apr 3–16, 2026)
 
 **Version:** v0.6.3 (Chrome Web Store submission ready)  
-**Status:** All blockers cleared, ready for Chrome Web Store submission
+**Status:** Submission package complete, awaiting Chrome review
 
 ### What's Complete (Sprints 1–6)
 
@@ -89,17 +95,17 @@ Every product processed by our compiler exists simultaneously as:
 - Store assets: Icons, descriptions, screenshots (4 captured), privacy policy
 - Build & release: Extension zip, deterministic build script, release process
 
-### Sprint 6 Deliverables (Completed Feb 12)
+### Sprint 6 Deliverables (Completed Apr 3)
 
-- Extension v0.3.0 built and zipped
+- Extension v0.3.0 built and zipped: `packages/lens-extension/extension-v0.3.0.zip`
 - Screenshots captured: overlay, landing, upload, demo (4 files, 1280x800px each)
 - Privacy policy deployed: https://storied-semolina-687067.netlify.app/privacy-policy.html
-- Chrome Web Store submission checklist: CHROME-WEB-STORE-CHECKLIST.md
-- Release process documentation: RELEASE-PROCESS-LENS.md
-- Submission-ready guide: SPRINT-6-SUBMISSION-READY.md
+- Chrome Web Store submission checklist: [CHROME-WEB-STORE-CHECKLIST.md](./docs/CHROME-WEB-STORE-CHECKLIST.md)
+- Release process documentation: [RELEASE-PROCESS-LENS.md](./docs/RELEASE-PROCESS-LENS.md)
+- Submission-ready guide: [SPRINT-6-SUBMISSION-READY.md](./docs/SPRINT-6-SUBMISSION-READY.md)
 - Git tag: v0.6.3 (pushed)
 
-**Reference:** [SPRINT-6-SUBMISSION-READY.md](./docs/SPRINT-6-SUBMISSION-READY.md)
+**Next action:** Submit to Chrome Web Store via developer console (awaiting approval 1–3 days)
 
 ---
 
@@ -220,7 +226,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 8, 2026.*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 12, 2026.*
 
 | Sprint | Period | Goal | Version | Status |
 |--------|--------|------|---------|--------|
@@ -230,11 +236,11 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability, retention policy | v0.5.5 | Complete |
 | Sprint 4 | Mar 6–19, 2026 | Production hardening, security, operations, scaling | v0.6.0 | Complete |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep: landing, store assets, support, demo polish | v0.6.2 | Complete |
-| Sprint 6 | Feb 12–26, 2026 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | In Progress |
-| Sprint 7 | Feb 27–Mar 12, 2026 | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | Planned |
-| Sprint 8 | Mar 13–27, 2026 | Public launch prep, final validation | v1.0 (release) | Planned |
+| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | In Progress |
+| Sprint 7 | Apr 17–30, 2026 | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | Planned |
+| Sprint 8 | May 1–14, 2026 | Public launch prep, final validation | v1.0 (release) | Planned |
 
-**Current status:** Sprint 6 complete (v0.6.3). Extension ready for Chrome Web Store. Screenshots captured, privacy policy deployed, submission checklist finalized. Google review pending (1–3 days). Next: Beta merchant onboarding (Sprint 7). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 6 in progress (v0.6.3). Extension ready for Chrome Web Store submission. Screenshots captured, privacy policy deployed, submission checklist finalized. Awaiting Chrome review (1–3 days typical). Next: Beta merchant onboarding (Sprint 7). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
