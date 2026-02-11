@@ -38,74 +38,58 @@ Every product processed by our compiler exists simultaneously as:
    - [Node.js](https://nodejs.org/) (18+)
    - [Git](https://git-scm.com/)
 
-2. **Verify Setup:**
+2. **Clone and navigate:**
    ```bash
-   # Windows
-   .\scripts\setup-check.ps1
-   
-   # Linux/Mac
-   bash scripts/setup-check.sh
+   cd mcj
+   npm install
    ```
 
 3. **Configure Environment:**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys
+   # Edit .env with your API keys (see docs/API_KEYS_GUIDE.md)
    ```
 
-4. **Install Dependencies:**
+4. **Start the demo:**
    ```bash
-   cd packages/shadow-index
-   pnpm install  # or npm install
+   npm run demo
    ```
 
-5. **Read the Setup Guide:**
-   See [SETUP.md](./SETUP.md) for detailed instructions.
-
-6. **Configure API Keys:**
-   See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md) for step-by-step API keys setup.
-
-**Quick Setup Verification:**
-```bash
-cd mcj
-npm run demo
-```
-
-This starts both the API (http://localhost:3000) and demo server (http://localhost:5177/) with:
-- Landing page at http://localhost:5177/
-- Developer demo at http://localhost:5177/index.html
-- Catalog upload at http://localhost:5177/catalog-upload.html
-- Matter demo at http://localhost:5177/matter-demo.html
+5. **Access:**
+   - Landing: http://localhost:5177/
+   - Developer Demo: http://localhost:5177/index.html
+   - Catalog Upload: http://localhost:5177/catalog-upload.html
+   - Matter Demo: http://localhost:5177/matter-demo.html
+   - API Dashboard: http://localhost:3000/v1/analytics/dashboard
 
 For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md).
 
 ---
 
-## Current Status (Sprint 6: Apr 3–16, 2026)
+## Current Status (Sprint 5: Mar 20–Apr 2, 2026)
 
-**Version:** v0.6.3 (Chrome Web Store submission ready)  
-**Status:** Submission package complete, awaiting Chrome review
+**Version:** v0.6.2 (Beta launch prep complete)  
+**Status:** Landing, store assets, support workflow, demo polish delivered
 
-### What's Complete (Sprints 1–6)
+### What's Complete (Sprints 1–5)
 
 - Full MVP pipeline: compile → resolve → display
 - Extension (Lens v0.3.0): Matter overlay, IndexedDB cache, MV3 manifest
 - API (Shadow Index v0.6.0): Analytics, reporting, retention policies, query cache
-- Demo: Landing page, catalog upload, matter-demo, developer demo
-- Store assets: Icons, descriptions, screenshots (4 captured), privacy policy
-- Build & release: Extension zip, deterministic build script, release process
+- Demo: Landing page (default at /), catalog upload, matter-demo, developer demo
+- Store assets: Icons, descriptions, privacy policy (draft in demo)
+- Production hardening: Load testing, security audit, operations manual
 
-### Sprint 6 Deliverables (Completed Apr 3)
+### Sprint 5 Deliverables (Completed Apr 2)
 
-- Extension v0.3.0 built and zipped: `packages/lens-extension/extension-v0.3.0.zip`
-- Screenshots captured: overlay, landing, upload, demo (4 files, 1280x800px each)
-- Privacy policy deployed: https://storied-semolina-687067.netlify.app/privacy-policy.html
-- Chrome Web Store submission checklist: [CHROME-WEB-STORE-CHECKLIST.md](./docs/CHROME-WEB-STORE-CHECKLIST.md)
-- Release process documentation: [RELEASE-PROCESS-LENS.md](./docs/RELEASE-PROCESS-LENS.md)
-- Submission-ready guide: [SPRINT-6-SUBMISSION-READY.md](./docs/SPRINT-6-SUBMISSION-READY.md)
-- Git tag: v0.6.3 (pushed)
+- Landing page: demo/landing.html (now default at http://localhost:5177/)
+- Store assets: Short description, full description, privacy policy
+- Demo polish: Mobile-responsive styles, install instructions
+- Support workflow: [SUPPORT-WORKFLOW.md](./docs/SUPPORT-WORKFLOW.md)
+- Documentation: Sprint 5 plan, store checklist, beta onboarding guide
+- Git tag: v0.6.2 (pushed)
 
-**Next action:** Submit to Chrome Web Store via developer console (awaiting approval 1–3 days)
+**Next steps:** Sprint 6 planning — Chrome Web Store submission readiness (screenshots, privacy URL deployment)
 
 ---
 
@@ -236,11 +220,11 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability, retention policy | v0.5.5 | Complete |
 | Sprint 4 | Mar 6–19, 2026 | Production hardening, security, operations, scaling | v0.6.0 | Complete |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep: landing, store assets, support, demo polish | v0.6.2 | Complete |
-| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | In Progress |
+| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | Planned |
 | Sprint 7 | Apr 17–30, 2026 | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | Planned |
 | Sprint 8 | May 1–14, 2026 | Public launch prep, final validation | v1.0 (release) | Planned |
 
-**Current status:** Sprint 6 in progress (v0.6.3). Extension ready for Chrome Web Store submission. Screenshots captured, privacy policy deployed, submission checklist finalized. Awaiting Chrome review (1–3 days typical). Next: Beta merchant onboarding (Sprint 7). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 5 in progress (v0.6.2). Planning for Sprint 6 store submission (Apr). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
