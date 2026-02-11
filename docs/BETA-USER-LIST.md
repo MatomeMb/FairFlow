@@ -2,7 +2,8 @@
 
 **Sprint 4 Week 4**  
 **Purpose:** Track beta users for onboarding  
-**Owner:** CEO / Product
+**Owner:** CEO / Product  
+**Status:** Ready for population
 
 ---
 

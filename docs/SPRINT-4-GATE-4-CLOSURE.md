@@ -14,7 +14,7 @@
 | All deliverables complete and tested | [OK] | T4.1–T4.6 delivered; 88 tests passing |
 | Release notes prepared | [OK] | [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md) |
 | Beta onboarding guide reviewed | [OK] | [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) |
-| v0.6.0 tag created and pushed | [ ] | Execute git commands below (see Git Tag Commands) |
+| v0.6.0 tag created and pushed | [OK] | Tag created and pushed to origin |
 
 ---
 

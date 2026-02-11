@@ -42,7 +42,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Sprint 3** | Feb 20 – Feb 9, 2026 | **Complete** | Analytics & Observability (MVP-14), API logging, reporting; v0.5.5 |
 | **Sprint 4** | Feb 10 – Mar 10, 2026 | **Complete** | Optimization & Scaling (Weeks 3–4 COMPLETE); v0.6.0 |
 
-**Next:** Beta readiness and production deployment. Closure items: [SPRINT-4-REMAINING.md](./SPRINT-4-REMAINING.md).
+**Next:** Beta readiness and production deployment. Sprint 4 Gate 4 closed; tag v0.6.0 pushed. External: [BETA-USER-LIST.md](./BETA-USER-LIST.md), [STAGING-DEPLOYMENT-RUNBOOK.md](./STAGING-DEPLOYMENT-RUNBOOK.md).
 
 ---
 

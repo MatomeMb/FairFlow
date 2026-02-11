@@ -49,6 +49,7 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**Sprint 4 Gate 4 Closure**](./SPRINT-4-GATE-4-CLOSURE.md) | **Gate 4 checklist, beta onboarding review, tag commands** | ~1 |
 | — | [**Sprint 4 Remaining**](./SPRINT-4-REMAINING.md) | **Outstanding Sprint 4 items: Gate 4, external, next steps** | ~1 |
 | — | [**Beta User List**](./BETA-USER-LIST.md) | **Template for beta user roster** | ~1 |
+| — | [**Staging Deployment Runbook**](./STAGING-DEPLOYMENT-RUNBOOK.md) | **Step-by-step staging deployment checklist** | ~1 |
 | — | [**Operations Manual**](./OPERATIONS-MANUAL.md) | **Deployment, monitoring, troubleshooting, scheduled jobs** | ~4 |
 | — | [**Security Verification Report**](./SECURITY-VERIFICATION-REPORT.md) | **API auth, rate limiting, key revocation** | ~2 |
 | — | [**Database Migration Roadmap**](./DATABASE-MIGRATION-ROADMAP.md) | **JSONL → SQLite → PostgreSQL path** | ~3 |

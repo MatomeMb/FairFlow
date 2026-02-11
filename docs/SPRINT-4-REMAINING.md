@@ -1,7 +1,7 @@
 # Sprint 4 — What Remains
 
 **As of:** February 2026  
-**Sprint 4 Status:** Week 4 deliverables complete; closure items pending
+**Sprint 4 Status:** CLOSED — All Gate 4 items complete
 
 ---
 
@@ -18,22 +18,22 @@
 
 ---
 
-## Remaining for Sprint 4 Closure
+## Gate 4 — Complete
 
-### Gate 4 (Required)
-
-| Item | Owner | Action |
+| Item | Owner | Status |
 |------|-------|--------|
 | Release notes | CTO | [OK] [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md) |
-| Beta onboarding review | CTO | Complete checklist in [SPRINT-4-GATE-4-CLOSURE.md](./SPRINT-4-GATE-4-CLOSURE.md) |
-| v0.6.0 tag pushed | CTO | Execute `git tag -a v0.6.0 ...` and `git push origin v0.6.0` |
+| Beta onboarding review | CTO | [OK] Checklist signed off in [SPRINT-4-GATE-4-CLOSURE.md](./SPRINT-4-GATE-4-CLOSURE.md) |
+| v0.6.0 tag pushed | CTO | [OK] Tag created and pushed to origin |
 
-### External (Prefer Before Beta Launch)
+---
+
+## External (Pre-Beta Launch)
 
 | Item | Owner | Action |
 |------|-------|--------|
-| Beta user list finalized | CEO / Product | Populate [BETA-USER-LIST.md](./BETA-USER-LIST.md) |
-| Staging deployment | DevOps | Deploy v0.6.0 to staging per [DEPLOYMENT-TO-STAGING.md](./DEPLOYMENT-TO-STAGING.md) |
+| Beta user list finalized | CEO / Product | Populate [BETA-USER-LIST.md](./BETA-USER-LIST.md) — template ready |
+| Staging deployment | DevOps | Deploy per [STAGING-DEPLOYMENT-RUNBOOK.md](./STAGING-DEPLOYMENT-RUNBOOK.md) |
 
 ---
 
@@ -55,11 +55,11 @@ Per [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md):
 
 ## Summary
 
-| Category | Remaining |
-|----------|-----------|
-| **Gate 4** | Beta onboarding review sign-off; tag push |
-| **External** | Beta user list; staging deployment |
-| **Sprint 4 scope** | All technical deliverables complete |
+| Category | Status |
+|----------|--------|
+| **Gate 4** | All complete |
+| **External** | Beta user list (template ready); staging deployment (runbook ready) |
+| **Sprint 4 scope** | CLOSED |
 
 ---
 
