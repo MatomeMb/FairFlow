@@ -15,7 +15,7 @@
 | **Promotional tile** | 440x280 (small), 920x680 (marquee) | [ ] Optional |
 | **Short description** | 132 chars max | [OK] store/description-short.txt |
 | **Full description** | Detailed | [OK] store/description-full.md |
-| **Privacy policy URL** | Hosted, publicly accessible | [ ] Host privacy-policy.html |
+| **Privacy policy URL** | Hosted, publicly accessible | [OK] demo/privacy-policy.html — use deployment URL |
 
 ---
 
@@ -59,6 +59,7 @@
 - [Chrome Web Store publishing](https://developer.chrome.com/docs/webstore/publish/)
 - [Manifest v3 migration](https://developer.chrome.com/docs/extensions/mv3/)
 - [store/](./packages/lens-extension/store/) — Description and privacy policy drafts
+- [SCREENSHOT-GUIDE.md](./SCREENSHOT-GUIDE.md) — Screenshot capture steps and dimensions
 
 ---
 

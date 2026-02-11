@@ -8,11 +8,11 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 | Area | Status | Notes |
 |------|--------|-------|
-| **Product** | **Sprint 5 IN PROGRESS** | Sprint 4 complete. Sprint 5: Landing page, Chrome Web Store assets, support workflow, demo polish. 88 tests passing. |
-| **Releases** | **v0.6.0** | shadow-index 0.6.0. Sprint 5 deliverables ready (landing, store assets, support). |
-| **Next** | **Beta launch** | First beta merchants; Chrome Web Store submission; soft beta start. |
+| **Product** | **Sprint 5 COMPLETE** | Landing, store assets, support, demo polish, Week 2 docs. 88 tests passing. |
+| **Releases** | **v0.6.2** | Sprint 5 closure. Privacy policy hosted; beta outreach/feedback templates; screenshot guide. |
+| **Next** | **Beta launch** | First beta merchants; Chrome Web Store submission (screenshots, deploy); soft beta start. |
 | **Risks** | **None** | 88/88 tests passing. |
-| **Stakeholder** | **CTO** | Sprint 5 Week 1 deliverables complete. |
+| **Stakeholder** | **CTO** | Sprint 5 complete. |
 
 **References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
@@ -26,9 +26,9 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **lens-extension** | **0.3.0** | MVP-13 cache, performance instrumentation, SHA-256 validation |
 | **matter-core** | **0.3.0** | Rust Compiler, matter CLI binary |
 
-**Release label:** `v0.6.0` (Sprint 4 complete — delivered Feb 11, 2026).
+**Release label:** `v0.6.2` (Sprint 5 complete — delivered Feb 2026).
 
-**Reproducing this state:** Use git tag `v0.6.0`. Run full demo: `npm run demo` (API + demo server). Landing: http://localhost:5177/. Demo: http://localhost:5177/index.html. Dashboard: http://localhost:3000/v1/analytics/dashboard.
+**Reproducing this state:** Use git tag `v0.6.2`. Run full demo: `npm run demo` (API + demo server). Landing: http://localhost:5177/. Demo: http://localhost:5177/index.html. Privacy: http://localhost:5177/privacy-policy.html. Dashboard: http://localhost:3000/v1/analytics/dashboard.
 
 ---
 
@@ -41,9 +41,9 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Sprint 2** | Feb 6 – Feb 19, 2026 | **Complete** | MVP-13 extension caching (IndexedDB), performance polish, validation; v0.5.0 |
 | **Sprint 3** | Feb 20 – Feb 9, 2026 | **Complete** | Analytics & Observability (MVP-14), API logging, reporting; v0.5.5 |
 | **Sprint 4** | Feb 10 – Mar 10, 2026 | **Complete** | Optimization & Scaling (Weeks 3–4 COMPLETE); v0.6.0 |
-| **Sprint 5** | Mar 20 – Apr 2, 2026 | **In Progress** | Beta launch prep: landing, store assets, support workflow |
+| **Sprint 5** | Mar 20 – Apr 2, 2026 | **Complete** | Beta launch prep: landing, store assets, support, Week 2 docs |
 
-**Next:** First beta merchants; Chrome Web Store submission. Sprint 5 Week 1 complete. See [SPRINT-5-PLAN.md](./SPRINT-5-PLAN.md), [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md), [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md).
+**Next:** First beta merchants; Chrome Web Store submission. See [SPRINT-5-CLOSURE.md](./SPRINT-5-CLOSURE.md), [SPRINT-5-PLAN.md](./SPRINT-5-PLAN.md), [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md), [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md).
 
 ---
 
@@ -86,4 +86,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 2026. Sprint 5 in progress. Landing, store assets, support workflow delivered. Next: Beta merchants, Chrome Web Store.*
+*Last updated: Feb 2026. Sprint 5 complete. Privacy policy hosted, beta templates, screenshot guide. Next: Beta merchants, Chrome Web Store.*

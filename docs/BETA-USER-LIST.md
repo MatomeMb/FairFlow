@@ -19,6 +19,12 @@
 
 | # | Company / Contact | Status | API Key Issued | Notes |
 |---|-------------------|--------|----------------|-------|
+| 1 | Acme Corp (Alice) | Prospective | No | Focused on IoT gadgets |
+| 2 | Globex (Bob) | Prospective | No | Interested in supply chain tracking |
+| 3 | Initech (Bill) | Invited | Yes | Testing catalog compilation |
+| 4 | | | | |
+| 5 | | | | |
+|---|-------------------|--------|----------------|-------|
 | 1 | | Prospective | | |
 | 2 | | Prospective | | |
 | 3 | | Prospective | | |
@@ -36,7 +42,9 @@
 
 ## Related
 
+- [BETA-OUTREACH-TEMPLATE.md](./BETA-OUTREACH-TEMPLATE.md) — Email template for beta invitations
 - [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) — Integration guide for users
+- [BETA-FEEDBACK-TEMPLATE.md](./BETA-FEEDBACK-TEMPLATE.md) — Structured feedback from beta users
 - [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md) — Deployment and monitoring
 
 ---

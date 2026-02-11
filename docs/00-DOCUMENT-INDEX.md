@@ -15,7 +15,7 @@
 
 This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
 
-**Current status (Feb 11, 2026):** Sprint 4 complete (v0.6.0). Production hardening (Week 4) delivered: load testing, security audit, operations manual, database roadmap, distributed architecture, and beta onboarding. 88/88 tests passing. Next: Beta launch. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+**Current status (Feb 11, 2026):** Sprint 5 complete (v0.6.2). Beta launch prep delivered: landing page, store assets, support workflow, demo polish, beta outreach/feedback templates, and 75% milestone review. 88/88 tests passing. Next: Beta launch. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -54,6 +54,13 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**Support Workflow**](./SUPPORT-WORKFLOW.md) | **Triage, templates, escalation for beta support** | ~2 |
 | — | [**Chrome Web Store Checklist**](./CHROME-WEB-STORE-CHECKLIST.md) | **Pre-submission checklist for Lens extension** | ~1 |
 | — | [**Install Lens**](./INSTALL-LENS.md) | **Build and load Lens extension (beta)** | ~1 |
+| — | [**Screenshot Guide**](./SCREENSHOT-GUIDE.md) | **Guide for capturing store assets** | ~1 |
+| — | [**Beta Outreach Template**](./BETA-OUTREACH-TEMPLATE.md) | **Templates for merchant outreach** | ~1 |
+| — | [**Beta Feedback Template**](./BETA-FEEDBACK-TEMPLATE.md) | **Structured feedback for beta users** | ~1 |
+| — | [**75% Milestone Review**](./75-PERCENT-MILESTONE-REVIEW.md) | **Stakeholder alignment document** | ~1 |
+| — | [**Sprint 5 Closure**](./SPRINT-5-CLOSURE.md) | **Sprint retrospective and closure** | ~1 |
+| — | [**Release Notes v0.6.1**](./RELEASE-NOTES-v0.6.1.md) | **Sprint 5 Week 1: landing, store assets, support** | ~2 |
+| — | [**Release Notes v0.6.2**](./RELEASE-NOTES-v0.6.2.md) | **Sprint 5 Week 2: stakeholder, outreach, feedback** | ~2 |
 | — | [**Operations Manual**](./OPERATIONS-MANUAL.md) | **Deployment, monitoring, troubleshooting, scheduled jobs** | ~4 |
 | — | [**Security Verification Report**](./SECURITY-VERIFICATION-REPORT.md) | **API auth, rate limiting, key revocation** | ~2 |
 | — | [**Database Migration Roadmap**](./DATABASE-MIGRATION-ROADMAP.md) | **JSONL → SQLite → PostgreSQL path** | ~3 |
