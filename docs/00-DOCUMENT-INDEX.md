@@ -50,6 +50,10 @@ This folder contains the complete project documentation for **.things that Matte
 | — | [**Sprint 4 Remaining**](./SPRINT-4-REMAINING.md) | **Outstanding Sprint 4 items: Gate 4, external, next steps** | ~1 |
 | — | [**Beta User List**](./BETA-USER-LIST.md) | **Template for beta user roster** | ~1 |
 | — | [**Staging Deployment Runbook**](./STAGING-DEPLOYMENT-RUNBOOK.md) | **Step-by-step staging deployment checklist** | ~1 |
+| — | [**Sprint 5 Plan**](./SPRINT-5-PLAN.md) | **Beta launch prep: landing, store assets, support** | ~1 |
+| — | [**Support Workflow**](./SUPPORT-WORKFLOW.md) | **Triage, templates, escalation for beta support** | ~2 |
+| — | [**Chrome Web Store Checklist**](./CHROME-WEB-STORE-CHECKLIST.md) | **Pre-submission checklist for Lens extension** | ~1 |
+| — | [**Install Lens**](./INSTALL-LENS.md) | **Build and load Lens extension (beta)** | ~1 |
 | — | [**Operations Manual**](./OPERATIONS-MANUAL.md) | **Deployment, monitoring, troubleshooting, scheduled jobs** | ~4 |
 | — | [**Security Verification Report**](./SECURITY-VERIFICATION-REPORT.md) | **API auth, rate limiting, key revocation** | ~2 |
 | — | [**Database Migration Roadmap**](./DATABASE-MIGRATION-ROADMAP.md) | **JSONL → SQLite → PostgreSQL path** | ~3 |
@@ -165,7 +169,7 @@ Day-specific completion reports and legacy summaries: [archive/README.md](./arch
 
 ## Next Steps
 
-1. Sprint 4 closure — see [SPRINT-4-REMAINING.md](./SPRINT-4-REMAINING.md) and [SPRINT-4-GATE-4-CLOSURE.md](./SPRINT-4-GATE-4-CLOSURE.md).
+1. Sprint 5 (beta launch prep) — see [SPRINT-5-PLAN.md](./SPRINT-5-PLAN.md), [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md), [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md).
 2. Beta user onboarding — see [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) and [BETA-USER-LIST.md](./BETA-USER-LIST.md).
 3. Production deployment and monitoring — see [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md) and [DEPLOYMENT-TO-STAGING.md](./DEPLOYMENT-TO-STAGING.md).
 4. Release notes — see [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md).

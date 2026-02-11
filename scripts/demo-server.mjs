@@ -52,7 +52,8 @@ server.listen(port, () => {
   console.log('');
   console.log('  .things that Matter - Demo');
   console.log('  --------------------------');
-  console.log(`  Home:           http://localhost:${port}/`);
+  console.log(`  Landing:        http://localhost:${port}/`);
+  console.log(`  Demo:          http://localhost:${port}/index.html`);
   console.log(`  Catalog Upload: http://localhost:${port}/catalog-upload.html`);
   console.log(`  Matter Demo:    http://localhost:${port}/matter-demo.html`);
   console.log('');

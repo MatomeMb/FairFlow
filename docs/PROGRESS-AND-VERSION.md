@@ -4,15 +4,15 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-## Current status (as of Feb 11, 2026)
+## Current status (as of Feb 2026)
 
 | Area | Status | Notes |
 |------|--------|-------|
-| **Product** | **Sprint 4 Week 4 COMPLETE** | Production hardening: load testing, security audit, operations manual, database roadmap, distributed architecture, beta onboarding. 88 tests passing (11 suites). |
-| **Releases** | **v0.6.0** | shadow-index 0.6.0; includes analytics, dashboard, retention, performance optimizations, security hardening. |
-| **Next** | **Beta launch** | Production deployment, beta user onboarding. |
-| **Risks** | **None** | 88/88 tests passing. All performance and security targets met. |
-| **Stakeholder** | **CTO** | Sprint 4 complete. Production hardening verified. |
+| **Product** | **Sprint 5 IN PROGRESS** | Sprint 4 complete. Sprint 5: Landing page, Chrome Web Store assets, support workflow, demo polish. 88 tests passing. |
+| **Releases** | **v0.6.0** | shadow-index 0.6.0. Sprint 5 deliverables ready (landing, store assets, support). |
+| **Next** | **Beta launch** | First beta merchants; Chrome Web Store submission; soft beta start. |
+| **Risks** | **None** | 88/88 tests passing. |
+| **Stakeholder** | **CTO** | Sprint 5 Week 1 deliverables complete. |
 
 **References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
@@ -28,7 +28,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 **Release label:** `v0.6.0` (Sprint 4 complete — delivered Feb 11, 2026).
 
-**Reproducing this state:** Use git tag `v0.6.0`. Run full demo: `npm run demo` (API + demo server). Or separately: `npm run start:api` and `npm run start:demo`. Demo: http://localhost:5177. Dashboard: http://localhost:3000/v1/analytics/dashboard.
+**Reproducing this state:** Use git tag `v0.6.0`. Run full demo: `npm run demo` (API + demo server). Landing: http://localhost:5177/. Demo: http://localhost:5177/index.html. Dashboard: http://localhost:3000/v1/analytics/dashboard.
 
 ---
 
@@ -41,8 +41,9 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Sprint 2** | Feb 6 – Feb 19, 2026 | **Complete** | MVP-13 extension caching (IndexedDB), performance polish, validation; v0.5.0 |
 | **Sprint 3** | Feb 20 – Feb 9, 2026 | **Complete** | Analytics & Observability (MVP-14), API logging, reporting; v0.5.5 |
 | **Sprint 4** | Feb 10 – Mar 10, 2026 | **Complete** | Optimization & Scaling (Weeks 3–4 COMPLETE); v0.6.0 |
+| **Sprint 5** | Mar 20 – Apr 2, 2026 | **In Progress** | Beta launch prep: landing, store assets, support workflow |
 
-**Next:** Beta readiness and production deployment. Sprint 4 Gate 4 closed; tag v0.6.0 pushed. External: [BETA-USER-LIST.md](./BETA-USER-LIST.md), [STAGING-DEPLOYMENT-RUNBOOK.md](./STAGING-DEPLOYMENT-RUNBOOK.md).
+**Next:** First beta merchants; Chrome Web Store submission. Sprint 5 Week 1 complete. See [SPRINT-5-PLAN.md](./SPRINT-5-PLAN.md), [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md), [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md).
 
 ---
 
@@ -53,7 +54,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Shadow Index API** | Done | Analysis reporting, Dashboard, Retention, Storage Monitor, Query Cache (T3.1), Pre-aggregation (T3.2), Stream I/O (T3.3) |
 | **Lens extension** | Done | MV3, matter:// intercept, overlay; XMP beacon (MVP-07); IndexedDB cache (MVP-13); Firefox compat + manifest_v2 |
 | **Platform test harness** | Done | JSON output (MVP-08); generate-report integration |
-| **Demo flow** | Done | Demo server; catalog-upload.html; matter-demo.html; E2E and manual validation |
+| **Demo flow** | Done | Landing page; demo server; catalog-upload.html; matter-demo.html; mobile-responsive; E2E validation |
 | **Tests** | Done | 88/88 Vitest (API, auth, batch, catalog, cache, aggregation, retention, storage, api-key-registry); Playwright (E2E) |
 | **Rust compiler** | Done | Compiler::compile(), matter CLI |
 | **P1** | Done | MVP-07–MVP-10 complete and tested |
@@ -85,4 +86,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 10, 2026. Sprint 4 Week 4 closed (v0.6.0); production hardening complete. Next: Beta readiness.*
+*Last updated: Feb 2026. Sprint 5 in progress. Landing, store assets, support workflow delivered. Next: Beta merchants, Chrome Web Store.*

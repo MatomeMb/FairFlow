@@ -161,6 +161,7 @@ curl "https://your-api/v1/analytics/report?from=2026-02-01&to=2026-02-28&groupBy
 - **Documentation:** [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md)
 - **Security:** [SECURITY-VERIFICATION-REPORT.md](./SECURITY-VERIFICATION-REPORT.md)
 - **API:** Health check at `GET /health`
+- **Triage and templates:** [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md)
 - **Contact:** Request API keys and report issues via your designated beta coordinator or team contact.
 
 ---
