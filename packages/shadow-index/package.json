@@ -1,6 +1,6 @@
 {
   "name": "@thingsthatmatter/shadow-index",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Shadow Index API - Fast hash-to-artifact resolution service",
   "type": "module",
   "main": "dist/index.js",
@@ -10,6 +10,8 @@
     "start": "node run-with-env.mjs",
     "test": "vitest",
     "verify-r2": "node scripts/verify-r2.mjs",
+    "pre-aggregate": "npm run build && node scripts/run-pre-aggregation.mjs",
+    "load-test": "node scripts/sustained-load-test.mjs",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
     "format": "prettier --write \"**/*.{ts,json,md}\""

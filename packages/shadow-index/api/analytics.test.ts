@@ -1,13 +1,9 @@
-import { describe, it, expect, vi } from 'vitest';
-import app from './index';
-import { promises as fs } from 'node:fs';
+/**
+ * MVP-14: Analytics event ingestion tests
+ * POST /v1/analytics/event — view and click events
+ */
 
-vi.mock('node:fs', () => ({
-  promises: {
-    appendFile: vi.fn().mockResolvedValue(undefined),
-    mkdir: vi.fn().mockResolvedValue(undefined),
-  }
-}));
+import app from './index';
 
 const BASE = 'http://localhost';
 
@@ -15,77 +11,67 @@ async function request(path: string, init?: RequestInit): Promise<Response> {
   return app.request(new Request(`${BASE}${path}`, init));
 }
 
-describe('POST /v1/analytics/event', () => {
-  it('should accept a valid view event', async () => {
-    const payload = {
-      event: 'view',
-      hash: 'abc1234567890123456789012345678901234567890123456789012345678901',
-      timestamp: new Date().toISOString(),
-      source_url: 'https://example.com/item'
-    };
+type ErrorResponse = { code?: string; message?: string; details?: unknown; [k: string]: unknown };
 
+describe('POST /v1/analytics/event (MVP-14)', () => {
+  const validHash = 'bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96';
+
+  it('valid view event → 201', async () => {
     const res = await request('/v1/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        event: 'view',
+        hash: validHash,
+        source_url: 'https://example.com/catalog',
+      }),
     });
-
     expect(res.status).toBe(201);
-    expect(await res.json()).toEqual({ ok: true });
-    expect(fs.appendFile).toHaveBeenCalled();
+    const body = (await res.json()) as { ok?: boolean };
+    expect(body.ok).toBe(true);
   });
 
-  it('should accept a valid click event', async () => {
-    const payload = {
-      event: 'click',
-      hash: 'abc1234567890123456789012345678901234567890123456789012345678901',
-      timestamp: new Date().toISOString(),
-      source_url: 'https://example.com/item',
-      target_action: 'checkout_initiated'
-    };
-
+  it('valid click event → 201', async () => {
     const res = await request('/v1/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        event: 'click',
+        hash: validHash,
+        source_url: 'https://example.com/catalog',
+        target_action: 'checkout_initiated',
+      }),
     });
-
     expect(res.status).toBe(201);
-    expect(await res.json()).toEqual({ ok: true });
-    expect(fs.appendFile).toHaveBeenCalled();
+    const body = (await res.json()) as { ok?: boolean };
+    expect(body.ok).toBe(true);
   });
 
-  it('should reject an invalid event type', async () => {
-    const payload = {
-      event: 'hover', // Invalid type
-      hash: 'abc1234567890123456789012345678901234567890123456789012345678901',
-      timestamp: new Date().toISOString(),
-      source_url: 'https://example.com/item'
-    };
-
+  it('invalid event type → 400', async () => {
     const res = await request('/v1/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        event: 'invalid',
+        hash: validHash,
+        source_url: 'https://example.com/catalog',
+      }),
     });
-
     expect(res.status).toBe(400);
+    const body = (await res.json()) as ErrorResponse;
+    expect(body.code).toBe('invalid_event');
   });
 
-  it('should reject an invalid hash length', async () => {
-    const payload = {
-      event: 'view',
-      hash: 'too-short',
-      timestamp: new Date().toISOString(),
-      source_url: 'https://example.com/item'
-    };
-
+  it('invalid hash (wrong length) → 400', async () => {
     const res = await request('/v1/analytics/event', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(payload),
+      body: JSON.stringify({
+        event: 'view',
+        hash: 'short',
+        source_url: 'https://example.com/catalog',
+      }),
     });
-
     expect(res.status).toBe(400);
   });
 });

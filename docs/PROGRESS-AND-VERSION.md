@@ -4,15 +4,15 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-## Current status (as of Feb 19, 2026)
+## Current status (as of Feb 11, 2026)
 
 | Area | Status | Notes |
 |------|--------|-------|
-| **Product** | **Sprint 2 COMPLETE** | MVP-13 IndexedDB cache integrated, validated across browsers. Performance logging and SHA-256 validation added. |
-| **Releases** | **v0.3.0 / v0.5.0** | lens-extension 0.3.0; shadow-index 0.5.0; matter-core 0.3.0. |
-| **Next** | **Sprint 3** | Feb 20 – Mar 5, 2026. Stability, UX polish, and further protocol enhancements. |
-| **Risks** | **None** | 45/45 Lens tests passing. 15/17 Core tests passing (2 expected ignores). |
-| **Stakeholder** | **CEO** | Sprint 2 Review and Release complete. |
+| **Product** | **Sprint 4 Week 4 COMPLETE** | Production hardening: load testing, security audit, operations manual, database roadmap, distributed architecture, beta onboarding. 88 tests passing (11 suites). |
+| **Releases** | **v0.6.0** | shadow-index 0.6.0; includes analytics, dashboard, retention, performance optimizations, security hardening. |
+| **Next** | **Beta launch** | Production deployment, beta user onboarding. |
+| **Risks** | **None** | 88/88 tests passing. All performance and security targets met. |
+| **Stakeholder** | **CTO** | Sprint 4 complete. Production hardening verified. |
 
 **References:** Day-level work and estimates → [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline and milestones → [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
@@ -22,13 +22,13 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 | Package | Version | Notes |
 |---------|---------|--------|
-| **shadow-index** | **0.5.0** | R2 storage, catalog import, bug fixes & polish |
+| **shadow-index** | **0.6.0** | Performance optimizations (caching, pre-aggregation, streaming I/O), retention policy, storage monitoring |
 | **lens-extension** | **0.3.0** | MVP-13 cache, performance instrumentation, SHA-256 validation |
 | **matter-core** | **0.3.0** | Rust Compiler, matter CLI binary |
 
-**Release label:** `v0.5.0` (Sprint 2 complete — delivered Feb 19, 2026). lens v0.3.0.
+**Release label:** `v0.6.0` (Sprint 4 complete — delivered Feb 11, 2026).
 
-**Reproducing this state:** Use git tag `v0.5.0`. Run API: `cd packages/shadow-index && npm run start`. Demo: `node scripts/demo-server.mjs 5178` then open http://localhost:5178/catalog-upload.html.
+**Reproducing this state:** Use git tag `v0.6.0`. Run full demo: `npm run demo` (API + demo server). Or separately: `npm run start:api` and `npm run start:demo`. Demo: http://localhost:5177. Dashboard: http://localhost:3000/v1/analytics/dashboard.
 
 ---
 
@@ -39,9 +39,10 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **Sprint 0** | By Jan 19, 2026 | **Complete** | Setup and architecture |
 | **Sprint 1** | Jan 20 – Feb 5, 2026 | **Complete** | Full MVP: compile → resolve → display; v0.4.0 |
 | **Sprint 2** | Feb 6 – Feb 19, 2026 | **Complete** | MVP-13 extension caching (IndexedDB), performance polish, validation; v0.5.0 |
-| **Sprint 3** | Feb 20 – Mar 5, 2026 | **Next** | Analytics & Observability (MVP-14), API logging, reporting; v0.6.0 |
+| **Sprint 3** | Feb 20 – Feb 9, 2026 | **Complete** | Analytics & Observability (MVP-14), API logging, reporting; v0.5.5 |
+| **Sprint 4** | Feb 10 – Mar 10, 2026 | **Complete** | Optimization & Scaling (Weeks 3–4 COMPLETE); v0.6.0 |
 
-**Next:** Sprint 3 Kickoff. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md).
+**Next:** Beta readiness and production deployment. Closure items: [SPRINT-4-REMAINING.md](./SPRINT-4-REMAINING.md).
 
 ---
 
@@ -49,14 +50,16 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 | Area | State | Notes |
 |------|--------|------|
-| **Shadow Index API** | Done | Compile, resolve, health, thing, gist; CORS; auth (MVP-09); rate limit; error shape (MVP-10); batch (MVP-11); catalog import (MVP-12) |
+| **Shadow Index API** | Done | Analysis reporting, Dashboard, Retention, Storage Monitor, Query Cache (T3.1), Pre-aggregation (T3.2), Stream I/O (T3.3) |
 | **Lens extension** | Done | MV3, matter:// intercept, overlay; XMP beacon (MVP-07); IndexedDB cache (MVP-13); Firefox compat + manifest_v2 |
 | **Platform test harness** | Done | JSON output (MVP-08); generate-report integration |
 | **Demo flow** | Done | Demo server; catalog-upload.html; matter-demo.html; E2E and manual validation |
-| **Tests** | Done | Vitest (API, auth, batch, catalog); Playwright (E2E); cargo test (steg) |
+| **Tests** | Done | 88/88 Vitest (API, auth, batch, catalog, cache, aggregation, retention, storage, api-key-registry); Playwright (E2E) |
 | **Rust compiler** | Done | Compiler::compile(), matter CLI |
 | **P1** | Done | MVP-07–MVP-10 complete and tested |
 | **P2 (batch/catalog)** | Done | MVP-11, MVP-12; catalog-upload demo delivered |
+| **P3 (analytics)** | Done | MVP-14 complete (Sprint 3); reporting engine and dashboard delivered |
+| **P4 (optimization)** | Done | Week 3–4 complete; p95 < 250ms; hit rate > 60%; security hardening; production docs |
 
 ---
 
@@ -71,7 +74,7 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 | **MVP-11** | Batch compilation | Done |
 | **MVP-12** | Merchant catalog import | Done |
 
-**Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md). **Planned next:** MVP-14 (Sprint 3 Analytics).
+**Backlog reference:** [10-MVP-BACKLOG.md](./10-MVP-BACKLOG.md).
 
 ---
 
@@ -82,4 +85,4 @@ Single source of truth for **code version**, **sprint state**, and **next sprint
 
 ---
 
-*Last updated: Feb 19, 2026. Sprint 2 closed (v0.5.0); MVP-13 cache complete. Next: Sprint 3 Kickoff (Analytics & Observability).*
+*Last updated: Feb 10, 2026. Sprint 4 Week 4 closed (v0.6.0); production hardening complete. Next: Beta readiness.*

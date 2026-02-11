@@ -1,10 +1,10 @@
 # shadow-index
 
-Shadow Index API - Fast hash-to-artifact resolution service.
+Shadow Index API — Fast hash-to-artifact resolution service for **.things that Matter**.
 
 ## Status
 
-**Version:** 0.4.0 (Sprint 1 complete, Feb 5, 2026)
+**Version:** 0.6.0 (Sprint 4 complete, Feb 2026)
 
 **Delivered:**
 - Product compilation (`POST /compile`)
@@ -16,8 +16,12 @@ Shadow Index API - Fast hash-to-artifact resolution service.
 - API key auth (MVP-09)
 - Rate limiting (MVP-09)
 - Error handling with consistent shape (MVP-10)
+- Analytics reporting (MVP-14)
+- Dashboard, retention, pre-aggregation, query cache
 
-**Sprint 2 (Feb 6–19):** Extension caching (MVP-13) — no API changes required. API remains stable.
+**Next:** Beta launch.
+
+**Architecture:** Layered design, SOLID principles, and design patterns documented in [docs/ARCHITECTURE.md](./docs/ARCHITECTURE.md).
 
 ## Overview
 

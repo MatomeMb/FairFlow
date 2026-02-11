@@ -14,31 +14,38 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
+import { getReport, validateDateRange } from '../lib/analytics-report.js';
+import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
+import { getCached, setCached, invalidateCache, buildCacheKey } from '../lib/query-cache.js';
+import { logError } from '../lib/error-logger.js';
+import { dashboardHandler } from './dashboard.js';
+import { RetentionPolicy } from '../lib/retention-policy.js';
+import { isApiKeyValid } from '../lib/api-key-registry.js';
 
 const app = new Hono();
 
 // Allow extension/page on different origin (e.g. localhost:5177) to call API
 app.use('*', cors());
 
-/** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Read at request time for testability. */
+/** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
-  const apiKey = process.env.SHADOW_INDEX_API_KEY;
-  if (!apiKey) {
+  const hasKeys = process.env.SHADOW_INDEX_API_KEY || process.env.SHADOW_INDEX_API_KEYS;
+  if (!hasKeys) {
     return next();
   }
   const headerKey = c.req.header('x-api-key');
   const auth = c.req.header('Authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
   const key = headerKey ?? bearer;
-  if (key !== apiKey) {
+  if (!isApiKeyValid(key)) {
     return c.json(err('unauthorized', 'Invalid or missing API key'), 401);
   }
   return next();
 });
 
-/** Simple in-memory rate limit (MVP-09): 100 req/min per IP (or per key when key is set). */
-const RATE_LIMIT_WINDOW_MS = 60_000;
-const RATE_LIMIT_MAX = 100;
+/** Rate limit (MVP-09). Configurable via RATE_LIMIT_WINDOW_MS, RATE_LIMIT_MAX. Default 100 req/min per IP. */
+const RATE_LIMIT_WINDOW_MS = parseInt(process.env.RATE_LIMIT_WINDOW_MS ?? '60000', 10) || 60_000;
+const RATE_LIMIT_MAX = parseInt(process.env.RATE_LIMIT_MAX ?? '100', 10) || 100;
 const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
 function getClientId(c: { req: { header: (n: string) => string | undefined } }): string {
   const forwarded = c.req.header('x-forwarded-for');
@@ -67,6 +74,11 @@ const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
 const indexFile = path.join(dataRoot, 'index.json');
 
+/** Events dir: override via ANALYTICS_EVENTS_DIR for tests */
+function getEventsDir(): string {
+  return process.env.ANALYTICS_EVENTS_DIR || path.join(dataRoot, 'events');
+}
+
 const storageMode = process.env.STORAGE_MODE || 'local';
 const useR2 = storageMode === 'r2' && isR2Configured();
 
@@ -84,16 +96,16 @@ type ProductInput = z.infer<typeof productSchema>;
 
 const viewEventSchema = z.object({
   event: z.literal('view'),
-  hash: z.string().length(64),
-  timestamp: z.string().datetime(),
+  hash: z.string().regex(/^[a-f0-9]{64}$/),
+  timestamp: z.string().datetime().optional(),
   source_url: z.string().url(),
   anon_id: z.string().optional(),
 });
 
 const clickEventSchema = z.object({
   event: z.literal('click'),
-  hash: z.string().length(64),
-  timestamp: z.string().datetime(),
+  hash: z.string().regex(/^[a-f0-9]{64}$/),
+  timestamp: z.string().datetime().optional(),
   source_url: z.string().url(),
   target_action: z.enum(['checkout_initiated', 'image_expanded', 'external_link']),
   anon_id: z.string().optional(),
@@ -277,7 +289,13 @@ async function compileAndPersistProduct(product: ProductInput): Promise<{
 
 // Health check endpoint
 app.get('/health', (c) => {
-  return c.json({ status: 'ok', service: 'shadow-index', timestamp: new Date().toISOString() });
+  return c.json({
+    status: 'ok',
+    service: 'shadow-index',
+    company: '.things that Matter',
+    version: '0.6.0',
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // Compile endpoint - transforms product data into .thing file (uses shared compileAndPersistProduct)
@@ -476,22 +494,143 @@ app.post('/v1/analytics/event', async (c) => {
 
   const parsed = analyticsEventSchema.safeParse(body);
   if (!parsed.success) {
-    return c.json(err('invalid_analytics', 'Invalid event payload', parsed.error.flatten()), 400);
+    return c.json(err('invalid_event', 'Invalid event payload', parsed.error.flatten()), 400);
   }
 
-  const event = parsed.data;
+  const event = {
+    ...parsed.data,
+    timestamp: parsed.data.timestamp ?? new Date().toISOString(),
+  };
   const date = new Date().toISOString().split('T')[0];
-  const eventsDir = path.join(dataRoot, 'events');
+  const eventsDir = getEventsDir();
   const logFile = path.join(eventsDir, `${date}.jsonl`);
 
   try {
     await fs.mkdir(eventsDir, { recursive: true });
     await fs.appendFile(logFile, JSON.stringify(event) + '\n', 'utf8');
+    invalidateCache();
     return c.json({ ok: true }, 201);
   } catch (error) {
     console.error(`[Analytics Error] ${error}`);
     return c.json(err('storage_error', 'Failed to persist analytics event'), 500);
   }
+});
+
+/** MVP-14: Report query params */
+const ReportQuerySchema = z.object({
+  from: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  to: z.string().regex(/^\d{4}-\d{2}-\d{2}$/),
+  groupBy: z.enum(['day', 'hash', 'both']).optional().default('day'),
+  sortBy: z.enum(['date', 'views', 'clicks']).optional().default('date'),
+  limit: z.coerce.number().int().min(1).max(1000).optional().default(100),
+  offset: z.coerce.number().int().min(0).optional().default(0),
+});
+
+// MVP-14: Analytics report (GET /v1/analytics/report)
+app.get('/v1/analytics/report', async (c) => {
+  const raw = Object.fromEntries(c.req.url ? new URL(c.req.url).searchParams : []);
+  const parsed = ReportQuerySchema.safeParse(raw);
+  if (!parsed.success) {
+    return c.json(
+      err('invalid_params', 'Invalid query parameters', parsed.error.flatten()),
+      400
+    );
+  }
+  const { from, to, groupBy, sortBy, limit, offset } = parsed.data;
+  const rangeErr = validateDateRange(from, to);
+  if (rangeErr) {
+    return c.json(
+      err('invalid_params', rangeErr === 'from > to' ? 'from must be ≤ to' : rangeErr),
+      400
+    );
+  }
+  const params = { from, to, groupBy, sortBy, limit, offset };
+  const cacheKey = buildCacheKey({ from, to, groupBy, sortBy, limit, offset });
+
+  startQuery();
+  const t0 = performance.now();
+  try {
+    let result = getCached(cacheKey);
+    if (result) {
+      const durationMs = Math.round(performance.now() - t0);
+      recordQuery(params, durationMs, result.rows.length);
+      endQuery();
+      return c.json(result, 200);
+    }
+
+    result = await getReport(getEventsDir(), from, to, groupBy, sortBy, limit, offset);
+    const durationMs = Math.round(performance.now() - t0);
+    const resultCount = result.ok ? result.rows.length : 0;
+    if (!result.ok) {
+      logError(params, result.error ?? 'Invalid parameters');
+      recordQuery(params, durationMs, 0, result.error ?? '');
+      endQuery();
+      return c.json(err('invalid_params', result.error ?? 'Invalid parameters'), 400);
+    }
+    setCached(cacheKey, result);
+    recordQuery(params, durationMs, resultCount);
+    endQuery();
+    return c.json(result, 200);
+  } catch (e) {
+    const durationMs = Math.round(performance.now() - t0);
+    const message = e instanceof Error ? e.message : String(e);
+    const stack = e instanceof Error ? e.stack : undefined;
+    logError(params, message, stack);
+    recordQuery(params, durationMs, 0, message);
+    endQuery();
+    return c.json(err('report_failed', message), 500);
+  }
+});
+
+// Sprint 4: Analytics dashboard (GET /v1/analytics/dashboard)
+const STORAGE_QUOTA_BYTES = parseInt(process.env.STORAGE_QUOTA_BYTES ?? String(5 * 1024 * 1024 * 1024), 10) || 5 * 1024 * 1024 * 1024;
+app.get('/v1/analytics/dashboard', (c) => dashboardHandler(c, {
+  eventsDir: getEventsDir(),
+  dataRoot,
+  quotaBytes: STORAGE_QUOTA_BYTES,
+}));
+
+// Sprint 4 Week 2: Retention policy — manual trigger (POST /v1/admin/retention/run)
+app.post('/v1/admin/retention/run', async (c) => {
+  const eventsDir = getEventsDir();
+  const archiveDir = path.join(dataRoot, 'archive');
+  const retentionDays = parseInt(process.env.RETENTION_DAYS ?? '90', 10) || 90;
+
+  const policy = new RetentionPolicy({
+    eventsDir,
+    archiveDir,
+    retentionDays,
+  });
+
+  try {
+    const result = await policy.execute();
+    const accept = c.req.header('Accept') ?? '';
+    const isForm = c.req.header('Content-Type')?.includes('application/x-www-form-urlencoded');
+
+    if (accept.includes('text/html') || isForm) {
+      return c.redirect(`/v1/analytics/dashboard?retention_processed=${result.processed}&retention_archived=${result.archived}`);
+    }
+    return c.json({
+      ok: true,
+      processed: result.processed,
+      archived: result.archived,
+      errors: result.errors,
+    }, 200);
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    return c.json(err('retention_failed', message), 500);
+  }
+});
+
+// Sprint 4 Week 3: Cache invalidation (POST /v1/admin/cache/clear)
+app.post('/v1/admin/cache/clear', (c) => {
+  invalidateCache();
+  const accept = c.req.header('Accept') ?? '';
+  const isForm = c.req.header('Content-Type')?.includes('application/x-www-form-urlencoded');
+  if (accept.includes('text/html') || isForm) {
+    return c.redirect('/v1/analytics/dashboard?cache_cleared=1');
+  }
+  return c.json({ ok: true, message: 'Cache cleared' }, 200);
 });
 
 // Serve .thing payloads for MVP (from R2 or local)
@@ -524,9 +663,14 @@ app.get('/thing/:hash', async (c) => {
 // Development server - skip when NODE_ENV=test so tests can import app without starting server
 const port = Number(process.env.PORT) || 3000;
 if (process.env.NODE_ENV !== 'test') {
-  console.log(`🚀 Shadow Index API starting on http://localhost:${port}`);
-  console.log(`📡 Health check: http://localhost:${port}/health`);
-  if (useR2) console.log('📦 R2 storage enabled');
+  console.log('');
+  console.log('  .things that Matter - Shadow Index API');
+  console.log('  ---------------------------------------');
+  console.log(`  API:       http://localhost:${port}`);
+  console.log(`  Health:    http://localhost:${port}/health`);
+  console.log(`  Dashboard: http://localhost:${port}/v1/analytics/dashboard`);
+  if (useR2) console.log('  Storage:   R2 enabled');
+  console.log('');
   serve({
     fetch: app.fetch,
     port,

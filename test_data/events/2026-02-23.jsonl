@@ -1,0 +1,5 @@
+{"event":"view","hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","timestamp":"2026-02-23T08:00:00.000Z","source_url":"https://example.com/1"}
+{"event":"click","hash":"aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa","timestamp":"2026-02-23T08:01:00.000Z","source_url":"https://example.com/1","target_action":"checkout_initiated"}
+{"event":"view","hash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","timestamp":"2026-02-23T14:00:00.000Z","source_url":"https://example.com/1"}
+{"event":"view","hash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","timestamp":"2026-02-23T14:01:00.000Z","source_url":"https://example.com/2"}
+{"event":"click","hash":"cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc","timestamp":"2026-02-23T14:02:00.000Z","source_url":"https://example.com/1","target_action":"checkout_initiated"}

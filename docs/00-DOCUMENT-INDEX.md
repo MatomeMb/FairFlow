@@ -15,7 +15,7 @@
 
 This folder contains the complete project documentation for **.things that Matter**, a company building infrastructure for **Object-Oriented Commerce** — portable, viral product distribution via `matter://` URIs and a browser extension.
 
-**Current status (Feb 19, 2026):** Sprint 2 complete (v0.5.0). MVP-13 IndexedDB cache integrated, performance instrumentation added, and 45/45 tests passing. Next: Sprint 3 Kickoff. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
+**Current status (Feb 11, 2026):** Sprint 4 complete (v0.6.0). Production hardening (Week 4) delivered: load testing, security audit, operations manual, database roadmap, distributed architecture, and beta onboarding. 88/88 tests passing. Next: Beta launch. Day-by-day work: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md). Timeline: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md).
 
 ---
 
@@ -42,20 +42,21 @@ This folder contains the complete project documentation for **.things that Matte
 | 11 | [Sprint 1 Plan](./11-SPRINT-1-PLAN.md) | Sprint 1 goal, backlog, and DoD | ~3 |
 | 12 | [Sprint 2 Plan](./12-SPRINT-2-PLAN.md) | Sprint 2 (P1) goal, backlog, and DoD | ~2 |
 | — | [**CTO Next Steps (Sprint 1 closeout)**](./CTO-NEXT-STEPS-SPRINT-1-CLOSEOUT.md) | Post–Sprint 1 actions and Sprint 2 readiness | ~2 |
-| — | [**Sprint 2 Retrospective**](./SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 (MVP-13) goal, results, lessons, and v0.5.0 release | ~3 |
-| — | [**MVP-14 Event Spec**](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | **Conversion tracking: event schema and JSONL storage decision (Sprint 3)** | ~3 |
-| — | [**Analytics Reporting Engine Spec**](./ANALYTICS-REPORTING-ENGINE-SPEC.md) | **MVP-14 Phase 2: GET /v1/analytics/report, aggregation engine, groupBy/sortBy/pagination** | ~10 |
-| — | [**Analytics Reporting Implementation Brief**](./ANALYTICS-REPORTING-IMPL-BRIEF.md) | **MVP-14 phases 1–4 execution plan: tasks, timeline, sign-off checklist** | ~5 |
-| — | [**Analytics Reporting Phase 1 Implementation Prompt**](./ANALYTICS-REPORTING-PHASE1-IMPL-PROMPT.md) | **Ready-to-code guide: fixtures, starter template, 60+ test stubs, hints, debugging** | ~15 |
-| — | [**Analytics Reporting Complete Summary**](./ANALYTICS-REPORTING-COMPLETE-SUMMARY.md) | **Navigation hub: quick start (8 steps), roadmap, acceptance criteria, test data facts** | ~6 |
-| — | [**Analytics Phase 1 CTO Handoff**](./ANALYTICS-PHASE1-CTO-HANDOFF.md) | **Phase 1 directive: core aggregation logic implementation (5 days, ready-to-code)** | ~8 |
-| — | [**Analytics Phase 2 CTO Handoff**](./ANALYTICS-PHASE2-CTO-HANDOFF.md) | **Phase 2 directive: HTTP API route implementation (3–4 days, integration testing)** | ~8 |
-| — | [**Analytics Phase 3 CTO Handoff**](./ANALYTICS-PHASE3-CTO-HANDOFF.md) | **Phase 3 directive: performance verification & load testing (2–3 days, benchmarking)** | ~8 |
-| — | [**Analytics Performance Baseline**](./ANALYTICS-PERFORMANCE-BASELINE.md) | **Performance measurements: 90-day range < 500ms, memory < 500MB, load tests passing** | ~2 |
-| — | [**Analytics Production Readiness**](./ANALYTICS-PRODUCTION-READINESS.md) | **Final sign-off checklist: phases 1–3 complete, production ready, deployment notes** | ~2 |
-| — | [**Analytics Final Release v0.6.0**](./ANALYTICS-FINAL-RELEASE-v0.6.0.md) | **Release handoff: git workflow, tag creation, merge to main, next steps (staging/beta)** | ~4 |
 | 13 | [Sprint 3 Plan](./13-SPRINT-3-PLAN.md) | Sprint 3 (R2 + Rust compiler) goal, backlog, DoD | ~2 |
 | 14 | [**Sprint 4 Plan**](./14-SPRINT-4-PLAN.md) | **Sprint 4 (bulk ingestion): POST /batch, POST /catalog/import, optional merchant dashboard** | ~6 |
+| — | [**Sprint 4 Week 4 Summary**](./SPRINT-4-WEEK-4-SUMMARY.md) | **Production hardening: load testing, security, operations manual, database roadmap, distributed architecture, beta onboarding** | ~3 |
+| — | [**Release Notes v0.6.0**](./RELEASE-NOTES-v0.6.0.md) | **Sprint 4 release: features, packages, documentation** | ~2 |
+| — | [**Sprint 4 Gate 4 Closure**](./SPRINT-4-GATE-4-CLOSURE.md) | **Gate 4 checklist, beta onboarding review, tag commands** | ~1 |
+| — | [**Sprint 4 Remaining**](./SPRINT-4-REMAINING.md) | **Outstanding Sprint 4 items: Gate 4, external, next steps** | ~1 |
+| — | [**Beta User List**](./BETA-USER-LIST.md) | **Template for beta user roster** | ~1 |
+| — | [**Operations Manual**](./OPERATIONS-MANUAL.md) | **Deployment, monitoring, troubleshooting, scheduled jobs** | ~4 |
+| — | [**Security Verification Report**](./SECURITY-VERIFICATION-REPORT.md) | **API auth, rate limiting, key revocation** | ~2 |
+| — | [**Database Migration Roadmap**](./DATABASE-MIGRATION-ROADMAP.md) | **JSONL → SQLite → PostgreSQL path** | ~3 |
+| — | [**Distributed Deployment Architecture**](./DISTRIBUTED-DEPLOYMENT-ARCHITECTURE.md) | **Multi-instance deployment** | ~2 |
+| — | [**Beta User Onboarding**](./BETA-USER-ONBOARDING.md) | **Beta merchant integration guide** | ~2 |
+| — | [**Optional Tasks Status**](./OPTIONAL-TASKS-STATUS.md) | **Sprint 4 optional items: catalog upload, cache clear, load test, cache stats** | ~1 |
+| — | [**MVP Final Touch-Ups**](./MVP-FINAL-TOUCHUPS.md) | **Professional prototype: branding, BEM, no emojis, ASD architecture** | ~2 |
+| — | [**Sprint 4 Execution Directive**](../SPRINT-4-EXECUTION-DIRECTIVE.md) | Sprint 4 completion summary; production hardening deliverables; configuration reference | ~3 |
 | 15 | [**Delivery Timeline (Feb–May 2026)**](./15-DELIVERY-TIMELINE.md) | **8-sprint timeline: current status, actuals (S1–4), realistic S5–8, milestones** | ~8 |
 | 16 | [**Weekly Work Plan**](./16-WEEKLY-WORK-PLAN.md) | **Day-by-day work for each week; realistic hour estimates; Sprints 5–8 daily tasks** | ~10 |
 | 17 | [**MVP-13 Acceptance & Schema**](./17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | **Extension caching: acceptance criteria and IndexedDB schema (Sprint 2)** | ~4 |
@@ -156,15 +157,18 @@ Day-specific completion reports and legacy summaries: [archive/README.md](./arch
 | 1.0 | Jan 21, 2026 | M. Mboweni | Initial creation |
 | 1.1 | Mar 2026 | M. Mboweni | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
 | 1.2 | Mar 2026 | M. Mboweni | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
-| 1.3 | Feb 8, 2026 | M. Mboweni | Primary docs structure; archive index; emoji removal; Sprint 2 status; Friday sprint prep |
+| 1.3 | Feb 8, 2026 | M. Mboweni | Primary docs structure; archive index; Sprint 2 status; Friday sprint prep |
+| 1.4 | Feb 11, 2026 | M. Mboweni | Sprint 4 Week 4 complete; production hardening docs indexed |
 
 ---
 
 ## Next Steps
 
-1. Friday Feb 13 cross-browser sprint — see [FRIDAY-EXECUTION-GUIDE.md](./FRIDAY-EXECUTION-GUIDE.md).
-2. Sprint 2 release v0.3.0 (lens-extension) — Feb 19 target.
-3. Align budget and roadmap with revised milestone dates (Phase 1 to Dec 2026).
+1. Sprint 4 closure — see [SPRINT-4-REMAINING.md](./SPRINT-4-REMAINING.md) and [SPRINT-4-GATE-4-CLOSURE.md](./SPRINT-4-GATE-4-CLOSURE.md).
+2. Beta user onboarding — see [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) and [BETA-USER-LIST.md](./BETA-USER-LIST.md).
+3. Production deployment and monitoring — see [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md) and [DEPLOYMENT-TO-STAGING.md](./DEPLOYMENT-TO-STAGING.md).
+4. Release notes — see [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md).
+5. Database migration planning — see [DATABASE-MIGRATION-ROADMAP.md](./DATABASE-MIGRATION-ROADMAP.md).
 
 ---
 

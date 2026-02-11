@@ -19,6 +19,7 @@ const mime = {
   '.js': 'application/javascript',
   '.json': 'application/json',
   '.ico': 'image/x-icon',
+  '.svg': 'image/svg+xml',
 };
 
 const server = http.createServer((req, res) => {
@@ -48,7 +49,11 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(port, () => {
-  console.log(`Demo server: http://localhost:${port}`);
-  console.log(`  catalog-upload: http://localhost:${port}/catalog-upload.html`);
-  console.log(`  matter-demo:    http://localhost:${port}/matter-demo.html`);
+  console.log('');
+  console.log('  .things that Matter - Demo');
+  console.log('  --------------------------');
+  console.log(`  Home:           http://localhost:${port}/`);
+  console.log(`  Catalog Upload: http://localhost:${port}/catalog-upload.html`);
+  console.log(`  Matter Demo:    http://localhost:${port}/matter-demo.html`);
+  console.log('');
 });

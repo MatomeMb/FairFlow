@@ -3,7 +3,6 @@
  * Uses app.request() so no server required; all tests run in-process.
  */
 
-import { describe, it, expect, beforeAll, afterAll } from 'vitest';
 import app from './index';
 
 const BASE = 'http://localhost';
