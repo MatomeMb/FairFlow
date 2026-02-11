@@ -75,48 +75,31 @@ Every product processed by our compiler exists simultaneously as:
 
 ---
 
-## Current Sprint (Sprint 2: Feb 6–19, 2026)
+## Current Status (Sprint 6: Feb 12–26, 2026)
 
-**Goal:** MVP-13 Extension Caching — IndexedDB cache, overlay performance, cross-browser validation  
-**Capacity:** 10 working days × 5 hours = 50 hours  
-**Target Version:** lens-extension v0.3.0
+**Version:** v0.6.3 (Chrome Web Store submission ready)  
+**Status:** All blockers cleared, ready for Chrome Web Store submission
 
-### Daily Breakdown (5-Hour Work Days)
+### What's Complete (Sprints 1–6)
 
-**Week 1: Planning & Implementation (Feb 6–12)** — Complete
+- Full MVP pipeline: compile → resolve → display
+- Extension (Lens v0.3.0): Matter overlay, IndexedDB cache, MV3 manifest
+- API (Shadow Index v0.6.0): Analytics, reporting, retention policies, query cache
+- Demo: Landing page, catalog upload, matter-demo, developer demo
+- Store assets: Icons, descriptions, screenshots (4 captured), privacy policy
+- Build & release: Extension zip, deterministic build script, release process
 
-| Day | Date | Focus | Subtasks (5h each) | Status |
-|-----|------|-------|-------------------|--------|
-| Fri | Feb 6 | Planning + Schema | Sprint kickoff (1h) → Criteria review (1.5h) → Schema finalization (1.5h) → Test structure (1h) | Complete |
-| Mon | Feb 9 | AC1 & AC2 Tests | Framework setup (0.5h) → Cache-on-read tests (1.5h) → Cache-on-success tests (1.5h) → Review (1h) | Complete |
-| Tue | Feb 10 | AC3, AC4 & Messages | Error isolation tests (1.5h) → TTL tests (1.5h) → Message protocol (1h) → Run suite (1h) | Complete |
-| Wed | Feb 11 | Cache Impl | `cacheGet()` (1h) → `cacheSet()` (1h) → Message handler (1h) → Error handling (1h) → Manual test (1h) | Complete |
-| Thu | Feb 12 | Content Script & Polish | Integrate `resolveHash()` (1h) → Overlay optimization (1h) → E2E validation (1.5h) → Verify IndexedDB (1h) | Complete |
+### Sprint 6 Deliverables (Completed Feb 12)
 
-**Week 2: Cross-Browser, Polish, Release (Feb 13–19)**
+- Extension v0.3.0 built and zipped
+- Screenshots captured: overlay, landing, upload, demo (4 files, 1280x800px each)
+- Privacy policy deployed: https://storied-semolina-687067.netlify.app/privacy-policy.html
+- Chrome Web Store submission checklist: CHROME-WEB-STORE-CHECKLIST.md
+- Release process documentation: RELEASE-PROCESS-LENS.md
+- Submission-ready guide: SPRINT-6-SUBMISSION-READY.md
+- Git tag: v0.6.3 (pushed)
 
-| Day | Date | Focus | Subtasks (5h each) | Status |
-|-----|------|-------|-------------------|--------|
-| Fri | Feb 13 | Cross-Browser Test | Chrome/Edge/Brave/Firefox validation (7h sprint); see [FRIDAY-EXECUTION-GUIDE](docs/FRIDAY-EXECUTION-GUIDE.md) | Pending |
-| Mon | Feb 16 | Tests & Documentation | Finalize tests (1h) → Integration test (1h) → README update (1h) → Verify docs (1h) → Progress update (1h) | Pending |
-| Tue | Feb 17 | Performance Validation | Profile render (1h) → Lazy-load verify (1h) → Baseline measurements (1h) → Document (1h) → 3G throttle test (1h) | Pending |
-| Wed | Feb 18 | Bug Fixes & Polish | Regression test (1.5h) → Fix bugs (1.5h) → Code review (1h) → Console validation (1h) | Pending |
-| Thu | Feb 19 | Sprint Review & Release | Demo prep (1h) → Demo/recording (1h) → Git tag v0.3.0 (1h) → Update progress (1h) → Retrospective (1h) | Pending |
-
-### Key Deliverables
-
-- **Feb 6:** Sprint plan + IndexedDB schema finalized
-- **Feb 9:** AC1 + AC2 tests passing (cache-on-read, cache-on-success)
-- **Feb 10:** AC3 + AC4 tests passing (no cache on error, TTL enforcement)
-- **Feb 11:** Cache functions in background.js (`cacheGet`, `cacheSet`)
-- **Feb 12:** Content script integration + overlay optimization + E2E manual test
-- **Feb 13:** Chrome, Edge, Brave, Firefox cross-browser validation (7h sprint)
-- **Feb 16:** Test suite finalized + docs updated
-- **Feb 17:** Performance baselines (cache hit <20ms, overlay render <50ms)
-- **Feb 18:** All bugs fixed + regression test passing
-- **Feb 19:** v0.3.0 tagged + demo delivered to CEO
-
-**Detailed daily breakdown:** [docs/SPRINT-2-DAILY-BREAKDOWN.md](./docs/SPRINT-2-DAILY-BREAKDOWN.md)
+**Reference:** [SPRINT-6-SUBMISSION-READY.md](./docs/SPRINT-6-SUBMISSION-READY.md)
 
 ---
 
@@ -222,11 +205,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprint 1):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits. MVP-13 IndexedDB cache integrated (Sprint 2, Week 1). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) for actuals and acceptance criteria.
-
-**In progress (Sprint 2):** Cross-browser validation, performance profiling, lens-extension v0.3.0 release (Feb 19 target).
-
-**Planned (Sprints 3–8):** Analytics (MVP-14), beta readiness, beta launch prep. Full metrics and revised milestones: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
+**Delivered (Sprints 1–6):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy. 88/88 tests passing. v0.6.3 ready for Chrome Web Store submission.
 
 ---
 
@@ -247,15 +226,15 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 |--------|--------|------|---------|--------|
 | Sprint 0 | By Jan 19, 2026 | Setup and architecture | — | Complete |
 | Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | Complete |
-| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.3.0 (lens) | In Progress |
-| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability | — | Planned |
-| Sprint 4 | Mar 6–19, 2026 | Beta readiness (onboarding, support, stability) | — | Planned |
-| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep (store assets, landing, first merchants) | — | Planned |
-| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — | Planned |
-| Sprint 7 | Apr 17–30, 2026 | Beta program | — | Planned |
-| Sprint 8 | May 1–14, 2026 | Public launch prep | — | Planned |
+| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | Complete |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14), observability, retention policy | v0.5.5 | Complete |
+| Sprint 4 | Mar 6–19, 2026 | Production hardening, security, operations, scaling | v0.6.0 | Complete |
+| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep: landing, store assets, support, demo polish | v0.6.2 | Complete |
+| Sprint 6 | Feb 12–26, 2026 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | In Progress |
+| Sprint 7 | Feb 27–Mar 12, 2026 | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | Planned |
+| Sprint 8 | Mar 13–27, 2026 | Public launch prep, final validation | v1.0 (release) | Planned |
 
-**Current status:** Sprint 2 complete (v0.5.0). Sprint 3 in progress: Analytics & Observability (MVP-14) event specification and storage decision finalized. Next: Implementation of ingestion API and extension hooks. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status:** Sprint 6 complete (v0.6.3). Extension ready for Chrome Web Store. Screenshots captured, privacy policy deployed, submission checklist finalized. Google review pending (1–3 days). Next: Beta merchant onboarding (Sprint 7). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
