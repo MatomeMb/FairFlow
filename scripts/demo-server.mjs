@@ -23,7 +23,7 @@ const mime = {
 };
 
 const server = http.createServer((req, res) => {
-  const url = req.url === '/' ? '/index.html' : req.url;
+  const url = req.url === '/' ? '/landing.html' : req.url;
   const file = path.join(root, path.normalize(url).replace(/^\//, ''));
   if (!file.startsWith(root)) {
     res.writeHead(403);
