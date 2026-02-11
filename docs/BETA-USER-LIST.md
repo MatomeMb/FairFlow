@@ -24,12 +24,14 @@
 | 3 | Initech (Bill) | Invited | Yes | Testing catalog compilation |
 | 4 | | | | |
 | 5 | | | | |
-|---|-------------------|--------|----------------|-------|
-| 1 | | Prospective | | |
-| 2 | | Prospective | | |
-| 3 | | Prospective | | |
-| 4 | | Prospective | | |
-| 5 | | Prospective | | |
+
+## Outreach Response Tracker (Sprint 6)
+
+| Company / Contact | Last Outreach Date | Channel | Response Received | Next Action | Owner |
+|-------------------|--------------------|---------|-------------------|-------------|-------|
+| Acme Corp (Alice) | Pending | Email | No | Send invite + follow-up call within 48h | CEO |
+| Globex (Bob) | Pending | Email | No | Send invite + follow-up call within 48h | CEO |
+| Initech (Bill) | In progress | Email | Yes | Continue onboarding support | CTO/CEO |
 
 ---
 

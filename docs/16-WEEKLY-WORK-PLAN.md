@@ -7,8 +7,8 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Weekly Work Plan (Day-by-Day) |
-| **Version** | 2.0 |
-| **Date** | February 5, 2026 |
+| **Version** | 2.1 |
+| **Date** | February 12, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Active — use for daily discipline and stakeholder alignment |
 
@@ -41,9 +41,9 @@ All task estimates below are in **hours (h)** and are intended to be realistic f
 
 ---
 
-## 3. Current Status (As of Feb 5, 2026)
+## 3. Current Status (As of Feb 12, 2026)
 
-**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: MVP path live (v0.4.0); all deliverables through Feb 5 complete (Sprint 1). Next: **Sprint 2** (Feb 6 – Feb 19, 2026) — MVP-13 extension caching; no blockers.
+**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: Sprints 1–5 complete (`v0.6.2`), 88/88 tests passing, core MVP delivered. Next focus is Sprint 6 execution (extension 1.0 release readiness and launch hardening).
 
 ---
 
@@ -205,27 +205,49 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 ---
 
-## 9. Sprints 6–8 (Apr 3 – May 14, 2026) — High-Level Focus
+## 9. Sprint 6 (Feb 12 – Feb 26, 2026) — Release Readiness & Launch Hardening
 
-| Sprint | Window | Focus |
-|--------|--------|-------|
-| **Sprint 6** | Apr 3 – Apr 16 | Extension 1.0 / merchant dashboard (optional); Chrome release-ready |
-| **Sprint 7** | Apr 17 – Apr 30 | Beta program: 5–10 merchants; 1,000+ products; feedback loop |
-| **Sprint 8** | May 1 – May 14 | Public launch prep: Store submission; landing; docs; v1.0 readiness |
+**Goal:** Clear store blockers and complete extension 1.0 release readiness gate.  
+**Capacity:** ~56h deliverable.
 
-Day-level plans for Sprints 6–8 will be created at the start of Sprint 5 or when capacity is confirmed.
+### Week 1 (Feb 12 – Feb 16)
 
-## 10. Post–May 2026 (High-Level Focus)
+| Day | Date | Planned work | Est. (h) | Owner | Deliverable |
+|-----|------|----------------|----------|-------|-------------|
+| **Mon** | Feb 12 | Immediate blocker triage: screenshot plan, privacy policy deployment option, outreach package handoff, store submission checklist audit | 6 | CTO | Blocker board with owners and due dates |
+| **Tue** | Feb 13 | Capture store screenshots (matter overlay, product overlay, catalog upload, landing hero) and save to `packages/lens-extension/store/screenshots/` | 6 | CTO | 3-5 approved PNG screenshots |
+| **Wed** | Feb 14 | Deploy privacy policy to public HTTPS URL and verify in browser/curl; update `CHROME-WEB-STORE-CHECKLIST.md` with final URL | 6 | CTO/DevOps | Public privacy policy URL validated |
+| **Thu** | Feb 15 | Build extension production bundle, zip output, and complete Chrome Web Store listing form (unlisted beta target) | 6 | CTO | Submission-ready package and listing draft |
+| **Fri** | Feb 16 | Hardening pass 1: install flow, permission review, regression of compile -> resolve -> overlay flow; log defects | 6 | CTO | Hardening report and prioritized bug list |
+
+### Week 2 (Feb 19 – Feb 26)
+
+| Day | Date | Planned work | Est. (h) | Owner | Deliverable |
+|-----|------|----------------|----------|-------|-------------|
+| **Mon** | Feb 19 | Address P0/P1 issues from hardening; verify fixes with focused regression tests | 6 | CTO | P0/P1 closure candidate |
+| **Tue** | Feb 20 | Chrome Web Store submission execution (upload, metadata final, unlisted/public choice) | 5 | CTO | Submission confirmation + listing URL |
+| **Wed** | Feb 21 | Release process formalization and dry run for Lens extension | 5 | CTO | `RELEASE-PROCESS-LENS.md` validated |
+| **Thu** | Feb 22 | Release gate review: quality, onboarding path, support readiness, unresolved defects | 5 | CTO + Product | `RELEASE-GATE-SPRINT-6.md` decision record |
+| **Fri** | Feb 23 | Sprint review with CEO; update progress docs, risks, and next sprint plan | 4 | CTO + CEO | Sprint 6 review pack |
+
+## 10. Sprints 7–8 (Feb 27 – Mar 27, 2026) — High-Level Focus
+
+| Sprint | Window | Focus | Acceptance Anchor |
+|--------|--------|-------|-------------------|
+| **Sprint 7** | Feb 27 – Mar 12 | Beta program execution | >=3 active merchants, feedback loop operating, SLA met |
+| **Sprint 8** | Mar 13 – Mar 27 | Public launch readiness | Launch candidate tagged + stakeholder sign-off |
+
+## 11. Post–Mar 2026 (High-Level Focus)
 
 | Period | Focus | Notes |
 |--------|--------|------|
-| **Jun – Jul** | Extension 1.0; Chrome Web Store public or unlisted | Store approval; docs; support |
-| **Aug – Sep** | Beta program | 5–10 merchants; 1,000+ products; feedback loop |
-| **Oct – Dec** | Public launch | Store listing; marketing; v1.0; Phase 2 prep |
+| **Apr – May** | Stabilize live beta and tune onboarding | Merchant growth, support quality, issue burn-down |
+| **Jun – Sep** | Expand beta footprint | 10+ merchants, stronger reporting, conversion insights |
+| **Oct – Dec** | Phase 2 preparation | Agentic commerce roadmap and platform upgrades |
 
 ---
 
-## 11. How to Use This Document
+## 12. How to Use This Document
 
 - **Daily:** Start the day with the planned task and estimated hours; log any deviation (blocker, scope change).
 - **Weekly:** Every Monday, confirm the week’s plan with CEO if needed; every Friday, note what was completed and what slipped.
@@ -234,6 +256,6 @@ Day-level plans for Sprints 6–8 will be created at the start of Sprint 5 or wh
 
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** February 5, 2026  
-**Next Review:** Start of Sprint 2 (Feb 6, 2026)
+**Document Version:** 2.1  
+**Last Updated:** February 12, 2026  
+**Next Review:** Sprint 6 midpoint (Feb 19, 2026)

@@ -4,7 +4,7 @@
   "description": "Browser extension for discovering .thing commerce objects",
   "type": "module",
   "scripts": {
-    "build": "vite build",
+    "build": "node scripts/build-extension.mjs",
     "dev": "vite build --watch",
     "type-check": "tsc --noEmit",
     "test": "vitest run",

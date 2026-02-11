@@ -1,5 +1,5 @@
 # .things that Matter
-## Delivery Timeline — Realistic Dates (As of Feb 8, 2026)
+## Delivery Timeline — Realistic Dates (As of Feb 12, 2026)
 
 ---
 
@@ -7,8 +7,8 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Delivery Timeline & Schedule |
-| **Version** | 2.0 |
-| **Date** | February 8, 2026 |
+| **Version** | 2.1 |
+| **Date** | February 12, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Active — single source of truth for delivery dates |
 
@@ -28,41 +28,40 @@ This document is the **single source of truth** for:
 
 ---
 
-## 2. Current Status (As of Feb 5, 2026)
+## 2. Current Status (As of Feb 12, 2026)
 
 | Dimension | Status | Detail |
 |-----------|--------|--------|
-| **Production readiness** | **MVP path live** | Shadow Index API (v0.4.0): compile, batch, catalog/import, resolve, thing, gist; R2 or local storage; auth and rate limit when configured. |
-| **Browser extension** | **Functional** | Lens extension (v0.2.0): matter:// interception, overlay, XMP beacon detection. No client-side cache yet (MVP-13 planned Sprint 2). |
-| **Rust compiler** | **Production-ready** | matter-core v0.3.0: `Compiler::compile()`, matter CLI; hash aligned with API. |
-| **Demo & merchant UX** | **Usable** | catalog-upload.html (CSV/JSON → matter URIs); matter-demo.html (paste matter://); Node demo server; sample catalog. |
-| **Tests** | **Passing** | Vitest (API, auth, batch, catalog); Playwright (E2E); cargo test (steg). |
-| **Next sprint** | **Sprint 2** | Feb 6 – Feb 19, 2026. MVP-13 extension caching (IndexedDB), overlay polish. See [16-WEEKLY-WORK-PLAN.md §5](./16-WEEKLY-WORK-PLAN.md#5-sprint-2-feb-6--feb-19-2026--extension-caching--polish). |
-| **Risks / blockers** | **None** | R2 and API keys configured; toolchains operational; no known critical bugs. |
+| **Product baseline** | **Sprints 1–5 complete** | MVP core delivered; beta launch prep complete; release `v0.6.2` tagged and pushed. |
+| **Quality** | **Stable** | 88/88 tests passing; core compile → resolve → overlay flow validated. |
+| **Immediate blockers** | **Open (critical)** | Store screenshots, public privacy policy URL, initial beta outreach, Chrome Web Store submission. |
+| **Current sprint** | **Sprint 6 in progress** | Feb 12 – Feb 26, 2026. Focus: extension 1.0 release readiness and launch hardening. |
+| **Next milestone** | **Sprint 8 launch candidate** | Public launch candidate target by Mar 27, 2026; launch target Mar 28, 2026. |
+| **Risks / blockers** | **Execution risk** | Store review lead time and beta onboarding cadence are now on the critical path. |
 
-**Stakeholder takeaway:** The core innovation — compile → store (R2/local) → resolve → matter:// → extension overlay — is **delivered and working**. Remaining work (Sprints 2–8) focuses on caching, analytics, beta readiness, and launch prep.
+**Stakeholder takeaway:** The core innovation — compile → store (R2/local) → resolve → matter:// → extension overlay — is delivered and working. Remaining work is execution and launch hardening across Sprints 6–8.
 
 ---
 
-## 3. Sprint Window: Completed + Planned (Feb 5 – May 14, 2026)
+## 3. Sprint Window: Planned vs Actual (Jan 20 – Mar 27, 2026)
 
-Sprints are **2 weeks** each. **Sprint 1** ended Feb 5, 2026. **Sprint 2** starts Feb 6, 2026.
+Sprints are tracked with baseline plan and execution updates. Sprints 1–5 are complete. Sprint 6 is active.
 
-| Sprint | Window | Status | Focus | Deliverables (actual or planned) |
-|--------|--------|--------|-------|-----------------------------------|
-| **Sprint 0** | By Jan 19, 2026 | **Done** | Setup and architecture | Environment, contracts, monorepo, planning |
-| **Sprint 1** | Jan 20 – Feb 5, 2026 | **Done** | Full MVP through batch/catalog | compile → resolve → matter:// → overlay; XMP beacon; auth/rate limit/errors; R2 storage; Rust compiler; POST /batch, POST /catalog/import; catalog-upload & matter-demo; v0.4.0 |
-| **Sprint 2** | Feb 6 – Feb 19, 2026 | **In Progress** | Extension caching & polish | MVP-13: IndexedDB cache integrated (Thu Feb 12); cross-browser Fri Feb 13; Firefox prep complete. [FRIDAY-EXECUTION-GUIDE](./FRIDAY-EXECUTION-GUIDE.md). |
-| **Sprint 3** | Feb 20 – Mar 5, 2026 | Planned | Analytics & observability | MVP-14: view/click events; API logging; export or minimal dashboard. [16-WEEKLY-WORK-PLAN §6](./16-WEEKLY-WORK-PLAN.md#6-sprint-3-feb-20--mar-5-2026--analytics--observability). |
-| **Sprint 4** | Mar 6 – Mar 19, 2026 | Planned | Beta readiness | Merchant onboarding doc; support process; 5–10 beta targets; stability. [16-WEEKLY-WORK-PLAN §7](./16-WEEKLY-WORK-PLAN.md#7-sprint-4-mar-6--mar-19-2026--beta-readiness). |
-| **Sprint 5** | Mar 20 – Apr 2, 2026 | Planned | Beta launch prep | Chrome Web Store assets; landing/demo pages; support workflow; soft beta start. [16-WEEKLY-WORK-PLAN §8](./16-WEEKLY-WORK-PLAN.md#8-sprint-5-mar-20--apr-2-2026--beta-launch-prep). |
-| **Sprint 6** | Apr 3 – Apr 16, 2026 | Planned | Extension 1.0 / merchant tooling | Full merchant dashboard (optional) or extension 1.0 polish; Chrome release-ready. |
-| **Sprint 7** | Apr 17 – Apr 30, 2026 | Planned | Beta program | 5–10 merchants; 1,000+ products; feedback loop. |
-| **Sprint 8** | May 1 – May 14, 2026 | Planned | Public launch prep | Store submission; landing; docs; support; v1.0 readiness. |
+| Sprint | Planned Window | Actual Window | Status | Focus | Key Deliverable |
+|--------|----------------|---------------|--------|-------|-----------------|
+| **Sprint 0** | By Jan 19, 2026 | By Jan 19, 2026 | **Complete** | Setup and architecture | Environment, contracts, monorepo, planning |
+| **Sprint 1** | Jan 20 – Feb 5, 2026 | Jan 20 – Feb 5, 2026 | **Complete** | Full MVP through batch/catalog | Core compile → resolve → overlay + batch/catalog; `v0.4.0` |
+| **Sprint 2** | Feb 6 – Feb 19, 2026 | Feb 6 – Feb 19, 2026 | **Complete** | Extension caching & polish | MVP-13 IndexedDB cache + validation; `v0.5.0` |
+| **Sprint 3** | Feb 20 – Mar 5, 2026 | Feb 20 – Mar 9, 2026 | **Complete** | Analytics & observability | MVP-14 events, reporting, dashboard; `v0.5.5` |
+| **Sprint 4** | Mar 6 – Mar 19, 2026 | Feb 10 – Mar 10, 2026 | **Complete** | Optimization & scaling | Performance hardening + operations/security docs; `v0.6.0` |
+| **Sprint 5** | Mar 20 – Apr 2, 2026 | Mar 20 – Apr 2, 2026 | **Complete** | Beta launch prep | Landing/store assets/support + closure docs; `v0.6.2` |
+| **Sprint 6** | Feb 12 – Feb 26, 2026 | TBD | **In Progress** | Extension 1.0 release readiness | Store submission + hardening + release gate |
+| **Sprint 7** | Feb 27 – Mar 12, 2026 | TBD | **Planned** | Active beta program | 5–10 merchant onboarding + feedback loop |
+| **Sprint 8** | Mar 13 – Mar 27, 2026 | TBD | **Planned** | Public launch readiness | Launch candidate + sign-off + `v1.0` readiness |
 
 **Summary:**
-- **Sprint 1 (done):** All deliverables through Feb 5, 2026; v0.4.0 released.
-- **Sprints 2–8 (planned):** Caching, analytics, beta readiness, launch prep; day-by-day plan in [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
+- **Sprints 1–5:** complete and released through `v0.6.2`.
+- **Sprints 6–8:** execution window for store release, beta scale-up, and launch candidate.
 
 ---
 
@@ -81,27 +80,24 @@ All of the following was completed **within Sprint 1 (Jan 20 – Feb 5, 2026)**:
 
 ---
 
-## 5. What Remains (Realistic Scope & Duration)
+## 5. What Remains (Execution Scope: Sprints 6–8)
 
-### 5.1 Sprints 2–8 (Feb 6 – May 14, 2026)
+### 5.1 Sprints 6–8 (Feb 12 – Mar 27, 2026)
 
-| Sprint | Window | Scope | Rationale |
-|--------|--------|--------|-----------|
-| **Sprint 2** | Feb 6 – Feb 19 | MVP-13 (extension caching), overlay polish | IndexedDB cache; 2 weeks for MVP cache + polish. |
-| **Sprint 3** | Feb 20 – Mar 5 | MVP-14 (analytics/events), API observability | View/click events; logging; 2 weeks for minimal pipeline. |
-| **Sprint 4** | Mar 6 – Mar 19 | Beta readiness | Onboarding doc, support process, target list, stability. |
-| **Sprint 5** | Mar 20 – Apr 2 | Beta launch prep | Store assets, landing, support workflow, first beta merchants. |
-| **Sprint 6** | Apr 3 – Apr 16 | Merchant dashboard (optional) / extension 1.0 | Polish and Chrome release-ready. |
-| **Sprint 7** | Apr 17 – Apr 30 | Beta program | 5–10 merchants; 1,000+ products; feedback. |
-| **Sprint 8** | May 1 – May 14 | Public launch prep | Store submission; landing; docs; v1.0. |
+| Sprint | Window | Scope | Output |
+|--------|--------|-------|--------|
+| **Sprint 6** | Feb 12 – Feb 26 | Immediate blockers + extension 1.0 hardening | Store submission package, release gate, release process docs |
+| **Sprint 7** | Feb 27 – Mar 12 | Beta merchant onboarding and support loop | >=3 active merchants, feedback cadence, triage SLA operating |
+| **Sprint 8** | Mar 13 – Mar 27 | Public launch readiness | Launch playbooks, sign-off review, launch candidate tag |
 
-### 5.2 Post–May 2026 (Phase 1 to Dec 2026)
+### 5.2 Immediate Blockers (Due by Feb 14, 2026)
 
-| Period | Focus | Key deliverables |
-|--------|--------|-------------------|
-| **May – Jun 2026** | Extension 1.0 polish, Chrome Web Store | Release-ready extension; store listing. |
-| **Jul – Sep 2026** | Beta program | 5–10 merchants; feedback loop. |
-| **Oct – Dec 2026** | Public launch | Chrome Web Store; landing; docs; support; v1.0. |
+| Blocker | Owner | Status | Exit Criteria |
+|---------|-------|--------|---------------|
+| Chrome store screenshots (3–5) | CTO | Open | PNG assets in `packages/lens-extension/store/screenshots/` |
+| Public privacy policy URL (HTTPS) | CTO/DevOps | Open | Live URL validated and recorded in checklist |
+| First outreach to Acme + Globex | CEO | Open | Merchant status updated to `Invited` |
+| Chrome Web Store submission | CTO | Open | Submission confirmation and listing URL |
 
 ---
 
@@ -110,25 +106,24 @@ All of the following was completed **within Sprint 1 (Jan 20 – Feb 5, 2026)**:
 | Milestone | Revised date | Status |
 |-----------|--------------|--------|
 | Contract signed | Jan 21, 2026 | Done |
-| Phase 0 / MVP through batch & catalog | **Feb 5, 2026** | Done (Sprint 1) |
-| Extension caching + analytics (75%) | **Mar 5, 2026** | Planned (Sprint 3) |
-| Beta readiness | **Mar 19, 2026** | Planned (Sprint 4) |
-| Beta launch prep | **Apr 2, 2026** | Planned (Sprint 5) |
-| Beta program | **Apr 30, 2026** | Planned (Sprint 7) |
-| Public launch (100%) | **Dec 15, 2026** | Unchanged |
+| MVP through beta prep (`v0.6.2`) | **Feb 11, 2026** | Done (Sprints 1–5) |
+| Sprint 6 release readiness gate | **Feb 26, 2026** | In Progress |
+| Beta program activation | **Mar 12, 2026** | Planned (Sprint 7) |
+| Public launch candidate | **Mar 27, 2026** | Planned (Sprint 8) |
+| Target public launch (`v1.0`) | **Mar 28, 2026** | Planned |
 
 ---
 
 ## 7. Dependencies & Critical Path
 
 ```
-Setup (Sprint 0) → Sprint 1 (MVP + P1 + R2 + Rust + batch/catalog) [DONE by Feb 5]
+Setup (Sprint 0) → Sprint 1-5 (MVP + hardening + beta prep) [DONE through v0.6.2]
                                  ↓
-Sprint 2 (caching) → Sprint 3 (analytics) → Sprint 4 (beta readiness) → Sprint 5 (beta prep)
+Immediate blockers (screenshots/privacy/outreach/submission) [DUE Feb 14]
                                  ↓
-Sprint 6 (extension 1.0) → Sprint 7 (beta program) → Sprint 8 (launch prep)
+Sprint 6 (release readiness) → Sprint 7 (active beta) → Sprint 8 (launch readiness)
                                  ↓
-                    Chrome Web Store → Public launch (Dec 2026)
+                    Chrome Web Store published → Public launch target (Mar 28, 2026)
 ```
 
 ---
@@ -147,6 +142,6 @@ Capacity: 6h/day productive dev, ~56–60h per 2-week sprint. Ceremonies ~4h/spr
 
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** February 8, 2026  
-**Next Review:** End of Sprint 2 (Feb 19, 2026)
+**Document Version:** 2.1  
+**Last Updated:** February 12, 2026  
+**Next Review:** Sprint 6 midpoint (Feb 19, 2026)

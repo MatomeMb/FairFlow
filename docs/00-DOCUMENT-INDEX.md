@@ -166,24 +166,25 @@ Day-specific completion reports and legacy summaries: [archive/README.md](./arch
 
 | Version | Date | Author | Changes |
 |---------|------|--------|---------|
-| 1.0 | Jan 21, 2026 | M. Mboweni | Initial creation |
-| 1.1 | Mar 2026 | M. Mboweni | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
-| 1.2 | Mar 2026 | M. Mboweni | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
-| 1.3 | Feb 8, 2026 | M. Mboweni | Primary docs structure; archive index; Sprint 2 status; Friday sprint prep |
-| 1.4 | Feb 11, 2026 | M. Mboweni | Sprint 4 Week 4 complete; production hardening docs indexed |
+| 1.0 | Jan 21, 2026 | M Mbowene | Initial creation |
+| 1.1 | Mar 2026 | M Mbowene | Delivery timeline (15), revised milestones, Sprint 4 complete; single source of truth: [15-DELIVERY-TIMELINE.md](./15-DELIVERY-TIMELINE.md) |
+| 1.2 | Mar 2026 | M Mbowene | Weekly work plan (16) with day-by-day and estimates; expanded 15 with current status; PROGRESS and Scrum model updated; backlog status column |
+| 1.3 | Feb 8, 2026 | M Mbowene | Primary docs structure; archive index; Sprint 2 status; Friday sprint prep |
+| 1.4 | Feb 11, 2026 | M Mbowene | Sprint 4 Week 4 complete; production hardening docs indexed |
+| 1.5 | Feb 11, 2026 | M Mbowene | Updated Next Steps for post–Sprint 5 execution: beta launch, store submission, support operations, release governance, and scale-readiness references |
 
 ---
 
 ## Next Steps
 
-1. Sprint 5 (beta launch prep) — see [SPRINT-5-PLAN.md](./SPRINT-5-PLAN.md), [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md), [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md).
-2. Beta user onboarding — see [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) and [BETA-USER-LIST.md](./BETA-USER-LIST.md).
-3. Production deployment and monitoring — see [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md) and [DEPLOYMENT-TO-STAGING.md](./DEPLOYMENT-TO-STAGING.md).
-4. Release notes — see [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md).
-5. Database migration planning — see [DATABASE-MIGRATION-ROADMAP.md](./DATABASE-MIGRATION-ROADMAP.md).
+1. Execute beta launch (post–Sprint 5) — onboard initial merchants and run controlled rollout using [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md), [BETA-USER-LIST.md](./BETA-USER-LIST.md), and [BETA-OUTREACH-TEMPLATE.md](./BETA-OUTREACH-TEMPLATE.md).
+2. Complete Chrome Web Store submission — finalize listing artifacts and submission checklist via [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md), [SCREENSHOT-GUIDE.md](./SCREENSHOT-GUIDE.md), and [INSTALL-LENS.md](./INSTALL-LENS.md).
+3. Operationalize support and feedback loops — run triage, escalation, and structured beta feedback through [SUPPORT-WORKFLOW.md](./SUPPORT-WORKFLOW.md) and [BETA-FEEDBACK-TEMPLATE.md](./BETA-FEEDBACK-TEMPLATE.md).
+4. Maintain release and governance cadence — track shipped scope and stakeholder alignment in [RELEASE-NOTES-v0.6.2.md](./RELEASE-NOTES-v0.6.2.md), [SPRINT-5-CLOSURE.md](./SPRINT-5-CLOSURE.md), and [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md).
+5. Prepare scale-readiness workstream — continue deployment and data-evolution planning using [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md), [DEPLOYMENT-TO-STAGING.md](./DEPLOYMENT-TO-STAGING.md), and [DATABASE-MIGRATION-ROADMAP.md](./DATABASE-MIGRATION-ROADMAP.md).
 
 ---
 
-**Prepared by:** Matome Mboweni, CTO  
+**Prepared by:** M Mbowene, CTO  
 **For:** Sobuhle Nyambali, CEO  
 **Date:** January 21, 2026
