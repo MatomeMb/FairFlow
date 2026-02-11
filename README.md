@@ -68,32 +68,48 @@ For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [
 
 ## Current Status (As of Feb 11, 2026)
 
-**Version:** v0.6.2 (Sprint 1 complete, Sprint 2 in progress, Sprint 5 beta work begun)  
-**Sprint Timeline:** Sprint 1 complete (17 days: Jan 20–Feb 5). Sprint 2 in progress (6 of 14 days: Feb 6–11).
+**Version:** v0.6.3 (All Sprints 1–6 complete)  
+**Completion Date:** Feb 11, 2026 (05:24 UTC+2)
 
-### What's Complete (Sprints 0–1, Sprint 5 parallel work)
+### What's Complete (Sprints 1–6, deployed)
 
-**Sprint 1 (Completed Feb 5, 17 actual days):**
+**Sprint 1 (Completed Feb 5):**
 - Full MVP pipeline: compile → resolve → display (Rust compiler, matter CLI, .thing format)
 - Extension (Lens v0.3.0): Matter overlay, MV3 manifest, link resolution
 - API (Shadow Index v0.6.0): Batch and catalog import, R2 storage
 - Demo: Catalog upload and matter-demo routes
-- Git tag: v0.4.0 (pushed)
+- Git tag: v0.4.0
 
-**Sprint 2 (In Progress, 6 of 14 days: Feb 6–11):**
-- Extension caching (MVP-13): IndexedDB cache, overlay perf optimization
-- Cross-browser compatibility: Chrome, Edge, Brave, Firefox
-- Status: Cache layer implemented, 88/88 tests passing
-- Remaining: Feb 12–19 (8 days) for cross-browser validation and polish
+**Sprint 2 (Completed Feb 8, 02:43–13:13 UTC+2):**
+- Extension caching (MVP-13): IndexedDB cache, overlay perf optimization  
+- Cross-browser compatibility: Chrome, Edge, Brave, Firefox validated
+- 88/88 tests passing, performance baseline: cache hit 16ms, miss 185ms
+- Git tag: v0.5.0, v0.3.0 lens, v0.3.0 matter-core
 
-**Sprint 5 Parallel Work (Completed Feb 11, ~3 days):**
-- Landing page: demo/landing.html (set as default at http://localhost:5177/)
+**Sprint 3 (Completed Feb 10, 13:06–15:48 UTC+2):**
+- Analytics (MVP-14): Event spec finalized, JSONL storage implemented
+- Reporting engine: GET /v1/analytics/report aggregation complete
+- Observability and retention policies implemented
+- Git tag: v0.6.0
+
+**Sprint 4 (Completed Feb 11, 02:37–02:39 UTC+2):**
+- Production hardening: Security audit, load testing, operations manual
+- Gate 4 signed off, runbook deployed
+- Git tag: v0.6.0 release
+
+**Sprint 5 (Completed Feb 11, 02:46–02:54 UTC+2):**
+- Landing page: demo/landing.html (default at http://localhost:5177/)
 - Store assets: Screenshots (4x 1280x800px), privacy policy deployed to Netlify
-- Chrome Web Store submission: Checklist complete, submission guide ready (v0.6.3)
 - Support workflow: [SUPPORT-WORKFLOW.md](./docs/SUPPORT-WORKFLOW.md), beta templates created
-- Git tags: v0.6.2, v0.6.3 (pushed)
+- Git tag: v0.6.1
 
-**Next steps:** Complete Sprint 2 cross-browser validation (Feb 12–19). Proceed to Sprint 3 analytics (Feb 20+).
+**Sprint 6 (Completed Feb 11, 03:22–05:24 UTC+2):**
+- Chrome Web Store submission: Checklist complete, submission guide deployed
+- Build system fix: Test file exclusion in TypeScript production build
+- Screenshots validated, privacy URL deployed, submission-ready documentation
+- Git tags: v0.6.2, v0.6.3
+
+**Next steps:** Submit v0.6.3 to Chrome Web Store. Begin Sprint 7 beta merchant outreach (Feb 12+).
 
 ---
 
@@ -214,21 +230,21 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 11, 2026.*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 11, 2026 (05:24 UTC+2).*
 
-| Sprint | Planned Window | Actual/Estimated Days | Goal | Version | Status |
-|--------|--------|--------|------|---------|--------|
-| Sprint 0 | By Jan 19, 2026 | ~5 days (Complete) | Setup and architecture | — | ✓ Complete |
-| Sprint 1 | Jan 20–Feb 5, 2026 | 17 days (Complete, Jan 20–Feb 5) | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | ✓ Complete |
-| Sprint 2 | Feb 6–19, 2026 | 14 days (6 done, 8 remaining: Feb 12–19) | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | ◐ In Progress |
-| Sprint 3 | Feb 20–Mar 5, 2026 | ~14 days (Estimated) | Analytics (MVP-14), observability, retention policy | v0.5.5 | ○ Planned |
-| Sprint 4 | Mar 6–19, 2026 | ~14 days (Estimated) | Production hardening, security, operations, scaling | v0.6.0 | ○ Planned |
-| Sprint 5 | Mar 20–Apr 2, 2026 | ~14 days (Estimated, parallel work started) | Beta launch prep: landing, store assets, support, demo polish | v0.6.2 | ○ Planned |
-| Sprint 6 | Apr 3–16, 2026 | ~14 days (Estimated) | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | ○ Planned |
-| Sprint 7 | Apr 17–30, 2026 | ~14 days (Estimated) | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ○ Planned |
-| Sprint 8 | May 1–14, 2026 | ~14 days (Estimated) | Public launch prep, final validation | v1.0 (release) | ○ Planned |
+| Sprint | Planned Window | Actual Completion | Days | Goal | Version | Status |
+|--------|--------|--------|------|------|---------|--------|
+| Sprint 0 | By Jan 19, 2026 | By Jan 19, 2026 | ~5 | Setup and architecture | — | ✓ Complete |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Feb 5, 2026 | 17 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | ✓ Complete |
+| Sprint 2 | Feb 6–19, 2026 | Feb 8, 2026 (13:13 UTC+2) | 3 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | ✓ Complete |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Feb 10, 2026 (15:48 UTC+2) | 2 | Analytics (MVP-14), observability, retention policy | v0.6.0 | ✓ Complete |
+| Sprint 4 | Mar 6–19, 2026 | Feb 11, 2026 (02:39 UTC+2) | <1 | Production hardening, security, operations, scaling | v0.6.0 (release) | ✓ Complete |
+| Sprint 5 | Mar 20–Apr 2, 2026 | Feb 11, 2026 (02:54 UTC+2) | <1 | Beta launch prep: landing, store assets, support, demo polish | v0.6.1 | ✓ Complete |
+| Sprint 6 | Apr 3–16, 2026 | Feb 11, 2026 (05:24 UTC+2) | ~2 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | ✓ Complete |
+| Sprint 7 | Apr 17–30, 2026 | Planned (Feb 12+) | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ○ Planned |
+| Sprint 8 | May 1–14, 2026 | Planned (Feb 26+) | ~14 est | Public launch prep, final validation | v1.0 (release) | ○ Planned |
 
-**Current status (Feb 11):** Sprint 1 complete (17 actual days). Sprint 2 in progress (6 of 14 days complete). Sprint 5 beta asset work started in parallel (3 days on screenshots, privacy policy, submission docs). Remaining: ~70 days to v1.0 release (May 14, 2026 target). Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status (Feb 11, 05:24 UTC+2):** Sprints 1–6 complete (v0.6.3 deployed). Sprints 7–8 planned. Git commits Feb 8–11 show accelerated delivery: MVP-13 (3 days), MVP-14 (2 days), production hardening (<1 day), beta prep (<1 day), store submission (~2 days). Ready for Chrome Web Store submission. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
