@@ -245,7 +245,7 @@ export function ProductPage() {
       <div className="bg-white border-b border-stone-200">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
-            <FairflowLogo markHeight={32} useBlendMode />
+            <FairflowLogo markHeight={32} />
             <span className="text-xs text-stone-500 font-mono">matter://{hash?.slice(0, 12)}...</span>
           </div>
         </div>

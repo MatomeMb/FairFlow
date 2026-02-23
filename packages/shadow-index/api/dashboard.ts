@@ -84,8 +84,8 @@ export async function dashboardHandler(c: Context, config?: DashboardConfig): Pr
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Analytics Dashboard — .things that Matter">
-  <title>Analytics Dashboard — .things that Matter</title>
+  <meta name="description" content="Analytics Dashboard — fairflow">
+  <title>Analytics Dashboard — fairflow</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; padding: 0; background: #0f172a; color: #e2e8f0; }
@@ -111,7 +111,7 @@ export async function dashboardHandler(c: Context, config?: DashboardConfig): Pr
 </head>
 <body>
   <header class="header" role="banner">
-    <span class="header-brand">.things that Matter</span>
+    <span class="header-brand">fairflow</span>
     <span class="header-sub">Analytics Dashboard</span>
   </header>
   <div class="body">
@@ -201,7 +201,7 @@ export async function dashboardHandler(c: Context, config?: DashboardConfig): Pr
     </div>
   </div>
   </div>
-  <footer style="padding:1rem 1.5rem;border-top:1px solid #1e293b;font-size:0.75rem;color:#64748b;">Copyright 2026 .things that Matter</footer>
+  <footer style="padding:1rem 1.5rem;border-top:1px solid #1e293b;font-size:0.75rem;color:#64748b;">Copyright 2026 fairflow</footer>
 </body>
 </html>`;
 

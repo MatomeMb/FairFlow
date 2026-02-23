@@ -292,7 +292,7 @@ app.get('/health', (c) => {
   return c.json({
     status: 'ok',
     service: 'shadow-index',
-    company: '.things that Matter',
+    company: 'fairflow',
     version: '0.6.0',
     timestamp: new Date().toISOString(),
   });
@@ -664,8 +664,8 @@ app.get('/thing/:hash', async (c) => {
 const port = Number(process.env.PORT) || 3000;
 if (process.env.NODE_ENV !== 'test') {
   console.log('');
-  console.log('  .things that Matter - Shadow Index API');
-  console.log('  ---------------------------------------');
+  console.log('  fairflow - Shadow Index API');
+  console.log('  ---------------------------');
   console.log(`  API:       http://localhost:${port}`);
   console.log(`  Health:    http://localhost:${port}/health`);
   console.log(`  Dashboard: http://localhost:${port}/v1/analytics/dashboard`);

@@ -1,30 +1,26 @@
-import logoMark from "/fairflow-logo.png";
-
 interface FairflowLogoProps {
   markHeight?: number;
   showWordmark?: boolean;
   variant?: "light" | "dark";
-  useBlendMode?: boolean;
 }
 
 export function FairflowLogo({
   markHeight = 48,
   showWordmark = true,
   variant = "light",
-  useBlendMode = false,
 }: FairflowLogoProps) {
   const wordSize = Math.round(markHeight * 0.6);
 
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
       <img
-        src={logoMark}
+        src="/fairflow-logo.png"
         alt="fairflow"
         style={{
           height: markHeight,
           width: "auto",
+          mixBlendMode: variant === "dark" ? "normal" : "multiply",
           filter: variant === "dark" ? "invert(1) brightness(3)" : "none",
-          mixBlendMode: useBlendMode ? "multiply" : "normal",
         }}
       />
       {showWordmark && (

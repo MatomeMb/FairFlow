@@ -142,7 +142,7 @@ export function OrderConfirmation() {
       {/* Header */}
       <div className="bg-white border-b border-stone-200">
         <div className="max-w-3xl mx-auto px-6 py-4">
-          <FairflowLogo markHeight={32} useBlendMode />
+          <FairflowLogo markHeight={32} />
         </div>
       </div>
 
@@ -241,10 +241,10 @@ export function OrderConfirmation() {
               </div>
             </div>
 
-            {/* Powered By Footer */}
+            {/* Footer */}
             <div className="text-center mt-8 pt-6 border-t border-stone-200">
               <p className="text-sm text-stone-500">
-                Powered by <span className="font-semibold">fairflow</span>
+                © 2026 fairflow
               </p>
             </div>
           </div>
