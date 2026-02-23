@@ -1,0 +1,27 @@
+{
+  "product": {
+    "title": "Rwandan Cofee",
+    "description": "fresh rwandan coffee",
+    "price": 30000,
+    "currency": "ZAR",
+    "category": "coffee"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-22T21:21:24.030Z",
+    "certifications": [
+      "organic"
+    ],
+    "stock_count": 15,
+    "matter_uri": "matter://24c9afb5a491ca3a51db9ac2d7d5f6691ad01463ee64d01dee713c225a897a08",
+    "thing_url": "http://localhost:3000/thing/24c9afb5a491ca3a51db9ac2d7d5f6691ad01463ee64d01dee713c225a897a08.json"
+  }
+}

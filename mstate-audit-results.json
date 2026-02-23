@@ -1,0 +1,68 @@
+{
+  "testEmail": "mstate_audit_1771717159279@test.com",
+  "timestamp": "2026-02-21T23:39:19.280Z",
+  "steps": {
+    "register": {
+      "status": "PASS",
+      "statusCode": 200,
+      "ok": true,
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...",
+      "message": "Merchant registered successfully"
+    },
+    "login": {
+      "status": "PASS",
+      "statusCode": 200,
+      "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6Ik...",
+      "message": "Login successful"
+    },
+    "getMe": {
+      "status": "FAIL",
+      "statusCode": 200,
+      "securityCheck": {
+        "password_hash_exposed": "PASS",
+        "kyc_data_exposed": "PASS"
+      },
+      "message": "Account retrieval failed"
+    },
+    "createProduct": {
+      "status": "FAIL",
+      "statusCode": 401,
+      "hash": "MISSING",
+      "matterUri": "MISSING",
+      "message": "Product creation failed"
+    },
+    "orderData": {
+      "status": "PARTIAL",
+      "checks": {
+        "orderExists": false,
+        "hasProductTitle": false,
+        "hasDeliveryAddress": false,
+        "fulfillmentPending": false
+      },
+      "productTitle": "MISSING",
+      "deliveryAddress": "MISSING"
+    },
+    "getOrders": {
+      "status": "FAIL",
+      "statusCode": 401,
+      "orderCount": 0,
+      "message": "Order fetch failed"
+    },
+    "submitKyc": {
+      "status": "FAIL",
+      "statusCode": 401,
+      "message": "KYC submission failed",
+      "encryptionCheck": {
+        "kyc_data_is_string": "FAIL",
+        "id_number_not_visible": "PASS"
+      }
+    },
+    "getNotifications": {
+      "status": "FAIL",
+      "statusCode": 401,
+      "notificationCount": 0,
+      "hasOrderNotification": false,
+      "message": "Notification fetch failed"
+    }
+  }
+}

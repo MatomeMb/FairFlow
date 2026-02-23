@@ -1,0 +1,19 @@
+[
+  {
+    "id": "860567ae-2362-43e3-96be-e86d2ef1dc6f",
+    "merchant_id": "dev-merchant-001",
+    "type": "order_received",
+    "title": "New order received: Rwandan Single Origin Coffee",
+    "message": "Order 16770a86-62b1-422e-91cd-2cc58a4c1ab0 paid by matomepontso@gmail.com",
+    "data": {
+      "order_id": "16770a86-62b1-422e-91cd-2cc58a4c1ab0",
+      "product_id": "a8aabd58b180abfa556bf338d42296488150eec76e724a53f3c97bb6278e6860",
+      "product_title": "Rwandan Single Origin Coffee",
+      "order_total": 1250000,
+      "customer_email": "matomepontso@gmail.com",
+      "delivery_address": "Matome, 135 main rd, Cape Town, Cape Town, 7700, +27672603309"
+    },
+    "read": true,
+    "created_at": "2026-02-22T07:54:00.527Z"
+  }
+]

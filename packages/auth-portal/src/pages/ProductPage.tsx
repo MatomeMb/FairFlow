@@ -1,0 +1,455 @@
+import { useState, useEffect } from 'react';
+import { useParams } from 'react-router-dom';
+import { Loader2, ShoppingCart } from 'lucide-react';
+import { FairflowLogo } from '../components/FairflowLogo';
+
+interface ThingFile {
+  product: {
+    id: string;
+    title: string;
+    description?: string;
+    price: number;
+    currency: string;
+    image_url?: string;
+    category?: string;
+  };
+  commerce: {
+    merchant_id: string;
+    payment_gateway: 'stripe';
+    supported_currencies: string[];
+    shipping_available: boolean;
+  };
+  metadata: {
+    schema_version: '1.0';
+    created_at: string;
+    matter_uri: string;
+    thing_url: string;
+    stock_count?: number;
+  };
+}
+
+type AddressForm = {
+  name: string;
+  line1: string;
+  line2: string;
+  suburb: string;
+  city: string;
+  postal_code: string;
+  phone: string;
+};
+
+const formatPrice = (amount: number, currency: string): string => {
+  const value = (amount / 100).toFixed(2);
+  if (currency === 'ZAR') return `R ${value}`;
+  if (currency === 'USD') return `$${value}`;
+  if (currency === 'EUR') return `€${value}`;
+  return `${currency} ${value}`;
+};
+
+const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
+const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+
+const getAnonId = (): string => {
+  const key = 'ttm_anon_id';
+  const existing = window.localStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  window.localStorage.setItem(key, id);
+  return id;
+};
+
+const sendAnalyticsEvent = async (payload: Record<string, unknown>) => {
+  try {
+    await fetch(`${apiBase}/v1/analytics/event`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    // Ignore analytics errors
+  }
+};
+
+export function ProductPage() {
+  const { hash } = useParams<{ hash: string }>();
+  const [thing, setThing] = useState<ThingFile | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [email, setEmail] = useState('');
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [imageError, setImageError] = useState(false);
+  const [deliveryAddress, setDeliveryAddress] = useState<AddressForm>({
+    name: '',
+    line1: '',
+    line2: '',
+    suburb: '',
+    city: '',
+    postal_code: '',
+    phone: '',
+  });
+  const [billingAddress, setBillingAddress] = useState<AddressForm>({
+    name: '',
+    line1: '',
+    line2: '',
+    suburb: '',
+    city: '',
+    postal_code: '',
+    phone: '',
+  });
+  const [billingSameAsDelivery, setBillingSameAsDelivery] = useState(true);
+  const [addressErrors, setAddressErrors] = useState<Record<string, string>>({});
+  const [billingErrors, setBillingErrors] = useState<Record<string, string>>({});
+  const [showAddressForm, setShowAddressForm] = useState(false);
+
+  useEffect(() => {
+    if (!hash) {
+      setError('Invalid product link');
+      setLoading(false);
+      return;
+    }
+
+    fetch(`${apiBase}/thing/${hash}.json`)
+      .then((res) => {
+        if (!res.ok) {
+          throw new Error('Product not found');
+        }
+        return res.json();
+      })
+      .then((data) => {
+        setThing(data);
+        setLoading(false);
+        if (hash) {
+          sendAnalyticsEvent({
+            event: 'view',
+            hash,
+            source_url: window.location.href,
+            anon_id: getAnonId(),
+          });
+        }
+      })
+      .catch((err) => {
+        setError(err.message || 'Failed to load product');
+        setLoading(false);
+      });
+  }, [hash]);
+
+  useEffect(() => {
+    const title = thing?.product.title ? `${thing.product.title} — fairflow` : 'fairflow';
+    document.title = title;
+  }, [thing]);
+
+  const validateAddress = (address: AddressForm, setErrors: (errors: Record<string, string>) => void) => {
+    const errors: Record<string, string> = {};
+    if (!address.name.trim()) errors.name = 'Recipient name is required';
+    if (!address.line1.trim()) errors.line1 = 'Street address is required';
+    if (!address.city.trim()) errors.city = 'City is required';
+    if (!address.postal_code.trim()) errors.postal_code = 'Postal code is required';
+    if (!address.phone.trim()) errors.phone = 'Phone number is required';
+    setErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
+
+  const handleBuyNow = async () => {
+    if (!isValidEmail(email)) {
+      alert('Please enter a valid email address');
+      return;
+    }
+
+    if (!showAddressForm) {
+      setShowAddressForm(true);
+      return;
+    }
+
+    if (!validateAddress(deliveryAddress, setAddressErrors)) {
+      return;
+    }
+
+    if (!billingSameAsDelivery && !validateAddress(billingAddress, setBillingErrors)) {
+      return;
+    }
+
+    if (!hash) return;
+
+    sendAnalyticsEvent({
+      event: 'click',
+      hash,
+      source_url: window.location.href,
+      target_action: 'checkout_initiated',
+      anon_id: getAnonId(),
+    });
+
+    setCheckoutLoading(true);
+
+    try {
+      const response = await fetch(`${apiBase}/checkout/create-session`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          product_hash: hash,
+          customer_email: email,
+          delivery_address: deliveryAddress,
+          billing_address: billingSameAsDelivery ? deliveryAddress : billingAddress,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+
+      const { url } = await response.json();
+      window.location.href = url;
+    } catch (err) {
+      alert('Failed to start checkout. Please try again.');
+      setCheckoutLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
+          <p className="text-stone-600">Loading product...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error || !thing) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+        <div className="text-center max-w-md mx-auto px-6">
+          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </div>
+          <h1 className="text-2xl font-bold text-stone-900 mb-2">Product Not Found</h1>
+          <p className="text-stone-600">
+            {error || 'This product is no longer available or the link may be invalid.'}
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const emailValid = isValidEmail(email);
+  const isOutOfStock = (thing.metadata.stock_count ?? 1) <= 0;
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+      {/* Header */}
+      <div className="bg-white border-b border-stone-200">
+        <div className="max-w-5xl mx-auto px-6 py-4">
+          <div className="flex items-center justify-between">
+            <FairflowLogo markHeight={32} useBlendMode />
+            <span className="text-xs text-stone-500 font-mono">matter://{hash?.slice(0, 12)}...</span>
+          </div>
+        </div>
+      </div>
+
+      {/* Product Content */}
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-8 md:gap-12 p-8 md:p-12">
+            {/* Product Image */}
+            <div className="aspect-square bg-stone-100 rounded-xl overflow-hidden flex items-center justify-center">
+              {thing.product.image_url && !imageError ? (
+                <img
+                  src={thing.product.image_url}
+                  alt={thing.product.title}
+                  className="w-full h-full object-cover"
+                  onError={() => setImageError(true)}
+                />
+              ) : (
+                <div className="text-center p-8">
+                  <div className="w-16 h-16 bg-stone-200 rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                  <p className="text-sm text-stone-500">Product Image</p>
+                </div>
+              )}
+            </div>
+
+            {/* Product Details */}
+            <div className="flex flex-col">
+              {/* Title & Price */}
+              <div className="mb-6">
+                <h2 className="text-3xl font-bold text-stone-900 mb-3">
+                  {thing.product.title}
+                </h2>
+                <div className="text-4xl font-bold text-blue-600">
+                  {formatPrice(thing.product.price, thing.product.currency)}
+                </div>
+              </div>
+
+              {/* Description */}
+              {thing.product.description && (
+                <div className="mb-8">
+                  <p className="text-stone-600 leading-relaxed">
+                    {thing.product.description}
+                  </p>
+                </div>
+              )}
+
+              {/* Email Input */}
+              <div className="mb-6">
+                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
+                  Email Address
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="you@example.com"
+                  className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-stone-900 placeholder-stone-400"
+                  disabled={checkoutLoading}
+                />
+              </div>
+
+              {/* Delivery Address Form */}
+              {showAddressForm && (
+                <div className="mt-4 space-y-3 border border-stone-300 rounded-lg p-4 bg-stone-50 mb-6">
+                  <h3 className="text-sm font-semibold text-stone-700">Delivery Address</h3>
+
+                  {[
+                    { key: 'name', label: 'Recipient Name', placeholder: 'Full name', required: true },
+                    { key: 'line1', label: 'Street Address', placeholder: '123 Main Street', required: true },
+                    { key: 'line2', label: 'Apartment / Floor', placeholder: 'Unit 4B (optional)', required: false },
+                    { key: 'suburb', label: 'Suburb', placeholder: 'Sandton', required: false },
+                    { key: 'city', label: 'City', placeholder: 'Johannesburg', required: true },
+                    { key: 'postal_code', label: 'Postal Code', placeholder: '2196', required: true },
+                    { key: 'phone', label: 'Phone', placeholder: '+27 82 000 0000', required: true },
+                  ].map(({ key, label, placeholder, required }) => (
+                    <div key={key}>
+                      <label className="block text-xs text-stone-600 mb-1">
+                        {label}{required && <span className="text-red-500 ml-1">*</span>}
+                      </label>
+                      <input
+                        type={key === 'phone' ? 'tel' : 'text'}
+                        placeholder={placeholder}
+                        value={deliveryAddress[key as keyof typeof deliveryAddress]}
+                        onChange={(e) =>
+                          setDeliveryAddress(prev => ({ ...prev, [key]: e.target.value }))
+                        }
+                        className="w-full px-3 py-2 bg-stone-800 border border-stone-300 rounded-lg text-white text-sm placeholder-stone-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                      />
+                      {addressErrors[key] && (
+                        <p className="text-red-500 text-xs mt-1">{addressErrors[key]}</p>
+                      )}
+                    </div>
+                  ))}
+
+                  <div className="pt-3 border-t border-stone-300 mt-3">
+                    <div className="flex items-center justify-between">
+                      <h3 className="text-sm font-semibold text-stone-700">Billing Address</h3>
+                      <label className="text-xs text-stone-600 flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={billingSameAsDelivery}
+                          onChange={(e) => {
+                            setBillingSameAsDelivery(e.target.checked);
+                            setBillingErrors({});
+                          }}
+                        />
+                        Same as delivery
+                      </label>
+                    </div>
+
+                    {!billingSameAsDelivery && (
+                      <div className="mt-3 space-y-3">
+                        {[
+                          { key: 'name', label: 'Billing Name', placeholder: 'Full name', required: true },
+                          { key: 'line1', label: 'Billing Street Address', placeholder: '123 Main Street', required: true },
+                          { key: 'line2', label: 'Apartment / Floor', placeholder: 'Unit 4B (optional)', required: false },
+                          { key: 'suburb', label: 'Suburb', placeholder: 'Sandton', required: false },
+                          { key: 'city', label: 'City', placeholder: 'Johannesburg', required: true },
+                          { key: 'postal_code', label: 'Postal Code', placeholder: '2196', required: true },
+                          { key: 'phone', label: 'Phone', placeholder: '+27 82 000 0000', required: true },
+                        ].map(({ key, label, placeholder, required }) => (
+                          <div key={`billing-${key}`}>
+                            <label className="block text-xs text-stone-600 mb-1">
+                              {label}{required && <span className="text-red-500 ml-1">*</span>}
+                            </label>
+                            <input
+                              type={key === 'phone' ? 'tel' : 'text'}
+                              placeholder={placeholder}
+                              value={billingAddress[key as keyof typeof billingAddress]}
+                              onChange={(e) =>
+                                setBillingAddress(prev => ({ ...prev, [key]: e.target.value }))
+                              }
+                              className="w-full px-3 py-2 bg-stone-800 border border-stone-300 rounded-lg text-white text-sm placeholder-stone-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            />
+                            {billingErrors[key] && (
+                              <p className="text-red-500 text-xs mt-1">{billingErrors[key]}</p>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              {/* Buy Button */}
+              <button
+                onClick={handleBuyNow}
+                disabled={!emailValid || checkoutLoading || isOutOfStock}
+                className="w-full bg-blue-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 text-lg"
+              >
+                {checkoutLoading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    Processing...
+                  </>
+                ) : isOutOfStock ? (
+                  <>
+                    <ShoppingCart className="w-5 h-5" />
+                    Out of Stock
+                  </>
+                ) : (
+                  <>
+                    <ShoppingCart className="w-5 h-5" />
+                    {showAddressForm ? 'Continue to Payment' : 'Buy Now'}
+                  </>
+                )}
+              </button>
+
+              {/* Trust Signals */}
+              <div className="mt-6 pt-6 border-t border-stone-200">
+                <div className="flex items-center gap-4 text-sm text-stone-600">
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                    </svg>
+                    Secure checkout
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
+                      <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
+                    </svg>
+                    Email receipt
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Powered By */}
+        <div className="text-center mt-8">
+          <p className="text-sm text-stone-500">
+            Powered by <span className="font-semibold">fairflow</span> — Distributed Commerce
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}

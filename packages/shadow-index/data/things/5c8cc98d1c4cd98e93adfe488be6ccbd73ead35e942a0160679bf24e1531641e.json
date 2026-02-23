@@ -1,0 +1,29 @@
+{
+  "product": {
+    "title": "Fair Trade Coffee Beans",
+    "description": "Organic Ethiopian Yirgacheffe - Rich, smooth flavor with notes of chocolate and citrus",
+    "price": 12500,
+    "currency": "ZAR",
+    "image_url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800",
+    "category": "coffee"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-21T14:33:37.434Z",
+    "certifications": [
+      "Fair Trade",
+      "Organic"
+    ],
+    "stock_count": 50,
+    "matter_uri": "matter://5c8cc98d1c4cd98e93adfe488be6ccbd73ead35e942a0160679bf24e1531641e",
+    "thing_url": "http://localhost:3000/thing/5c8cc98d1c4cd98e93adfe488be6ccbd73ead35e942a0160679bf24e1531641e.json"
+  }
+}

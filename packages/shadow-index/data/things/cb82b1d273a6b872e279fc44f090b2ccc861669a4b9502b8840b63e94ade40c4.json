@@ -1,0 +1,26 @@
+{
+  "product": {
+    "title": "Rwandan Single Origin Coffee",
+    "price": 29900,
+    "currency": "ZAR",
+    "category": "coffee"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-23T08:14:26.110Z",
+    "certifications": [
+      "organic"
+    ],
+    "stock_count": 20,
+    "matter_uri": "matter://cb82b1d273a6b872e279fc44f090b2ccc861669a4b9502b8840b63e94ade40c4",
+    "thing_url": "http://localhost:3000/thing/cb82b1d273a6b872e279fc44f090b2ccc861669a4b9502b8840b63e94ade40c4.json"
+  }
+}
