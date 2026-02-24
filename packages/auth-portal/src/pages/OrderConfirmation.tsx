@@ -76,7 +76,8 @@ export function OrderConfirmation() {
           }
           return res.json();
         })
-        .then((orderData: Order) => {
+        .then((data: { ok: boolean; order: Order }) => {
+          const orderData = data.order;
           setOrder(orderData);
           
           // Fetch product title
