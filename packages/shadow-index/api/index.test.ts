@@ -167,29 +167,25 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
     else delete process.env.SHADOW_INDEX_API_KEY;
   });
 
-  it('returns 401 when API key is missing', async () => {
+  it('returns 200 for /health without API key (whitelisted for observability)', async () => {
     const res = await appWithKey.request(
       new Request(`${BASE}/health`, {
         headers: { 'x-forwarded-for': 'test-auth-1' },
       })
     );
-    expect(res.status).toBe(401);
-    const body = (await res.json()) as ErrorResponse;
-    expect(body.code).toBe('unauthorized');
+    expect(res.status).toBe(200);
   });
 
-  it('returns 401 when API key is wrong', async () => {
+  it('returns 200 for /health with any API key (whitelisted for observability)', async () => {
     const res = await appWithKey.request(
       new Request(`${BASE}/health`, {
         headers: { 'x-api-key': 'wrong', 'x-forwarded-for': 'test-auth-2' },
       })
     );
-    expect(res.status).toBe(401);
-    const body = (await res.json()) as ErrorResponse;
-    expect(body.code).toBe('unauthorized');
+    expect(res.status).toBe(200);
   });
 
-  it('returns 200 when x-api-key is valid', async () => {
+  it('returns 200 when x-api-key is valid on /health', async () => {
     const res = await appWithKey.request(
       new Request(`${BASE}/health`, {
         headers: { 'x-api-key': 'testkey', 'x-forwarded-for': 'test-auth-3' },

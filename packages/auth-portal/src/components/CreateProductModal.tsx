@@ -49,6 +49,7 @@ const INITIAL_STATE: FormState = {
 };
 
 export default function CreateProductModal({ isOpen, onClose, onCreated }: CreateProductModalProps) {
+  const apiBase = import.meta.env.VITE_API_BASE_URL || '';
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState('');
@@ -153,7 +154,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     setIsSubmitting(true);
 
     try {
-      const response = await fetch('http://localhost:3000/v1/merchant/products', {
+      const response = await fetch(`${apiBase}/v1/merchant/products`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

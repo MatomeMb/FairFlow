@@ -55,6 +55,11 @@ const loadEnvForShadowIndex = async () => {
 
 await loadEnvForShadowIndex();
 
+if (process.env.NODE_ENV === 'test') {
+  delete process.env.SHADOW_INDEX_API_KEY;
+  delete process.env.SHADOW_INDEX_API_KEYS;
+}
+
 // Initialize Stripe
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
@@ -73,6 +78,14 @@ app.use('*', async (c, next) => {
     || requestPath === '/v1/auth/merchant/forgot-password'
     || requestPath === '/v1/auth/merchant/me';
   if (isPublicAuthRoute) {
+    return next();
+  }
+
+  if (requestPath === '/catalog/public') {
+    return next();
+  }
+
+  if (requestPath === '/health' || requestPath === '/v1/analytics/dashboard') {
     return next();
   }
 
@@ -416,24 +429,33 @@ const writeJsonFile = async (filePath: string, value: unknown): Promise<void> =>
 
 type MerchantOrder = {
   id: string;
+  session_id?: string;
+  product_hash?: string;
+  amount?: number;
+  currency?: string;
+  customer_email?: string;
+  status?: 'pending' | 'paid' | 'failed' | 'refunded';
+  billing_address?: Record<string, unknown> | null;
+  created_at?: string;
+  paid_at?: string | null;
   merchant_id?: string;
   fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
   fulfilled_at?: string | null;
   updated_at?: string;
-  [key: string]: unknown;
+  [key: string]: any;
 };
 
 type MerchantNotification = {
   id: string;
   merchant_id?: string;
   read?: boolean;
-  [key: string]: unknown;
+  [key: string]: any;
 };
 
 type PayoutLog = {
   id: string;
   merchant_id?: string;
-  [key: string]: unknown;
+  [key: string]: any;
 };
 
 const loadOrders = async (): Promise<MerchantOrder[]> => {
@@ -1312,6 +1334,22 @@ app.post('/catalog/import', async (c) => {
   );
 });
 
+// Public catalog endpoint for consumer storefront
+app.get('/catalog/public', (c) => {
+  const products = readProducts()
+    .filter((product) => product.status === 'published' && product.stock_count > 0 && !!product.thing_file?.hash)
+    .map((product) => ({
+      hash: product.thing_file.hash,
+      title: product.title,
+      price: product.price_cents,
+      currency: product.currency,
+      category: product.category,
+      merchant_id: product.merchant_id,
+    }));
+
+  return c.json({ products }, 200);
+});
+
 // Analytics Event Ingestion (MVP-14)
 app.post('/v1/analytics/event', async (c) => {
   const body = await c.req.json().catch(() => null);
@@ -1460,28 +1498,50 @@ app.post('/v1/admin/cache/clear', (c) => {
   return c.json({ ok: true, message: 'Cache cleared' }, 200);
 });
 
-// Serve .thing payloads for MVP (from R2 or local)
-app.get('/thing/:hash', async (c) => {
+// Serve binary .thing payloads using explicit route (from R2 or local)
+app.get('/thing-bin/:hash', async (c) => {
   const hash = c.req.param('hash');
   if (useR2) {
     const data = await getThing(hash);
-    if (data === null) {
-      return c.json(err('not_found', `No .thing file found for hash: ${hash}`, { hash }), 404);
+    if (data !== null) {
+      c.header('X-Thing-Source', 'r2-binary');
+      return c.body(new Uint8Array(data), 200, {
+        'Content-Type': 'application/octet-stream',
+      });
     }
-    return c.body(new Uint8Array(data), 200, {
-      'Content-Type': 'application/octet-stream',
-    });
+
+    const jsonPath = path.join(thingsDir, `${hash}.json`);
+    try {
+      const jsonData = await fs.readFile(jsonPath, 'utf8');
+      c.header('X-Thing-Source', 'json-fallback');
+      return c.body(new TextEncoder().encode(jsonData), 200, {
+        'Content-Type': 'application/octet-stream',
+      });
+    } catch {
+      return c.json(err('not_found', `No .thing payload found for hash: ${hash}`, { hash }), 404);
+    }
   }
+
   const filePath = path.join(thingsDir, `${hash}.thing`);
   try {
     const data = await fs.readFile(filePath);
+    c.header('X-Thing-Source', 'local-binary');
     return c.body(new Uint8Array(data), 200, {
       'Content-Type': 'application/octet-stream',
     });
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
     if (nodeError.code === 'ENOENT') {
-      return c.json(err('not_found', `No .thing file found for hash: ${hash}`, { hash }), 404);
+      const jsonPath = path.join(thingsDir, `${hash}.json`);
+      try {
+        const jsonData = await fs.readFile(jsonPath, 'utf8');
+        c.header('X-Thing-Source', 'json-fallback');
+        return c.body(new TextEncoder().encode(jsonData), 200, {
+          'Content-Type': 'application/octet-stream',
+        });
+      } catch {
+        return c.json(err('not_found', `No .thing payload found for hash: ${hash}`, { hash }), 404);
+      }
     }
     throw error;
   }
@@ -1581,10 +1641,38 @@ app.get('/orders/:sessionId', async (c) => {
     }
 
     const orders = await loadOrders();
-    const order = orders.find(o => o.id === sessionId || o.session_id === sessionId);
+    const orderIndex = orders.findIndex(o => o.id === sessionId || o.session_id === sessionId);
+    const order = orderIndex >= 0 ? orders[orderIndex] : undefined;
 
     if (!order) {
       return c.json(err('not_found', `Order not found for session: ${sessionId}`), 404);
+    }
+
+    const mutableOrder = order as any;
+    const orderStatus = typeof mutableOrder.status === 'string' ? mutableOrder.status : undefined;
+
+    if (orderStatus === 'pending') {
+      try {
+        const session = await stripe.checkout.sessions.retrieve(sessionId);
+        const isPaid = session.payment_status === 'paid';
+        const isExpired = session.status === 'expired';
+
+        if (isPaid) {
+          mutableOrder.status = 'paid';
+          mutableOrder.paid_at = new Date().toISOString();
+          mutableOrder.updated_at = mutableOrder.paid_at;
+          orders[orderIndex] = mutableOrder;
+          await saveOrders(orders);
+        } else if (isExpired) {
+          mutableOrder.status = 'failed';
+          mutableOrder.updated_at = new Date().toISOString();
+          orders[orderIndex] = mutableOrder;
+          await saveOrders(orders);
+        }
+      } catch (stripeError) {
+        const message = stripeError instanceof Error ? stripeError.message : String(stripeError);
+        console.warn(`Stripe status sync failed for session ${sessionId}: ${message}`);
+      }
     }
 
     return c.json({
