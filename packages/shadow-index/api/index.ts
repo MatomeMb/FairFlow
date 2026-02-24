@@ -86,6 +86,11 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  // Allow public access to order confirmation
+  if (requestPath.startsWith('/orders/')) {
+    return next();
+  }
+
   const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
   const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
   if (isMerchantRoute || isMerchantAnalyticsRoute) {
@@ -1525,7 +1530,7 @@ app.post('/checkout/create-session', async (c) => {
         },
       ],
       mode: 'payment',
-      success_url: `${process.env.AUTH_PORTAL_BASE_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.AUTH_PORTAL_BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${process.env.AUTH_PORTAL_BASE_URL}/product/${product_hash}`,
       customer_email: customer_email,
       metadata: {
@@ -1536,6 +1541,24 @@ app.post('/checkout/create-session', async (c) => {
       },
     });
 
+    // Create and save order
+    const order: MerchantOrder = {
+      id: session.id,
+      session_id: session.id,
+      product_hash,
+      merchant_id: product.merchant_id,
+      amount: priceInCents,
+      currency: product.currency || 'usd',
+      customer_email,
+      status: 'pending',
+      billing_address: billing_address || null,
+      created_at: new Date().toISOString(),
+      paid_at: null,
+    };
+
+    const existingOrders = await loadOrders();
+    await saveOrders([...existingOrders, order]);
+
     return c.json({
       ok: true,
       url: session.url,
@@ -1545,6 +1568,33 @@ app.post('/checkout/create-session', async (c) => {
     const message = error instanceof Error ? error.message : String(error);
     console.error('Checkout session creation failed:', message);
     return c.json(err('checkout_failed', 'Failed to create checkout session'), 500);
+  }
+});
+
+// GET /orders/:sessionId - Fetch order details by session ID
+app.get('/orders/:sessionId', async (c) => {
+  try {
+    const sessionId = c.req.param('sessionId');
+    
+    if (!sessionId) {
+      return c.json(err('invalid_request', 'Missing session ID'), 400);
+    }
+
+    const orders = await loadOrders();
+    const order = orders.find(o => o.id === sessionId || o.session_id === sessionId);
+
+    if (!order) {
+      return c.json(err('not_found', `Order not found for session: ${sessionId}`), 404);
+    }
+
+    return c.json({
+      ok: true,
+      order,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Failed to fetch order:', message);
+    return c.json(err('order_fetch_failed', 'Failed to fetch order details'), 500);
   }
 });
 
