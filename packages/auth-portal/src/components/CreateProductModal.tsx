@@ -1,10 +1,11 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
 import { apiBase, apiKey } from '../lib/config';
+import type { MerchantProductApi } from '../types/merchant';
 
 interface CreateProductModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onCreated: (product: any) => void;
+  onCreated: (product: MerchantProductApi) => void;
 }
 
 type FormState = {
@@ -56,7 +57,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [successPayload, setSuccessPayload] = useState<SuccessPayload | null>(null);
-  const [createdProduct, setCreatedProduct] = useState<any>(null);
+  const [createdProduct, setCreatedProduct] = useState<MerchantProductApi | null>(null);
   const [copiedField, setCopiedField] = useState<'matter' | 'page' | null>(null);
 
   useEffect(() => {
@@ -192,10 +193,10 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           thing_url: thing.thing_url,
           hash: thing.hash,
         });
-        setCreatedProduct(data);
+        setCreatedProduct(data as MerchantProductApi);
         setStep('success');
       } else {
-        onCreated(data);
+        onCreated(data as MerchantProductApi);
         onClose();
       }
     } catch {

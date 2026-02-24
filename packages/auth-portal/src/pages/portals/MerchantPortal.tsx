@@ -6,8 +6,12 @@ import { MetricCard } from '../../components/shared/MetricCard';
 import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
 import CreateProductModal from '../../components/CreateProductModal';
-import KYCForm, { type KycSubmitPayload } from '../../components/KYCForm';
-import { Package, Bell, ShoppingCart, AlertTriangle } from 'lucide-react';
+import { type KycSubmitPayload } from '../../components/KYCForm';
+import { Package, Bell } from 'lucide-react';
+import type { MerchantProductApi, MerchantOrder, MerchantNotification, MerchantAccount, PayoutLog } from '../../types/merchant';
+import { MerchantOrders } from './merchant/MerchantOrders';
+import { MerchantNotifications } from './merchant/MerchantNotifications';
+import { MerchantKYCPayouts } from './merchant/MerchantKYCPayouts';
 import {
   Area,
   AreaChart,
@@ -32,112 +36,6 @@ interface Product {
   matterUri?: string;
   thingUrl?: string;
   hash?: string;
-}
-
-interface MerchantProductApi {
-  id: string;
-  title: string;
-  description?: string;
-  price_cents: number;
-  currency: 'ZAR';
-  category?: string;
-  stock_count: number;
-  image_url?: string;
-  shipping_available: boolean;
-  certifications: string[];
-  thing_file?: {
-    hash: string;
-    matter_uri: string;
-    thing_url: string;
-    generated_at: string;
-  };
-  status: 'draft' | 'published' | 'archived';
-  created_at: string;
-  updated_at: string;
-}
-
-interface DeliveryAddress {
-  name?: string;
-  line1?: string;
-  line2?: string;
-  suburb?: string;
-  city?: string;
-  postal_code?: string;
-  phone?: string;
-}
-
-interface MerchantOrder {
-  id: string;
-  session_id: string;
-  product_hash: string;
-  product_title?: string;
-  customer_email: string;
-  amount: number;
-  currency: string;
-  created_at: string;
-  merchant_marked_fulfilled_at?: string;
-  consumer_confirmed_delivery: boolean;
-  consumer_confirmed_at?: string;
-  payout_status: 'holding' | 'pending_release' | 'released' | 'failed';
-  payout_log_id?: string;
-  fulfilled_at?: string | null;
-  fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
-  delivery_address?: DeliveryAddress | null;
-}
-
-interface MerchantNotification {
-  id: string;
-  merchant_id: string;
-  type: 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'high_value_order';
-  title: string;
-  message: string;
-  data: {
-    order_id?: string;
-    product_id?: string;
-    product_title?: string;
-    order_total?: number;
-    customer_email?: string;
-    delivery_address?: string;
-  };
-  read: boolean;
-  created_at: string;
-}
-
-interface MerchantAccount {
-  id: string;
-  business_name: string;
-  email: string;
-  kyc_status: 'not_started' | 'pending' | 'approved' | 'rejected';
-  kyc_data?: {
-    id_number: string;
-    date_of_birth: string;
-    address: string;
-    phone: string;
-  };
-  bank_account?: {
-    account_holder_name: string;
-    account_number: string;
-    branch_code: string;
-    bank_name: string;
-    account_type: 'cheque' | 'savings' | 'transmission';
-  };
-  commission_rate: number;
-  payout_frequency: 'weekly' | 'monthly';
-  payout_minimum: number;
-  total_earnings: number;
-  pending_payout: number;
-  updated_at: string;
-}
-
-interface PayoutLog {
-  id: string;
-  merchant_id: string;
-  orders_included: string[];
-  gross_amount: number;
-  commission_amount: number;
-  net_amount: number;
-  status: 'pending' | 'processing' | 'completed' | 'failed';
-  created_at: string;
 }
 
 type ReportRowDay = { date: string; views: number; clicks: number };
@@ -874,7 +772,30 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         {productsLoading ? (
-          <InlineSpinner label="Loading products..." />
+          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden">
+            <table className="w-full text-sm">
+              <thead className="bg-stone-800">
+                <tr>
+                  <th className="px-6 py-3 text-left text-stone-300">Product</th>
+                  <th className="px-6 py-3 text-left text-stone-300">Category</th>
+                  <th className="px-6 py-3 text-right text-stone-300">Price</th>
+                  <th className="px-6 py-3 text-right text-stone-300">Stock</th>
+                  <th className="px-6 py-3 text-center text-stone-300">Status</th>
+                  <th className="px-6 py-3 text-left text-stone-300">Links</th>
+                  <th className="px-6 py-3 text-right text-stone-300">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {[0, 1, 2].map((index) => (
+                  <tr key={index} className="border-t border-stone-800">
+                    <td className="px-6 py-4" colSpan={7}>
+                      <div className="h-4 bg-stone-800 rounded animate-pulse w-full" />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : products.length === 0 ? (
           <EmptyState icon={<Package className="w-10 h-10 text-stone-500" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
         ) : (
@@ -1135,98 +1056,16 @@ export const MerchantPortal: React.FC = () => {
   const commissionRate = merchantAccount?.commission_rate ?? 0.03;
 
   const renderOrders = () => (
-    <div className="space-y-4">
-      {ordersError && (
-        <ErrorBanner message={ordersError} onDismiss={() => setOrdersError(null)} />
-      )}
-
-      {ordersLoading ? (
-        <InlineSpinner label="Loading orders..." />
-      ) : orders.length === 0 ? (
-        <EmptyState icon={<Package className="w-10 h-10 text-stone-500" />} title="No orders yet" description="No orders yet. Share your product links to get started." />
-      ) : (
-        <div className="space-y-4">
-          {orders.map((order) => (
-            <div
-              key={order.id}
-              className="rounded-xl border p-5 bg-stone-900 border-stone-800"
-            >
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <p className="font-mono text-xs text-stone-400">Order #{order.id}</p>
-                  {order.product_title && (
-                    <p className="text-sm font-medium text-stone-200">
-                      {order.product_title}
-                    </p>
-                  )}
-                  {!order.product_title && order.product_hash && (
-                    <p className="font-mono text-xs text-stone-500">
-                      {order.product_hash.slice(0, 16)}…
-                    </p>
-                  )}
-                  <p className="text-sm text-stone-300">Ordered: {new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}</p>
-                </div>
-
-                {order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered' ? (
-                  <span className="text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400">Fulfilled ✓</span>
-                ) : (
-                  <button
-                    onClick={() => handleMarkAsFulfilled(order.id)}
-                    disabled={fulfillingOrderId === order.id}
-                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-700 px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
-                  >
-                    {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Fulfilled'}
-                  </button>
-                )}
-              </div>
-
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
-                <p className="text-stone-300"><span className="text-stone-500">Customer:</span> {order.customer_email}</p>
-                <p className="text-stone-300">
-                  <span className="text-stone-500">Amount:</span> R {(order.amount / 100).toFixed(2)}
-                  <span className="text-stone-500"> (Platform takes R {(Math.round(order.amount * commissionRate) / 100).toFixed(2)} · Merchant receives R {((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)})</span>
-                </p>
-                <p className="text-stone-300 md:col-span-2">
-                  <span className="text-stone-500">Fulfillment:</span>{' '}
-                  {order.fulfillment_status === 'pending' || !order.fulfillment_status
-                    ? 'Pending'
-                    : `${order.fulfillment_status === 'delivered' ? 'Fulfilled ✓' : 'Fulfilled ✓'}${order.merchant_marked_fulfilled_at ? ` — ${new Date(order.merchant_marked_fulfilled_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}`}
-                </p>
-                <p className="text-stone-300 md:col-span-2">
-                  <span className="text-stone-500">Delivery:</span>{' '}
-                  {order.consumer_confirmed_delivery
-                    ? `Delivered ✓ — consumer confirmed ${order.consumer_confirmed_at ? new Date(order.consumer_confirmed_at).toLocaleDateString('en-ZA', { dateStyle: 'medium' }) : ''}`
-                    : order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered'
-                      ? 'Confirmation email sent to customer'
-                      : 'Waiting for consumer confirmation'}
-                </p>
-                <p className="text-stone-300 md:col-span-2">
-                  <span className="text-stone-500">Payout:</span>{' '}
-                  {order.payout_status === 'pending_release' && order.amount
-                    ? `Queued for transfer — R ${((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)}`
-                    : getPayoutStatusLabel(order)}
-                </p>
-              </div>
-
-              {order.delivery_address && (
-                <div className="mt-4 bg-stone-800 border border-stone-700 rounded-lg p-3 text-sm text-stone-300">
-                  <p className="text-stone-400 mb-1">Delivery Address</p>
-                  <p>{order.delivery_address.name}</p>
-                  <p>{order.delivery_address.line1}</p>
-                  {order.delivery_address.line2 && <p>{order.delivery_address.line2}</p>}
-                  <p>
-                    {[order.delivery_address.suburb, order.delivery_address.city, order.delivery_address.postal_code]
-                      .filter(Boolean)
-                      .join(', ')}
-                  </p>
-                  {order.delivery_address.phone && <p>{order.delivery_address.phone}</p>}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <MerchantOrders
+      orders={orders}
+      ordersLoading={ordersLoading}
+      ordersError={ordersError}
+      fulfillingOrderId={fulfillingOrderId}
+      commissionRate={commissionRate}
+      onDismissOrdersError={() => setOrdersError(null)}
+      onMarkAsFulfilled={handleMarkAsFulfilled}
+      getPayoutStatusLabel={getPayoutStatusLabel}
+    />
   );
 
   const formatRelativeTime = (iso: string) => {
@@ -1245,172 +1084,35 @@ export const MerchantPortal: React.FC = () => {
     return `R ${(numeric / 100).toFixed(2)}`;
   };
 
-  const renderNotificationIcon = (type: MerchantNotification['type']) => {
-    if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-emerald-400" />;
-    if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-amber-400" />;
-    if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-red-400" />;
-    return <Bell className="w-4 h-4 text-stone-400" />;
-  };
-
   const renderNotifications = () => (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <h3 className="font-bold">Notifications</h3>
-        <button
-          onClick={markAllNotificationsRead}
-          className="text-xs text-emerald-400 hover:text-emerald-300"
-        >
-          Mark all as read
-        </button>
-      </div>
-
-      {notificationsError && (
-        <ErrorBanner message={notificationsError} onDismiss={() => setNotificationsError(null)} />
-      )}
-
-      {notificationsLoading ? (
-        <InlineSpinner label="Loading notifications..." />
-      ) : notifications.length === 0 ? (
-        <EmptyState icon={<Bell className="w-10 h-10 text-stone-500" />} title="No notifications" description="You're all caught up — no notifications." />
-      ) : (
-        <div className="space-y-3">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`border rounded-xl p-4 ${
-                notification.type === 'high_value_order'
-                  ? 'border-red-500/40 bg-red-500/10'
-                  : notification.read
-                  ? 'bg-stone-900 border-stone-800'
-                  : 'bg-stone-900 border-emerald-700/50 border-l-4 border-l-emerald-500'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
-                  <div className="min-w-0">
-                    <p className={`text-sm ${notification.read ? 'text-stone-300' : 'text-white font-semibold'}`}>{notification.title}</p>
-                    <p className="text-xs text-stone-400 mt-1">{notification.message}</p>
-                    <p className="text-xs text-stone-500 mt-2">{formatRelativeTime(notification.created_at)}</p>
-                  </div>
-                </div>
-                {!notification.read && (
-                  <button
-                    onClick={() => markNotificationRead(notification.id)}
-                    disabled={updatingNotificationId === notification.id}
-                    className="text-xs text-emerald-400 hover:text-emerald-300 disabled:text-stone-500 px-3 py-3 min-h-[44px] rounded-lg border border-emerald-800/40"
-                  >
-                    {updatingNotificationId === notification.id ? 'Updating...' : 'Mark as read'}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <MerchantNotifications
+      notifications={notifications}
+      notificationsLoading={notificationsLoading}
+      notificationsError={notificationsError}
+      updatingNotificationId={updatingNotificationId}
+      onDismissNotificationsError={() => setNotificationsError(null)}
+      onMarkAllNotificationsRead={markAllNotificationsRead}
+      onMarkNotificationRead={markNotificationRead}
+      formatRelativeTime={formatRelativeTime}
+    />
   );
 
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const renderKycPayouts = () => (
-    <div className="space-y-6">
-      {accountError && (
-        <ErrorBanner message={accountError} onDismiss={() => setAccountError(null)} />
-      )}
-
-      {(accountLoading || payoutsLoading) && <InlineSpinner label="Loading KYC and payout data..." />}
-
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 space-y-4">
-        <KYCForm
-          kycStatus={merchantAccount?.kyc_status || 'not_started'}
-          initialBusinessName={merchantAccount?.business_name || kycForm.business_name}
-          maskedAccountNumber={merchantAccount?.bank_account?.account_number}
-          bankAccountOnFile={merchantAccount?.bank_account}
-          submitting={kycSubmitting}
-          onSubmit={handleStartKyc}
-        />
-      </div>
-
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 space-y-4">
-        <h3 className="font-bold">KYC & Payouts</h3>
-        <p className="text-sm text-stone-400">Platform commission: {(commissionRate * 100).toFixed(1)}% per order</p>
-
-        {merchantAccount?.bank_account && (
-          <div className="rounded-lg border border-stone-700 bg-stone-800/30 p-4">
-            <div className="flex items-center justify-between">
-              <h4 className="font-semibold">Bank Account on File</h4>
-            </div>
-            <div className="mt-3 space-y-1 text-sm text-stone-300">
-              <p><span className="text-stone-500">Bank:</span> {merchantAccount.bank_account.bank_name}</p>
-              <p><span className="text-stone-500">Account holder:</span> {merchantAccount.bank_account.account_holder_name}</p>
-              <p><span className="text-stone-500">Account number:</span> {merchantAccount.bank_account.account_number}</p>
-              <p><span className="text-stone-500">Branch code:</span> {merchantAccount.bank_account.branch_code}</p>
-              <p><span className="text-stone-500">Account type:</span> {merchantAccount.bank_account.account_type}</p>
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
-          <div className="bg-stone-800 border border-stone-700 rounded-lg p-3">
-            <p className="text-stone-500">Pending payout</p>
-            <p className="text-white font-semibold">R {((merchantAccount?.pending_payout ?? 0) / 100).toFixed(2)}</p>
-          </div>
-          <div className="bg-stone-800 border border-stone-700 rounded-lg p-3">
-            <p className="text-stone-500">Total earnings</p>
-            <p className="text-white font-semibold">R {((merchantAccount?.total_earnings ?? 0) / 100).toFixed(2)}</p>
-          </div>
-          <div className="bg-stone-800 border border-stone-700 rounded-lg p-3">
-            <p className="text-stone-500">Commission rate</p>
-            <p className="text-white font-semibold">{(commissionRate * 100).toFixed(1)}%</p>
-          </div>
-          <div className="bg-stone-800 border border-stone-700 rounded-lg p-3">
-            <p className="text-stone-500">Payout frequency</p>
-            <p className="text-white font-semibold capitalize">{merchantAccount?.payout_frequency || 'weekly'}</p>
-          </div>
-        </div>
-
-        {payoutsLoading ? (
-          <InlineSpinner label="Loading payouts..." />
-        ) : payoutLogs.length === 0 ? (
-          <p className="text-sm text-stone-500">No payouts yet. Payouts queue only after KYC approval and consumer confirmation.</p>
-        ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-stone-400 border-b border-stone-800">
-                <tr>
-                  <th className="py-2 text-left">Date</th>
-                  <th className="py-2 text-right">Gross</th>
-                  <th className="py-2 text-right">Commission</th>
-                  <th className="py-2 text-right">Net</th>
-                  <th className="py-2 text-right">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {payoutLogs.map((payout) => (
-                  <tr key={payout.id} className="border-b border-stone-800">
-                    <td className="py-2 text-stone-300">{new Date(payout.created_at).toLocaleDateString('en-ZA')}</td>
-                    <td className="py-2 text-right text-stone-300">{formatCents(payout.gross_amount)}</td>
-                    <td className="py-2 text-right text-stone-300">{formatCents(payout.commission_amount)}</td>
-                    <td className="py-2 text-right text-emerald-400">{formatCents(payout.net_amount)}</td>
-                    <td className="py-2 text-right">
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        payout.status === 'completed' ? 'bg-emerald-900/50 text-emerald-400' :
-                        payout.status === 'processing' ? 'bg-blue-900/50 text-blue-400' :
-                        payout.status === 'failed' ? 'bg-red-900/50 text-red-400' :
-                        'bg-amber-900/50 text-amber-400'
-                      }`}>
-                        {payout.status}
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-      </div>
-    </div>
+    <MerchantKYCPayouts
+      kycSubmitting={kycSubmitting}
+      kycForm={kycForm}
+      merchantAccount={merchantAccount}
+      payoutLogs={payoutLogs}
+      payoutsLoading={payoutsLoading}
+      accountLoading={accountLoading}
+      accountError={accountError}
+      commissionRate={commissionRate}
+      onDismissAccountError={() => setAccountError(null)}
+      onStartKyc={handleStartKyc}
+      formatCents={formatCents}
+    />
   );
 
   const renderMyAccount = () => (

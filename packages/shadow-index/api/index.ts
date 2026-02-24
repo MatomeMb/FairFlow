@@ -94,6 +94,11 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  // Allow public access to product resolution endpoint used by consumer product pages
+  if (requestPath.startsWith('/resolve/')) {
+    return next();
+  }
+
   // Allow public access to checkout endpoints
   if (requestPath.startsWith('/checkout/')) {
     return next();
