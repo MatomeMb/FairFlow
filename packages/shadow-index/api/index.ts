@@ -72,6 +72,11 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  // Allow public access to product detail pages (/thing/:hash.json)
+  if (requestPath.match(/^\/thing\/.+\.json$/)) {
+    return next();
+  }
+
   const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
   const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
   if (isMerchantRoute || isMerchantAnalyticsRoute) {
@@ -1134,6 +1139,31 @@ app.get('/gist/:hash', async (c) => {
     gist: entry.gist,
     checkout_url: entry.checkout_url,
   });
+});
+
+// Get full thing file (product detail) by hash
+app.get('/thing/:hash', async (c) => {
+  let hash = c.req.param('hash');
+  // Remove trailing .json if present
+  if (hash.endsWith('.json')) {
+    hash = hash.slice(0, -5);
+  }
+  const thingPath = path.join(thingsDir, `${hash}.json`);
+  try {
+    const content = await fs.readFile(thingPath, 'utf8');
+    const thing = JSON.parse(content);
+    c.header('Content-Type', 'application/json');
+    return c.json(thing);
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOENT') {
+      return c.json(err('not_found', `Thing file not found for hash: ${hash}`, { hash }), 404);
+    }
+    return c.json(
+      err('internal_error', 'Failed to load thing file', { hash, error: nodeError.message }),
+      500
+    );
+  }
 });
 
 // Batch compilation endpoint (Sprint 4 — MVP-11)
