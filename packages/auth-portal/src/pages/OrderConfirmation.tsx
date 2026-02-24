@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { CheckCircle2, Loader2, Package, Mail } from 'lucide-react';
 import { FairflowLogo } from '../components/FairflowLogo';
+import { apiBase } from '../lib/config';
+import { formatPrice } from '../lib/format';
 
 interface Order {
   id: string;
@@ -31,14 +33,6 @@ interface ThingFile {
   };
 }
 
-const formatPrice = (amount: number, currency: string): string => {
-  const value = (amount / 100).toFixed(2);
-  if (currency === 'ZAR') return `R ${value}`;
-  if (currency === 'USD') return `$${value}`;
-  if (currency === 'EUR') return `€${value}`;
-  return `${currency} ${value}`;
-};
-
 const formatDateTime = (isoString: string): string => {
   const date = new Date(isoString);
   return date.toLocaleString('en-ZA', {
@@ -46,8 +40,6 @@ const formatDateTime = (isoString: string): string => {
     timeStyle: 'short',
   });
 };
-
-const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 export function OrderConfirmation() {
   const [searchParams] = useSearchParams();

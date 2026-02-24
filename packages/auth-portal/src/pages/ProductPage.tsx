@@ -2,6 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { Loader2, ShoppingCart } from 'lucide-react';
 import { FairflowLogo } from '../components/FairflowLogo';
+import { apiBase } from '../lib/config';
+import { formatPrice } from '../lib/format';
+import { AddressFields, type AddressForm } from '../components/shared/AddressFields';
 
 interface ThingFile {
   product: {
@@ -28,29 +31,9 @@ interface ThingFile {
   };
 }
 
-type AddressForm = {
-  name: string;
-  line1: string;
-  line2: string;
-  suburb: string;
-  city: string;
-  postal_code: string;
-  phone: string;
-};
-
-const formatPrice = (amount: number, currency: string): string => {
-  const value = (amount / 100).toFixed(2);
-  if (currency === 'ZAR') return `R ${value}`;
-  if (currency === 'USD') return `$${value}`;
-  if (currency === 'EUR') return `€${value}`;
-  return `${currency} ${value}`;
-};
-
 const isValidEmail = (email: string): boolean => {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 };
-
-const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
 
 const getAnonId = (): string => {
   const key = 'ttm_anon_id';
@@ -103,6 +86,7 @@ export function ProductPage() {
   const [addressErrors, setAddressErrors] = useState<Record<string, string>>({});
   const [billingErrors, setBillingErrors] = useState<Record<string, string>>({});
   const [showAddressForm, setShowAddressForm] = useState(false);
+  const [emailError, setEmailError] = useState<string>('');
 
   useEffect(() => {
     if (!hash) {
@@ -153,8 +137,10 @@ export function ProductPage() {
   };
 
   const handleBuyNow = async () => {
+    setEmailError('');
+
     if (!isValidEmail(email)) {
-      alert('Please enter a valid email address');
+      setEmailError('Please enter a valid email address');
       return;
     }
 
@@ -237,7 +223,7 @@ export function ProductPage() {
   }
 
   const emailValid = isValidEmail(email);
-  const isOutOfStock = (thing.metadata.stock_count ?? 1) <= 0;
+  const isOutOfStock = (thing?.metadata?.stock_count ?? 1) <= 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -297,129 +283,109 @@ export function ProductPage() {
                 </div>
               )}
 
-              {/* Email Input */}
-              <div className="mb-6">
-                <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
-                  Email Address
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="you@example.com"
-                  className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-stone-900 placeholder-stone-400"
-                  disabled={checkoutLoading}
-                />
-              </div>
-
-              {/* Delivery Address Form */}
               {showAddressForm && (
-                <div className="mt-4 space-y-3 border border-stone-300 rounded-lg p-4 bg-stone-50 mb-6">
-                  <h3 className="text-sm font-semibold text-stone-700">Delivery Address</h3>
-
-                  {[
-                    { key: 'name', label: 'Recipient Name', placeholder: 'Full name', required: true },
-                    { key: 'line1', label: 'Street Address', placeholder: '123 Main Street', required: true },
-                    { key: 'line2', label: 'Apartment / Floor', placeholder: 'Unit 4B (optional)', required: false },
-                    { key: 'suburb', label: 'Suburb', placeholder: 'Sandton', required: false },
-                    { key: 'city', label: 'City', placeholder: 'Johannesburg', required: true },
-                    { key: 'postal_code', label: 'Postal Code', placeholder: '2196', required: true },
-                    { key: 'phone', label: 'Phone', placeholder: '+27 82 000 0000', required: true },
-                  ].map(({ key, label, placeholder, required }) => (
-                    <div key={key}>
-                      <label className="block text-xs text-stone-600 mb-1">
-                        {label}{required && <span className="text-red-500 ml-1">*</span>}
-                      </label>
-                      <input
-                        type={key === 'phone' ? 'tel' : 'text'}
-                        placeholder={placeholder}
-                        value={deliveryAddress[key as keyof typeof deliveryAddress]}
-                        onChange={(e) =>
-                          setDeliveryAddress(prev => ({ ...prev, [key]: e.target.value }))
-                        }
-                        className="w-full px-3 py-2 bg-stone-800 border border-stone-300 rounded-lg text-white text-sm placeholder-stone-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      />
-                      {addressErrors[key] && (
-                        <p className="text-red-500 text-xs mt-1">{addressErrors[key]}</p>
-                      )}
-                    </div>
-                  ))}
-
-                  <div className="pt-3 border-t border-stone-300 mt-3">
-                    <div className="flex items-center justify-between">
-                      <h3 className="text-sm font-semibold text-stone-700">Billing Address</h3>
-                      <label className="text-xs text-stone-600 flex items-center gap-2">
-                        <input
-                          type="checkbox"
-                          checked={billingSameAsDelivery}
-                          onChange={(e) => {
-                            setBillingSameAsDelivery(e.target.checked);
-                            setBillingErrors({});
-                          }}
-                        />
-                        Same as delivery
-                      </label>
-                    </div>
-
-                    {!billingSameAsDelivery && (
-                      <div className="mt-3 space-y-3">
-                        {[
-                          { key: 'name', label: 'Billing Name', placeholder: 'Full name', required: true },
-                          { key: 'line1', label: 'Billing Street Address', placeholder: '123 Main Street', required: true },
-                          { key: 'line2', label: 'Apartment / Floor', placeholder: 'Unit 4B (optional)', required: false },
-                          { key: 'suburb', label: 'Suburb', placeholder: 'Sandton', required: false },
-                          { key: 'city', label: 'City', placeholder: 'Johannesburg', required: true },
-                          { key: 'postal_code', label: 'Postal Code', placeholder: '2196', required: true },
-                          { key: 'phone', label: 'Phone', placeholder: '+27 82 000 0000', required: true },
-                        ].map(({ key, label, placeholder, required }) => (
-                          <div key={`billing-${key}`}>
-                            <label className="block text-xs text-stone-600 mb-1">
-                              {label}{required && <span className="text-red-500 ml-1">*</span>}
-                            </label>
-                            <input
-                              type={key === 'phone' ? 'tel' : 'text'}
-                              placeholder={placeholder}
-                              value={billingAddress[key as keyof typeof billingAddress]}
-                              onChange={(e) =>
-                                setBillingAddress(prev => ({ ...prev, [key]: e.target.value }))
-                              }
-                              className="w-full px-3 py-2 bg-stone-800 border border-stone-300 rounded-lg text-white text-sm placeholder-stone-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                            />
-                            {billingErrors[key] && (
-                              <p className="text-red-500 text-xs mt-1">{billingErrors[key]}</p>
-                            )}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
+                <div className="flex items-center gap-2 mb-4 text-sm text-stone-500">
+                  <span className="flex items-center gap-1">
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs flex items-center justify-center font-semibold">✓</span>
+                    Contact
+                  </span>
+                  <span className="flex-1 h-px bg-stone-200" />
+                  <span className="flex items-center gap-1">
+                    <span className="w-5 h-5 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-semibold">2</span>
+                    Delivery
+                  </span>
                 </div>
               )}
 
-              {/* Buy Button */}
-              <button
-                onClick={handleBuyNow}
-                disabled={!emailValid || checkoutLoading || isOutOfStock}
-                className="w-full bg-blue-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 text-lg"
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleBuyNow();
+                }}
               >
-                {checkoutLoading ? (
-                  <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    Processing...
-                  </>
-                ) : isOutOfStock ? (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    Out of Stock
-                  </>
-                ) : (
-                  <>
-                    <ShoppingCart className="w-5 h-5" />
-                    {showAddressForm ? 'Continue to Payment' : 'Buy Now'}
-                  </>
+                <div className="mb-6">
+                  <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
+                    Email Address
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (emailError) setEmailError('');
+                    }}
+                    placeholder="you@example.com"
+                    className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-stone-900 placeholder-stone-400"
+                    disabled={checkoutLoading}
+                  />
+                  {emailError && <p className="text-red-500 text-xs mt-1">{emailError}</p>}
+                </div>
+
+                {showAddressForm && (
+                  <div className="mt-4 space-y-3 border border-stone-300 rounded-lg p-4 bg-stone-50 mb-6">
+                    <h3 className="text-sm font-semibold text-stone-700">Delivery Address</h3>
+
+                    <AddressFields
+                      values={deliveryAddress}
+                      onChange={setDeliveryAddress}
+                      errors={addressErrors}
+                      prefix="delivery"
+                    />
+
+                    <div className="pt-3 border-t border-stone-300 mt-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-sm font-semibold text-stone-700">Billing Address</h3>
+                        <label className="text-xs text-stone-600 flex items-center gap-2">
+                          <input
+                            type="checkbox"
+                            checked={billingSameAsDelivery}
+                            onChange={(e) => {
+                              setBillingSameAsDelivery(e.target.checked);
+                              setBillingErrors({});
+                            }}
+                          />
+                          Same as delivery
+                        </label>
+                      </div>
+
+                      {!billingSameAsDelivery && (
+                        <div className="mt-3 space-y-3">
+                          <AddressFields
+                            values={billingAddress}
+                            onChange={setBillingAddress}
+                            errors={billingErrors}
+                            prefix="billing"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 )}
-              </button>
+
+                <button
+                  type="submit"
+                  disabled={!emailValid || checkoutLoading || isOutOfStock}
+                  className="w-full bg-blue-600 text-white font-semibold py-4 px-6 rounded-lg hover:bg-blue-700 active:bg-blue-800 disabled:bg-stone-300 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 text-lg"
+                >
+                  {checkoutLoading ? (
+                    <>
+                      <Loader2 className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : isOutOfStock ? (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      Out of Stock
+                    </>
+                  ) : (
+                    <>
+                      <ShoppingCart className="w-5 h-5" />
+                      {showAddressForm ? 'Continue to Payment' : 'Buy Now'}
+                    </>
+                  )}
+                </button>
+              </form>
 
               {/* Trust Signals */}
               <div className="mt-6 pt-6 border-t border-stone-200">

@@ -1,13 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import type { AnalyticsDashboard } from "../types/analytics";
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-const API_KEY = import.meta.env.VITE_API_KEY || "";
+import { apiBase, apiKey } from "../lib/config";
 
 const buildHeaders = (includeAccept = false): Record<string, string> => {
   const headers: Record<string, string> = {};
   if (includeAccept) headers.Accept = "application/json";
-  if (API_KEY) headers["x-api-key"] = API_KEY;
+  if (apiKey) headers["x-api-key"] = apiKey;
   return headers;
 };
 
@@ -20,7 +18,7 @@ export function useAnalytics(refreshInterval = 30000) {
 
   const fetchData = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/v1/analytics/dashboard`, {
+      const res = await fetch(`${apiBase}/v1/analytics/dashboard`, {
         headers: buildHeaders(true),
       });
       if (!res.ok) throw new Error(`API returned ${res.status}`);
@@ -38,7 +36,7 @@ export function useAnalytics(refreshInterval = 30000) {
 
   const checkHealth = useCallback(async () => {
     try {
-      const res = await fetch(`${API_BASE}/health`, {
+      const res = await fetch(`${apiBase}/health`, {
         headers: buildHeaders(),
       });
       return res.ok;

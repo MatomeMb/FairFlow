@@ -62,6 +62,14 @@ export function formatCurrency(amount: number, currency: 'ZAR' | 'USD' = 'ZAR'):
   })}`;
 }
 
+export const formatPrice = (amount: number, currency: string): string => {
+  const value = (amount / 100).toFixed(2);
+  if (currency === 'ZAR') return `R ${value}`;
+  if (currency === 'USD') return `$${value}`;
+  if (currency === 'EUR') return `€${value}`;
+  return `${currency} ${value}`;
+};
+
 export function formatPercent(value: number, decimals: number = 1): string {
   return `${value.toFixed(decimals)}%`;
 }

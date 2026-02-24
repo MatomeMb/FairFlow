@@ -1479,7 +1479,6 @@ export const MerchantPortal: React.FC = () => {
           Save Changes
         </button>
       </div>
-          className="px-4 py-3 min-h-[44px] bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-medium"
       <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
         <h3 className="font-bold mb-4">Account Settings</h3>
         <div className="space-y-3">

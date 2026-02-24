@@ -1,4 +1,5 @@
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { apiBase, apiKey } from '../lib/config';
 
 interface CreateProductModalProps {
   isOpen: boolean;
@@ -49,7 +50,6 @@ const INITIAL_STATE: FormState = {
 };
 
 export default function CreateProductModal({ isOpen, onClose, onCreated }: CreateProductModalProps) {
-  const apiBase = import.meta.env.VITE_API_BASE_URL || '';
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState('');
@@ -76,6 +76,8 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     if (form.price_cents === null) return 'R0.00';
     return `R${(form.price_cents / 100).toFixed(2)}`;
   }, [form.price_cents]);
+
+  const productPageUrl = `${window.location.origin}/product/${successPayload?.hash}`;
 
   const setField = <K extends keyof FormState>(key: K, value: FormState[K]) => {
     setForm((prev: FormState) => ({ ...prev, [key]: value }));
@@ -159,7 +161,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
         headers: {
           'Content-Type': 'application/json',
           'x-merchant-id': 'dev-merchant-001',
-          'x-api-key': import.meta.env.VITE_API_KEY || '',
+          'x-api-key': apiKey,
         },
         body: JSON.stringify({
           title: form.title.trim(),
@@ -286,7 +288,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
                 placeholder="125.00"
               />
-              <p className="mt-1 text-xs text-stone-400">Stored as cents: {form.price_cents ?? 0} ({prettyPrice})</p>
+              <p className="mt-1 text-xs text-stone-400">Price preview: {prettyPrice}</p>
               {errors.price_cents && <p className="mt-1 text-xs text-red-400">{errors.price_cents}</p>}
             </div>
 
@@ -379,7 +381,6 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <p className="mb-1 text-xs text-stone-400">
                 Your portable product link — share this anywhere. It works even if your website changes.
               </p>
-              <p className="text-xs text-stone-500 mb-2">Your portable product link:</p>
               <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">
                 <code className="flex-1 text-xs text-emerald-400 break-all">{successPayload?.matter_uri}</code>
                 <button
@@ -398,10 +399,10 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               </p>
               <p className="text-xs text-stone-500 mb-2">Product page:</p>
               <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">
-                <code className="flex-1 text-xs text-blue-400 break-all">localhost:5178/product/{successPayload?.hash}</code>
+                <code className="flex-1 text-xs text-blue-400 break-all">{productPageUrl}</code>
                 <button
                   type="button"
-                  onClick={() => handleCopy(`http://localhost:5178/product/${successPayload?.hash}`, 'page')}
+                  onClick={() => handleCopy(productPageUrl, 'page')}
                   className="rounded-md bg-stone-700 hover:bg-stone-600 px-3 py-2 text-xs text-white min-h-[44px]"
                 >
                   {copiedField === 'page' ? 'Copied!' : 'Copy'}

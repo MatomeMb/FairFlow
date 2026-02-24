@@ -119,116 +119,156 @@ export const KYCForm: React.FC<KYCFormProps> = ({
         <div className="rounded-md border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-300">{error}</div>
       )}
 
-      <input
-        type="text"
-        placeholder="Business Name"
-        value={form.business_name}
-        disabled={disabled}
-        onChange={(e) => setForm((prev) => ({ ...prev, business_name: e.target.value }))}
-        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-      />
+      <div>
+        <label htmlFor="kyc-business-name" className="block text-sm text-stone-400 mb-1">Business Name</label>
+        <input
+          id="kyc-business-name"
+          type="text"
+          placeholder="Business Name"
+          value={form.business_name}
+          disabled={disabled}
+          onChange={(e) => setForm((prev) => ({ ...prev, business_name: e.target.value }))}
+          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="ID Number"
-        value={form.id_number}
-        disabled={disabled}
-        onChange={(e) => setForm((prev) => ({ ...prev, id_number: e.target.value }))}
-        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-      />
+      <div>
+        <label htmlFor="kyc-id-number" className="block text-sm text-stone-400 mb-1">ID Number</label>
+        <input
+          id="kyc-id-number"
+          type="text"
+          placeholder="ID Number"
+          value={form.id_number}
+          disabled={disabled}
+          onChange={(e) => setForm((prev) => ({ ...prev, id_number: e.target.value }))}
+          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+        />
+      </div>
 
-      <input
-        type="date"
-        value={form.date_of_birth}
-        disabled={disabled}
-        onChange={(e) => setForm((prev) => ({ ...prev, date_of_birth: e.target.value }))}
-        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-      />
+      <div>
+        <label htmlFor="kyc-dob" className="block text-sm text-stone-400 mb-1">Date of Birth</label>
+        <input
+          id="kyc-dob"
+          type="date"
+          value={form.date_of_birth}
+          disabled={disabled}
+          onChange={(e) => setForm((prev) => ({ ...prev, date_of_birth: e.target.value }))}
+          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Residential Address"
-        value={form.residential_address}
-        disabled={disabled}
-        onChange={(e) => setForm((prev) => ({ ...prev, residential_address: e.target.value }))}
-        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-      />
+      <div>
+        <label htmlFor="kyc-address" className="block text-sm text-stone-400 mb-1">Residential Address</label>
+        <input
+          id="kyc-address"
+          type="text"
+          placeholder="Residential Address"
+          value={form.residential_address}
+          disabled={disabled}
+          onChange={(e) => setForm((prev) => ({ ...prev, residential_address: e.target.value }))}
+          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+        />
+      </div>
 
-      <input
-        type="text"
-        placeholder="Phone"
-        value={form.phone}
-        disabled={disabled}
-        onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-        className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-      />
+      <div>
+        <label htmlFor="kyc-phone" className="block text-sm text-stone-400 mb-1">Phone</label>
+        <input
+          id="kyc-phone"
+          type="text"
+          placeholder="Phone"
+          value={form.phone}
+          disabled={disabled}
+          onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
+          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+        />
+      </div>
 
       <div className="rounded-lg border border-stone-700 bg-stone-800/30 p-4 space-y-3">
         <p className="text-xs uppercase tracking-wide text-stone-400">South African Bank Account</p>
 
-        <input
-          type="text"
-          placeholder="Account holder name"
-          value={form.bank_account.account_holder_name}
-          disabled={disabled}
-          onChange={(e) => setForm((prev) => ({
-            ...prev,
-            bank_account: { ...prev.bank_account, account_holder_name: e.target.value },
-          }))}
-          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-        />
+        <div>
+          <label htmlFor="kyc-account-holder" className="block text-sm text-stone-400 mb-1">Account Holder Name</label>
+          <input
+            id="kyc-account-holder"
+            type="text"
+            placeholder="Account holder name"
+            value={form.bank_account.account_holder_name}
+            disabled={disabled}
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              bank_account: { ...prev.bank_account, account_holder_name: e.target.value },
+            }))}
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+          />
+        </div>
 
-        <select
-          value={form.bank_account.bank_name}
-          disabled={disabled}
-          onChange={(e) => setForm((prev) => ({
-            ...prev,
-            bank_account: { ...prev.bank_account, bank_name: e.target.value },
-          }))}
-          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-        >
-          {BANK_OPTIONS.map((bank) => (
-            <option key={bank} value={bank}>{bank}</option>
-          ))}
-        </select>
+        <div>
+          <label htmlFor="kyc-bank-name" className="block text-sm text-stone-400 mb-1">Bank Name</label>
+          <select
+            id="kyc-bank-name"
+            value={form.bank_account.bank_name}
+            disabled={disabled}
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              bank_account: { ...prev.bank_account, bank_name: e.target.value },
+            }))}
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+          >
+            {BANK_OPTIONS.map((bank) => (
+              <option key={bank} value={bank}>{bank}</option>
+            ))}
+          </select>
+        </div>
 
-        <input
-          type="text"
-          placeholder="Account number (9-11 digits)"
-          value={disabled ? (maskedAccountNumber || '') : form.bank_account.account_number}
-          disabled={disabled}
-          onChange={(e) => setForm((prev) => ({
-            ...prev,
-            bank_account: { ...prev.bank_account, account_number: e.target.value.replace(/\D/g, '').slice(0, 11) },
-          }))}
-          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-        />
+        <div>
+          <label htmlFor="kyc-account-number" className="block text-sm text-stone-400 mb-1">Account Number</label>
+          <input
+            id="kyc-account-number"
+            type="text"
+            placeholder="Account number (9-11 digits)"
+            value={disabled ? (maskedAccountNumber || '') : form.bank_account.account_number}
+            disabled={disabled}
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              bank_account: { ...prev.bank_account, account_number: e.target.value.replace(/\D/g, '').slice(0, 11) },
+            }))}
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+          />
+        </div>
 
-        <input
-          type="text"
-          placeholder="Branch code (6 digits)"
-          value={form.bank_account.branch_code}
-          disabled={disabled}
-          onChange={(e) => setForm((prev) => ({
-            ...prev,
-            bank_account: { ...prev.bank_account, branch_code: e.target.value.replace(/\D/g, '').slice(0, 6) },
-          }))}
-          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-        />
+        <div>
+          <label htmlFor="kyc-branch-code" className="block text-sm text-stone-400 mb-1">Branch Code</label>
+          <input
+            id="kyc-branch-code"
+            type="text"
+            placeholder="Branch code (6 digits)"
+            value={form.bank_account.branch_code}
+            disabled={disabled}
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              bank_account: { ...prev.bank_account, branch_code: e.target.value.replace(/\D/g, '').slice(0, 6) },
+            }))}
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+          />
+        </div>
 
-        <select
-          value={form.bank_account.account_type}
-          disabled={disabled}
-          onChange={(e) => setForm((prev) => ({
-            ...prev,
-            bank_account: { ...prev.bank_account, account_type: e.target.value as SABankAccountForm['account_type'] },
-          }))}
-          className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
-        >
-          <option value="cheque">Cheque/Current</option>
-          <option value="savings">Savings</option>
-          <option value="transmission">Transmission</option>
-        </select>
+        <div>
+          <label htmlFor="kyc-account-type" className="block text-sm text-stone-400 mb-1">Account Type</label>
+          <select
+            id="kyc-account-type"
+            value={form.bank_account.account_type}
+            disabled={disabled}
+            onChange={(e) => setForm((prev) => ({
+              ...prev,
+              bank_account: { ...prev.bank_account, account_type: e.target.value as SABankAccountForm['account_type'] },
+            }))}
+            className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white text-sm disabled:opacity-60"
+          >
+            <option value="cheque">Cheque/Current</option>
+            <option value="savings">Savings</option>
+            <option value="transmission">Transmission</option>
+          </select>
+        </div>
       </div>
 
       {!disabled && (
