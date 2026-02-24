@@ -375,16 +375,20 @@ export const MerchantPortal: React.FC = () => {
     try {
       const params = `from=${formatDate(from)}&to=${formatDate(to)}&limit=1000`;
       const [dayRes, hashRes] = await Promise.all([
-        fetch(`${apiBase}/v1/analytics/report?${params}&groupBy=day&sortBy=date`, {
+        merchantFetch(`${apiBase}/v1/analytics/report?${params}&groupBy=day&sortBy=date`, {
           headers: { Accept: 'application/json' },
         }),
-        fetch(`${apiBase}/v1/analytics/report?${params}&groupBy=hash&sortBy=clicks`, {
+        merchantFetch(`${apiBase}/v1/analytics/report?${params}&groupBy=hash&sortBy=clicks`, {
           headers: { Accept: 'application/json' },
         }),
       ]);
 
       if (!dayRes.ok || !hashRes.ok) {
-        throw new Error('Failed to load analytics');
+        const [dayErr, hashErr] = await Promise.all([
+          dayRes.ok ? Promise.resolve('') : apiError(dayRes, 'Failed to load analytics'),
+          hashRes.ok ? Promise.resolve('') : apiError(hashRes, 'Failed to load analytics'),
+        ]);
+        throw new Error(dayErr || hashErr || 'Failed to load analytics');
       }
 
       const dayData = await dayRes.json();
@@ -402,7 +406,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setAnalyticsLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, authToken]);
 
   useEffect(() => {
     if (activeTab !== 'analytics') return;

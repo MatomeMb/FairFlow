@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
 
 export function LoginPage() {
-  const { signInWithGoogle, signInWithEmail } = useAuth();
+  const { signInWithEmail } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

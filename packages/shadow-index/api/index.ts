@@ -21,6 +21,38 @@ import { logError } from '../lib/error-logger.js';
 import { dashboardHandler } from './dashboard.js';
 import { RetentionPolicy } from '../lib/retention-policy.js';
 import { isApiKeyValid } from '../lib/api-key-registry.js';
+import { merchantProductsRouter, readProducts, writeProducts } from './merchant-products.js';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const loadEnvFromFile = async (filePath: string) => {
+  try {
+    const raw = await fs.readFile(filePath, 'utf8');
+    for (const line of raw.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith('#')) continue;
+      const match = trimmed.match(/^([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)$/);
+      if (!match) continue;
+      const [, key, rawValue] = match;
+      const cleaned = rawValue.replace(/^['"]|['"]$/g, '').trim();
+      if (process.env[key] === undefined) {
+        process.env[key] = cleaned;
+      }
+    }
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code !== 'ENOENT') throw error;
+  }
+};
+
+const loadEnvForShadowIndex = async () => {
+  const packageRoot = path.join(__dirname, '..');
+  await loadEnvFromFile(path.join(packageRoot, '.env'));
+  await loadEnvFromFile(path.join(packageRoot, '.env.local'));
+};
+
+await loadEnvForShadowIndex();
 
 const app = new Hono();
 
@@ -29,6 +61,30 @@ app.use('*', cors());
 
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
+  const requestPath = c.req.path;
+  const isPublicAuthRoute = requestPath === '/v1/auth/google'
+    || requestPath === '/v1/auth/google/callback'
+    || requestPath === '/v1/auth/merchant/register'
+    || requestPath === '/v1/auth/merchant/login'
+    || requestPath === '/v1/auth/merchant/forgot-password'
+    || requestPath === '/v1/auth/merchant/me';
+  if (isPublicAuthRoute) {
+    return next();
+  }
+
+  const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
+  const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
+  if (isMerchantRoute || isMerchantAnalyticsRoute) {
+    const auth = c.req.header('Authorization');
+    const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+    if (bearer) {
+      const payload = verifyJwt(bearer, jwtSecret);
+      if (payload?.typ === 'merchant_auth') {
+        return next();
+      }
+    }
+  }
+
   const hasKeys = process.env.SHADOW_INDEX_API_KEY || process.env.SHADOW_INDEX_API_KEYS;
   if (!hasKeys) {
     return next();
@@ -66,9 +122,6 @@ app.use('*', async (c, next) => {
   }
   return next();
 });
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
@@ -186,6 +239,358 @@ type ErrorPayload = { code: string; message: string; details?: unknown };
 const err = (code: string, message: string, details?: unknown): ErrorPayload =>
   details !== undefined ? { code, message, details } : { code, message };
 
+type MerchantAccount = {
+  id: string;
+  business_name: string;
+  email: string;
+  password_hash?: string;
+  auth_provider?: 'password' | 'google';
+  kyc_status?: 'not_started' | 'pending' | 'approved' | 'rejected';
+  commission_rate?: number;
+  payout_frequency?: 'weekly' | 'monthly';
+  payout_minimum?: number;
+  total_earnings?: number;
+  pending_payout?: number;
+  kyc_data?: {
+    id_number: string;
+    date_of_birth: string;
+    address: string;
+    phone: string;
+  };
+  bank_account?: {
+    account_holder_name: string;
+    bank_name: string;
+    branch_code: string;
+    account_type: 'cheque' | 'savings' | 'transmission';
+    account_number: string;
+  };
+  reset_token?: string;
+  reset_expires_at?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+const merchantAccountsFile = path.join(dataRoot, 'merchant_accounts.json');
+const ordersFile = path.join(dataRoot, 'orders.json');
+const notificationsFile = path.join(dataRoot, 'notifications.json');
+const payoutLogsFile = path.join(dataRoot, 'payout_logs.json');
+const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? 'http://localhost:5178';
+const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? 'dev-jwt-secret-change-me';
+
+const registerSchema = z.object({
+  business_name: z.string().trim().min(1, 'Business name is required'),
+  email: z.string().trim().email('Valid email is required'),
+  password: z.string().min(8, 'Password must be at least 8 characters'),
+});
+
+const loginSchema = z.object({
+  email: z.string().trim().email('Valid email is required'),
+  password: z.string().min(1, 'Password is required'),
+});
+
+const forgotPasswordSchema = z.object({
+  email: z.string().trim().email('Valid email is required'),
+});
+
+const base64UrlEncode = (input: Buffer | string): string => {
+  const source = typeof input === 'string' ? Buffer.from(input, 'utf8') : input;
+  return source.toString('base64').replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+};
+
+const base64UrlDecode = (input: string): Buffer => {
+  const normalized = input.replace(/-/g, '+').replace(/_/g, '/');
+  const padding = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
+  return Buffer.from(normalized + padding, 'base64');
+};
+
+const hmacSha256 = (value: string, secret: string): string =>
+  base64UrlEncode(crypto.createHmac('sha256', secret).update(value).digest());
+
+const signJwt = (payload: Record<string, unknown>, secret: string): string => {
+  const header = { alg: 'HS256', typ: 'JWT' };
+  const headerB64 = base64UrlEncode(JSON.stringify(header));
+  const payloadB64 = base64UrlEncode(JSON.stringify(payload));
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const signature = hmacSha256(signingInput, secret);
+  return `${signingInput}.${signature}`;
+};
+
+const verifyJwt = (token: string, secret: string): Record<string, unknown> | null => {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+
+  const [headerB64, payloadB64, signatureB64] = parts;
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const expected = hmacSha256(signingInput, secret);
+
+  const providedBuf = Buffer.from(signatureB64, 'utf8');
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  if (providedBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(payloadB64).toString('utf8')) as Record<string, unknown>;
+    const exp = payload.exp;
+    if (typeof exp === 'number' && Date.now() >= exp * 1000) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+};
+
+const hashPassword = (password: string): string => {
+  const salt = crypto.randomBytes(16).toString('hex');
+  const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
+  return `${salt}:${derived}`;
+};
+
+const verifyPassword = (password: string, storedHash?: string): boolean => {
+  if (!storedHash) return false;
+  const [salt, expected] = storedHash.split(':');
+  if (!salt || !expected) return false;
+  const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
+  const providedBuf = Buffer.from(derived, 'utf8');
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  return providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf);
+};
+
+const normalizeMerchantAccounts = (value: unknown): MerchantAccount[] => {
+  if (Array.isArray(value)) return value as MerchantAccount[];
+  if (value && typeof value === 'object') return [value as MerchantAccount];
+  return [];
+};
+
+const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
+  try {
+    const raw = await fs.readFile(merchantAccountsFile, 'utf8');
+    const parsed = JSON.parse(raw) as unknown;
+    return normalizeMerchantAccounts(parsed);
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOENT') return [];
+    throw error;
+  }
+};
+
+const saveMerchantAccounts = async (accounts: MerchantAccount[]) => {
+  await fs.mkdir(dataRoot, { recursive: true });
+  await fs.writeFile(merchantAccountsFile, JSON.stringify(accounts, null, 2), 'utf8');
+};
+
+const readJsonFile = async <T>(filePath: string, fallback: T): Promise<T> => {
+  try {
+    const raw = await fs.readFile(filePath, 'utf8');
+    return JSON.parse(raw) as T;
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOENT') return fallback;
+    throw error;
+  }
+};
+
+const writeJsonFile = async (filePath: string, value: unknown): Promise<void> => {
+  await fs.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
+};
+
+type MerchantOrder = {
+  id: string;
+  merchant_id?: string;
+  fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
+  fulfilled_at?: string | null;
+  updated_at?: string;
+  [key: string]: unknown;
+};
+
+type MerchantNotification = {
+  id: string;
+  merchant_id?: string;
+  read?: boolean;
+  [key: string]: unknown;
+};
+
+type PayoutLog = {
+  id: string;
+  merchant_id?: string;
+  [key: string]: unknown;
+};
+
+const loadOrders = async (): Promise<MerchantOrder[]> => {
+  const parsed = await readJsonFile<Record<string, MerchantOrder> | MerchantOrder[]>(ordersFile, {});
+  if (Array.isArray(parsed)) return parsed;
+  return Object.values(parsed ?? {});
+};
+
+const saveOrders = async (orders: MerchantOrder[]): Promise<void> => {
+  const keyed: Record<string, MerchantOrder> = {};
+  for (const order of orders) {
+    if (order.id) keyed[order.id] = order;
+  }
+  await writeJsonFile(ordersFile, keyed);
+};
+
+const loadNotifications = async (): Promise<MerchantNotification[]> =>
+  readJsonFile<MerchantNotification[]>(notificationsFile, []);
+
+const saveNotifications = async (items: MerchantNotification[]): Promise<void> => {
+  await writeJsonFile(notificationsFile, items);
+};
+
+const loadPayoutLogs = async (): Promise<PayoutLog[]> =>
+  readJsonFile<PayoutLog[]>(payoutLogsFile, []);
+
+const sanitizeMerchantAccount = (account: MerchantAccount) => {
+  const { password_hash, reset_token, reset_expires_at, ...safe } = account;
+  return safe;
+};
+
+const issueMerchantToken = (account: MerchantAccount): string => {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  const payload = {
+    sub: account.id,
+    email: account.email,
+    role: 'merchant',
+    typ: 'merchant_auth',
+    iat: nowSeconds,
+    exp: nowSeconds + 60 * 60 * 24 * 7,
+  };
+  return signJwt(payload, jwtSecret);
+};
+
+const normalizePortalBaseUrl = (baseUrl: string): string =>
+  baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
+
+const inferPortalBaseUrl = (c: { req: { header: (name: string) => string | undefined } }): string => {
+  const explicit = c.req.header('x-auth-portal-base-url');
+  if (explicit) {
+    try {
+      const parsed = new URL(explicit);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return parsed.origin;
+      }
+    } catch {
+      // ignore invalid override
+    }
+  }
+
+  const referer = c.req.header('referer');
+  if (referer) {
+    try {
+      const parsed = new URL(referer);
+      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
+        return parsed.origin;
+      }
+    } catch {
+      // ignore invalid referer
+    }
+  }
+
+  return authPortalBaseUrl;
+};
+
+const buildPortalUrl = (pathName: string, params?: Record<string, string>, portalBaseUrl?: string): string => {
+  const baseUrl = normalizePortalBaseUrl(portalBaseUrl ?? authPortalBaseUrl);
+  const target = new URL(pathName, baseUrl);
+  if (params) {
+    for (const [key, value] of Object.entries(params)) {
+      target.searchParams.set(key, value);
+    }
+  }
+  return target.toString();
+};
+
+const extractBearerToken = (authHeader: string | undefined): string | null => {
+  if (!authHeader) return null;
+  if (!authHeader.startsWith('Bearer ')) return null;
+  return authHeader.slice(7).trim() || null;
+};
+
+const getGoogleOAuthConfig = () => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  if (!clientId || !clientSecret || !redirectUri) return null;
+  return { clientId, clientSecret, redirectUri };
+};
+
+const exchangeGoogleCode = async (
+  code: string,
+  config: { clientId: string; clientSecret: string; redirectUri: string }
+): Promise<{ access_token?: string } | null> => {
+  const body = new URLSearchParams({
+    code,
+    client_id: config.clientId,
+    client_secret: config.clientSecret,
+    redirect_uri: config.redirectUri,
+    grant_type: 'authorization_code',
+  });
+
+  const response = await fetch('https://oauth2.googleapis.com/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: body.toString(),
+  });
+
+  if (!response.ok) return null;
+  return (await response.json()) as { access_token?: string };
+};
+
+const fetchGoogleProfile = async (accessToken: string): Promise<{ email?: string; name?: string } | null> => {
+  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+  if (!response.ok) return null;
+  return (await response.json()) as { email?: string; name?: string };
+};
+
+const buildGoogleState = (portalBaseUrl: string): string => {
+  const nowSeconds = Math.floor(Date.now() / 1000);
+  return signJwt(
+    {
+      typ: 'google_oauth_state',
+      nonce: crypto.randomUUID(),
+      return_to: portalBaseUrl,
+      iat: nowSeconds,
+      exp: nowSeconds + 60 * 10,
+    },
+    jwtSecret
+  );
+};
+
+const parseGoogleState = (state: string | null): Record<string, unknown> | null => {
+  if (!state) return null;
+  const payload = verifyJwt(state, jwtSecret);
+  if (payload?.typ !== 'google_oauth_state') return null;
+  return payload;
+};
+
+const getMerchantIdentity = async (c: { req: { header: (name: string) => string | undefined } }): Promise<{
+  account: MerchantAccount | null;
+  merchantIds: string[];
+}> => {
+  const token = extractBearerToken(c.req.header('Authorization'));
+  if (!token) {
+    return { account: null, merchantIds: ['dev-merchant-001', 'default'] };
+  }
+
+  const payload = verifyJwt(token, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return { account: null, merchantIds: ['dev-merchant-001', 'default'] };
+  }
+
+  const subject = typeof payload.sub === 'string' ? payload.sub : null;
+  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) =>
+    (subject && candidate.id === subject) || (email && candidate.email.toLowerCase() === email)
+  ) ?? null;
+
+  const merchantIds = ['dev-merchant-001', 'default'];
+  if (account?.id) merchantIds.unshift(account.id);
+  return { account, merchantIds };
+};
+
 /** Parse CSV body to array of product-like objects. Header: title,price,currency,image_url,checkout_url (order flexible). */
 function parseCsvToProducts(csvBody: string): {
   products: Array<Record<string, unknown>>;
@@ -296,6 +701,383 @@ app.get('/health', (c) => {
     version: '0.6.0',
     timestamp: new Date().toISOString(),
   });
+});
+
+// Merchant self-serve auth endpoints
+app.post('/v1/auth/merchant/register', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const parsed = registerSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(err('invalid_request', 'Invalid registration payload', parsed.error.flatten()), 400);
+  }
+
+  const email = parsed.data.email.toLowerCase();
+  const accounts = await loadMerchantAccounts();
+  const exists = accounts.some((account) => account.email.toLowerCase() === email);
+  if (exists) {
+    return c.json(err('account_exists', 'A merchant account with this email already exists'), 409);
+  }
+
+  const now = new Date().toISOString();
+  const account: MerchantAccount = {
+    id: crypto.randomUUID(),
+    business_name: parsed.data.business_name,
+    email,
+    password_hash: hashPassword(parsed.data.password),
+    auth_provider: 'password',
+    kyc_status: 'not_started',
+    commission_rate: 0.03,
+    payout_frequency: 'weekly',
+    payout_minimum: 50000,
+    total_earnings: 0,
+    pending_payout: 0,
+    created_at: now,
+    updated_at: now,
+  };
+
+  accounts.push(account);
+  await saveMerchantAccounts(accounts);
+
+  return c.json(
+    {
+      token: issueMerchantToken(account),
+      account: sanitizeMerchantAccount(account),
+    },
+    201
+  );
+});
+
+app.post('/v1/auth/merchant/login', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const parsed = loginSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(err('invalid_request', 'Invalid login payload', parsed.error.flatten()), 400);
+  }
+
+  const email = parsed.data.email.toLowerCase();
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) => candidate.email.toLowerCase() === email);
+  if (!account || !verifyPassword(parsed.data.password, account.password_hash)) {
+    return c.json(err('invalid_credentials', 'Invalid email or password'), 401);
+  }
+
+  account.updated_at = new Date().toISOString();
+  await saveMerchantAccounts(accounts);
+
+  return c.json({
+    token: issueMerchantToken(account),
+    account: sanitizeMerchantAccount(account),
+  });
+});
+
+app.get('/v1/auth/merchant/me', async (c) => {
+  const token = extractBearerToken(c.req.header('Authorization'));
+  if (!token) {
+    return c.json(err('unauthorized', 'Missing Bearer token'), 401);
+  }
+
+  const payload = verifyJwt(token, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return c.json(err('unauthorized', 'Invalid or expired token'), 401);
+  }
+
+  const subject = typeof payload.sub === 'string' ? payload.sub : null;
+  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
+  if (!subject && !email) {
+    return c.json(err('unauthorized', 'Token payload is missing subject'), 401);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) =>
+    subject ? candidate.id === subject : candidate.email.toLowerCase() === email
+  );
+  if (!account) {
+    return c.json(err('unauthorized', 'Account not found for token'), 401);
+  }
+
+  return c.json({ account: sanitizeMerchantAccount(account) });
+});
+
+app.post('/v1/auth/merchant/forgot-password', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined) {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const parsed = forgotPasswordSchema.safeParse(body);
+  if (!parsed.success) {
+    return c.json(err('invalid_request', 'Invalid forgot-password payload', parsed.error.flatten()), 400);
+  }
+
+  const email = parsed.data.email.toLowerCase();
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) => candidate.email.toLowerCase() === email);
+  if (!account) {
+    return c.json({ ok: true, message: 'If the account exists, a reset token has been generated.' });
+  }
+
+  const resetToken = crypto.randomBytes(24).toString('hex');
+  account.reset_token = resetToken;
+  account.reset_expires_at = new Date(Date.now() + 60 * 60 * 1000).toISOString();
+  account.updated_at = new Date().toISOString();
+  await saveMerchantAccounts(accounts);
+
+  return c.json({
+    ok: true,
+    message: 'Reset token generated.',
+    reset_token: resetToken,
+  });
+});
+
+app.get('/v1/auth/google', (c) => {
+  const portalBaseUrl = inferPortalBaseUrl(c);
+  const config = getGoogleOAuthConfig();
+  if (!config) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
+  }
+
+  const params = new URLSearchParams({
+    client_id: config.clientId,
+    redirect_uri: config.redirectUri,
+    response_type: 'code',
+    scope: 'openid email profile',
+    access_type: 'offline',
+    include_granted_scopes: 'true',
+    prompt: 'select_account',
+    state: buildGoogleState(portalBaseUrl),
+  });
+
+  return c.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
+});
+
+app.get('/v1/auth/google/callback', async (c) => {
+  const parsedState = parseGoogleState(c.req.query('state') ?? null);
+  const stateReturnTo = parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
+  const portalBaseUrl = stateReturnTo ?? authPortalBaseUrl;
+
+  const errorCode = c.req.query('error');
+  if (errorCode) {
+    const mapped = errorCode === 'access_denied' ? 'google_cancelled' : 'google_token_failed';
+    return c.redirect(buildPortalUrl('/merchant/login', { error: mapped }, portalBaseUrl));
+  }
+
+  if (!parsedState) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+  }
+
+  const code = c.req.query('code');
+  if (!code) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+  }
+
+  const config = getGoogleOAuthConfig();
+  if (!config) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
+  }
+
+  const tokenResponse = await exchangeGoogleCode(code, config);
+  const accessToken = tokenResponse?.access_token;
+  if (!accessToken) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+  }
+
+  const profile = await fetchGoogleProfile(accessToken);
+  const profileEmail = profile?.email?.toLowerCase();
+  if (!profileEmail) {
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_no_email' }, portalBaseUrl));
+  }
+
+  const now = new Date().toISOString();
+  const accounts = await loadMerchantAccounts();
+  let account = accounts.find((candidate) => candidate.email.toLowerCase() === profileEmail);
+
+  if (!account) {
+    account = {
+      id: crypto.randomUUID(),
+      business_name: profile?.name?.trim() || profileEmail.split('@')[0],
+      email: profileEmail,
+      auth_provider: 'google',
+      kyc_status: 'not_started',
+      commission_rate: 0.03,
+      payout_frequency: 'weekly',
+      payout_minimum: 50000,
+      total_earnings: 0,
+      pending_payout: 0,
+      created_at: now,
+      updated_at: now,
+    };
+    accounts.push(account);
+  } else {
+    account.auth_provider = 'google';
+    account.updated_at = now;
+  }
+
+  await saveMerchantAccounts(accounts);
+
+  const merchantToken = issueMerchantToken(account);
+  return c.redirect(buildPortalUrl('/merchant', { token: merchantToken }, portalBaseUrl));
+});
+
+// Merchant dashboard endpoints
+app.route('/v1/merchant/products', merchantProductsRouter);
+
+app.post('/v1/merchant/products/:productId/restock', async (c) => {
+  const productId = c.req.param('productId');
+  const body = await c.req.json().catch(() => ({}));
+  const quantityRaw = typeof body === 'object' && body ? (body as { quantity?: unknown }).quantity : undefined;
+  const quantity = typeof quantityRaw === 'number' && Number.isFinite(quantityRaw) ? Math.max(1, Math.floor(quantityRaw)) : 10;
+
+  const products = readProducts();
+  const target = products.find((product) => product.id === productId);
+  if (!target) {
+    return c.json(err('not_found', 'Product not found'), 404);
+  }
+
+  target.stock_count = Math.max(0, (target.stock_count ?? 0) + quantity);
+  target.updated_at = new Date().toISOString();
+  writeProducts(products);
+
+  return c.json({
+    id: target.id,
+    stock_count: target.stock_count,
+    updated_at: target.updated_at,
+  });
+});
+
+app.get('/v1/merchant/orders', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  const orders = await loadOrders();
+  const filtered = orders.filter((order) => !order.merchant_id || merchantIds.includes(order.merchant_id));
+  filtered.sort((a, b) => {
+    const aCreated = typeof a.created_at === 'string' ? a.created_at : '';
+    const bCreated = typeof b.created_at === 'string' ? b.created_at : '';
+    return bCreated.localeCompare(aCreated);
+  });
+  return c.json({ orders: filtered });
+});
+
+app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
+  const orderId = c.req.param('orderId');
+  const orders = await loadOrders();
+  const order = orders.find((candidate) => candidate.id === orderId);
+  if (!order) {
+    return c.json(err('not_found', 'Order not found'), 404);
+  }
+
+  const now = new Date().toISOString();
+  order.fulfillment_status = 'fulfilled';
+  order.fulfilled_at = now;
+  order.updated_at = now;
+  await saveOrders(orders);
+
+  return c.json({ ok: true, order });
+});
+
+app.get('/v1/merchant/account', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (account) {
+    return c.json(sanitizeMerchantAccount(account));
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const fallback = accounts[0] ?? null;
+  if (!fallback) {
+    return c.json(err('not_found', 'Merchant account not found'), 404);
+  }
+  return c.json(sanitizeMerchantAccount(fallback));
+});
+
+app.get('/v1/merchant/payouts', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  const payouts = await loadPayoutLogs();
+  const filtered = payouts.filter((item) => !item.merchant_id || merchantIds.includes(item.merchant_id));
+  filtered.sort((a, b) => {
+    const aCreated = typeof a.created_at === 'string' ? a.created_at : '';
+    const bCreated = typeof b.created_at === 'string' ? b.created_at : '';
+    return bCreated.localeCompare(aCreated);
+  });
+  return c.json(filtered);
+});
+
+app.post('/v1/merchant/kyc/submit', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const { account } = await getMerchantIdentity(c);
+  const accounts = await loadMerchantAccounts();
+  const target = account ?? accounts[0];
+  if (!target) {
+    return c.json(err('not_found', 'Merchant account not found'), 404);
+  }
+
+  const payload = body as {
+    business_name?: string;
+    id_number?: string;
+    date_of_birth?: string;
+    residential_address?: string;
+    phone?: string;
+    bank_account?: {
+      account_holder_name?: string;
+      bank_name?: string;
+      branch_code?: string;
+      account_type?: string;
+      account_number?: string;
+    };
+  };
+
+  target.business_name = payload.business_name?.trim() || target.business_name;
+  target.kyc_status = 'pending';
+  target.kyc_data = {
+    id_number: payload.id_number ?? '',
+    date_of_birth: payload.date_of_birth ?? '',
+    address: payload.residential_address ?? '',
+    phone: payload.phone ?? '',
+  };
+  target.bank_account = {
+    account_holder_name: payload.bank_account?.account_holder_name ?? '',
+    bank_name: payload.bank_account?.bank_name ?? '',
+    branch_code: payload.bank_account?.branch_code ?? '',
+    account_type: (payload.bank_account?.account_type as 'cheque' | 'savings' | 'transmission' | undefined) ?? 'cheque',
+    account_number: payload.bank_account?.account_number ?? '',
+  };
+  target.updated_at = new Date().toISOString();
+
+  await saveMerchantAccounts(accounts);
+  return c.json({ ok: true, account: sanitizeMerchantAccount(target) });
+});
+
+app.get('/v1/merchant/notifications', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  const items = await loadNotifications();
+  const filtered = items.filter((item) => !item.merchant_id || merchantIds.includes(item.merchant_id));
+  filtered.sort((a, b) => {
+    const aCreated = typeof a.created_at === 'string' ? a.created_at : '';
+    const bCreated = typeof b.created_at === 'string' ? b.created_at : '';
+    return bCreated.localeCompare(aCreated);
+  });
+  return c.json(filtered);
+});
+
+app.patch('/v1/merchant/notifications/:notificationId', async (c) => {
+  const notificationId = c.req.param('notificationId');
+  const notifications = await loadNotifications();
+  const target = notifications.find((item) => item.id === notificationId);
+  if (!target) {
+    return c.json(err('not_found', 'Notification not found'), 404);
+  }
+  target.read = true;
+  await saveNotifications(notifications);
+  return c.json({ ok: true, notification: target });
 });
 
 // Compile endpoint - transforms product data into .thing file (uses shared compileAndPersistProduct)
