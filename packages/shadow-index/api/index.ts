@@ -13,6 +13,7 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
+import Stripe from 'stripe';
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
 import { getReport, validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
@@ -54,6 +55,9 @@ const loadEnvForShadowIndex = async () => {
 
 await loadEnvForShadowIndex();
 
+// Initialize Stripe
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+
 const app = new Hono();
 
 // Allow extension/page on different origin (e.g. localhost:5177) to call API
@@ -74,6 +78,11 @@ app.use('*', async (c, next) => {
 
   // Allow public access to product detail pages (/thing/:hash.json)
   if (requestPath.match(/^\/thing\/.+\.json$/)) {
+    return next();
+  }
+
+  // Allow public access to checkout endpoints
+  if (requestPath.startsWith('/checkout/')) {
     return next();
   }
 
@@ -176,6 +185,7 @@ type StoredThing = {
   matter_uri: string;
   thing_url: string;
   thing_path: string;
+  thing_file?: any;
   image_url?: string;
   checkout_url?: string;
   gist: {
@@ -1469,6 +1479,72 @@ app.get('/thing/:hash', async (c) => {
       return c.json(err('not_found', `No .thing file found for hash: ${hash}`, { hash }), 404);
     }
     throw error;
+  }
+});
+
+// POST /checkout/create-session - Create a Stripe checkout session
+app.post('/checkout/create-session', async (c) => {
+  try {
+    const body = await c.req.json();
+    const { product_hash, customer_email, delivery_address, billing_address } = body;
+
+    if (!product_hash || !customer_email) {
+      return c.json(err('invalid_request', 'Missing product_hash or customer_email'), 400);
+    }
+
+    // Get product details from merchant products
+    const products = readProducts();
+    const product = products.find(p => p.thing_file?.hash === product_hash);
+
+    if (!product) {
+      return c.json(err('product_not_found', `Product not found: ${product_hash}`), 404);
+    }
+
+    // Validate stock
+    if (product.stock_count !== undefined && product.stock_count <= 0) {
+      return c.json(err('out_of_stock', 'This product is out of stock'), 400);
+    }
+
+    const priceInCents = product.price_cents;
+    const title = product.title;
+
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: (product.currency || 'usd').toLowerCase(),
+            product_data: {
+              name: title,
+              images: product.image_url ? [product.image_url] : [],
+            },
+            unit_amount: priceInCents,
+          },
+          quantity: 1,
+        },
+      ],
+      mode: 'payment',
+      success_url: `${process.env.AUTH_PORTAL_BASE_URL}/checkout-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.AUTH_PORTAL_BASE_URL}/product/${product_hash}`,
+      customer_email: customer_email,
+      metadata: {
+        product_hash,
+        product_id: product.id,
+        delivery_address: JSON.stringify(delivery_address || {}),
+        billing_address: JSON.stringify(billing_address || {}),
+      },
+    });
+
+    return c.json({
+      ok: true,
+      url: session.url,
+      session_id: session.id,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('Checkout session creation failed:', message);
+    return c.json(err('checkout_failed', 'Failed to create checkout session'), 500);
   }
 });
 
