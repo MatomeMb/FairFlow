@@ -153,21 +153,21 @@ b3fc49c (README professional polish), ec4de85 (README Sprint 6 update), b4c6711 
 │                                                                             │
 │   MERCHANTS / CREATORS                    CONSUMERS / AI AGENTS              │
 │         │                                         │                          │
-│         ▼                                         ▼                          │
+│         �-�                                         �-�                          │
 │   ┌──────────────┐                    ┌──────────────────────┐               │
 │   │ matter-core  │                    │   Lens Extension     │               │
-│   │ (Rust)       │──── compile ──────▶│   (Chrome MV3)       │               │
+│   │ (Rust)       │──── compile ──────�-�│   (Chrome MV3)       │               │
 │   │ Compiler     │                    │   - matter://        │               │
 │   └──────────────┘                    │   - XMP beacon       │               │
 │         │                             │   - IndexedDB cache  │               │
 │         │ .thing + hash               │   - Overlay          │               │
-│         ▼                             └──────────┬───────────┘               │
+│         �-�                             └──────────┬───────────┘               │
 │   ┌──────────────┐                              │                            │
-│   │ Shadow Index │◀──── resolve (cache/API) ────┘                            │
+│   │ Shadow Index │�-�──── resolve (cache/API) ────┘                            │
 │   │ API (Node)   │                                                           │
 │   └──────┬───────┘                                                           │
 │          │                                                                   │
-│          ▼                                                                   │
+│          �-�                                                                   │
 │   ┌──────────────┐                    ┌──────────────────────┐               │
 │   │ Cloudflare   │                    │ Future: CLIP, Vectors│               │
 │   │ R2 Storage   │                    │ FlatBuffers, signing │               │
@@ -216,22 +216,22 @@ b3fc49c (README professional polish), ec4de85 (README Sprint 6 update), b4c6711 
 ```
 User clicks matter:// hash or image with XMP
          │
-         ▼
+         �-�
 Content script: resolveHash(hash)
          │
-         ▼
+         �-�
 chrome.runtime.sendMessage({ type: 'resolve', hash })
          │
-         ▼
+         �-�
 Background (service worker):
   1. cacheGet(hash) → IndexedDB
   2. HIT?  → return cached data (16ms)
   3. MISS? → fetchResolve(API) → cacheSet(hash, data) → return (185ms)
          │
-         ▼
+         �-�
 Content script: renderOverlay(target, data)
          │
-         ▼
+         �-�
 User sees: title, price, image, Buy Now
 ```
 
@@ -1151,13 +1151,13 @@ function openDb() {
                     │  matter://hash  │
                     └────────┬────────┘
                              │
-                             ▼
+                             �-�
                     ┌─────────────────┐
                     │ Content script  │
                     │ sendMessage()   │
                     └────────┬────────┘
                              │
-                             ▼
+                             �-�
                     ┌─────────────────┐
                     │ Service worker  │
                     │ cacheGet(hash)  │
@@ -1167,14 +1167,14 @@ function openDb() {
               │                             │
          HIT (16ms)                    MISS
               │                             │
-              │                             ▼
+              │                             �-�
               │                    ┌─────────────────┐
               │                    │ fetchResolve()  │
               │                    │ Shadow Index    │
               │                    │ API (185ms)     │
               │                    └────────┬────────┘
               │                             │
-              │                             ▼
+              │                             �-�
               │                    ┌─────────────────┐
               │                    │ cacheSet(hash)  │
               │                    │ (12ms, async)   │
@@ -1182,13 +1182,13 @@ function openDb() {
               │                             │
               └──────────────┬──────────────┘
                              │
-                             ▼
+                             �-�
                     ┌─────────────────┐
                     │ renderOverlay() │
                     │ (17ms)          │
                     └────────┬────────┘
                              │
-                             ▼
+                             �-�
                     ┌─────────────────┐
                     │ User sees:      │
                     │ image, price,   │
@@ -1205,15 +1205,15 @@ function openDb() {
 ```
 Product image → Replicate CLIP API → 512-dim vector
                                             │
-                                            ▼
+                                            �-�
                                     Vector DB (Pinecone/Weaviate)
                                             │
 User query "running shoes under $100" ───────┘
                                             │
-                                            ▼
+                                            �-�
                                     Similarity search <100ms
                                             │
-                                            ▼
+                                            �-�
                                     Return .thing (5ms binary)
 ```
 
