@@ -1,9 +1,13 @@
 /**
  * Analytics Reporting Engine — Aggregation logic
  * MVP-14: GET /v1/analytics/report
+ * Sprint 4 Week 3: Streaming JSONL parse (T3.3)
  */
+import { createReadStream } from 'fs';
 import { promises as fs } from 'fs';
 import path from 'path';
+import { createInterface } from 'readline';
+import { loadAggregate } from './pre-aggregation.js';
 
 export type GroupBy = 'day' | 'hash' | 'both';
 export type SortBy = 'date' | 'views' | 'clicks';
@@ -95,7 +99,7 @@ function incMap(
   map.set(key, cur);
 }
 
-/** Parse single JSONL file; return { byDate, byHash, byBoth } aggregates */
+/** Parse single JSONL file via streaming; return { byDate, byHash, byBoth } aggregates */
 export async function aggregateFile(filePath: string): Promise<{
   byDate: Map<string, { views: number; clicks: number }>;
   byHash: Map<string, { views: number; clicks: number }>;
@@ -105,37 +109,37 @@ export async function aggregateFile(filePath: string): Promise<{
   const byHash = new Map<string, { views: number; clicks: number }>();
   const byBoth = new Map<string, { views: number; clicks: number }>();
 
-  let content: string;
-  try {
-    content = await fs.readFile(filePath, 'utf8');
-  } catch {
-    return { byDate, byHash, byBoth };
-  }
-
   const dateStr = path.basename(filePath, '.jsonl');
-  const lines = content.split(/\r?\n/).filter(Boolean);
 
-  for (const line of lines) {
-    try {
-      const obj = JSON.parse(line) as { event?: string; hash?: string };
-      const event = obj?.event;
-      const hash = typeof obj?.hash === 'string' ? obj.hash : '';
+  return new Promise((resolve) => {
+    const stream = createReadStream(filePath, { encoding: 'utf8' });
+    const rl = createInterface({ input: stream, crlfDelay: Infinity });
 
-      if (event === 'view') {
-        incMap(byDate, dateStr, true);
-        if (hash) incMap(byHash, hash, true);
-        if (hash) incMap(byBoth, `${hash}|${dateStr}`, true);
-      } else if (event === 'click') {
-        incMap(byDate, dateStr, false);
-        if (hash) incMap(byHash, hash, false);
-        if (hash) incMap(byBoth, `${hash}|${dateStr}`, false);
+    rl.on('line', (line) => {
+      const trimmed = line.trim();
+      if (!trimmed) return;
+      try {
+        const obj = JSON.parse(trimmed) as { event?: string; hash?: string };
+        const event = obj?.event;
+        const hash = typeof obj?.hash === 'string' ? obj.hash : '';
+
+        if (event === 'view') {
+          incMap(byDate, dateStr, true);
+          if (hash) incMap(byHash, hash, true);
+          if (hash) incMap(byBoth, `${hash}|${dateStr}`, true);
+        } else if (event === 'click') {
+          incMap(byDate, dateStr, false);
+          if (hash) incMap(byHash, hash, false);
+          if (hash) incMap(byBoth, `${hash}|${dateStr}`, false);
+        }
+      } catch {
+        // skip malformed line
       }
-    } catch {
-      // skip malformed line
-    }
-  }
+    });
 
-  return { byDate, byHash, byBoth };
+    rl.on('close', () => resolve({ byDate, byHash, byBoth }));
+    stream.on('error', () => resolve({ byDate, byHash, byBoth }));
+  });
 }
 
 /** Merge multiple file aggregates into one */
@@ -178,7 +182,12 @@ export function mergeAggregates(
   return { byDate, byHash, byBoth };
 }
 
-/** Build report result from aggregates */
+/** Derive aggregates dir from events dir (sibling dir) */
+function getAggregatesDir(eventsDir: string): string {
+  return path.join(path.dirname(eventsDir), 'aggregates');
+}
+
+/** Build report result from aggregates. Uses pre-aggregated data when available (T3.2). */
 export async function getReport(
   eventsDir: string,
   from: string,
@@ -202,7 +211,16 @@ export async function getReport(
   }
 
   const files = await listEventFiles(eventsDir, from, to);
-  const aggregates = await Promise.all(files.map((fp) => aggregateFile(fp)));
+  const aggregatesDir = getAggregatesDir(eventsDir);
+
+  const aggregates = await Promise.all(
+    files.map(async (fp) => {
+      const dateStr = path.basename(fp, '.jsonl');
+      const preAgg = await loadAggregate(aggregatesDir, dateStr);
+      if (preAgg) return preAgg;
+      return aggregateFile(fp);
+    })
+  );
   const merged = mergeAggregates(aggregates);
 
   let totalViews = 0;

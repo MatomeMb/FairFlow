@@ -1,0 +1,25 @@
+{
+  "product": {
+    "title": "Portrait",
+    "description": "painting",
+    "price": 15900,
+    "currency": "ZAR",
+    "category": "crafts"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-21T12:44:32.912Z",
+    "certifications": [],
+    "stock_count": 15,
+    "matter_uri": "matter://3632ff3645e2e7282a866cd33bbccd2fa6dbf8c1ff6e07889b0e29019861ad6e",
+    "thing_url": "http://localhost:3000/thing/3632ff3645e2e7282a866cd33bbccd2fa6dbf8c1ff6e07889b0e29019861ad6e.json"
+  }
+}

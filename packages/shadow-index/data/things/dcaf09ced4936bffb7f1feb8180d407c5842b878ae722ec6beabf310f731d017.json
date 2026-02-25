@@ -1,0 +1,25 @@
+{
+  "product": {
+    "title": "Audit Test Product",
+    "description": "CTO audit test",
+    "price": 9900,
+    "currency": "ZAR",
+    "category": "other"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-21T19:09:59.862Z",
+    "certifications": [],
+    "stock_count": 10,
+    "matter_uri": "matter://dcaf09ced4936bffb7f1feb8180d407c5842b878ae722ec6beabf310f731d017",
+    "thing_url": "http://localhost:3000/thing/dcaf09ced4936bffb7f1feb8180d407c5842b878ae722ec6beabf310f731d017.json"
+  }
+}

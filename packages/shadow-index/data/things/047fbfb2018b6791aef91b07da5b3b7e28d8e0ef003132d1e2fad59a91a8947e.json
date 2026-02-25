@@ -1,0 +1,29 @@
+{
+  "product": {
+    "title": "Fair Trade Coffee Beans",
+    "description": "Organic Ethiopian Yirgacheffe",
+    "price": 12500,
+    "currency": "ZAR",
+    "image_url": "https://example.com/coffee.jpg",
+    "category": "coffee"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": true
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-21T12:16:13.462Z",
+    "certifications": [
+      "Fair Trade",
+      "Organic"
+    ],
+    "stock_count": 50,
+    "matter_uri": "matter://047fbfb2018b6791aef91b07da5b3b7e28d8e0ef003132d1e2fad59a91a8947e",
+    "thing_url": "http://localhost:3000/thing/047fbfb2018b6791aef91b07da5b3b7e28d8e0ef003132d1e2fad59a91a8947e.json"
+  }
+}

@@ -7,97 +7,63 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | CTO Action Plan |
-| **Version** | 1.0 |
-| **Date** | January 21, 2026 |
-| **Author** | Matome Mboweni, CTO |
+| **Version** | 2.0 |
+| **Date** | February 11, 2026 |
+| **Author** | Matome Mbowene, CTO |
 
 ---
 
 ## Executive Summary
 
-**Current Status:** Sprint 0 (Setup Phase) - Week 1, Day 1  
-**Next Milestone:** Phase 0 Go/No-Go Decision (Feb 28, 2026)  
-**Timeline:** 11 months to public launch (Dec 15, 2026)
-
-This document outlines immediate next steps, priorities, and action items for the CTO to execute over the next 2-4 weeks.
+**Current Status:** Sprints 1–6 Complete (v0.6.3 Deployed)  
+**Next Milestone:** Sprint 7 Beta Program Execution (Feb 12+, 2026)  
+**Timeline:** 10 months to public launch (Dec 15, 2026)
 
 ---
 
-## Immediate Priorities (This Week: Jan 21-27, 2026)
+## Enterprise Roadmap (Feb 12+)
 
-### Priority 1: Complete Sprint 0 Setup Tasks
+Building the professional infrastructure to support scale, recruitment, and investor relations.
 
-| Task | Status | Deadline | Owner | Notes |
-|------|--------|----------|-------|-------|
-| Sign new company contract | -- Pending | Jan 31, 2026 | CEO + CTO | Legal foundation |
-| Set up development environment | -- In Progress | Feb 2, 2026 | CTO | Cursor Pro, VS Code, Rust |
-| Create GitHub organization | -- Pending | Jan 25, 2026 | CTO | `thingsthatmatter` org |
-| Initialize monorepo structure | -- Pending | Jan 26, 2026 | CTO | `packages/` directory |
-| Set up Supabase project | -- Pending | Jan 28, 2026 | CTO | Database schema |
-| Configure Vercel deployment | -- Pending | Jan 29, 2026 | CTO | CI/CD pipeline |
-| Set up Cloudflare R2 bucket | -- Pending | Jan 30, 2026 | CTO | Artifact storage |
-| Begin Rust learning | -- In Progress | Ongoing | CTO | Chapters 1-5 |
+### 1. Enterprise Infrastructure & Security
+| ID | Task | Description |
+|---|---|---|
+| Ent-01 | **Domain & Redirect** | Setup official company domain; redirect traffic via GitHub Enterprise for security. |
+| Ent-02 | **RBAC Portals** | specialized login portals for CEO/CTO (Prototype) and Merchants (Alpha). |
+| Ent-03 | **Investor Mode** | Feature-specific "view-only" access for demos without dev-environment exposure. |
+| Ent-04 | **Unified Auth** | End-to-end user authentication for all platform entry points. |
 
-### Priority 2: Infrastructure Accounts Setup
+### 2. Growth & Operations
+| ID | Task | Description |
+|---|---|---|
+| Gr-01 | **Chrome Store Strategy** | Research and execute "Why" strategy for Chrome Web Store distribution. |
+| Gr-02 | **Checkout Integrity** | Cross-browser validation of checkout link functionality (Last Mile). |
+| Gr-03 | **Careers Platform** | Integrated section for job applications with database storage. |
+| Gr-04 | **Newsletter** | Management system for subscriber growth and retention. |
 
-**Action Items:**
-
-1. **Create accounts** (if not already done):
-   - Done: GitHub Organization: `thingsthatmatter`
-   - -- Supabase account (free tier)
-   - -- Vercel account (hobby tier)
-   - -- Cloudflare account (R2 storage)
-   - -- Replicate account (CLIP API)
-   - -- Redis Cloud (free tier)
-
-2. **Set up billing alerts** for all paid services:
-   - Cloudflare R2: ~R630/month limit
-   - Replicate CLIP: ~R540/month limit
-
-3. **Create service accounts and API keys:**
-   - Store securely in environment variables
-   - Document in secure password manager
+### 3. Agentic & Internal Systems
+| ID | Task | Description |
+|---|---|---|
+| Sys-01 | **AI Agent (NLP/Voice)** | Implementation of Text/Speech agent for on-site assistance. |
+| Sys-02 | **Company Email** | In-house deployment of email and collaboration hub for IP security. |
 
 ---
 
-## Week 2 Priorities (Jan 28 - Feb 2, 2026)
+## Legacy Priorities (Jan-Feb 2026)
 
-### Sprint 0 Completion Checklist
+*The following milestones from Sprint 0 and Phase 0 have been successfully delivered.*
 
-- [ ] All infrastructure accounts created and verified
-- [ ] Development environment fully operational
-- [ ] GitHub repo structure established
-- [ ] Database schema designed (initial draft)
-- [ ] CI/CD pipeline configured
-- [ ] Rust toolchain installed (`rustup`, `cargo`)
-- [ ] Rust Book: Completed Chapters 1-5
+### Sprint 0 Setup
+- GitHub Org: `thingsthatmatter` established
+- Monorepo structure initialized
+- Database and Infrastructure (Supabase, Vercel, R2) configured
 
-### Phase 0 Preparation
-
-**Begin planning for Phase 0: Validation (Feb 3 - Mar 2)**
-
-1. **Steganography Research:**
-   - Research XMP metadata injection libraries (Rust crates)
-   - Research EOF binary append techniques
-   - Identify test platforms (Discord, Telegram, Twitter, etc.)
-   - Create Phase 0 testing plan
-
-2. **Tool Preparation:**
-   - Set up Rust project for steganography tools
-   - Identify crates: `image` (image processing), `exif` (XMP), etc.
-   - Create test image samples
+### Phase 1: MVP Delivery
+- Compiler (Rust) and Link Resolution (API) delivered
+- Extension (Lens) v0.3.0 delivered
+- Cross-browser validation complete (88/88 tests passing)
 
 ---
-
-## Phase 0: Critical Validation (Feb 3 - Mar 2, 2026)
-
-### Week 3-4: Build Steganography Tools
-
-**Deliverables:**
-- [ ] `xmp_inject.py` - XMP metadata injection tool
-- [ ] `eof_append.py` - EOF binary append tool
-- [ ] `extract_payload.py` - Payload extraction tool
-- [ ] Initial platform tests (5 platforms)
 
 **Technical Approach:**
 ```rust

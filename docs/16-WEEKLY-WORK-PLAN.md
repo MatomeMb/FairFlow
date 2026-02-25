@@ -7,8 +7,8 @@
 |--------------------------|---|
 | **Company Name** | .things that Matter |
 | **Document Type** | Weekly Work Plan (Day-by-Day) |
-| **Version** | 2.0 |
-| **Date** | February 5, 2026 |
+| **Version** | 2.1 |
+| **Date** | February 12, 2026 |
 | **Author** | Matome Mboweni, CTO |
 | **Status** | Active — use for daily discipline and stakeholder alignment |
 
@@ -41,9 +41,9 @@ All task estimates below are in **hours (h)** and are intended to be realistic f
 
 ---
 
-## 3. Current Status (As of Feb 19, 2026)
+## 3. Current Status (As of Feb 12, 2026)
 
-**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: Sprint 2 complete (v0.5.0); MVP-13 IndexedDB cache, cross-browser validation, performance instrumentation delivered. Sprint 3 (MVP-14 Analytics) begins Feb 20. No blockers.
+**Full current status:** [PROGRESS-AND-VERSION.md](./PROGRESS-AND-VERSION.md). Summary: Sprints 1–5 complete (`v0.6.2`), 88/88 tests passing, core MVP delivered. Next focus is Sprint 6 execution (extension 1.0 release readiness and launch hardening).
 
 ---
 
@@ -82,10 +82,9 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
-| **Fri** | Feb 13 | Cross-browser smoke test (Chrome, Edge, Brave, Firefox) — **DONE Feb 10** | 6 | Compatibility note ✓ |
+| **Fri** | Feb 13 | Cross-browser smoke test (Chrome, Edge); fix any compatibility issues; document supported browsers | 6 | Compatibility note |
 | **Tue** | Apr 8 | Overlay performance: reduce reflows; lazy-load image; measure and log slow paths | 5 | Performance improvements |
-| **Mon** | Feb 16 | Tests & Documentation — finalize tests, integration test (full resolve flow), README update, verify docs, progress update | 5 | Tests + docs ✓ |
-| **Tue** | Feb 17 | Performance Validation — profile render, lazy-load verify, baseline measurements, 3G throttle; document in THURSDAY-PERFORMANCE-BASELINES | 5 | Performance validated ✓ |
+| **Tue** | Feb 17 | Extension tests (manual or automated) for cache hit/miss; update README and runbook | 5 | Tests + docs |
 | **Thu** | Apr 10 | Integration test full flow; regression pass; fix bugs from testing | 6 | Stable build |
 | **Thu** | Feb 19 | Sprint review, demo to CEO; retrospective; release checklist; tag (e.g. lens v0.3.0) and update PROGRESS | 5 | Sprint 2 closed |
 
@@ -95,30 +94,56 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 ## 6. Sprint 3 (Feb 20 – Mar 5, 2026) — Analytics & Observability
 
-**Goal:** MVP-14 view/click events; API ingestion; merchant reporting; internal observability dashboard.  
-**Capacity:** ~60h deliverable. **Target:** Tag v0.6.0.
+**Goal:** MVP-14 view/click events; API logging; minimal export or dashboard.  
+**Capacity:** ~56h deliverable.
 
-### Week 1 (Feb 20 – Feb 24) — Infrastructure & Extension
+### Week 1 (Feb 20 – Feb 26)
+
+| Day | Date | Planned work | Est. (h) | Deliverable |
+|-----|------|----------------|----------|-------------|
+| **Fri** | Feb 20 | Sprint 3 Planning Meeting; Design event schema; choose storage strategy (Postgres/D1 vs JSON logs) | 6 | Plan + Schema |
+| **Mon** | Feb 23 | Extension: Background script hooks for "overlay:open" event. Unique user ID generation (anon). | 6 | Event dispatch logic |
+| **Tue** | Feb 24 | Content Script: Hook "Buy Now" click events; relay to background; add performance timing to payload. | 6 | Conversion tracking |
+| **Wed** | Feb 25 | API: Implement `POST /v1/analytics/event`. Add Zod validation; CORS check; basic ingestion logic. | 6 | API Ingestion active |
+| **Thu** | Feb 26 | Persistence: Local SQL or JSON-append storage implementation in `shadow-index`. High-volume safety. | 6 | Persistent event logs |
+
+### Week 2 (Feb 27 – Mar 5)
+
+| Day | Date | Planned work | Est. (h) | Deliverable |
+|-----|------|----------------|----------|-------------|
+| **Fri** | Feb 27 | Aggregation: Daily background job (or on-demand) to count views/clicks per hash. | 6 | Aggregated data |
+| **Mon** | Mar 2 | Reporting: API endpoint `GET /v1/analytics/report?hash=...`; unit tests for aggregation correctess. | 6 | Report API endpoint |
+| **Tue** | Mar 3 | Minimal Dashboard: Internal HTML page showing top products and API throughput metrics. | 6 | Internal Dashboard |
+| **Wed** | Mar 4 | E2E Integration: Click product → Verify event in DB → Verify report count update. Buffer for bugs. | 6 | Verified end-to-end |
+| **Thu** | Mar 5 | Sprint review; Demo to CEO; Retrospective; v0.6.0 release; update PROGRESS-AND-VERSION. | 6 | Sprint 3 closed |
+
+**Sprint 3 total:** ~60h.
+
+---
+
+## 7. Sprint 4 (Mar 6 – Mar 19, 2026) — Merchant Platform Polish
+
+---
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
 | **Mon** | Feb 20 | Sprint planning; define event schema (view: hash, timestamp, source; click: hash, target e.g. checkout); decide storage (API log vs local file vs Supabase) | 6 | Event spec + storage choice |
-| **Tue** | Feb 21 | Extension: implement sendEvent in background; configurable API base | 6 | sendEvent + config |
+| **Tue** | Apr 15 | API: POST /events or internal log; middleware to record resolve/compile with timestamp; optional batch event endpoint | 6 | Event ingestion path |
 | **Wed** | Feb 22 | Extension: fire “view” when overlay shown; fire “click” on Buy Now; send to API or local buffer | 5 | Extension events |
 | **Thu** | Feb 23 | Persist events (file or DB); avoid PII; retention policy (e.g. 90 days); simple query by date range | 6 | Event storage |
-| **Fri** | Feb 24 | API: POST /v1/analytics/event; validate payload; write to storage | 5 | Event ingestion |
+| **Fri** | Apr 18 | Export endpoint or script: CSV/JSON of events for date range; or minimal dashboard page (counts by day) | 5 | Export or dashboard |
 
-### Week 2 (Feb 27 – Mar 5) — Reporting & Release
+### Week 2 (Feb 27 – Mar 5)
 
 | Day | Date | Planned work | Est. (h) | Deliverable |
 |-----|------|----------------|----------|-------------|
-| **Mon** | Feb 27 | Aggregation engine; GET /v1/analytics/report (from, to, groupBy) | 6 | Report endpoint |
-| **Tue** | Feb 28 | API request logging; error observability; Vitest for event endpoints | 5 | Observability + tests |
-| **Wed** | Mar 2 | Docs: analytics runbook, event schema, privacy note | 5 | Documentation |
-| **Thu** | Mar 3 | Internal HTML status dashboard; E2E: View to DB to Report | 6 | Dashboard + E2E |
-| **Fri** | Mar 5 | Sprint review; demo conversion tracking; tag v0.6.0; update PROGRESS | 5 | Sprint 3 closed |
+| **Mon** | Feb 27 | API request logging (method, path, status, duration); rotate or size-bound log; no sensitive data | 5 | Request logs |
+| **Tue** | Feb 28 | Error logging and alerting path (e.g. log to file; optional webhook); document runbook for ops | 5 | Error observability |
+| **Wed** | Apr 23 | Vitest tests for event endpoints; manual test event flow end-to-end | 5 | Tests |
+| **Thu** | Mar 2 | Docs: analytics runbook, event schema, privacy note; update PROGRESS and roadmap | 5 | Documentation |
+| **Fri** | Mar 3 | Sprint review, retro; release; tag (e.g. shadow-index v0.5.0 if API changes) | 4 | Sprint 3 closed |
 
-**Sprint 3 total:** ~60h. See [13-SPRINT-3-PLAN.md](./13-SPRINT-3-PLAN.md) for full spec.
+**Sprint 3 total:** ~52h.
 
 ---
 
@@ -180,27 +205,49 @@ All work delivered **by Feb 5, 2026** (current sprint):
 
 ---
 
-## 9. Sprints 6–8 (Apr 3 – May 14, 2026) — High-Level Focus
+## 9. Sprint 6 (Feb 12 – Feb 26, 2026) — Release Readiness & Launch Hardening
 
-| Sprint | Window | Focus |
-|--------|--------|-------|
-| **Sprint 6** | Apr 3 – Apr 16 | Extension 1.0 / merchant dashboard (optional); Chrome release-ready |
-| **Sprint 7** | Apr 17 – Apr 30 | Beta program: 5–10 merchants; 1,000+ products; feedback loop |
-| **Sprint 8** | May 1 – May 14 | Public launch prep: Store submission; landing; docs; v1.0 readiness |
+**Goal:** Clear store blockers and complete extension 1.0 release readiness gate.  
+**Capacity:** ~56h deliverable.
 
-Day-level plans for Sprints 6–8 will be created at the start of Sprint 5 or when capacity is confirmed.
+### Week 1 (Feb 12 – Feb 16)
 
-## 10. Post–May 2026 (High-Level Focus)
+| Day | Date | Planned work | Est. (h) | Owner | Deliverable |
+|-----|------|----------------|----------|-------|-------------|
+| **Mon** | Feb 12 | Immediate blocker triage: screenshot plan, privacy policy deployment option, outreach package handoff, store submission checklist audit | 6 | CTO | Blocker board with owners and due dates |
+| **Tue** | Feb 13 | Capture store screenshots (matter overlay, product overlay, catalog upload, landing hero) and save to `packages/lens-extension/store/screenshots/` | 6 | CTO | 3-5 approved PNG screenshots |
+| **Wed** | Feb 14 | Deploy privacy policy to public HTTPS URL and verify in browser/curl; update `CHROME-WEB-STORE-CHECKLIST.md` with final URL | 6 | CTO/DevOps | Public privacy policy URL validated |
+| **Thu** | Feb 15 | Build extension production bundle, zip output, and complete Chrome Web Store listing form (unlisted beta target) | 6 | CTO | Submission-ready package and listing draft |
+| **Fri** | Feb 16 | Hardening pass 1: install flow, permission review, regression of compile -> resolve -> overlay flow; log defects | 6 | CTO | Hardening report and prioritized bug list |
+
+### Week 2 (Feb 19 – Feb 26)
+
+| Day | Date | Planned work | Est. (h) | Owner | Deliverable |
+|-----|------|----------------|----------|-------|-------------|
+| **Mon** | Feb 19 | Address P0/P1 issues from hardening; verify fixes with focused regression tests | 6 | CTO | P0/P1 closure candidate |
+| **Tue** | Feb 20 | Chrome Web Store submission execution (upload, metadata final, unlisted/public choice) | 5 | CTO | Submission confirmation + listing URL |
+| **Wed** | Feb 21 | Release process formalization and dry run for Lens extension | 5 | CTO | `RELEASE-PROCESS-LENS.md` validated |
+| **Thu** | Feb 22 | Release gate review: quality, onboarding path, support readiness, unresolved defects | 5 | CTO + Product | `RELEASE-GATE-SPRINT-6.md` decision record |
+| **Fri** | Feb 23 | Sprint review with CEO; update progress docs, risks, and next sprint plan | 4 | CTO + CEO | Sprint 6 review pack |
+
+## 10. Sprints 7–8 (Feb 27 – Mar 27, 2026) — High-Level Focus
+
+| Sprint | Window | Focus | Acceptance Anchor |
+|--------|--------|-------|-------------------|
+| **Sprint 7** | Feb 27 – Mar 12 | Beta program execution | >=3 active merchants, feedback loop operating, SLA met |
+| **Sprint 8** | Mar 13 – Mar 27 | Public launch readiness | Launch candidate tagged + stakeholder sign-off |
+
+## 11. Post–Mar 2026 (High-Level Focus)
 
 | Period | Focus | Notes |
 |--------|--------|------|
-| **Jun – Jul** | Extension 1.0; Chrome Web Store public or unlisted | Store approval; docs; support |
-| **Aug – Sep** | Beta program | 5–10 merchants; 1,000+ products; feedback loop |
-| **Oct – Dec** | Public launch | Store listing; marketing; v1.0; Phase 2 prep |
+| **Apr – May** | Stabilize live beta and tune onboarding | Merchant growth, support quality, issue burn-down |
+| **Jun – Sep** | Expand beta footprint | 10+ merchants, stronger reporting, conversion insights |
+| **Oct – Dec** | Phase 2 preparation | Agentic commerce roadmap and platform upgrades |
 
 ---
 
-## 11. How to Use This Document
+## 12. How to Use This Document
 
 - **Daily:** Start the day with the planned task and estimated hours; log any deviation (blocker, scope change).
 - **Weekly:** Every Monday, confirm the week’s plan with CEO if needed; every Friday, note what was completed and what slipped.
@@ -209,6 +256,6 @@ Day-level plans for Sprints 6–8 will be created at the start of Sprint 5 or wh
 
 ---
 
-**Document Version:** 2.0  
-**Last Updated:** February 5, 2026  
-**Next Review:** Start of Sprint 2 (Feb 6, 2026)
+**Document Version:** 2.1  
+**Last Updated:** February 12, 2026  
+**Next Review:** Sprint 6 midpoint (Feb 19, 2026)

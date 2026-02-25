@@ -1,15 +1,38 @@
-# Deployment to Staging - MVP-13 Cache Write Path
+# Deployment to Staging
 
 **Date:** February 11, 2026  
+**Status:** Ready for staging deployment
+
+---
+
+## Shadow Index API (v0.6.0)
+
+**Package:** `packages/shadow-index`  
+**Version:** 0.6.0  
+**Reference:** [RELEASE-NOTES-v0.6.0.md](./RELEASE-NOTES-v0.6.0.md), [OPERATIONS-MANUAL.md](./OPERATIONS-MANUAL.md)
+
+**Deploy steps:**
+```bash
+cd packages/shadow-index
+npm install
+npm run build
+# Deploy dist/ and run-with-env.mjs per hosting platform (Vercel, Node, etc.)
+```
+
+**Verification:** `GET /health` returns `{ status: "ok" }`; `GET /v1/analytics/dashboard` loads.
+
+---
+
+## Lens Extension (MVP-13 Cache Write Path)
+
 **Feature:** Cache write path integration with error handling  
-**Commit:** `5b4574c`  
-**Status:** ✅ Ready for staging deployment
+**Commit:** `5b4574c`
 
 ---
 
 ## Pre-Deployment Checklist
 
-### Code Quality ✅
+### Code Quality
 - [x] All 45 tests passing (no regressions)
 - [x] Code review completed
 - [x] No console errors
@@ -17,21 +40,21 @@
 - [x] No memory leaks detected
 - [x] Performance targets met (<50ms write latency)
 
-### Testing ✅
+### Testing
 - [x] Unit tests: 21/21 passing
 - [x] Integration tests: 28/28 passing
 - [x] Manual E2E: 6/6 scenarios validated
 - [x] Code coverage: 97% (target: 95%+)
 - [x] No regressions in existing functionality
 
-### Documentation ✅
+### Documentation
 - [x] WEDNESDAY-COMPLETION-SUMMARY.md created
 - [x] README.md updated with write path details
 - [x] E2E_TESTING_MANUAL.md created
 - [x] Code comments added for complex logic
 - [x] Performance baselines documented
 
-### Git ✅
+### Git
 - [x] Commit message follows convention (feat: ...)
 - [x] All files committed
 - [x] Commit hash: `5b4574c`
@@ -147,7 +170,7 @@ Expected: <2MB per 1000 entries
 
 ### Step 8: Cross-Browser Validation (Optional for Staging)
 
-**Chrome:** ✅ Required for MVP
+**Chrome:** Required for MVP
 ```bash
 # Already tested above
 ```
@@ -256,12 +279,12 @@ npm run test
 
 | Phase | Duration | Status |
 |-------|----------|--------|
-| Code review | ~15 min | ✅ Complete |
+| Code review | ~15 min | Complete |
 | Merge to staging | ~5 min | ⏳ Ready |
 | Build & deploy | ~10 min | ⏳ Ready |
 | Smoke testing | ~30 min | ⏳ Ready |
 | Performance validation | ~15 min | ⏳ Ready |
-| **Total** | **~75 min** | ✅ On track |
+| **Total** | **~75 min** | On track |
 
 ---
 
@@ -269,13 +292,13 @@ npm run test
 
 | Criterion | Target | Status |
 |-----------|--------|--------|
-| All tests pass | 45/45 | ✅ |
-| No console errors | 0 errors | ✅ |
-| Write latency < 50ms | < 50ms | ✅ |
-| Cache hits observed | > 0 | ✅ |
-| No memory leaks | Clean | ✅ |
-| API response unaffected | 0ms delta | ✅ |
-| Manual E2E complete | 6/6 pass | ✅ |
+| All tests pass | 45/45 | Met |
+| No console errors | 0 errors | Met |
+| Write latency < 50ms | < 50ms | Met |
+| Cache hits observed | > 0 | Met |
+| No memory leaks | Clean | Met |
+| API response unaffected | 0ms delta | Met |
+| Manual E2E complete | 6/6 pass | Met |
 
 ---
 
@@ -300,10 +323,10 @@ Hi Team,
 
 MVP-13 cache write path integration is deployed to staging and ready for validation.
 
-✅ All 45 tests passing (no regressions)
-✅ Write latency: 8-15ms median, 42ms p95
-✅ Manual E2E: 6/6 scenarios validated
-✅ Code coverage: 97%
+- All 45 tests passing (no regressions)
+- Write latency: 8-15ms median, 42ms p95
+- Manual E2E: 6/6 scenarios validated
+- Code coverage: 97%
 
 Changes include:
 - Automatic caching of successful API responses
@@ -320,14 +343,14 @@ Questions? See docs/WEDNESDAY-COMPLETION-SUMMARY.md or reach out.
 
 ## Next Steps After Staging Validation
 
-### If Staging Passes ✅
+### If Staging Passes
 1. [ ] Code review approval
 2. [ ] QA sign-off
 3. [ ] Deploy to production
 4. [ ] Monitor production metrics
 5. [ ] Close sprint in Jira
 
-### If Issues Found ⚠️
+### If Issues Found
 1. [ ] Capture detailed logs
 2. [ ] Create JIRA ticket with reproduction steps
 3. [ ] Fix on main branch
@@ -380,14 +403,14 @@ Questions? See docs/WEDNESDAY-COMPLETION-SUMMARY.md or reach out.
 
 | Role | Name | Date | Status |
 |------|------|------|--------|
-| Developer | — | Feb 11 | ✅ Complete |
+| Developer | — | Feb 11 | Complete |
 | Tech Lead | — | — | ⏳ Pending |
 | QA | — | — | ⏳ Pending |
 | CTO | — | — | ⏳ Pending |
 
 ---
 
-**Deployment Status: READY FOR STAGING** ✅
+**Deployment Status:** Ready for staging.
 
 **Estimated Time to Production:** 2-3 days (pending approvals)
 

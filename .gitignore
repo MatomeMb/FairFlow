@@ -37,6 +37,7 @@ build/
 # Logs
 logs/
 *.log
+**/data/events/*.jsonl
 
 # MVP-14 analytics event data (append-only JSONL)
 **/data/events/*.jsonl

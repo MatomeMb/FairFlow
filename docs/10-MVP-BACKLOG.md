@@ -63,6 +63,19 @@
 | MVP-13 | Extension caching | IndexedDB cache works | **Done** (Sprint 2) |
 | MVP-14 | Analytics events | Track views and clicks | **Planned** (Sprint 3) |
 
+### P3 (Enterprise & Post-Beta Infrastructure)
+
+| ID | Story | Acceptance Criteria | Status |
+|----|-------|---------------------|--------|
+| MVP-15 | Enterprise Domain & Redirect | Official domain setup + GitHub Enterprise redirection | **Next** |
+| MVP-16 | RBAC & Multi-Tenant Login | CEO/CTO/Merchant portal logins with specific views | **Next** |
+| MVP-17 | Unified Authentication System | Secure auth across all platform entry points | **Next** |
+| MVP-18 | Chrome Store & Checkout Polish | Distribution strategy + cross-browser checkout validation | **Next** |
+| MVP-19 | Careers Platform | Candidates can apply; data stored in company DB | **Next** |
+| MVP-20 | Retention Engine (Newsletter) | Subscriber capture and email management system | **Next** |
+| MVP-21 | Agentic Interface (Text/Speech) | AI Agent for voice/text assistance on-site | **Next** |
+| MVP-22 | Secure Internal Workspace | In-house company email and collaboration hub | **Next** |
+
 ---
 
 ## 3. Evaluation Tasks (Always On)
@@ -81,4 +94,4 @@
 
 ---
 
-Last reviewed: Feb 19, 2026. MVP-01–MVP-13 done (Sprints 1–2); MVP-14 (Sprint 3) planned. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).
+Last reviewed: Feb 11, 2026. MVP-01–MVP-13 done; MVP-14–MVP-22 added/planned. Day-by-day plan: [16-WEEKLY-WORK-PLAN.md](./16-WEEKLY-WORK-PLAN.md).

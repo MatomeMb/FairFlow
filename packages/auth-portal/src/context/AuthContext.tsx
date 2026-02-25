@@ -1,0 +1,103 @@
+import React, { createContext, useContext, useEffect, useState } from "react";
+import { Session } from "@supabase/supabase-js";
+import { jwtDecode } from "jwt-decode";
+import { supabase } from "../lib/supabase";
+import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
+
+interface AuthContextType {
+  user: AuthUser | null;
+  session: Session | null;
+  role: AppRole | null;
+  loading: boolean;
+  signInWithGoogle: () => Promise<void>;
+  signInWithEmail: (email: string, password: string) => Promise<void>;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType | undefined>(undefined);
+
+export function AuthProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
+  const [role, setRole] = useState<AppRole | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  function extractRoleFromSession(session: Session | null): AppRole | null {
+    if (!session?.access_token) return null;
+    try {
+      const decoded = jwtDecode<JWTClaims>(session.access_token);
+      return decoded.user_role ?? "consumer";
+    } catch {
+      return "consumer";
+    }
+  }
+
+  function buildUser(session: Session, appRole: AppRole): AuthUser {
+    return {
+      id: session.user.id,
+      email: session.user.email ?? "",
+      role: appRole,
+      name: session.user.user_metadata?.full_name,
+      avatarUrl: session.user.user_metadata?.avatar_url,
+    };
+  }
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSession(session);
+      const appRole = extractRoleFromSession(session);
+      setRole(appRole);
+      if (session && appRole) {
+        setUser(buildUser(session, appRole));
+      }
+      setLoading(false);
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (_event, session) => {
+        setSession(session);
+        const appRole = extractRoleFromSession(session);
+        setRole(appRole);
+        if (session && appRole) {
+          setUser(buildUser(session, appRole));
+        } else {
+          setUser(null);
+        }
+      }
+    );
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const signInWithGoogle = async () => {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: `${window.location.origin}/auth/callback`,
+      },
+    });
+  };
+
+  const signInWithEmail = async (email: string, password: string) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) throw error;
+  };
+
+  const signOut = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+    setRole(null);
+  };
+
+  return (
+    <AuthContext.Provider value={{ user, session, role, loading, signInWithGoogle, signInWithEmail, signOut }}>
+      {children}
+    </AuthContext.Provider>
+  );
+}
+
+export const useAuth = () => {
+  const ctx = useContext(AuthContext);
+  if (!ctx) throw new Error("useAuth must be used inside <AuthProvider>");
+  return ctx;
+};

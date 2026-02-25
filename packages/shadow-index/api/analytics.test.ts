@@ -3,7 +3,6 @@
  * POST /v1/analytics/event — view and click events
  */
 
-import { describe, it, expect } from 'vitest';
 import app from './index';
 
 const BASE = 'http://localhost';

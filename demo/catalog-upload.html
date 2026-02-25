@@ -3,172 +3,135 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Catalog Upload — .things that Matter</title>
-    <style>
-      * { box-sizing: border-box; }
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        margin: 32px;
-        color: #111827;
-        max-width: 720px;
-      }
-      .card {
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 24px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-        margin-bottom: 20px;
-      }
-      h1 { margin: 0 0 8px 0; font-size: 22px; }
-      h2 { margin: 16px 0 8px 0; font-size: 16px; color: #374151; }
-      p { margin: 0 0 12px 0; color: #4b5563; }
-      label { display: block; margin-bottom: 4px; font-weight: 500; font-size: 14px; }
-      input[type="text"], input[type="file"] {
-        width: 100%;
-        padding: 8px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        margin-bottom: 12px;
-        font-size: 14px;
-      }
-      input[type="file"] { padding: 10px; }
-      button {
-        background: #2563eb;
-        color: white;
-        border: none;
-        padding: 10px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        font-size: 14px;
-      }
-      button:hover { background: #1d4ed8; }
-      button:disabled { background: #9ca3af; cursor: not-allowed; }
-      .hint { font-size: 12px; color: #6b7280; margin-top: 4px; }
-      #result { margin-top: 20px; }
-      .summary { padding: 12px; background: #f0fdf4; border-radius: 8px; margin-bottom: 12px; font-size: 14px; }
-      .summary.error { background: #fef2f2; }
-      .uris { list-style: none; padding: 0; margin: 0; }
-      .uris li { padding: 6px 0; border-bottom: 1px solid #e5e7eb; font-size: 13px; }
-      .uris a { color: #2563eb; font-weight: 500; text-decoration: none; word-break: break-all; }
-      .uris a:hover { text-decoration: underline; }
-      .errors { padding: 12px; background: #fef2f2; border-radius: 8px; margin-top: 12px; font-size: 13px; color: #991b1b; }
-      .errors ul { margin: 0; padding-left: 20px; }
-    </style>
+    <meta name="description" content="Upload catalog CSV or JSON to compile products and get matter:// URIs - fairflow" />
+    <title>Catalog Upload - fairflow</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles/design-system.css" />
+    <link rel="stylesheet" href="styles/components.css" />
   </head>
-  <body>
-    <div class="card">
-      <h1>Catalog Upload</h1>
-      <p>Upload a CSV or JSON catalog to compile products and get matter:// URIs (Sprint 4 — MVP-11/12).</p>
+  <body class="layout">
+    <a href="#main" class="skiplink">Skip to main content</a>
+    <header class="header" role="banner">
+      <a href="landing.html" class="header__brand-link">fairflow</a>
+      <span class="header__tagline">Catalog Upload</span>
+    </header>
+    <main id="main" class="layout__main" role="main">
+      <div class="card">
+        <h1 class="card__title">Catalog Upload</h1>
+        <p class="card__subtitle">Upload a CSV or JSON catalog to compile products and get matter:// URIs.</p>
 
-      <label for="apiUrl">API base URL</label>
-      <input type="text" id="apiUrl" value="http://localhost:3000" placeholder="http://localhost:3000" />
+        <div class="form-group">
+          <label for="apiUrl" class="form-group__label">API base URL</label>
+          <input type="text" id="apiUrl" class="form-group__input" value="http://localhost:3000" placeholder="http://localhost:3000" aria-describedby="apiUrlHint" />
+          <p id="apiUrlHint" class="form-group__hint">Set if Shadow Index is configured with SHADOW_INDEX_API_KEY.</p>
+        </div>
 
-      <label for="apiKey">API key (optional)</label>
-      <input type="text" id="apiKey" placeholder="Leave empty if not required" />
-      <p class="hint">Set if Shadow Index is configured with SHADOW_INDEX_API_KEY.</p>
+        <div class="form-group">
+          <label for="apiKey" class="form-group__label">API key (optional)</label>
+          <input type="text" id="apiKey" class="form-group__input" placeholder="Leave empty if not required" autocomplete="off" />
+        </div>
 
-      <label for="file">CSV or JSON file</label>
-      <input type="file" id="file" accept=".csv,.json,text/csv,application/json" />
-      <p class="hint">CSV: header row <code>title,price,currency</code> (optional: image_url, checkout_url). JSON: <code>{ "products": [ { "title", "price", "currency", ... } ] }</code></p>
+        <div class="form-group">
+          <label for="file" class="form-group__label">CSV or JSON file</label>
+          <input type="file" id="file" class="form-group__input" accept=".csv,.json,text/csv,application/json" aria-describedby="fileHint" />
+          <p id="fileHint" class="form-group__hint">CSV: header row <code>title,price,currency</code> (optional: image_url, checkout_url). JSON: <code>{ "products": [ ... ] }</code>. <a href="sample-catalog.csv" download>Download sample CSV</a></p>
+        </div>
 
-      <button type="button" id="submit" disabled>Upload and compile</button>
-    </div>
+        <button type="button" id="submit" class="btn btn--primary" disabled aria-busy="false">Upload and compile</button>
+      </div>
 
-    <div id="result"></div>
+      <div id="result" role="status" aria-live="polite"></div>
+    </main>
+    <footer class="footer" role="contentinfo">Copyright 2026 fairflow</footer>
 
     <script>
-      const apiUrlEl = document.getElementById('apiUrl');
-      const apiKeyEl = document.getElementById('apiKey');
-      const fileEl = document.getElementById('file');
-      const submitEl = document.getElementById('submit');
-      const resultEl = document.getElementById('result');
+      (function () {
+        const apiUrlEl = document.getElementById('apiUrl');
+        const apiKeyEl = document.getElementById('apiKey');
+        const fileEl = document.getElementById('file');
+        const submitEl = document.getElementById('submit');
+        const resultEl = document.getElementById('result');
 
-      fileEl.addEventListener('change', () => { submitEl.disabled = !fileEl.files?.length; });
+        fileEl.addEventListener('change', function () { submitEl.disabled = !fileEl.files.length; });
 
-      submitEl.addEventListener('click', async () => {
-        const file = fileEl.files?.[0];
-        if (!file) return;
+        submitEl.addEventListener('click', async function () {
+          const file = fileEl.files[0];
+          if (!file) return;
 
-        submitEl.disabled = true;
-        resultEl.innerHTML = '<p>Uploading…</p>';
+          submitEl.disabled = true;
+          submitEl.setAttribute('aria-busy', 'true');
+          resultEl.innerHTML = '<div class="card"><p class="result-summary result-summary--success" role="status">Uploading...</p></div>';
 
-        const base = (apiUrlEl.value || 'http://localhost:3000').replace(/\/$/, '');
-        const key = apiKeyEl.value?.trim() || null;
+          const base = (apiUrlEl.value || 'http://localhost:3000').replace(/\/$/, '');
+          const key = apiKeyEl.value.trim() || null;
 
-        try {
-          const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
-          let url = base + '/catalog/import';
-          let body;
-          let contentType;
+          try {
+            const isCsv = file.name.toLowerCase().endsWith('.csv') || file.type === 'text/csv';
+            const url = base + '/catalog/import';
+            let body;
+            let contentType;
 
-          if (isCsv) {
-            body = await file.text();
-            contentType = 'text/csv';
-          } else {
-            const text = await file.text();
-            const json = JSON.parse(text);
-            if (!json.products || !Array.isArray(json.products)) {
-              throw new Error('JSON must be { "products": [ ... ] }');
+            if (isCsv) {
+              body = await file.text();
+              contentType = 'text/csv';
+            } else {
+              const text = await file.text();
+              const json = JSON.parse(text);
+              if (!json.products || !Array.isArray(json.products)) {
+                throw new Error('JSON must be { "products": [ ... ] }');
+              }
+              body = JSON.stringify(json);
+              contentType = 'application/json';
             }
-            body = JSON.stringify(json);
-            contentType = 'application/json';
+
+            const headers = { 'Content-Type': contentType };
+            if (key) headers['x-api-key'] = key;
+
+            const res = await fetch(url, { method: 'POST', headers, body });
+            const data = await res.json().catch(function () { return {}; });
+
+            if (!res.ok) {
+              resultEl.innerHTML = '<div class="card"><div class="result-summary result-summary--error">Error ' + res.status + ': ' + (data.message || data.code || res.statusText) + '</div>' + (data.details ? '<pre>' + JSON.stringify(data.details, null, 2) + '</pre>' : '') + '</div>';
+              submitEl.disabled = false;
+              submitEl.setAttribute('aria-busy', 'false');
+              return;
+            }
+
+            const imported = data.imported ?? data.results?.length ?? 0;
+            const failed = data.failed ?? data.errors?.length ?? 0;
+            const hasErrors = Array.isArray(data.errors) && data.errors.length > 0;
+
+            let html = '<div class="card"><h2 class="card__title">Result</h2>';
+            html += '<div class="result-summary ' + (hasErrors ? 'result-summary--error' : 'result-summary--success') + '">Imported: ' + imported + (failed ? ' | Failed: ' + failed : '') + '</div>';
+
+            if (data.results && data.results.length) {
+              html += '<h2 class="card__title">Matter URIs</h2><ul class="uri-list">';
+              data.results.forEach(function (r) {
+                const uri = r.matter_uri || 'matter://' + r.hash;
+                const title = (r.gist && r.gist.title) || r.hash.slice(0, 12) + '...';
+                html += '<li class="uri-list__item"><a href="' + uri + '" class="uri-list__link">' + title + '</a> - ' + uri + '</li>';
+              });
+              html += '</ul>';
+            }
+
+            if (hasErrors) {
+              html += '<div class="error-list"><span class="error-list__title">Errors</span><ul>';
+              data.errors.forEach(function (e) {
+                html += '<li>' + (e.index != null ? 'Row/Index ' + e.index + ': ' : '') + (e.message || e.code || JSON.stringify(e)) + '</li>';
+              });
+              html += '</ul></div>';
+            }
+
+            html += '</div>';
+            resultEl.innerHTML = html;
+          } catch (err) {
+            resultEl.innerHTML = '<div class="card"><div class="result-summary result-summary--error">' + (err.message || String(err)) + '</div></div>';
           }
 
-          const headers = { 'Content-Type': contentType };
-          if (key) headers['x-api-key'] = key;
-
-          const res = await fetch(url, {
-            method: 'POST',
-            headers,
-            body,
-          });
-
-          const data = await res.json().catch(() => ({}));
-
-          if (!res.ok) {
-            resultEl.innerHTML = `
-              <div class="card">
-                <div class="summary error">Error ${res.status}: ${data.message || data.code || res.statusText}</div>
-                ${data.details ? '<pre>' + JSON.stringify(data.details, null, 2) + '</pre>' : ''}
-              </div>`;
-            submitEl.disabled = false;
-            return;
-          }
-
-          const imported = data.imported ?? data.results?.length ?? 0;
-          const failed = data.failed ?? data.errors?.length ?? 0;
-          const hasErrors = Array.isArray(data.errors) && data.errors.length > 0;
-
-          let html = '<div class="card"><h2>Result</h2>';
-          html += `<div class="summary ${hasErrors ? 'error' : ''}">Imported: ${imported}${failed ? ` · Failed: ${failed}` : ''}</div>`;
-
-          if (data.results?.length) {
-            html += '<h2>Matter URIs</h2><ul class="uris">';
-            data.results.forEach((r) => {
-              const uri = r.matter_uri || `matter://${r.hash}`;
-              const title = r.gist?.title || r.hash?.slice(0, 12) + '…';
-              html += `<li><a href="${uri}">${title}</a> — ${uri}</li>`;
-            });
-            html += '</ul>';
-          }
-
-          if (hasErrors) {
-            html += '<div class="errors"><strong>Errors</strong><ul>';
-            data.errors.forEach((e) => {
-              html += `<li>${e.index != null ? `Row/Index ${e.index}: ` : ''}${e.message || e.code || JSON.stringify(e)}</li>`;
-            });
-            html += '</ul></div>';
-          }
-
-          html += '</div>';
-          resultEl.innerHTML = html;
-        } catch (err) {
-          resultEl.innerHTML = `<div class="card"><div class="summary error">${err.message || String(err)}</div></div>`;
-        }
-
-        submitEl.disabled = false;
-      });
+          submitEl.disabled = false;
+          submitEl.setAttribute('aria-busy', 'false');
+        });
+      })();
     </script>
   </body>
 </html>

@@ -19,6 +19,8 @@ const log = {
   cacheWrite: (hash, bytes, ms = 0) => console.log(`[Cache WRITE] Hash: ${hash} (${bytes} bytes${ms ? `, ${ms}ms` : ''})`),
   cacheWriteError: (hash, err) => console.error(`[Cache WRITE FAILED] Hash: ${hash}: ${err.message}`),
   apiError: (hash, status) => console.error(`[API ERROR] Hash: ${hash}: ${status}`),
+  perf: (hash, ms) => console.log(`[Lens Perf] Hash: ${hash} resolved in ${ms}ms`),
+  invalidHash: (hash) => console.warn(`[Lens] Invalid hash attempted: ${hash}`),
   error: (msg) => console.error(`[Cache ERROR] ${msg}`),
   init: (msg) => console.log(`[Cache] ${msg}`),
 };
@@ -108,6 +110,22 @@ async function fetchResolve(baseUrl, hash) {
 }
 
 /**
+ * Send analytics event to Shadow Index.
+ * @param {string} baseUrl
+ * @param {object} payload
+ * @returns {Promise<void>}
+ */
+async function sendEvent(baseUrl, payload) {
+  const url = `${baseUrl.replace(/\/$/, '')}/v1/analytics/event`;
+  // Fire and forget from the extension's perspective
+  fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  }).catch((err) => console.error(`[Analytics] Failed to send ${payload.event} event:`, err));
+}
+
+/**
  * Get API base URL from storage or default.
  * @returns {Promise<string>}
  */
@@ -120,34 +138,13 @@ async function getApiBaseUrl() {
   });
 }
 
-/**
- * MVP-14: Send analytics event to Shadow Index API (fire-and-forget).
- * @param {string} baseUrl - API base URL
- * @param {object} payload - { event, hash, source_url, target_action? }
- */
-function sendEvent(baseUrl, payload) {
-  const url = `${baseUrl.replace(/\/$/, '')}/v1/analytics/event`;
-  const body = {
-    ...payload,
-    timestamp: payload.timestamp || new Date().toISOString(),
-  };
-  fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  }).catch(() => {}); // Fire-and-forget; ignore errors
-}
-
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-  // MVP-14: Analytics event (fire-and-forget)
-  if (message && message.type === 'analytics:event') {
-    const { event, hash, source_url, target_action } = message.payload || {};
-    if (event && hash && source_url) {
-      getApiBaseUrl().then((baseUrl) => {
-        sendEvent(baseUrl, { event, hash, source_url, target_action });
-      });
-    }
-    sendResponse({ ok: true });
+  if (message && message.type === 'analytics:event' && message.payload) {
+    (async () => {
+      const baseUrl = await getApiBaseUrl();
+      await sendEvent(baseUrl, message.payload);
+      sendResponse({ ok: true });
+    })();
     return true;
   }
 
@@ -157,8 +154,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   }
 
   const hash = message.hash.trim();
-  if (!hash) {
-    sendResponse({ ok: false, error: 'Missing hash' });
+  if (!hash || hash.length < 64) { // SHA-256 length
+    log.invalidHash(hash);
+    sendResponse({ ok: false, error: 'Invalid or missing hash' });
     return true;
   }
 
@@ -170,6 +168,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       if (cached) {
         const ms = Math.round(performance.now() - start);
         log.cacheHit(hash, ms);
+        log.perf(hash, ms);
         sendResponse({ ok: true, data: cached });
         return;
       }
@@ -190,6 +189,8 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         // Continue — API succeeded, cache write failed (graceful degradation)
       }
       
+      const totalMs = Math.round(performance.now() - start);
+      log.perf(hash, totalMs);
       sendResponse({ ok: true, data });
     } catch (e) {
       const error = e instanceof Error ? e.message : String(e);

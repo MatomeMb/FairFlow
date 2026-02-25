@@ -1,0 +1,29 @@
+import type { ReactNode } from "react";
+
+interface EmptyStateProps {
+  icon?: ReactNode;
+  title: string;
+  description: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+}
+
+export function EmptyState({ icon, title, description, action }: EmptyStateProps) {
+  return (
+    <div className="flex flex-col items-center justify-center py-12 px-4 text-center">
+      {icon && <div className="text-6xl mb-4">{icon}</div>}
+      <h3 className="text-xl font-semibold text-white mb-2">{title}</h3>
+      <p className="text-stone-400 mb-6 max-w-md">{description}</p>
+      {action && (
+        <button
+          onClick={action.onClick}
+          className="inline-flex items-center gap-2 h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+        >
+          {action.label}
+        </button>
+      )}
+    </div>
+  );
+}

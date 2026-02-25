@@ -1,0 +1,98 @@
+[
+  {
+    "id": "41e1b996-5a79-49a2-b811-1f264913d7a4",
+    "merchant_id": "dev-merchant-001",
+    "title": "Fair Trade Coffee Beans",
+    "description": "Organic Ethiopian Yirgacheffe",
+    "price_cents": 12500,
+    "currency": "ZAR",
+    "category": "coffee",
+    "stock_count": 58,
+    "image_url": "https://example.com/coffee.jpg",
+    "shipping_available": true,
+    "certifications": [
+      "Fair Trade",
+      "Organic"
+    ],
+    "thing_file": {
+      "hash": "047fbfb2018b6791aef91b07da5b3b7e28d8e0ef003132d1e2fad59a91a8947e",
+      "matter_uri": "matter://047fbfb2018b6791aef91b07da5b3b7e28d8e0ef003132d1e2fad59a91a8947e",
+      "thing_url": "http://localhost:3000/thing/047fbfb2018b6791aef91b07da5b3b7e28d8e0ef003132d1e2fad59a91a8947e.json",
+      "generated_at": "2026-02-21T12:16:13.462Z"
+    },
+    "status": "published",
+    "created_at": "2026-02-21T12:16:13.462Z",
+    "updated_at": "2026-02-21T12:16:13.462Z"
+  },
+  {
+    "id": "c5a1304c-15d0-4344-ac04-d73897bde0d6",
+    "merchant_id": "dev-merchant-001",
+    "title": "Portrait",
+    "description": "painting",
+    "price_cents": 15900,
+    "currency": "ZAR",
+    "category": "crafts",
+    "stock_count": 15,
+    "shipping_available": true,
+    "certifications": [],
+    "thing_file": {
+      "hash": "3632ff3645e2e7282a866cd33bbccd2fa6dbf8c1ff6e07889b0e29019861ad6e",
+      "matter_uri": "matter://3632ff3645e2e7282a866cd33bbccd2fa6dbf8c1ff6e07889b0e29019861ad6e",
+      "thing_url": "http://localhost:3000/thing/3632ff3645e2e7282a866cd33bbccd2fa6dbf8c1ff6e07889b0e29019861ad6e.json",
+      "generated_at": "2026-02-21T12:44:32.912Z"
+    },
+    "status": "published",
+    "created_at": "2026-02-21T12:44:32.912Z",
+    "updated_at": "2026-02-21T12:44:32.912Z"
+  },
+  {
+    "id": "a45598a9-48dd-418a-83b9-fd04ddb7a893",
+    "merchant_id": "dev-merchant-001",
+    "title": "Fair Trade Coffee Beans",
+    "description": "Organic Ethiopian Yirgacheffe - Rich, smooth flavor with notes of chocolate and citrus",
+    "price_cents": 12500,
+    "currency": "ZAR",
+    "category": "coffee",
+    "stock_count": 50,
+    "image_url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800",
+    "shipping_available": true,
+    "certifications": [
+      "Fair Trade",
+      "Organic"
+    ],
+    "thing_file": {
+      "hash": "5c8cc98d1c4cd98e93adfe488be6ccbd73ead35e942a0160679bf24e1531641e",
+      "matter_uri": "matter://5c8cc98d1c4cd98e93adfe488be6ccbd73ead35e942a0160679bf24e1531641e",
+      "thing_url": "http://localhost:3000/thing/5c8cc98d1c4cd98e93adfe488be6ccbd73ead35e942a0160679bf24e1531641e.json",
+      "generated_at": "2026-02-21T14:33:37.434Z"
+    },
+    "status": "published",
+    "created_at": "2026-02-21T14:33:37.434Z",
+    "updated_at": "2026-02-21T14:33:37.434Z"
+  },
+  {
+    "id": "95ddad51-270a-4575-b3ef-272a6362b677",
+    "merchant_id": "dev-merchant-001",
+    "title": "Fair Trade Coffee Beans",
+    "description": "Organic Ethiopian Yirgacheffe - Rich, smooth flavor with notes of chocolate and citrus",
+    "price_cents": 12500,
+    "currency": "ZAR",
+    "category": "coffee",
+    "stock_count": 50,
+    "image_url": "https://images.unsplash.com/photo-1559056199-641a0ac8b55e?w=800",
+    "shipping_available": true,
+    "certifications": [
+      "Fair Trade",
+      "Organic"
+    ],
+    "thing_file": {
+      "hash": "8ec2f44336f419a8ce69729dcb1ab294738d6108627d4b070e2f500d0c791767",
+      "matter_uri": "matter://8ec2f44336f419a8ce69729dcb1ab294738d6108627d4b070e2f500d0c791767",
+      "thing_url": "http://localhost:3000/thing/8ec2f44336f419a8ce69729dcb1ab294738d6108627d4b070e2f500d0c791767.json",
+      "generated_at": "2026-02-21T14:38:49.084Z"
+    },
+    "status": "published",
+    "created_at": "2026-02-21T14:38:49.084Z",
+    "updated_at": "2026-02-21T14:38:49.084Z"
+  }
+]

@@ -1,7 +1,6 @@
 /**
  * Analytics Reporting Engine — Phase 1 tests
  */
-import { describe, it, expect } from 'vitest';
 import path from 'path';
 import { promises as fs } from 'fs';
 import {

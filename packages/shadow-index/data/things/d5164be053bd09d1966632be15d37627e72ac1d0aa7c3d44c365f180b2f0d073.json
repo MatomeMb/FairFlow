@@ -1,0 +1,25 @@
+{
+  "product": {
+    "title": "Split-Brain Test",
+    "description": "Audit fix",
+    "price": 1000,
+    "currency": "ZAR",
+    "category": "coffee"
+  },
+  "commerce": {
+    "merchant_id": "dev-merchant-001",
+    "payment_gateway": "stripe",
+    "supported_currencies": [
+      "ZAR"
+    ],
+    "shipping_available": false
+  },
+  "metadata": {
+    "schema_version": "1.0",
+    "created_at": "2026-02-21T19:48:01.162Z",
+    "certifications": [],
+    "stock_count": 5,
+    "matter_uri": "matter://d5164be053bd09d1966632be15d37627e72ac1d0aa7c3d44c365f180b2f0d073",
+    "thing_url": "http://localhost:3000/thing/d5164be053bd09d1966632be15d37627e72ac1d0aa7c3d44c365f180b2f0d073.json"
+  }
+}

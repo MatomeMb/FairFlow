@@ -3,22 +3,41 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Demo — .things that Matter</title>
-    <style>
-      body { font-family: system-ui, sans-serif; margin: 2rem; max-width: 480px; }
-      h1 { margin-bottom: 0.5rem; }
-      p { color: #555; margin-bottom: 1rem; }
-      ul { list-style: none; padding: 0; }
-      a { display: block; padding: 0.75rem; margin-bottom: 0.5rem; background: #f0f0f0; border-radius: 8px; color: #2563eb; text-decoration: none; font-weight: 500; }
-      a:hover { background: #e5e7eb; }
-    </style>
+    <meta name="description" content="fairflow - Object-Oriented Commerce. Portable, viral product distribution via matter:// URIs." />
+    <title>fairflow - Demo</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles/design-system.css" />
+    <link rel="stylesheet" href="styles/components.css" />
   </head>
-  <body>
-    <h1>Demo</h1>
-    <p>.things that Matter — Sprint 4</p>
-    <ul>
-      <li><a href="catalog-upload.html">Catalog upload</a> — Upload CSV/JSON, compile products, get matter:// URIs</li>
-      <li><a href="matter-demo.html">Matter demo</a> — matter:// link and Lens overlay</li>
-    </ul>
+  <body class="layout">
+    <a href="#main" class="skiplink">Skip to main content</a>
+    <header class="header" role="banner">
+      <div>
+        <span class="header__brand">fairflow</span>
+        <span class="header__tagline">Object-Oriented Commerce</span>
+      </div>
+    </header>
+    <main id="main" class="layout__main layout__main--narrow" role="main">
+      <p style="margin-bottom: var(--space-4);"><a href="landing.html" class="footer__link">Home</a></p>
+      <h1>Developer Demo</h1>
+      <p>Portable, viral product distribution via <code>matter://</code> URIs. Compile products, share links, and track engagement.</p>
+      <div class="card" style="margin-bottom: var(--space-4);">
+        <h2 class="card__title">Install Lens (Beta)</h2>
+        <p class="card__subtitle">Chrome: Open <code>chrome://extensions</code>, enable Developer mode, click Load unpacked, select <code>packages/lens-extension</code> (build output in <code>dist/</code> or source).</p>
+      </div>
+      <nav class="nav" aria-label="Demo navigation">
+        <a href="catalog-upload.html" class="nav__link">
+          <span class="nav__link-title">Catalog Upload</span>
+          <span class="nav__link-desc">Upload CSV or JSON, compile products, get matter:// URIs</span>
+        </a>
+        <a href="matter-demo.html" class="nav__link">
+          <span class="nav__link-title">Matter Demo</span>
+          <span class="nav__link-desc">matter:// link and Lens overlay</span>
+        </a>
+      </nav>
+    </main>
+    <footer class="footer" role="contentinfo">
+      <p>Copyright 2026 fairflow. <a href="https://github.com/MatomeMb/.Things-That-Matter" class="footer__link" target="_blank" rel="noopener">GitHub</a></p>
+    </footer>
   </body>
 </html>

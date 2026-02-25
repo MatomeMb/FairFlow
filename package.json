@@ -1,9 +1,12 @@
 {
   "name": "things-that-matter",
   "private": true,
-  "description": "Matter Protocol monorepo",
+  "description": ".things that Matter — Object-Oriented Commerce",
   "scripts": {
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "start:api": "cd packages/shadow-index && npm run start",
+    "start:demo": "node scripts/demo-server.mjs",
+    "demo": "node scripts/launch-demo.mjs"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0"

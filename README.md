@@ -38,53 +38,78 @@ Every product processed by our compiler exists simultaneously as:
    - [Node.js](https://nodejs.org/) (18+)
    - [Git](https://git-scm.com/)
 
-2. **Verify Setup:**
+2. **Clone and navigate:**
    ```bash
-   # Windows
-   .\scripts\setup-check.ps1
-   
-   # Linux/Mac
-   bash scripts/setup-check.sh
+   cd mcj
+   npm install
    ```
 
 3. **Configure Environment:**
    ```bash
    cp .env.example .env
-   # Edit .env with your API keys
+   # Edit .env with your API keys (see docs/API_KEYS_GUIDE.md)
    ```
 
-4. **Install Dependencies:**
+4. **Start the demo:**
    ```bash
-   cd packages/shadow-index
-   npm install
+   npm run demo
    ```
 
-5. **Read the Setup Guide:**
-   See [SETUP.md](./SETUP.md) for detailed instructions.
+5. **Access:**
+   - Landing: http://localhost:5177/
+   - Developer Demo: http://localhost:5177/index.html
+   - Catalog Upload: http://localhost:5177/catalog-upload.html
+   - Matter Demo: http://localhost:5177/matter-demo.html
+   - API Dashboard: http://localhost:3000/v1/analytics/dashboard
 
-6. **Configure API Keys:**
-   See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md) for step-by-step API keys setup.
-
-**Quick Setup Verification:**
-```bash
-# Windows
-.\scripts\test-setup.ps1
-
-# Test all API keys are configured
-```
+For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md).
 
 ---
 
-## Current Sprint (Sprint 4: Mar 6 – Mar 19, 2026)
+## Current Status (As of Feb 11, 2026)
 
-**Goal:** Beta readiness — internal dashboard, retention policy, staging validation  
-**Target:** v0.6.0 shipped; Sprint 4 deliverables
+**Version:** v0.6.3 (All Sprints 1–6 complete)  
+**Completion Date:** Feb 11, 2026 (05:24 UTC+2)
 
-**Sprint 3 complete (Feb 2026):** MVP-14 Analytics Reporting Engine — event ingestion (POST /v1/analytics/event), aggregation (GET /v1/analytics/report), 66 tests, performance verified (< 500ms), tag v0.6.0. [Analytics README](./docs/ANALYTICS-REPORTING-ENGINE-README.md) | [FEBRUARY-21-ANALYSIS.md](./docs/FEBRUARY-21-ANALYSIS.md)
+### What's Complete (Sprints 1–6, deployed)
 
-**Sprint 2 complete (Feb 19, 2026):** MVP-13 IndexedDB cache, cross-browser validation (Chrome, Edge, Brave, Firefox); lens v0.3.0, tag v0.5.0. [Demo script](./docs/SPRINT-2-DEMO-SCRIPT.md) | [Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md)
+**Sprint 1 (Completed Feb 5):**
+- Full MVP pipeline: compile → resolve → display (Rust compiler, matter CLI, .thing format)
+- Extension (Lens v0.3.0): Matter overlay, MV3 manifest, link resolution
+- API (Shadow Index v0.6.0): Batch and catalog import, R2 storage
+- Demo: Catalog upload and matter-demo routes
+- Git tag: v0.4.0
 
-**Full spec:** [14-SPRINT-4-PLAN.md](./docs/14-SPRINT-4-PLAN.md) | **Status:** [Progress and Version](./docs/PROGRESS-AND-VERSION.md)
+**Sprint 2 (Completed Feb 8, 02:43–13:13 UTC+2):**
+- Extension caching (MVP-13): IndexedDB cache, overlay perf optimization  
+- Cross-browser compatibility: Chrome, Edge, Brave, Firefox validated
+- 88/88 tests passing, performance baseline: cache hit 16ms, miss 185ms
+- Git tag: v0.5.0, v0.3.0 lens, v0.3.0 matter-core
+
+**Sprint 3 (Completed Feb 10, 13:06–15:48 UTC+2):**
+- Analytics (MVP-14): Event spec finalized, JSONL storage implemented
+- Reporting engine: GET /v1/analytics/report aggregation complete
+- Observability and retention policies implemented
+- Git tag: v0.6.0
+
+**Sprint 4 (Completed Feb 11, 02:37–02:39 UTC+2):**
+- Production hardening: Security audit, load testing, operations manual
+- Gate 4 signed off, runbook deployed
+- Git tag: v0.6.0 release
+
+**Sprint 5 (Completed Feb 11, 02:46–02:54 UTC+2):**
+- Landing page: demo/landing.html (default at http://localhost:5177/)
+- Store assets: Screenshots (4x 1280x800px), privacy policy deployed to Netlify
+- Support workflow: [SUPPORT-WORKFLOW.md](./docs/SUPPORT-WORKFLOW.md), beta templates created
+- Git tag: v0.6.1
+
+**Sprint 6 (Completed Feb 11, 03:22–05:24 UTC+2):**
+- Chrome Web Store submission: Checklist complete, submission guide deployed
+- Build system fix: Test file exclusion in TypeScript production build
+- Screenshots validated, privacy URL deployed, submission-ready documentation
+- Git tags: v0.6.2, v0.6.3
+
+**Next steps:** Submit v0.6.3 to Chrome Web Store. Begin Sprint 7 beta merchant outreach (Feb 12+).
 
 ---
 
@@ -104,38 +129,47 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [07-SYSTEM-DIAGRAMS](./docs/07-SYSTEM-DIAGRAMS.md) | UML diagrams and system analysis |
 | [08-CTO-NEXT-STEPS](./docs/08-CTO-NEXT-STEPS.md) | CTO action plan and immediate priorities |
 | [CTO Execution Guide](./docs/CTO-EXECUTION-GUIDE.md) | Step-by-step execution guide |
+| [Scrum Master Plan for CEO](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | 8-sprint roadmap and success criteria |
 | [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
 | [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
 | [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Jan 20–Feb 5, 2026) — MVP vertical slice |
-| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–19, 2026) — Extension caching (MVP-13), overlay polish |
-| [Sprint 2 Demo Script](./docs/SPRINT-2-DEMO-SCRIPT.md) | Reproducible demo flow for Sprint Review |
-| [Sprint 2 Retrospective](./docs/SPRINT-2-RETROSPECTIVE-FEB-19.md) | Sprint 2 closeout, lessons learned, action items |
-| [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Feb 20–Mar 5, 2026) — Analytics & observability (MVP-14); event schema, API ingestion, report endpoint, dashboard |
-| [MVP-14 Event Spec & Storage](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema (view/click), storage decision (JSONL), validation |
-| [February 21 Analysis](./docs/FEBRUARY-21-ANALYSIS.md) | MVP-14 pipeline architecture, implementation summary |
-| [Analytics Reporting Engine](./docs/ANALYTICS-REPORTING-ENGINE-README.md) | Entry point — spec, impl brief, performance, readiness |
-| [Analytics Reporting Engine Spec](./docs/ANALYTICS-REPORTING-ENGINE-SPEC.md) | GET /v1/analytics/report spec, aggregation |
-| [Analytics Reporting Impl Brief](./docs/ANALYTICS-REPORTING-IMPL-BRIEF.md) | 4-phase execution plan, task checklists |
-| [Analytics Performance Baseline](./docs/ANALYTICS-PERFORMANCE-BASELINE.md) | Measured times; targets < 500ms |
-| [Analytics Production Readiness](./docs/ANALYTICS-PRODUCTION-READINESS.md) | Final checklist, sign-off |
-| [Deployment](./docs/DEPLOYMENT.md) | Staging and production deployment procedures |
-| [Staging Deployment Notes v0.6.0](./docs/STAGING-DEPLOYMENT-NOTES.md) | v0.6.0-specific verification |
-| [Phase 4 Optimization Plan](./docs/PHASE-4-OPTIMIZATION-PLAN.md) | Internal dashboard, retention, monitoring |
-| [What's Next](./WHATS-NEXT-POST-REFACTORING.md) | Post-refactoring action plan |
-| [v0.6.0 Release Ready](./V0.6.0-RELEASE-READY.md) | Pre-release checklist, git commands |
-| [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 6–19, 2026) — Beta readiness |
-| [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria |
-| [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility |
+| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
+| [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
+| [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
+| [Friday Execution Guide](./docs/FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines for Fri Feb 13 cross-browser validation |
+| [Friday Sprint Analysis](./docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) | Risk matrix, contingencies, pre-flight checklist |
+| [Sprint 2 Completion Checklist](./docs/SPRINT-2-COMPLETION-CHECKLIST.md) | AC gates, quality checkpoints, DoD, demo prep, risk mitigation |
+| [Verify MVP-13 Cache](./docs/VERIFY-MVP-13-CACHE.md) | Manual verification steps: cache hit/miss, IndexedDB inspection |
+| [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |
+| [MVP-14 Event Spec](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Analytics event schema and JSONL storage (Sprint 3) |
+| [Analytics Reporting Engine Spec](./docs/ANALYTICS-REPORTING-ENGINE-SPEC.md) | MVP-14 Phase 2: GET /v1/analytics/report aggregation engine (complete spec) |
+| [Analytics Impl Brief](./docs/ANALYTICS-REPORTING-IMPL-BRIEF.md) | MVP-14 phases 1–4 execution plan with 4-phase roadmap |
+| [Analytics Phase 1 Implementation](./docs/ANALYTICS-REPORTING-PHASE1-IMPL-PROMPT.md) | Ready-to-code guide: fixtures, starter template, 60+ test stubs |
+| [Analytics Complete Summary](./docs/ANALYTICS-REPORTING-COMPLETE-SUMMARY.md) | Quick start (8 steps), roadmap, acceptance criteria, test data facts |
+| [Analytics Phase 1 CTO Handoff](./docs/ANALYTICS-PHASE1-CTO-HANDOFF.md) | Phase 1 directive: core aggregation logic (5 days, ready-to-code) |
+| [Analytics Phase 2 CTO Handoff](./docs/ANALYTICS-PHASE2-CTO-HANDOFF.md) | Phase 2 directive: HTTP API route (3–4 days, integration testing) |
+| [Analytics Phase 3 CTO Handoff](./docs/ANALYTICS-PHASE3-CTO-HANDOFF.md) | Phase 3 directive: performance verification (2–3 days, load testing) |
+| [Analytics Performance Baseline](./docs/ANALYTICS-PERFORMANCE-BASELINE.md) | Performance verified: 90-day < 500ms, memory < 500MB, load tests passing |
+| [Analytics Production Readiness](./docs/ANALYTICS-PRODUCTION-READINESS.md) | Final sign-off checklist: phases 1–3 complete, production ready |
+| [Analytics Final Release v0.6.0](./docs/ANALYTICS-FINAL-RELEASE-v0.6.0.md) | Release handoff: git workflow, tag creation, merge to main, next steps |
+| [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) — R2 storage, Rust compiler, matter CLI |
+| [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) — Batch, catalog import, catalog-upload demo |
 | [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | 8-sprint Feb–May 2026; current status; revised milestones |
-| [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) | Day-by-day work and realistic estimates |
+| [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) | Day-by-day work and realistic estimates (Sprints 5–8) |
 | [Progress and Version](./docs/PROGRESS-AND-VERSION.md) | Code version, sprint state, next sprint (single source of truth) |
+| [CEO Sync (Sprint 2)](./docs/CEO-SYNC-SPRINT-2.md) | Sprint 2 features delivered, demo flow, Sprint 3 scope |
 | [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Guide for setting up API keys |
 
 **Setup & Configuration:**
 - [SETUP.md](./SETUP.md) - Detailed development environment setup
+- [SETUP_COMPLETE.md](./SETUP_COMPLETE.md) - Setup completion summary and status
 - [docs/RUST_WINDOWS_SETUP.md](./docs/RUST_WINDOWS_SETUP.md) - Rust installation on Windows
 
-PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder (if generated).
+**Phase 0 Implementation:**
+- [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) - Platform validation testing workflow and decision matrix
+- [matter-core/PHASE0_IMPLEMENTATION.md](./packages/matter-core/PHASE0_IMPLEMENTATION.md) - Phase 0 steganography implementation details
+
+PDF versions are available in [`docs/pdf/`](./docs/pdf/). Historical day reports: [docs/archive/](./docs/archive/README.md).
 
 ---
 
@@ -151,7 +185,7 @@ PDF versions are available in the [`docs/pdf/`](./docs/pdf/) folder (if generate
 | API | Node.js / Vercel Edge |
 | Database | PostgreSQL (Supabase) |
 | Storage | Cloudflare R2 |
-| Browser Extension | Vanilla JS + WASM |
+| Browser Extension | Vanilla JS, IndexedDB, MV3 |
 
 ---
 
@@ -181,9 +215,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–3):** Compile → resolve → display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; **MVP-13 IndexedDB cache**; cross-browser validation (Chrome, Edge, Brave, Firefox); **MVP-14 Analytics Reporting Engine** (event ingestion, GET /v1/analytics/report, 66 tests, < 500ms for 90-day queries). See [Progress and Version](./docs/PROGRESS-AND-VERSION.md) and [ANALYTICS-REPORTING-ENGINE-README.md](./docs/ANALYTICS-REPORTING-ENGINE-README.md).
-
-**Planned (Sprint 4–8, Mar–May 2026):** Internal dashboard, retention policy; beta readiness; beta launch prep. Full metrics: [14-SPRINT-4-PLAN.md](./docs/14-SPRINT-4-PLAN.md), [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).
+**Delivered (Sprints 1–6):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy. 88/88 tests passing. v0.6.3 ready for Chrome Web Store submission.
 
 ---
 
@@ -192,55 +224,27 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Role | Name | Responsibilities |
 |------|------|------------------|
 | **CEO** | Sobuhle Nyambali | Strategy, partnerships, fundraising |
-| **CTO** | Matome Mboweni | Technical architecture, development |
+| **CTO** | Matome Mbowene | Technical architecture, development |
 
 ---
 
-## Timeline (4-Week Rolling View)
+## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 11, 2026 (05:24 UTC+2).*
 
-### Previous 2 Weeks (Feb 20 – Mar 5, 2026) — Sprint 3 Completed
+| Sprint | Planned Window | Actual Completion | Days | Goal | Version | Status |
+|--------|--------|--------|------|------|---------|--------|
+| Sprint 0 | By Jan 19, 2026 | By Jan 19, 2026 | ~5 | Setup and architecture | — | ✓ Complete |
+| Sprint 1 | Jan 20–Feb 5, 2026 | Feb 5, 2026 | 17 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | ✓ Complete |
+| Sprint 2 | Feb 6–19, 2026 | Feb 8, 2026 (13:13 UTC+2) | 3 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | ✓ Complete |
+| Sprint 3 | Feb 20–Mar 5, 2026 | Feb 10, 2026 (15:48 UTC+2) | 2 | Analytics (MVP-14), observability, retention policy | v0.6.0 | ✓ Complete |
+| Sprint 4 | Mar 6–19, 2026 | Feb 11, 2026 (02:39 UTC+2) | <1 | Production hardening, security, operations, scaling | v0.6.0 (release) | ✓ Complete |
+| Sprint 5 | Mar 20–Apr 2, 2026 | Feb 11, 2026 (02:54 UTC+2) | <1 | Beta launch prep: landing, store assets, support, demo polish | v0.6.1 | ✓ Complete |
+| Sprint 6 | Apr 3–16, 2026 | Feb 11, 2026 (05:24 UTC+2) | ~2 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | ✓ Complete |
+| Sprint 7 | Apr 17–30, 2026 | Planned (Feb 12+) | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ○ Planned |
+| Sprint 8 | May 1–14, 2026 | Planned (Feb 26+) | ~14 est | Public launch prep, final validation | v1.0 (release) | ○ Planned |
 
-| Task | Est. | Status |
-|------|------|--------|
-| Event schema + storage decision | 6h | Done |
-| Extension sendEvent + view/click hooks | 11h | Done |
-| POST /v1/analytics/event; JSONL storage | 5h | Done |
-| Aggregation engine; GET /v1/analytics/report | 6h | Done |
-| Performance + load tests; docs refactor | 12h | Done |
-| v0.6.0 tagged (shadow-index 0.6.0) | 5h | Done |
-
-### Now (Mar 6 – Mar 19, 2026)
-
-Sprint 4 in progress. Tag v0.6.0 on main. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
-
-### Next 2 Weeks (Mar 6 – Mar 19, 2026) — Sprint 4
-
-| Phase | Tasks | Est. | Status |
-|-------|-------|------|--------|
-| **Staging** | Deploy v0.6.0; verify analytics endpoints | 4h | Planned |
-| **Dashboard** | Internal HTML status page; event counts | 6h | Planned |
-| **Retention** | 90-day retention policy; cleanup job | 4h | Planned |
-| **Beta prep** | QA validation; merchant onboarding prep | 6h | Planned |
-
-*Day-by-day breakdown with estimates: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md).*
-
----
-
-### Full 8-Sprint Overview
-
-| Sprint | Period | Goal | Version |
-|--------|--------|------|---------|
-| Sprint 0 | By Jan 19, 2026 | Setup and architecture | — |
-| Sprint 1 | Jan 20–Feb 5, 2026 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 |
-| Sprint 2 | Feb 6–19, 2026 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 |
-| Sprint 3 | Feb 20–Mar 5, 2026 | Analytics (MVP-14): event ingestion, reporting engine, 66 tests | v0.6.0 |
-| Sprint 4 | Mar 6–19, 2026 | Beta readiness: dashboard, retention, staging | — |
-| Sprint 5 | Mar 20–Apr 2, 2026 | Beta launch prep | — |
-| Sprint 6 | Apr 3–16, 2026 | Extension 1.0 / merchant tooling | — |
-| Sprint 7 | Apr 17–30, 2026 | Beta program | — |
-| Sprint 8 | May 1–14, 2026 | Public launch prep | — |
+**Current status (Feb 11, 05:24 UTC+2):** Sprints 1–6 complete (v0.6.3 deployed). Sprints 7–8 planned. Git commits Feb 8–11 show accelerated delivery: MVP-13 (3 days), MVP-14 (2 days), production hardening (<1 day), beta prep (<1 day), store submission (~2 days). Ready for Chrome Web Store submission. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
@@ -259,7 +263,8 @@ This project is licensed under the MIT License - see the [LICENSE](./LICENSE) fi
 | `scripts/setup-api-keys.ps1` | Interactive API keys setup helper |
 | `scripts/generate-ed25519-keys.py` | Generate Ed25519 cryptographic keys |
 | `scripts/create-test-data.ps1` | Create test data for platform validation |
-| `scripts/demo-server.mjs` | Start demo server for matter-demo and catalog-upload (default port 5177) |
+
+---
 
 ## Testing Tools
 
@@ -283,7 +288,9 @@ cargo run --bin platform-test -- test-extraction downloaded_image.jpg
 cargo run --bin platform-test -- generate-report results.json
 ```
 
-See [Manual E2E Smoke](./docs/MANUAL-E2E-SMOKE.md) for end-to-end testing workflow.
+See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for the full workflow.
+
+---
 
 ## Contact
 

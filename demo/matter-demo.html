@@ -3,81 +3,46 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Matter MVP Demo</title>
-    <style>
-      body {
-        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-        margin: 32px;
-        color: #111827;
-      }
-      .card {
-        max-width: 520px;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
-      }
-      h1 {
-        margin: 0 0 12px 0;
-        font-size: 22px;
-      }
-      p {
-        margin: 0 0 12px 0;
-        color: #4b5563;
-      }
-      a {
-        color: #2563eb;
-        font-weight: 600;
-        text-decoration: none;
-      }
-      a:hover {
-        text-decoration: underline;
-      }
-      .hint {
-        margin-top: 16px;
-        font-size: 12px;
-        color: #6b7280;
-      }
-      input {
-        width: 100%;
-        padding: 10px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        font-size: 14px;
-        margin-bottom: 12px;
-      }
-      .click-link {
-        display: inline-block;
-        margin-top: 8px;
-      }
-    </style>
+    <meta name="description" content="Test matter:// URIs and Lens overlay - fairflow" />
+    <title>Matter Demo - fairflow</title>
+    <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+    <link rel="stylesheet" href="styles/design-system.css" />
+    <link rel="stylesheet" href="styles/components.css" />
   </head>
-  <body>
-    <div class="card">
-      <h1>Matter MVP Demo</h1>
-      <p>Paste a <code>matter://</code> URI below, then click the link to trigger the Lens overlay.</p>
-      <label for="uri">Matter URI</label>
-      <input
-        type="text"
-        id="uri"
-        placeholder="matter://&lt;hash&gt;"
-        value="matter://bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96"
-      />
-      <p>
-        Link: <a href="#" id="link" class="click-link">Click here</a>
-      </p>
-      <p class="hint">Uses Shadow Index: http://localhost:3000. Install the Lens extension to see the overlay.</p>
-    </div>
+  <body class="layout">
+    <a href="#main" class="skiplink">Skip to main content</a>
+    <header class="header" role="banner">
+      <a href="landing.html" class="header__brand-link">fairflow</a>
+      <span class="header__tagline">Matter Demo</span>
+    </header>
+    <main id="main" class="layout__main layout__main--narrow" role="main">
+      <div class="card">
+        <h1 class="card__title">Matter Demo</h1>
+        <p class="card__subtitle">Paste a <code>matter://</code> URI below, then click the link to trigger the Lens overlay.</p>
+
+        <div class="form-group">
+          <label for="uri" class="form-group__label">Matter URI</label>
+          <input type="text" id="uri" class="form-group__input" placeholder="matter://&lt;hash&gt;" value="matter://bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96" aria-describedby="uriHint" />
+          <p id="uriHint" class="form-group__hint">Uses Shadow Index at http://localhost:3000. Install the Lens extension to see the overlay.</p>
+        </div>
+
+        <p>Link: <a href="#" id="link" class="uri-list__link">Click here</a></p>
+      </div>
+    </main>
+    <footer class="footer" role="contentinfo">Copyright 2026 fairflow</footer>
+
     <script>
-      const input = document.getElementById('uri');
-      const link = document.getElementById('link');
-      function update() {
-        const v = (input.value || '').trim();
-        link.href = v.startsWith('matter://') ? v : 'matter://' + v;
-        link.textContent = link.href;
-      }
-      input.addEventListener('input', update);
-      update();
+      (function () {
+        const input = document.getElementById('uri');
+        const link = document.getElementById('link');
+        function update() {
+          const v = (input.value || '').trim();
+          link.href = v.startsWith('matter://') ? v : 'matter://' + v;
+          link.textContent = link.href;
+        }
+        input.addEventListener('input', update);
+        update();
+      })();
     </script>
   </body>
 </html>

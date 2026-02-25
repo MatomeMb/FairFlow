@@ -1,0 +1,14 @@
+[
+  {
+    "id": "scene5-payout-28106",
+    "merchant_id": "default",
+    "orders_included": [
+      "b956fd4e-12b7-46e1-98d3-029dd4294dfd"
+    ],
+    "gross_amount": 29900,
+    "commission_amount": 1794,
+    "net_amount": 28106,
+    "status": "pending",
+    "created_at": "2026-02-22T08:14:12.845Z"
+  }
+]
