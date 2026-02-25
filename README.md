@@ -1,6 +1,6 @@
 # fairflow
 
-> **Building the infrastructure for Object-Oriented Commerce** — where products become portable, self-sovereign digital objects that can be transacted anywhere on the internet.
+> **Building the infrastructure for Object-Oriented Commerce** - where products become portable, self-sovereign digital objects that can be transacted anywhere on the internet.
 
 ---
 
@@ -94,7 +94,7 @@ For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [
 **Version:** v0.7.0 (Payment Integration & Merchant Portal Complete)  
 **Last Updated:** Feb 25, 2026
 
-### What's Complete (Sprints 1–6 + Payment Integration, deployed)
+### What's Complete (Sprints 1-6 + Payment Integration, deployed)
 
 **Sprint 1 (Completed Feb 5):**
 - Full MVP pipeline: compile → resolve → display (Rust compiler, matter CLI, .thing format)
@@ -103,30 +103,30 @@ For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [
 - Demo: Catalog upload and matter-demo routes
 - Git tag: v0.4.0
 
-**Sprint 2 (Completed Feb 8, 02:43–13:13 UTC+2):**
+**Sprint 2 (Completed Feb 8, 02:43-13:13 UTC+2):**
 - Extension caching (MVP-13): IndexedDB cache, overlay perf optimization  
 - Cross-browser compatibility: Chrome, Edge, Brave, Firefox validated
 - 88/88 tests passing, performance baseline: cache hit 16ms, miss 185ms
 - Git tag: v0.5.0, v0.3.0 lens, v0.3.0 matter-core
 
-**Sprint 3 (Completed Feb 10, 13:06–15:48 UTC+2):**
+**Sprint 3 (Completed Feb 10, 13:06-15:48 UTC+2):**
 - Analytics (MVP-14): Event spec finalized, JSONL storage implemented
 - Reporting engine: GET /v1/analytics/report aggregation complete
 - Observability and retention policies implemented
 - Git tag: v0.6.0
 
-**Sprint 4 (Completed Feb 11, 02:37–02:39 UTC+2):**
+**Sprint 4 (Completed Feb 11, 02:37-02:39 UTC+2):**
 - Production hardening: Security audit, load testing, operations manual
 - Gate 4 signed off, runbook deployed
 - Git tag: v0.6.0 release
 
-**Sprint 5 (Completed Feb 11, 02:46–02:54 UTC+2):**
+**Sprint 5 (Completed Feb 11, 02:46-02:54 UTC+2):**
 - Landing page: demo/landing.html (default at http://localhost:5177/)
 - Store assets: Screenshots (4x 1280x800px), privacy policy deployed to Netlify
 - Support workflow: [SUPPORT-WORKFLOW.md](./docs/SUPPORT-WORKFLOW.md), beta templates created
 - Git tag: v0.6.1
 
-**Sprint 6 (Completed Feb 11, 03:22–05:24 UTC+2):**
+**Sprint 6 (Completed Feb 11, 03:22-05:24 UTC+2):**
 - Chrome Web Store submission: Checklist complete, submission guide deployed
 - Build system fix: Test file exclusion in TypeScript production build
 - Screenshots validated, privacy URL deployed, submission-ready documentation
@@ -164,8 +164,8 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Scrum Master Plan for CEO](./docs/12-SCRUM-MASTER-PLAN-FOR-CEO.md) | 8-sprint roadmap and success criteria |
 | [Scrum Operating Model](./docs/09-SCRUM-OPERATING-MODEL.md) | Scrum framework, ceremonies, and team structure |
 | [MVP Backlog](./docs/10-MVP-BACKLOG.md) | Prioritized product backlog (P0/P1/P2) |
-| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Jan 20–Feb 5, 2026) — MVP vertical slice |
-| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6–Feb 19, 2026) — Extension caching (MVP-13), overlay polish |
+| [Sprint 1 Plan](./docs/11-SPRINT-1-PLAN.md) | Sprint 1 (Jan 20-Feb 5, 2026) - MVP vertical slice |
+| [Sprint 2 Plan](./docs/12-SPRINT-2-PLAN.md) | Sprint 2 (Feb 6-Feb 19, 2026) - Extension caching (MVP-13), overlay polish |
 | [MVP-13 Acceptance & Schema](./docs/17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB cache design, acceptance criteria, message protocol |
 | [MVP-13 Cross-Browser](./docs/MVP-13-CROSS-BROWSER.md) | Chrome/Edge/Brave/Firefox compatibility matrix and testing checklist |
 | [Friday Execution Guide](./docs/FRIDAY-EXECUTION-GUIDE.md) | Sprint flow, decision tree, baselines for Fri Feb 13 cross-browser validation |
@@ -175,19 +175,19 @@ All project documentation is in the `docs/` folder. **Current plan and status:**
 | [Sprint 2 Closeout](./docs/CTO-NEXT-STEPS-SPRINT-2-CLOSEOUT.md) | Sprint 2 closeout memo |
 | [MVP-14 Event Spec](./docs/MVP-14-EVENT-SPEC-AND-STORAGE.md) | Analytics event schema and JSONL storage (Sprint 3) |
 | [Analytics Reporting Engine Spec](./docs/ANALYTICS-REPORTING-ENGINE-SPEC.md) | MVP-14 Phase 2: GET /v1/analytics/report aggregation engine (complete spec) |
-| [Analytics Impl Brief](./docs/ANALYTICS-REPORTING-IMPL-BRIEF.md) | MVP-14 phases 1–4 execution plan with 4-phase roadmap |
+| [Analytics Impl Brief](./docs/ANALYTICS-REPORTING-IMPL-BRIEF.md) | MVP-14 phases 1-4 execution plan with 4-phase roadmap |
 | [Analytics Phase 1 Implementation](./docs/ANALYTICS-REPORTING-PHASE1-IMPL-PROMPT.md) | Ready-to-code guide: fixtures, starter template, 60+ test stubs |
 | [Analytics Complete Summary](./docs/ANALYTICS-REPORTING-COMPLETE-SUMMARY.md) | Quick start (8 steps), roadmap, acceptance criteria, test data facts |
 | [Analytics Phase 1 CTO Handoff](./docs/ANALYTICS-PHASE1-CTO-HANDOFF.md) | Phase 1 directive: core aggregation logic (5 days, ready-to-code) |
-| [Analytics Phase 2 CTO Handoff](./docs/ANALYTICS-PHASE2-CTO-HANDOFF.md) | Phase 2 directive: HTTP API route (3–4 days, integration testing) |
-| [Analytics Phase 3 CTO Handoff](./docs/ANALYTICS-PHASE3-CTO-HANDOFF.md) | Phase 3 directive: performance verification (2–3 days, load testing) |
+| [Analytics Phase 2 CTO Handoff](./docs/ANALYTICS-PHASE2-CTO-HANDOFF.md) | Phase 2 directive: HTTP API route (3-4 days, integration testing) |
+| [Analytics Phase 3 CTO Handoff](./docs/ANALYTICS-PHASE3-CTO-HANDOFF.md) | Phase 3 directive: performance verification (2-3 days, load testing) |
 | [Analytics Performance Baseline](./docs/ANALYTICS-PERFORMANCE-BASELINE.md) | Performance verified: 90-day < 500ms, memory < 500MB, load tests passing |
-| [Analytics Production Readiness](./docs/ANALYTICS-PRODUCTION-READINESS.md) | Final sign-off checklist: phases 1–3 complete, production ready |
+| [Analytics Production Readiness](./docs/ANALYTICS-PRODUCTION-READINESS.md) | Final sign-off checklist: phases 1-3 complete, production ready |
 | [Analytics Final Release v0.6.0](./docs/ANALYTICS-FINAL-RELEASE-v0.6.0.md) | Release handoff: git workflow, tag creation, merge to main, next steps |
-| [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) — R2 storage, Rust compiler, matter CLI |
-| [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) — Batch, catalog import, catalog-upload demo |
-| [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | 8-sprint Feb–May 2026; current status; revised milestones |
-| [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) | Day-by-day work and realistic estimates (Sprints 5–8) |
+| [Sprint 3 Plan](./docs/13-SPRINT-3-PLAN.md) | Sprint 3 (Mar 3-16, 2026) - R2 storage, Rust compiler, matter CLI |
+| [Sprint 4 Plan](./docs/14-SPRINT-4-PLAN.md) | Sprint 4 (Mar 17-30, 2026) - Batch, catalog import, catalog-upload demo |
+| [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md) | 8-sprint Feb-May 2026; current status; revised milestones |
+| [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md) | Day-by-day work and realistic estimates (Sprints 5-8) |
 | [Progress and Version](./docs/PROGRESS-AND-VERSION.md) | Code version, sprint state, next sprint (single source of truth) |
 | [CEO Sync (Sprint 2)](./docs/CEO-SYNC-SPRINT-2.md) | Sprint 2 features delivered, demo flow, Sprint 3 scope |
 | [API_KEYS_GUIDE](./docs/API_KEYS_GUIDE.md) | Guide for setting up API keys |
@@ -247,7 +247,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–6 + Payment Integration):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy; Stripe payment processing; merchant portal with payout automation; public product pages; order tracking; authenticated analytics. 88/88 tests passing. Ready for production deployment.
+**Delivered (Sprints 1-6 + Payment Integration):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy; Stripe payment processing; merchant portal with payout automation; public product pages; order tracking; authenticated analytics. 88/88 tests passing. Ready for production deployment.
 
 ---
 
@@ -266,18 +266,18 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 | Sprint | Planned Window | Actual Completion | Days | Goal | Version | Status |
 |--------|--------|--------|------|------|---------|--------|
-| Sprint 0 | By Jan 19, 2026 | By Jan 19, 2026 | ~5 | Setup and architecture | — | ✓ Complete |
-| Sprint 1 | Jan 20–Feb 5, 2026 | Feb 5, 2026 | 17 | Full MVP: compile–resolve–display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | ✓ Complete |
-| Sprint 2 | Feb 6–19, 2026 | Feb 8, 2026 (13:13 UTC+2) | 3 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | ✓ Complete |
-| Sprint 3 | Feb 20–Mar 5, 2026 | Feb 10, 2026 (15:48 UTC+2) | 2 | Analytics (MVP-14), observability, retention policy | v0.6.0 | ✓ Complete |
-| Sprint 4 | Mar 6–19, 2026 | Feb 11, 2026 (02:39 UTC+2) | <1 | Production hardening, security, operations, scaling | v0.6.0 (release) | ✓ Complete |
-| Sprint 5 | Mar 20–Apr 2, 2026 | Feb 11, 2026 (02:54 UTC+2) | <1 | Beta launch prep: landing, store assets, support, demo polish | v0.6.1 | ✓ Complete |
-| Sprint 6 | Apr 3–16, 2026 | Feb 11, 2026 (05:24 UTC+2) | ~2 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | ✓ Complete |
-| **Weekend Sprint** | **Feb 24-25, 2026** | **Feb 25, 2026** | **2** | **Payment integration, merchant portal, rebrand to fairflow** | **v0.7.0** | **✓ Complete** |
-| Sprint 7 | Apr 17–30, 2026 | In Progress | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ⚡ In Progress |
-| Sprint 8 | May 1–14, 2026 | Planned | ~14 est | Public launch prep, final validation | v1.0 (release) | ○ Planned |
+| Sprint 0 | By Jan 19, 2026 | By Jan 19, 2026 | ~5 | Setup and architecture | N/A | Complete |
+| Sprint 1 | Jan 20-Feb 5, 2026 | Feb 5, 2026 | 17 | Full MVP: compile-resolve-display; P1; R2; Rust; batch & catalog; demo | v0.4.0 | Complete |
+| Sprint 2 | Feb 6-19, 2026 | Feb 8, 2026 (13:13 UTC+2) | 3 | Extension caching (MVP-13): IndexedDB cache, overlay perf, cross-browser | v0.5.0 | Complete |
+| Sprint 3 | Feb 20-Mar 5, 2026 | Feb 10, 2026 (15:48 UTC+2) | 2 | Analytics (MVP-14), observability, retention policy | v0.6.0 | Complete |
+| Sprint 4 | Mar 6-19, 2026 | Feb 11, 2026 (02:39 UTC+2) | <1 | Production hardening, security, operations, scaling | v0.6.0 (release) | Complete |
+| Sprint 5 | Mar 20-Apr 2, 2026 | Feb 11, 2026 (02:54 UTC+2) | <1 | Beta launch prep: landing, store assets, support, demo polish | v0.6.1 | Complete |
+| Sprint 6 | Apr 3-16, 2026 | Feb 11, 2026 (05:24 UTC+2) | ~2 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | Complete |
+| **Weekend Sprint** | **Feb 24-25, 2026** | **Feb 25, 2026** | **2** | **Payment integration, merchant portal, rebrand to fairflow** | **v0.7.0** | **Complete** |
+| Sprint 7 | Apr 17-30, 2026 | In Progress | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | In Progress |
+| Sprint 8 | May 1-14, 2026 | Planned | ~14 est | Public launch prep, final validation | v1.0 (release) | Planned |
 
-**Current status (Feb 25, 2026):** Sprints 1–6 complete (v0.6.3 deployed). Weekend sprint complete (v0.7.0) with Stripe payment integration, merchant portal with payout automation, and rebrand to fairflow. PR to main in progress. Sprint 7 (beta merchant outreach) in progress. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status (Feb 25, 2026):** Sprints 1-6 complete (v0.6.3 deployed). Weekend sprint complete (v0.7.0) with Stripe payment integration, merchant portal with payout automation, and rebrand to fairflow. PR to main in progress. Sprint 7 (beta merchant outreach) in progress. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
@@ -333,4 +333,4 @@ See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for the 
 
 ---
 
-*"Make commerce portable, viral, and universally accessible — for humans today, AI agents tomorrow, and a decentralized economy in the future."*
+*"Make commerce portable, viral, and universally accessible - for humans today, AI agents tomorrow, and a decentralized economy in the future."*
