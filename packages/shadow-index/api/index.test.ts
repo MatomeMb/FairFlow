@@ -149,6 +149,8 @@ describe('GET /health', () => {
   });
 });
 
+// MVP-14 analytics event tests: see api/analytics.test.ts
+
 // MVP-09: Auth (optional API key). Uses app.request(); env set before import.
 describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
   let appWithKey: typeof app;

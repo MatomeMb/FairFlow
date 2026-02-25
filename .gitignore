@@ -39,6 +39,9 @@ logs/
 *.log
 **/data/events/*.jsonl
 
+# MVP-14 analytics event data (append-only JSONL)
+**/data/events/*.jsonl
+
 # OS
 Thumbs.db
 .DS_Store

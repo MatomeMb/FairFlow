@@ -65,19 +65,11 @@ pnpm test
 3. Click "Load unpacked"
 4. Select the `packages/lens-extension/` folder
 
-### Firefox
-**Option A — MV3 (manifest.json):** Try first; Firefox 121+ supports MV3 experimentally.
+### Firefox (MV3 support experimental)
 1. Open `about:debugging`
 2. Click "This Firefox"
 3. Click "Load Temporary Add-on"
 4. Select `manifest.json` from `packages/lens-extension/`
-
-**Option B — MV2 fallback (manifest_v2.json):** Use if MV3 fails to load or message passing is broken.
-1. Open `about:debugging` → This Firefox → Load Temporary Add-on
-2. Select `manifest_v2.json` (Firefox accepts any manifest filename)
-3. Includes `firefox-compat.js` (chrome.* polyfill for `browser.*` API)
-
-See [docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md](../../docs/FRIDAY-CROSS-BROWSER-SPRINT-ANALYSIS.md) for Firefox risk mitigation.
 
 ## Configuration
 
@@ -308,7 +300,7 @@ DevTools → Application → IndexedDB → `lens-matter-cache` → `payloads`
 - Cache writes are synchronous relative to user response (response always happens first)
 - Large payloads (>5MB) may hit IndexedDB quota on devices with limited storage
 - No automatic cache eviction (quota management planned for future sprint)
-- Cross-browser validation: Friday Feb 13 sprint (Chrome/Edge/Brave/Firefox); prep complete
+- Cross-browser testing (Edge/Brave/Firefox) pending (Chrome-first MVP)
 
 **Expected behavior:**
 - First resolution: API call → IndexedDB write → overlay displays
@@ -348,16 +340,18 @@ See [docs/MVP-13-CROSS-BROWSER.md](../../docs/MVP-13-CROSS-BROWSER.md) for detai
 
 ## Status
 
-**MVP-13 (Caching): Complete**
+**MVP-13 (Caching - Read Path): Complete**
 
 Completed:
 - Cache module: 5 functions with IndexedDB backend (Monday, Feb 9)
-- Unit tests: 15 tests covering all acceptance criteria
-- Integration tests: 16 tests for resolve handler
+- Unit tests: 15 tests covering all acceptance criteria (Monday, Feb 9)
+- Integration tests: 16 tests for resolve handler read path (Tuesday, Feb 10)
 - Logging: Structured [Cache HIT] / [Cache MISS] logging
-- cacheSet() integration in background.js (Wednesday, Feb 11)
-- E2E validation: 45/45 tests passing (Thursday, Feb 12)
-- Firefox compatibility layer + manifest_v2 fallback (Friday prep)
+
+Deferred to Wednesday:
+- cacheSet() integration on successful API responses
+- Error path handling (don't cache on API failure)
+- Full end-to-end testing with real matter:// links
 
 **Core Features:**
 - Image detection (XMP beacons) — MVP-07 [Complete]
