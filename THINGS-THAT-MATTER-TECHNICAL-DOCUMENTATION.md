@@ -1,4 +1,4 @@
-# .things that Matter
+# fairflow
 ## Executive Technical Documentation
 ### Investor-Grade Technical Package for CEO & Strategic Stakeholders
 
@@ -6,7 +6,7 @@
 
 | **Document Information** | |
 |--------------------------|---|
-| **Company Name** | .things that Matter |
+| **Company Name** | fairflow |
 | **Document Type** | Technical Documentation Package |
 | **Version** | 2.0 |
 | **Date** | April 3, 2026 |
@@ -39,9 +39,9 @@
 
 ## 1.1 Product Vision
 
-**What is Things That Matter?**
+**What is fairflow?**
 
-.things that Matter is building the infrastructure for **Object-Oriented Commerce** — where products become portable, self-sovereign digital objects that can be transacted anywhere on the internet. The internet today is architected around "Places." To purchase an item, users must navigate to a specific URL, load a heavy storefront, and operate within a walled garden. We are changing that.
+fairflow is building the infrastructure for **Object-Oriented Commerce** - where products become portable, self-sovereign digital objects that can be transacted anywhere on the internet. The internet today is architected around "Places." To purchase an item, users must navigate to a specific URL, load a heavy storefront, and operate within a walled garden. We are changing that.
 
 We build a **Commerce Compiler** that transforms product data into portable, intelligent digital objects called **Universal Commerce Containers** (`.thing` files). These artifacts:
 
@@ -52,7 +52,7 @@ We build a **Commerce Compiler** that transforms product data into portable, int
 
 **Core Problem:** Products are rigidly coupled to platforms. Commerce is treated as a destination, not a capability. HTML scraping is inefficient for AI agents. Social sharing creates friction.
 
-**Unique Approach:** Instead of another marketplace, we build the "physics" — a compiler that transforms product data into portable artifacts. Products exist simultaneously as:
+**Unique Approach:** Instead of another marketplace, we build the "physics" - a compiler that transforms product data into portable artifacts. Products exist simultaneously as:
 
 | Vector | Format | Use Case |
 |--------|--------|----------|
@@ -82,9 +82,9 @@ We build a **Commerce Compiler** that transforms product data into portable, int
 
 | Dimension | Status | Detail |
 |-----------|--------|--------|
-| **Shadow Index API** | Production | v0.6.0 — compile, resolve, batch, catalog, analytics, retention, query cache, storage monitor |
-| **Lens Extension** | Store-ready | v0.3.0 — matter://, XMP beacon, IndexedDB cache, performance instrumentation, SHA-256 validation |
-| **Rust Compiler** | Production | matter-core v0.3.0 — Compiler::compile(), matter CLI, deterministic output |
+| **Shadow Index API** | Production | v0.6.0 - compile, resolve, batch, catalog, analytics, retention, query cache, storage monitor |
+| **Lens Extension** | Store-ready | v0.3.0 - matter://, XMP beacon, IndexedDB cache, performance instrumentation, SHA-256 validation |
+| **Rust Compiler** | Production | matter-core v0.3.0 - Compiler::compile(), matter CLI, deterministic output |
 | **Tests** | Passing | 88/88 tests, 100% critical path coverage |
 | **Cross-browser** | Verified | Chrome, Edge, Brave, Firefox all validated (Sprint 2) |
 | **Store submission** | Complete | Screenshots (4x 1280x800), privacy policy deployed, checklist complete |
@@ -96,7 +96,7 @@ We build a **Commerce Compiler** that transforms product data into portable, int
 | Cache hit latency | <50ms | 16ms | PASS |
 | Cache miss (API) | <300ms | 185ms | PASS |
 | Overlay render | <30ms | 17ms | PASS |
-| Speedup factor | 5–10x | 11.5x | PASS |
+| Speedup factor | 5-10x | 11.5x | PASS |
 | Test coverage | 95%+ | 100% | PASS |
 | Memory overhead | <5MB/100 | 1.8MB/100 | PASS |
 | Analytics query (p95) | <250ms | 212ms | PASS |
@@ -111,21 +111,21 @@ b3fc49c (README professional polish), ec4de85 (README Sprint 6 update), b4c6711 
 
 **Why is this technically hard?**
 
-1. **Portable product identity** — Products must resolve consistently across any medium (link, image, file) with a stable hash-based identity.
-2. **Dual optimization** — Human-friendly (visual overlay, images) and machine-friendly (future: 5ms binary resolution, 140x faster than HTML).
-3. **Decentralized trust** — No central product catalog; resolution via hash; future cryptographic signing for verification.
-4. **Cross-browser extension** — Manifest V3, service worker, IndexedDB, message passing — all with consistent behavior across Chrome, Edge, Brave, Firefox.
+1. **Portable product identity** - Products must resolve consistently across any medium (link, image, file) with a stable hash-based identity.
+2. **Dual optimization** - Human-friendly (visual overlay, images) and machine-friendly (future: 5ms binary resolution, 140x faster than HTML).
+3. **Decentralized trust** - No central product catalog; resolution via hash; future cryptographic signing for verification.
+4. **Cross-browser extension** - Manifest V3, service worker, IndexedDB, message passing - all with consistent behavior across Chrome, Edge, Brave, Firefox.
 
 **Architecture decisions that create competitive moat:**
 
-- **IndexedDB cache-first resolution** — 11.5x speedup; competitors typically do server-side caching or no caching.
-- **XMP metadata in images** — Product discovery without link dependency; survives image sharing.
-- **Rust compiler** — Performance foundation for future FlatBuffers and cryptographic signing.
-- **CLIP integration (planned)** — Semantic vectors enable "find similar" and AI-native commerce at 40x fewer tokens than HTML.
+- **IndexedDB cache-first resolution** - 11.5x speedup; competitors typically do server-side caching or no caching.
+- **XMP metadata in images** - Product discovery without link dependency; survives image sharing.
+- **Rust compiler** - Performance foundation for future FlatBuffers and cryptographic signing.
+- **CLIP integration (planned)** - Semantic vectors enable "find similar" and AI-native commerce at 40x fewer tokens than HTML.
 
 **Performance advantages:**
 
-- Cache hit: 16ms vs typical 100–300ms for product APIs
+- Cache hit: 16ms vs typical 100-300ms for product APIs
 - Future: 5ms binary resolution vs 700ms HTML parsing
 - Future: 97.5% cost reduction for AI agent product queries
 
@@ -133,11 +133,11 @@ b3fc49c (README professional polish), ec4de85 (README Sprint 6 update), b4c6711 
 
 ## 1.4 30-Second Pitch
 
-**.things that Matter** builds the infrastructure for **Object-Oriented Commerce** — products as portable digital objects that work anywhere: in links, images, and (future) binary files for AI agents.
+**fairflow** builds the infrastructure for **Object-Oriented Commerce** - products as portable digital objects that work anywhere: in links, images, and (future) binary files for AI agents.
 
 - **Today:** matter:// links and XMP beacons resolve to product overlays in 16ms (cached) or 185ms (API); Chrome Web Store submission approved
 - **Metrics:** 11.5x cache speedup, 100% test coverage, 88/88 tests passing
-- **Thesis:** Portability first, then AI-nativity — get it working everywhere first, then make it agent-native
+- **Thesis:** Portability first, then AI-nativity - get it working everywhere first, then make it agent-native
 - **Next:** Beta merchant onboarding (Sprint 7), public launch (Sprint 8)
 
 ---
@@ -187,7 +187,7 @@ b3fc49c (README professional polish), ec4de85 (README Sprint 6 update), b4c6711 
 | Cache hit latency | <50ms | 16ms | 68% under | PASS |
 | Cache miss (API) | <300ms | 185ms | 45% under | PASS |
 | Overlay render | <30ms | 17ms | 43% under | PASS |
-| Speedup factor | 5–10x | 11.5x | 15% over | PASS |
+| Speedup factor | 5-10x | 11.5x | 15% over | PASS |
 | Storage quota usage | <5% | 0.088% | 99.9% under | PASS |
 | Memory overhead | <5MB/100 | 1.8MB/100 | 64% under | PASS |
 | Test coverage | 95%+ | 100% | 5% over | PASS |
@@ -260,8 +260,8 @@ packages/lens-extension/
 └── icons/
 ```
 
-- **Service worker:** `background.js` — handles resolve requests, cache layer, API calls; no DOM access
-- **Content script:** `content.js` — runs on all URLs; detects matter:// clicks and image XMP; renders overlay
+- **Service worker:** `background.js` - handles resolve requests, cache layer, API calls; no DOM access
+- **Content script:** `content.js` - runs on all URLs; detects matter:// clicks and image XMP; renders overlay
 - **Permissions:** storage, activeTab, scripting; host_permissions for http(s)
 - **Manifest:** `manifest_version: 3`; `background.service_worker`; content_scripts matches `["<all_urls>"]`
 
@@ -272,13 +272,13 @@ packages/lens-extension/
 - Entry shape: `{ hash, gist, thing_url, image_url?, checkout_url?, fetchedAt }`
 - TTL: 24 hours (entries older than 24h treated as misses)
 
-**Cache behavior (AC1–AC6):**
-- AC1: Cache-on-read — check cache before API
-- AC2: Cache-on-success — store successful API responses
-- AC3: No cache on error — failed requests not cached
-- AC4: TTL enforcement — 24h expiration
-- AC5: Overlay unchanged — cached data produces identical overlay
-- AC6: Isolation — IndexedDB in service worker context
+**Cache behavior (AC1-AC6):**
+- AC1: Cache-on-read - check cache before API
+- AC2: Cache-on-success - store successful API responses
+- AC3: No cache on error - failed requests not cached
+- AC4: TTL enforcement - 24h expiration
+- AC5: Overlay unchanged - cached data produces identical overlay
+- AC6: Isolation - IndexedDB in service worker context
 
 ### 2.2.3 Message Passing Protocol
 
@@ -286,7 +286,7 @@ packages/lens-extension/
 // Content → Background (content.js line 14)
 { type: 'resolve', hash: '1a5f3799...' }
 
-// Background → Content (success) — background.js line 161
+// Background -> Content (success) - background.js line 161
 { ok: true, data: { hash, gist, thing_url, image_url?, checkout_url?, fetchedAt, ... } }
 
 // Background → Content (error)
@@ -359,8 +359,8 @@ packages/lens-extension/
 5. Produce matter:// URI with hash
 
 **CLI commands:**
-- `matter compile <input>` — compile product to .thing and hash
-- `matter verify <hash>` — verify hash against stored artifact
+- `matter compile <input>` - compile product to .thing and hash
+- `matter verify <hash>` - verify hash against stored artifact
 
 **Hash computation:** SHA-256 of canonical JSON; byte-order and key ordering must match Shadow Index API for consistent resolution.
 
@@ -395,11 +395,11 @@ packages/matter-core/
 
 | Operation | Measured | Target | Status |
 |-----------|----------|--------|--------|
-| Cache hit | 16ms avg (12–18ms range) | <50ms | PASS |
-| Cache miss + API | 185ms avg (175–195ms) | <300ms | PASS |
-| Cache write | 12ms avg (11–14ms) | <50ms | PASS |
+| Cache hit | 16ms avg (12-18ms range) | <50ms | PASS |
+| Cache miss + API | 185ms avg (175-195ms) | <300ms | PASS |
+| Cache write | 12ms avg (11-14ms) | <50ms | PASS |
 | Overlay render | 17ms avg | <30ms | PASS |
-| Speedup factor | 11.5x | 5–10x | PASS |
+| Speedup factor | 11.5x | 5-10x | PASS |
 
 **Memory:** 1.8MB per 100 entries; 0.088% of storage quota. Zero leaks confirmed via heap snapshot.
 
@@ -453,8 +453,8 @@ E2E: Playwright; manual validation on matter-demo and catalog-upload flows.
 6. Cache check: cacheGet('abc123def456')
    ├─ HIT (16ms avg) → Return cached data immediately
    └─ MISS → Continue to step 7
-7. API call: fetchResolve(baseUrl, hash) — network ~185ms
-8. Cache write: cacheSet(hash, data) — IndexedDB ~12ms (error boundary)
+7. API call: fetchResolve(baseUrl, hash) - network ~185ms
+8. Cache write: cacheSet(hash, data) - IndexedDB ~12ms (error boundary)
 9. Return data to content script: sendResponse({ ok: true, data })
 10. Content script: renderOverlay(target, data)
 11. User sees overlay: image, title, price, "Buy Now" button
@@ -492,7 +492,7 @@ E2E: Playwright; manual validation on matter-demo and catalog-upload flows.
 10. User sees product info; Buy Now opens checkout
 ```
 
-**Technical detail (content.js L50–77):** `extractXmpJpeg()` iterates JPEG segments; `extractXmpPng()` iterates PNG chunks; regex extracts `<matter:hash>` and `<matter:gist>` from XML string.
+**Technical detail (content.js L50-77):** `extractXmpJpeg()` iterates JPEG segments; `extractXmpPng()` iterates PNG chunks; regex extracts `<matter:hash>` and `<matter:gist>` from XML string.
 
 ### Workflow 3: Product Verification (Future)
 
@@ -531,7 +531,7 @@ E2E: Playwright; manual validation on matter-demo and catalog-upload flows.
 | Cache hit | <50ms | 16ms | PASS |
 | Cache miss | <300ms | 185ms | PASS |
 | Overlay render | <30ms | 17ms | PASS |
-| Speedup | 5–10x | 11.5x | PASS |
+| Speedup | 5-10x | 11.5x | PASS |
 | Storage usage | <5% | 0.088% | PASS |
 | Memory/100 entries | <5MB | 1.8MB | PASS |
 
@@ -574,8 +574,8 @@ E2E: Playwright; manual validation on matter-demo and catalog-upload flows.
 
 ## 4.1 Strategic Roadmap
 
-**Phase 1: Portability (Current – MVP-13)**  
-Timeline: Feb 9–19, 2026 (2 weeks)  
+**Phase 1: Portability (Current - MVP-13)**  
+Timeline: Feb 9-19, 2026 (2 weeks)  
 Status: 95% complete
 
 - Cache layer production-ready
@@ -591,14 +591,14 @@ Status: 95% complete
 | E2E validation | Feb 12 | PASS |
 | Performance baselines | Feb 12 | PASS |
 | Cross-browser (Chrome, Edge, Brave, Firefox) | Feb 13 | In progress |
-| Staging deployment | Feb 14–19 | Planned |
+| Staging deployment | Feb 14-19 | Planned |
 
 Success: All 4 browsers working; performance within range; zero critical bugs.
 
 ---
 
 **Phase 2: Adoption**  
-Timeline: Feb 19 – Mar 3 (2 weeks)  
+Timeline: Feb 19 - Mar 3 (2 weeks)  
 Status: Not started
 
 - Staging deployment v0.5.0
@@ -617,13 +617,13 @@ Status: Not started
 - Week 1–2: Product validation, image handling
 - Week 3–4: Replicate API (CLIP ViT-B/32)
 - Week 5: Vector storage (semantic search)
-- Week 6–7: FlatBuffers binary format
+- Week 6-7: FlatBuffers binary format
 - Week 8: Performance profiling
-- Week 9–10: CLIP vs HTML comparison testing
+- Week 9-10: CLIP vs HTML comparison testing
 
 Success: CLIP end-to-end; 140x speedup validated; 97.5% cost savings.
 
-**Thesis:** Portability precedes nativity — work everywhere first, then AI-native.
+**Thesis:** Portability precedes nativity - work everywhere first, then AI-native.
 
 **Roadmap Timeline (Mermaid Gantt):**
 
