@@ -89,6 +89,14 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  if (requestPath === '/v1/admin/payouts/release' || requestPath === '/v1/admin/mor-status' || requestPath === '/v1/admin/payouts/backfill') {
+    return next();
+  }
+
+  if (requestPath === '/webhooks/stripe') {
+    return next();
+  }
+
   // Allow public access to product detail pages (/thing/:hash.json)
   if (requestPath.match(/^\/thing\/.+\.json$/)) {
     return next();
@@ -460,8 +468,44 @@ type MerchantNotification = {
 type PayoutLog = {
   id: string;
   merchant_id?: string;
+  orders_included?: string[];
+  gross_amount?: number;
+  commission_amount?: number;
+  net_amount?: number;
+  currency?: string;
+  status?: 'pending' | 'processing' | 'completed' | 'failed';
+  transfer_reference?: string | null;
+  failure_reason?: string | null;
+  initiated_by?: string;
+  created_at?: string;
+  transferred_at?: string | null;
   [key: string]: any;
 };
+
+interface MerchantOrderBackend extends MerchantOrder {}
+
+interface PayoutLogBackend extends PayoutLog {}
+
+interface MoRStatusResponse {
+  platform_intake: {
+    total_orders: number;
+    paid_orders: number;
+    fulfilled_orders: number;
+    paid_and_fulfilled: number;
+    unqueued_paid_fulfilled: number;
+  };
+  payout_routing: {
+    total_payout_logs: number;
+    pending_payouts: number;
+    completed_payouts: number;
+    failed_payouts: number;
+    total_net_pending_cents: number;
+    total_net_released_cents: number;
+  };
+  routing_health: 'healthy' | 'gap_detected' | 'no_data';
+  gap_order_ids: string[];
+  generated_at: string;
+}
 
 const loadOrders = async (): Promise<MerchantOrder[]> => {
   const parsed = await readJsonFile<Record<string, MerchantOrder> | MerchantOrder[]>(ordersFile, {});
@@ -486,6 +530,196 @@ const saveNotifications = async (items: MerchantNotification[]): Promise<void> =
 
 const loadPayoutLogs = async (): Promise<PayoutLog[]> =>
   readJsonFile<PayoutLog[]>(payoutLogsFile, []);
+
+const savePayoutLogs = async (logs: PayoutLog[]): Promise<void> => {
+  await writeJsonFile(payoutLogsFile, logs);
+};
+
+async function loadAllOrders(): Promise<MerchantOrderBackend[]> {
+  return loadOrders();
+}
+
+async function saveAllOrders(orders: MerchantOrderBackend[]): Promise<void> {
+  await saveOrders(orders);
+}
+
+/**
+ * Queue an eligible order for payout exactly once.
+ * Idempotency guarantee: if an order is already present in any payout log `orders_included`,
+ * this returns the existing payout log and does not create a duplicate.
+ */
+async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
+  const orders = await loadOrders();
+  const order = orders.find((candidate) => candidate.id === orderId);
+  if (!order) {
+    throw new Error(`Order not found: ${orderId}`);
+  }
+
+  const orderStatus = order.status ?? 'unknown';
+  const fulfillmentStatus = order.fulfillment_status ?? 'unknown';
+  if (orderStatus !== 'paid' || fulfillmentStatus !== 'fulfilled') {
+    console.info(`[MoR] Order ${orderId} not eligible for payout: status=${orderStatus} fulfillment=${fulfillmentStatus}`);
+    return null;
+  }
+
+  const existingLogs = await loadPayoutLogs();
+  const existing = existingLogs.find((log) => Array.isArray(log.orders_included) && log.orders_included.includes(orderId));
+  if (existing) {
+    console.info(`[MoR] Order ${orderId} already queued in payout ${existing.id} — skipping`);
+    return existing;
+  }
+
+  const grossAmount = typeof order.amount === 'number' ? order.amount : 0;
+  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.06');
+  const commissionAmount = Math.round(grossAmount * commissionRate);
+  const netAmount = grossAmount - commissionAmount;
+
+  const payoutLog: PayoutLog = {
+    id: crypto.randomUUID(),
+    merchant_id: order.merchant_id,
+    orders_included: [orderId],
+    gross_amount: grossAmount,
+    commission_amount: commissionAmount,
+    net_amount: netAmount,
+    currency: order.currency ?? 'ZAR',
+    status: 'pending',
+    transfer_reference: null,
+    failure_reason: null,
+    initiated_by: 'auto_fulfillment_trigger',
+    created_at: new Date().toISOString(),
+    transferred_at: null,
+  };
+
+  const updatedLogs = [...existingLogs, payoutLog];
+  await savePayoutLogs(updatedLogs);
+
+  order.payout_status = 'pending_release';
+  order.payout_log_id = payoutLog.id;
+  order.updated_at = new Date().toISOString();
+  await saveOrders(orders);
+
+  console.info('[MoR] Payout queued', {
+    orderId,
+    payoutLogId: payoutLog.id,
+    amount: payoutLog.net_amount,
+    merchant_id: payoutLog.merchant_id,
+  });
+
+  return payoutLog;
+}
+
+/**
+ * Move one pending payout log to completed and mark linked orders as released.
+ * Idempotency guarantee: refuses non-pending payout logs and does not mutate twice.
+ */
+async function releasePayoutLog(payoutLogId: string, initiatedBy: string): Promise<PayoutLogBackend> {
+  const payoutLogs = await loadPayoutLogs();
+  const target = payoutLogs.find((item) => item.id === payoutLogId);
+  if (!target) {
+    throw new Error(`releasePayoutLog: Payout log not found: ${payoutLogId}`);
+  }
+
+  if (target.status !== 'pending') {
+    const error = Object.assign(
+      new Error(`releasePayoutLog: Payout already processed (status: ${target.status})`),
+      { currentStatus: target.status }
+    );
+    throw error;
+  }
+
+  const transferReference = `MANUAL-${Date.now()}-${payoutLogId.slice(0, 8).toUpperCase()}`;
+  target.status = 'completed';
+  target.transfer_reference = transferReference;
+  target.transferred_at = new Date().toISOString();
+  target.initiated_by = initiatedBy;
+  await savePayoutLogs(payoutLogs);
+
+  const includedOrderIds = Array.isArray(target.orders_included) ? target.orders_included : [];
+  const orders = await loadAllOrders();
+  const updatedOrders = orders.map((order) => {
+    if (!includedOrderIds.includes(order.id)) return order;
+    return {
+      ...order,
+      payout_status: 'released' as const,
+      payout_log_id: target.id,
+      updated_at: new Date().toISOString(),
+    };
+  });
+  await saveAllOrders(updatedOrders);
+
+  console.info('[MoR] Payout released', {
+    payoutLogId,
+    merchant_id: target.merchant_id,
+    amount: target.net_amount,
+    initiated_by: initiatedBy,
+  });
+
+  return target;
+}
+
+/**
+ * Compute Merchant-of-Record routing health snapshot.
+ * Idempotency guarantee: read-only function with no side effects.
+ */
+async function buildMoRStatus(): Promise<MoRStatusResponse> {
+  const [orders, payoutLogs] = await Promise.all([loadAllOrders(), loadPayoutLogs()]);
+
+  const paidOrders = orders.filter((order) => order.status === 'paid');
+  const fulfilledOrders = orders.filter((order) => order.fulfillment_status === 'fulfilled');
+  const paidAndFulfilled = orders.filter((order) => order.status === 'paid' && order.fulfillment_status === 'fulfilled');
+
+  const queuedOrderIds = new Set<string>();
+  for (const log of payoutLogs) {
+    if (Array.isArray(log.orders_included)) {
+      for (const orderId of log.orders_included) {
+        queuedOrderIds.add(orderId);
+      }
+    }
+  }
+
+  const gapOrders = paidAndFulfilled.filter((order) => !queuedOrderIds.has(order.id));
+  const pendingPayouts = payoutLogs.filter((log) => log.status === 'pending');
+  const completedPayouts = payoutLogs.filter((log) => log.status === 'completed');
+  const failedPayouts = payoutLogs.filter((log) => log.status === 'failed');
+
+  const totalNetPending = pendingPayouts.reduce((sum, log) => sum + (typeof log.net_amount === 'number' ? log.net_amount : 0), 0);
+  const totalNetReleased = completedPayouts.reduce((sum, log) => sum + (typeof log.net_amount === 'number' ? log.net_amount : 0), 0);
+
+  const routingHealth: MoRStatusResponse['routing_health'] =
+    orders.length === 0 && payoutLogs.length === 0
+      ? 'no_data'
+      : gapOrders.length > 0
+        ? 'gap_detected'
+        : 'healthy';
+
+  return {
+    platform_intake: {
+      total_orders: orders.length,
+      paid_orders: paidOrders.length,
+      fulfilled_orders: fulfilledOrders.length,
+      paid_and_fulfilled: paidAndFulfilled.length,
+      unqueued_paid_fulfilled: gapOrders.length,
+    },
+    payout_routing: {
+      total_payout_logs: payoutLogs.length,
+      pending_payouts: pendingPayouts.length,
+      completed_payouts: completedPayouts.length,
+      failed_payouts: failedPayouts.length,
+      total_net_pending_cents: totalNetPending,
+      total_net_released_cents: totalNetReleased,
+    },
+    routing_health: routingHealth,
+    gap_order_ids: gapOrders.map((order) => order.id),
+    generated_at: new Date().toISOString(),
+  };
+}
+
+function validateAdminAuth(authHeader: string | undefined): boolean {
+  const configuredSecret = process.env.ADMIN_SECRET_KEY;
+  if (!configuredSecret || !authHeader) return false;
+  const token = authHeader.replace(/^Bearer\s+/i, '').trim();
+  return token === configuredSecret;
+}
 
 const sanitizeMerchantAccount = (account: MerchantAccount) => {
   const { password_hash, reset_token, reset_expires_at, ...safe } = account;
@@ -1025,7 +1259,91 @@ app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
   order.updated_at = now;
   await saveOrders(orders);
 
+  if (order.status === 'paid') {
+    const payoutLog = await queueOrderForPayout(order.id);
+    if (payoutLog) {
+      console.info('[MoR] Order queued for payout:', {
+        orderId: order.id,
+        payoutLogId: payoutLog.id,
+        amount: payoutLog.net_amount,
+        merchant_id: payoutLog.merchant_id,
+      });
+    }
+  }
+
   return c.json({ ok: true, order });
+});
+
+app.post('/v1/admin/payouts/release', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const body = await c.req.json().catch(() => null) as { payout_log_id?: string } | null;
+  const payoutLogId = body?.payout_log_id;
+  if (!payoutLogId) {
+    return c.json({ ok: false, error: 'Missing payout_log_id' }, 400);
+  }
+
+  try {
+    const released = await releasePayoutLog(payoutLogId, 'admin_manual');
+    return c.json({ ok: true, payout_log: released });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    const currentStatus = (error as { currentStatus?: string }).currentStatus;
+    if (message.includes('not found')) {
+      return c.json({ ok: false, error: 'Payout log not found' }, 404);
+    }
+    if (currentStatus) {
+      return c.json({ ok: false, error: 'Payout already processed', current_status: currentStatus }, 400);
+    }
+    console.error('[MoR] Release failed', { payout_log_id: payoutLogId, error: message });
+    return c.json({ ok: false, error: 'Release failed', detail: message }, 500);
+  }
+});
+
+app.get('/v1/admin/mor-status', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  try {
+    const status = await buildMoRStatus();
+    return c.json({ ok: true, ...status });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[MoR] Status check failed', { error: message });
+    return c.json({ ok: false, error: 'Status check failed', detail: message }, 500);
+  }
+});
+
+app.post('/v1/admin/payouts/backfill', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  try {
+    const status = await buildMoRStatus();
+    const results: Array<{ orderId: string; result: string; payoutLogId?: string }> = [];
+
+    for (const orderId of status.gap_order_ids) {
+      try {
+        const payoutLog = await queueOrderForPayout(orderId);
+        results.push({ orderId, result: 'queued', payoutLogId: payoutLog?.id });
+      } catch (error) {
+        const message = error instanceof Error ? error.message : String(error);
+        results.push({ orderId, result: `error: ${message}` });
+      }
+    }
+
+    const queued = results.filter((item) => item.result === 'queued').length;
+    const errors = results.filter((item) => item.result.startsWith('error:')).length;
+    console.info('[MoR] Backfill complete', { queued, errors, total: status.gap_order_ids.length });
+    return c.json({ ok: true, queued, errors, results });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return c.json({ ok: false, error: 'Backfill failed', detail: message }, 500);
+  }
 });
 
 app.get('/v1/merchant/account', async (c) => {
@@ -1636,6 +1954,66 @@ app.post('/checkout/create-session', async (c) => {
   }
 });
 
+// POST /webhooks/stripe - Stripe webhook settlement source of truth
+app.post('/webhooks/stripe', async (c) => {
+  const signature = c.req.header('stripe-signature');
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+  if (!signature || !webhookSecret) {
+    return c.json(err('webhook_config_error', 'Missing Stripe webhook signature or secret'), 400);
+  }
+
+  const payload = await c.req.text();
+  let event: Stripe.Event;
+  try {
+    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    return c.json(err('webhook_signature_invalid', message), 400);
+  }
+
+  try {
+    if (event.type === 'checkout.session.completed') {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const sessionId = session.id;
+      const orders = await loadOrders();
+      const order = orders.find((item) => item.id === sessionId || item.session_id === sessionId);
+      if (order) {
+        if (order.status !== 'paid') {
+          const now = new Date().toISOString();
+          order.status = 'paid';
+          order.paid_at = now;
+          order.updated_at = now;
+          await saveOrders(orders);
+          console.info('[MoR] Order payment settled via webhook', {
+            orderId: order.id,
+            payoutLogId: order.payout_log_id ?? null,
+            amount: order.amount,
+            merchant_id: order.merchant_id,
+          });
+        }
+
+        if (order.fulfillment_status === 'fulfilled') {
+          const payoutLog = await queueOrderForPayout(order.id);
+          if (payoutLog) {
+            console.info('[MoR] Order queued after webhook settlement', {
+              orderId: order.id,
+              payoutLogId: payoutLog.id,
+              amount: payoutLog.net_amount,
+              merchant_id: payoutLog.merchant_id,
+            });
+          }
+        }
+      }
+    }
+
+    return c.json({ ok: true }, 200);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    console.error('[MoR] Stripe webhook processing failed', { error: message });
+    return c.json(err('webhook_processing_failed', message), 500);
+  }
+});
+
 // GET /orders/:sessionId - Fetch order details by session ID
 app.get('/orders/:sessionId', async (c) => {
   try {
@@ -1651,33 +2029,6 @@ app.get('/orders/:sessionId', async (c) => {
 
     if (!order) {
       return c.json(err('not_found', `Order not found for session: ${sessionId}`), 404);
-    }
-
-    const mutableOrder = order as any;
-    const orderStatus = typeof mutableOrder.status === 'string' ? mutableOrder.status : undefined;
-
-    if (orderStatus === 'pending') {
-      try {
-        const session = await stripe.checkout.sessions.retrieve(sessionId);
-        const isPaid = session.payment_status === 'paid';
-        const isExpired = session.status === 'expired';
-
-        if (isPaid) {
-          mutableOrder.status = 'paid';
-          mutableOrder.paid_at = new Date().toISOString();
-          mutableOrder.updated_at = mutableOrder.paid_at;
-          orders[orderIndex] = mutableOrder;
-          await saveOrders(orders);
-        } else if (isExpired) {
-          mutableOrder.status = 'failed';
-          mutableOrder.updated_at = new Date().toISOString();
-          orders[orderIndex] = mutableOrder;
-          await saveOrders(orders);
-        }
-      } catch (stripeError) {
-        const message = stripeError instanceof Error ? stripeError.message : String(stripeError);
-        console.warn(`Stripe status sync failed for session ${sessionId}: ${message}`);
-      }
     }
 
     return c.json({
@@ -1710,3 +2061,10 @@ if (process.env.NODE_ENV !== 'test') {
 
 // Export for Vercel Edge Functions and tests
 export default app;
+export {
+  queueOrderForPayout,
+  releasePayoutLog,
+  buildMoRStatus,
+  validateAdminAuth,
+};
+export type { PayoutLogBackend, MerchantOrderBackend, MoRStatusResponse };
