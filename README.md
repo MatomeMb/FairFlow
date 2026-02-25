@@ -1,4 +1,4 @@
-# .things that Matter
+# fairflow
 
 > **Building the infrastructure for Object-Oriented Commerce** — where products become portable, self-sovereign digital objects that can be transacted anywhere on the internet.
 
@@ -8,7 +8,7 @@
 
 The internet today is architected around "Places." To purchase an item, users must navigate to a specific URL, load a heavy storefront, and operate within a walled garden. We're changing that.
 
-**.things that Matter** builds a **Commerce Compiler** that transforms product data into portable, intelligent digital objects called **Universal Commerce Containers** (`.thing` files). These artifacts:
+**fairflow** builds a **Commerce Compiler** that transforms product data into portable, intelligent digital objects called **Universal Commerce Containers** (`.thing` files). These artifacts:
 
 - Carry their own identity, price, semantic meaning, and checkout logic
 - Are visually shareable for humans (embedded in images)
@@ -66,12 +66,35 @@ For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [
 
 ---
 
-## Current Status (As of Feb 11, 2026)
+## Latest Features (v0.7.0)
 
-**Version:** v0.6.3 (All Sprints 1–6 complete)  
-**Completion Date:** Feb 11, 2026 (05:24 UTC+2)
+### Payment Processing & E-Commerce
+- **Stripe Integration**: Full checkout flow with session management
+- **Order Tracking**: Consumer-facing order confirmation and status tracking
+- **Public Product Pages**: Shareable product detail pages via `/thing/:hash`
+- **Order Management**: GET `/orders/:sessionId` endpoint for order retrieval
 
-### What's Complete (Sprints 1–6, deployed)
+### Merchant Portal Enhancements  
+- **Payout Routing Automation**: Automated merchant payout infrastructure (MOR)
+- **State Separation**: Clean separation of merchant and consumer workflows
+- **KYC Integration**: Complete merchant verification and compliance workflows
+- **Analytics Dashboard**: Authenticated merchant analytics with real-time metrics
+
+### Frontend Polish (Sprint A)
+- 20+ UI/UX refinements (F-01 through F-20)
+- fairflow logo and brand identity implementation
+- Google OAuth visual improvements
+- Responsive layout optimizations
+- Address field components and form validation
+
+---
+
+## Current Status (As of Feb 25, 2026)
+
+**Version:** v0.7.0 (Payment Integration & Merchant Portal Complete)  
+**Last Updated:** Feb 25, 2026
+
+### What's Complete (Sprints 1–6 + Payment Integration, deployed)
 
 **Sprint 1 (Completed Feb 5):**
 - Full MVP pipeline: compile → resolve → display (Rust compiler, matter CLI, .thing format)
@@ -109,7 +132,16 @@ For detailed setup: See [SETUP.md](./SETUP.md). For API key configuration: See [
 - Screenshots validated, privacy URL deployed, submission-ready documentation
 - Git tags: v0.6.2, v0.6.3
 
-**Next steps:** Submit v0.6.3 to Chrome Web Store. Begin Sprint 7 beta merchant outreach (Feb 12+).
+**Weekend Sprint & Rebrand (Completed Feb 24-25):**
+- **Brand Evolution:** Rebranded from ".things that Matter" to "fairflow"
+- **Payment Processing:** Full Stripe integration with checkout and order confirmation
+- **Merchant Portal:** State separation, payout routing automation, KYC workflows
+- **Consumer Experience:** Public product pages (`/thing/:hash`), order tracking (`/orders/:sessionId`)
+- **Frontend Polish:** 20+ UI/UX improvements (F-01 through F-20), logo refinement, Google OAuth styling
+- **API Enhancements:** Authenticated analytics, merchant routes, public resolve endpoints
+- **Infrastructure:** Runtime data file management, improved config portability
+
+**Next steps:** Complete PR merge to main, continue merchant portal refinements, prepare for beta merchant outreach.
 
 ---
 
@@ -215,7 +247,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## Key Metrics & Success Criteria
 
-**Delivered (Sprints 1–6):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy. 88/88 tests passing. v0.6.3 ready for Chrome Web Store submission.
+**Delivered (Sprints 1–6 + Payment Integration):** Compile to resolve to display pipeline; batch and catalog import; R2 storage; Rust compiler; matter CLI; extension overlay and XMP beacon; auth and rate limits; IndexedDB cache; analytics and reporting; production hardening; landing page; store assets; screenshots and privacy policy; Stripe payment processing; merchant portal with payout automation; public product pages; order tracking; authenticated analytics. 88/88 tests passing. Ready for production deployment.
 
 ---
 
@@ -230,7 +262,7 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 
 ## 8-Sprint Delivery Timeline
 
-*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 11, 2026 (05:24 UTC+2).*
+*Source: [Delivery Timeline](./docs/15-DELIVERY-TIMELINE.md). Day-by-day work: [Weekly Work Plan](./docs/16-WEEKLY-WORK-PLAN.md). Last updated: Feb 25, 2026.*
 
 | Sprint | Planned Window | Actual Completion | Days | Goal | Version | Status |
 |--------|--------|--------|------|------|---------|--------|
@@ -241,10 +273,11 @@ PHASE 3: DECENTRALIZED COMMERCE (2028+)
 | Sprint 4 | Mar 6–19, 2026 | Feb 11, 2026 (02:39 UTC+2) | <1 | Production hardening, security, operations, scaling | v0.6.0 (release) | ✓ Complete |
 | Sprint 5 | Mar 20–Apr 2, 2026 | Feb 11, 2026 (02:54 UTC+2) | <1 | Beta launch prep: landing, store assets, support, demo polish | v0.6.1 | ✓ Complete |
 | Sprint 6 | Apr 3–16, 2026 | Feb 11, 2026 (05:24 UTC+2) | ~2 | Extension 1.0 release readiness, Chrome Web Store submission | v0.6.3 | ✓ Complete |
-| Sprint 7 | Apr 17–30, 2026 | Planned (Feb 12+) | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ○ Planned |
-| Sprint 8 | May 1–14, 2026 | Planned (Feb 26+) | ~14 est | Public launch prep, final validation | v1.0 (release) | ○ Planned |
+| **Weekend Sprint** | **Feb 24-25, 2026** | **Feb 25, 2026** | **2** | **Payment integration, merchant portal, rebrand to fairflow** | **v0.7.0** | **✓ Complete** |
+| Sprint 7 | Apr 17–30, 2026 | In Progress | ~14 est | Beta program execution, merchant onboarding, feedback loop | v1.0 (candidate) | ⚡ In Progress |
+| Sprint 8 | May 1–14, 2026 | Planned | ~14 est | Public launch prep, final validation | v1.0 (release) | ○ Planned |
 
-**Current status (Feb 11, 05:24 UTC+2):** Sprints 1–6 complete (v0.6.3 deployed). Sprints 7–8 planned. Git commits Feb 8–11 show accelerated delivery: MVP-13 (3 days), MVP-14 (2 days), production hardening (<1 day), beta prep (<1 day), store submission (~2 days). Ready for Chrome Web Store submission. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
+**Current status (Feb 25, 2026):** Sprints 1–6 complete (v0.6.3 deployed). Weekend sprint complete (v0.7.0) with Stripe payment integration, merchant portal with payout automation, and rebrand to fairflow. PR to main in progress. Sprint 7 (beta merchant outreach) in progress. Single source of truth: [Progress and Version](./docs/PROGRESS-AND-VERSION.md).
 
 ---
 
@@ -294,8 +327,8 @@ See [Phase 0 Platform Testing Guide](./docs/PHASE0_PLATFORM_TESTING.md) for the 
 
 ## Contact
 
-- **Company**: .things that Matter
-- **Website**: [thingsthatmatter.com](https://thingsthatmatter.com) *(coming soon)*
+- **Company**: fairflow
+- **Website**: [fairflow.co](https://fairflow.co) *(coming soon)*
 - **Repository**: [GitHub](https://github.com/MatomeMb/.Things-That-Matter)
 
 ---
