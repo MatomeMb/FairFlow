@@ -71,3 +71,6 @@ secrets/
 # Local development
 .local/
 local/
+
+# Generated git reporting artifacts
+reports/git/
