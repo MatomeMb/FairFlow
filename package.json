@@ -6,7 +6,8 @@
     "test:e2e": "playwright test",
     "start:api": "cd packages/shadow-index && npm run start",
     "start:demo": "node scripts/demo-server.mjs",
-    "demo": "node scripts/launch-demo.mjs"
+    "demo": "node scripts/launch-demo.mjs",
+    "git:report": "powershell -ExecutionPolicy Bypass -File scripts/git-version-report.ps1"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0"
