@@ -26,7 +26,7 @@ if (!useHTML && outputFile.endsWith('.pdf')) {
   try {
     execSync('wkhtmltopdf --version', { stdio: 'ignore' });
   } catch {
-    console.log('⚠️  pdflatex/wkhtmltopdf not found. Converting to HTML instead.');
+    console.warn('Warning: pdflatex/wkhtmltopdf not found. Converting to HTML instead.');
     outputFile = inputFile.replace('.md', '.html');
   }
 }
@@ -36,27 +36,27 @@ if (!fs.existsSync(inputFile)) {
   process.exit(1);
 }
 
-console.log(`📄 Converting ${inputFile} → ${outputFile}...`);
+console.log(`Converting ${inputFile} -> ${outputFile}...`);
 
 try {
   // Check if pandoc is installed
   try {
     execSync('pandoc --version', { stdio: 'ignore' });
   } catch {
-    console.error('❌ pandoc not found. Install with: choco install pandoc');
-    console.error('   Or download from: https://pandoc.org/installing.html');
+    console.error('Error: pandoc not found.');
+    console.error('Install instructions: https://pandoc.org/installing.html');
     process.exit(1);
   }
 
   // Use pandoc to convert to standalone HTML (universal format)
   const command = `pandoc "${inputFile}" -o "${outputFile}" --from=markdown --to=html -s --toc --css=https://cdn.jsdelivr.net/npm/water.css`;
 
-  console.log(`📦 Converting to: ${path.extname(outputFile) === '.html' ? 'HTML' : 'PDF'}`);
+  console.log(`Output format: ${path.extname(outputFile) === '.html' ? 'HTML' : 'PDF'}`);
   execSync(command, { stdio: 'inherit' });
 
-  console.log(`✅ PDF created: ${outputFile}`);
-  console.log(`📊 File size: ${(fs.statSync(outputFile).size / 1024).toFixed(1)} KB`);
+  console.log(`Output created: ${outputFile}`);
+  console.log(`File size: ${(fs.statSync(outputFile).size / 1024).toFixed(1)} KB`);
 } catch (error) {
-  console.error('❌ Conversion failed:', error.message);
+  console.error('Conversion failed:', error.message);
   process.exit(1);
 }

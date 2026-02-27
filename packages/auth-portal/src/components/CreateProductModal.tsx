@@ -370,7 +370,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
         ) : (
           <div className="overflow-y-auto flex-1 px-6 py-6 space-y-4">
             <div className="flex items-center gap-2 text-emerald-400">
-              <span className="text-lg">✓</span>
+              <span className="text-xs font-semibold">OK</span>
               <span className="text-sm font-semibold">Product published</span>
             </div>
             <div>
@@ -380,7 +380,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
 
             <div>
               <p className="mb-1 text-xs text-stone-400">
-                Your portable product link — share this anywhere. It works even if your website changes.
+                Your portable product link - share this anywhere. It works even if your website changes.
               </p>
               <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">
                 <code className="flex-1 text-xs text-emerald-400 break-all">{successPayload?.matter_uri}</code>
@@ -396,7 +396,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
 
             <div>
               <p className="mb-1 text-xs text-stone-400">
-                Direct product page — share this link for consumers to buy immediately.
+                Direct product page - share this link for consumers to buy immediately.
               </p>
               <p className="text-xs text-stone-500 mb-2">Product page:</p>
               <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">

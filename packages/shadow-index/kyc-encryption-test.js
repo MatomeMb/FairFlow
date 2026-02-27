@@ -25,10 +25,10 @@
   const acc = JSON.parse(raw);
   
   const isEncrypted = typeof acc.kyc_data === 'string';
-  console.log('KYC data encrypted at rest:', isEncrypted ? '✓' : '✗ PLAINTEXT');
+  console.log('KYC data encrypted at rest:', isEncrypted ? '[PASS]' : '[FAIL] PLAINTEXT');
   
   const containsIdNumber = JSON.stringify(acc).includes('8001015009087');
-  console.log('Contains id_number:', containsIdNumber ? '✗ EXPOSED' : '✓ hidden');
+  console.log('Contains id_number:', containsIdNumber ? '[FAIL] EXPOSED' : '[PASS] hidden');
   
   // Check API response
   const apiRes = await fetch('http://localhost:3000/v1/merchant/account', { 
@@ -37,6 +37,6 @@
   const apiData = await apiRes.json();
   
   const hasKycData = !!apiData.kyc_data;
-  console.log('API hides kyc_data:', !hasKycData ? '✓' : '✗ EXPOSED');
-  console.log('API has business_name:', !!apiData.business_name ? '✓' : '✗');
+  console.log('API hides kyc_data:', !hasKycData ? '[PASS]' : '[FAIL] EXPOSED');
+  console.log('API has business_name:', !!apiData.business_name ? '[PASS]' : '[FAIL]');
 })();

@@ -51,7 +51,7 @@ export function MerchantNotifications({
             className="text-white/90 hover:text-white leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Dismiss error"
           >
-            ✕
+            x
           </button>
         </div>
       )}

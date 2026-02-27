@@ -15,11 +15,11 @@ Write-Host "Checking prerequisites..." -ForegroundColor Yellow
 
 # Check for test image
 if (Test-Path $testImage) {
-    Write-Host "✓ Test image found: $testImage" -ForegroundColor Green
+    Write-Host "[OK] Test image found: $testImage" -ForegroundColor Green
     $imageSize = (Get-Item $testImage).Length
     Write-Host "  Size: $([math]::Round($imageSize/1KB, 2)) KB" -ForegroundColor Gray
 } else {
-    Write-Host "✗ Test image NOT found: $testImage" -ForegroundColor Red
+    Write-Host "[ERROR] Test image NOT found: $testImage" -ForegroundColor Red
     Write-Host "  Please add a test product image (JPEG or PNG) to test_data/ directory" -ForegroundColor Yellow
     Write-Host "  Minimum size: 500x500px" -ForegroundColor Yellow
     Write-Host ""
@@ -31,11 +31,11 @@ if (Test-Path $testImage) {
 
 # Check for test .thing file
 if (Test-Path $testThing) {
-    Write-Host "✓ Test .thing file found: $testThing" -ForegroundColor Green
+    Write-Host "[OK] Test .thing file found: $testThing" -ForegroundColor Green
     $thingSize = (Get-Item $testThing).Length
     Write-Host "  Size: $thingSize bytes" -ForegroundColor Gray
 } else {
-    Write-Host "✗ Test .thing file NOT found: $testThing" -ForegroundColor Red
+    Write-Host "[ERROR] Test .thing file NOT found: $testThing" -ForegroundColor Red
     Write-Host "  Creating test .thing file..." -ForegroundColor Yellow
     Set-Location test_data
     .\create_test_thing.ps1
@@ -44,12 +44,12 @@ if (Test-Path $testThing) {
 
 # Check for output directory
 if (Test-Path $testOutput) {
-    Write-Host "✓ Test output directory exists: $testOutput" -ForegroundColor Green
+    Write-Host "[OK] Test output directory exists: $testOutput" -ForegroundColor Green
 } else {
-    Write-Host "✗ Test output directory NOT found: $testOutput" -ForegroundColor Red
+    Write-Host "[ERROR] Test output directory NOT found: $testOutput" -ForegroundColor Red
     Write-Host "  Creating directory..." -ForegroundColor Yellow
     New-Item -ItemType Directory -Force -Path $testOutput | Out-Null
-    Write-Host "✓ Created: $testOutput" -ForegroundColor Green
+    Write-Host "[OK] Created: $testOutput" -ForegroundColor Green
 }
 
 Write-Host ""

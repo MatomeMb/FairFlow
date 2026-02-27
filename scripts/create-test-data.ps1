@@ -26,10 +26,10 @@ MOCK_THING_FILE_V1
 
 $thingPath = Join-Path $OutputDir "test.thing"
 $thingData | Out-File -FilePath $thingPath -Encoding UTF8
-Write-Host "✓ Created test .thing file: $thingPath" -ForegroundColor Green
+Write-Host "[OK] Created test .thing file: $thingPath" -ForegroundColor Green
 
 # Instructions for test image
-Write-Host "`n⚠️  Test Image Required" -ForegroundColor Yellow
+Write-Host "`n[WARNING] Test image required" -ForegroundColor Yellow
 Write-Host "Please provide a test image (JPEG or PNG) for embedding." -ForegroundColor White
 Write-Host "`nNext steps:" -ForegroundColor Cyan
 Write-Host "  1. Place a test image in: $OutputDir\test.jpg (or test.png)" -ForegroundColor White

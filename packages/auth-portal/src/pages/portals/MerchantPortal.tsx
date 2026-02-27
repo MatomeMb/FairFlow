@@ -62,7 +62,7 @@ const ErrorBanner: React.FC<{ message: string; onDismiss: () => void }> = ({ mes
       className="text-white/90 hover:text-white leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
       aria-label="Dismiss error"
     >
-      ✕
+      x
     </button>
   </div>
 );
@@ -665,7 +665,7 @@ export const MerchantPortal: React.FC = () => {
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-5">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-amber-400">Welcome — let's get you set up</h3>
+                <h3 className="font-semibold text-amber-400">Welcome - let's get you set up</h3>
                 <p className="mt-1 text-sm text-stone-400">
                   Complete these three steps to start selling.
                 </p>
@@ -674,7 +674,7 @@ export const MerchantPortal: React.FC = () => {
                 onClick={() => setShowOnboardingBanner(false)}
                 className="text-stone-400 hover:text-stone-200"
               >
-                ✕
+                x
               </button>
             </div>
             <div className="mt-4 space-y-3">
@@ -703,7 +703,7 @@ export const MerchantPortal: React.FC = () => {
                     <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
                       step.done ? 'bg-emerald-500 text-white' : 'bg-stone-700 text-stone-400'
                     }`}>
-                      {step.done ? '✓' : i + 1}
+                      {step.done ? 'OK' : i + 1}
                     </span>
                     <span className={`text-sm ${step.done ? 'text-stone-500 line-through' : 'text-stone-200'}`}>
                       {step.label}

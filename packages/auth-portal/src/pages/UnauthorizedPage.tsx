@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { ShieldAlert } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 
 export function UnauthorizedPage() {
@@ -8,7 +9,9 @@ export function UnauthorizedPage() {
   return (
     <div className="min-h-screen flex items-center justify-center bg-stone-950">
       <div className="w-full max-w-md p-8 bg-stone-900 rounded-2xl border border-stone-800 text-center">
-        <div className="text-6xl mb-4">🚫</div>
+        <div className="mb-4 flex justify-center">
+          <ShieldAlert className="h-14 w-14 text-red-400" aria-hidden="true" />
+        </div>
         <h1 className="text-2xl font-bold text-white mb-2">Access Denied</h1>
         <p className="text-stone-400 mb-6">
           You don't have permission to access this area.

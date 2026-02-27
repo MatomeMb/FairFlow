@@ -50,7 +50,7 @@ const server = http.createServer((req, res) => {
 
 server.listen(port, () => {
   console.log('');
-  console.log('  .things that Matter - Demo');
+  console.log('  fairflow - Demo');
   console.log('  --------------------------');
   console.log(`  Landing:        http://localhost:${port}/`);
   console.log(`  Demo:          http://localhost:${port}/index.html`);

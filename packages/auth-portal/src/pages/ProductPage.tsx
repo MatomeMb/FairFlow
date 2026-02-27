@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
-import { Loader2, ShoppingCart } from 'lucide-react';
+import { Check, Loader2, ShoppingCart } from 'lucide-react';
 import { FairflowLogo } from '../components/FairflowLogo';
 import { apiBase } from '../lib/config';
 import { formatPrice } from '../lib/format';
@@ -286,7 +286,9 @@ export function ProductPage() {
               {showAddressForm && (
                 <div className="flex items-center gap-2 mb-4 text-sm text-stone-500">
                   <span className="flex items-center gap-1">
-                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs flex items-center justify-center font-semibold">✓</span>
+                    <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-600 text-xs flex items-center justify-center font-semibold">
+                      <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                    </span>
                     Contact
                   </span>
                   <span className="flex-1 h-px bg-stone-200" />

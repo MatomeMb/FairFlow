@@ -34,7 +34,7 @@ export function MerchantOrders({
             className="text-white/90 hover:text-white leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
             aria-label="Dismiss error"
           >
-            ✕
+            x
           </button>
         </div>
       )}
@@ -79,7 +79,7 @@ export function MerchantOrders({
                 </div>
 
                 {order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered' ? (
-                  <span className="text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400">Fulfilled ✓</span>
+                  <span className="text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400">Fulfilled</span>
                 ) : (
                   <button
                     onClick={() => onMarkAsFulfilled(order.id)}
@@ -101,12 +101,12 @@ export function MerchantOrders({
                   <span className="text-stone-500">Fulfillment:</span>{' '}
                   {order.fulfillment_status === 'pending' || !order.fulfillment_status
                     ? 'Pending'
-                    : `${order.fulfillment_status === 'delivered' ? 'Fulfilled ✓' : 'Fulfilled ✓'}${order.merchant_marked_fulfilled_at ? ` — ${new Date(order.merchant_marked_fulfilled_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}`}
+                    : `Fulfilled${order.merchant_marked_fulfilled_at ? ` - ${new Date(order.merchant_marked_fulfilled_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}`}
                 </p>
                 <p className="text-stone-300 md:col-span-2">
                   <span className="text-stone-500">Delivery:</span>{' '}
                   {order.consumer_confirmed_delivery
-                    ? `Delivered ✓ — consumer confirmed ${order.consumer_confirmed_at ? new Date(order.consumer_confirmed_at).toLocaleDateString('en-ZA', { dateStyle: 'medium' }) : ''}`
+                    ? `Delivered - consumer confirmed ${order.consumer_confirmed_at ? new Date(order.consumer_confirmed_at).toLocaleDateString('en-ZA', { dateStyle: 'medium' }) : ''}`
                     : order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered'
                       ? 'Confirmation email sent to customer'
                       : 'Waiting for consumer confirmation'}
@@ -114,7 +114,7 @@ export function MerchantOrders({
                 <p className="text-stone-300 md:col-span-2">
                   <span className="text-stone-500">Payout:</span>{' '}
                   {order.payout_status === 'pending_release' && order.amount
-                    ? `Queued for transfer — R ${((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)}`
+                    ? `Queued for transfer - R ${((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)}`
                     : getPayoutStatusLabel(order)}
                 </p>
               </div>

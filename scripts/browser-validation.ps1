@@ -14,7 +14,7 @@ $ErrorActionPreference = 'Stop'
 $root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 
 Write-Host ''
-Write-Host '=== .things that Matter - Cross-Browser Validation ===' -ForegroundColor Cyan
+Write-Host '=== fairflow - Cross-Browser Validation ===' -ForegroundColor Cyan
 Write-Host ''
 
 # 1. Check prerequisites

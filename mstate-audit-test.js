@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 
 /**
- * M-State Completeness Audit — End-to-End Test
- * Validates the full merchant flow: Register → Login → Create Product → Simulate Orders → KYC → Payouts
+ * M-State Completeness Audit - End-to-End Test
+ * Validates the full merchant flow: Register -> Login -> Create Product -> Simulate Orders -> KYC -> Payouts
  */
 
 const http = require('http');
@@ -84,11 +84,11 @@ const tests = {
       if (success) {
         global.token = res.body.token;
       }
-      console.log(success ? '✓ Register: PASS' : '✗ Register: FAIL');
+      console.log(success ? '[PASS] Register' : '[FAIL] Register');
       return success;
     } catch (e) {
       results.steps.register = { status: 'FAIL', error: e.message };
-      console.log('✗ Register: ERROR -', e.message);
+      console.log('[FAIL] Register error -', e.message);
       return false;
     }
   },
@@ -112,11 +112,11 @@ const tests = {
       if (success && !global.token) {
         global.token = res.body.token;
       }
-      console.log(success ? '✓ Login: PASS' : '✗ Login: FAIL');
+      console.log(success ? '[PASS] Login' : '[FAIL] Login');
       return success;
     } catch (e) {
       results.steps.login = { status: 'FAIL', error: e.message };
-      console.log('✗ Login: ERROR -', e.message);
+      console.log('[FAIL] Login error -', e.message);
       return false;
     }
   },
@@ -145,13 +145,13 @@ const tests = {
         message: success ? 'Account retrieved securely' : 'Account retrieval failed'
       };
 
-      console.log(success ? '✓ Get Account: PASS' : '✗ Get Account: FAIL');
-      console.log(hasPasswordHash ? '  ✗ password_hash exposed in response!' : '  ✓ password_hash properly hidden');
-      console.log(hasKycData ? '  ✗ kyc_data exposed in response!' : '  ✓ kyc_data properly excluded');
+      console.log(success ? '[PASS] Get account' : '[FAIL] Get account');
+      console.log(hasPasswordHash ? '  [FAIL] password_hash exposed in response' : '  [PASS] password_hash properly hidden');
+      console.log(hasKycData ? '  [FAIL] kyc_data exposed in response' : '  [PASS] kyc_data properly excluded');
       return success;
     } catch (e) {
       results.steps.getMe = { status: 'FAIL', error: e.message };
-      console.log('✗ Get Account: ERROR -', e.message);
+      console.log('[FAIL] Get account error -', e.message);
       return false;
     }
   },
@@ -190,13 +190,13 @@ const tests = {
         global.productHash = res.body.thing_file?.hash;
       }
 
-      console.log(success ? '✓ Create Product: PASS' : '✗ Create Product: FAIL');
-      console.log(hasHash ? '  ✓ Hash generated' : '  ✗ Hash MISSING');
-      console.log(hasMatterUri ? '  ✓ Matter URI generated' : '  ✗ Matter URI MISSING');
+      console.log(success ? '[PASS] Create product' : '[FAIL] Create product');
+      console.log(hasHash ? '  [PASS] Hash generated' : '  [FAIL] Hash missing');
+      console.log(hasMatterUri ? '  [PASS] Matter URI generated' : '  [FAIL] Matter URI missing');
       return success;
     } catch (e) {
       results.steps.createProduct = { status: 'FAIL', error: e.message };
-      console.log('✗ Create Product: ERROR -', e.message);
+      console.log('[FAIL] Create product error -', e.message);
       return false;
     }
   },
@@ -204,7 +204,7 @@ const tests = {
   async step5_simulateOrder() {
     console.log('\n=== Step 5: Simulate Stripe Webhook (Order Placed) ===');
     if (!global.productHash) {
-      console.log('✗ Skipped: No product hash from previous step');
+      console.log('[SKIP] No product hash from previous step');
       return false;
     }
 
@@ -237,11 +237,11 @@ const tests = {
         message: success ? 'Order webhook processed' : 'Webhook processing failed'
       };
 
-      console.log(success ? '✓ Webhook: PASS' : '✗ Webhook: FAIL');
+      console.log(success ? '[PASS] Webhook' : '[FAIL] Webhook');
       return success;
     } catch (e) {
       results.steps.webhook = { status: 'FAIL', error: e.message };
-      console.log('✗ Webhook: ERROR -', e.message);
+      console.log('[FAIL] Webhook error -', e.message);
       return false;
     }
   },
@@ -271,10 +271,10 @@ const tests = {
         deliveryAddress: recentOrder?.delivery_address?.name || 'MISSING'
       };
 
-      console.log(checks.orderExists ? '✓ Order exists' : '✗ Order not found');
-      console.log(checks.hasProductTitle ? '  ✓ product_title stored: ' + recentOrder?.product_title : '  ✗ product_title MISSING');
-      console.log(checks.hasDeliveryAddress ? '  ✓ Delivery address stored' : '  ✗ Address MISSING');
-      console.log(checks.fulfillmentPending ? '  ✓ Status is pending' : '  ✗ Status not pending');
+      console.log(checks.orderExists ? '[PASS] Order exists' : '[FAIL] Order not found');
+      console.log(checks.hasProductTitle ? '  [PASS] product_title stored: ' + recentOrder?.product_title : '  [FAIL] product_title missing');
+      console.log(checks.hasDeliveryAddress ? '  [PASS] Delivery address stored' : '  [FAIL] Address missing');
+      console.log(checks.fulfillmentPending ? '  [PASS] Status is pending' : '  [FAIL] Status is not pending');
 
       if (recentOrder?.id) {
         global.orderId = recentOrder.id;
@@ -283,7 +283,7 @@ const tests = {
       return Object.values(checks).every(v => v);
     } catch (e) {
       results.steps.orderData = { status: 'FAIL', error: e.message };
-      console.log('✗ Order Data: ERROR -', e.message);
+      console.log('[FAIL] Order data error -', e.message);
       return false;
     }
   },
@@ -307,12 +307,12 @@ const tests = {
         message: success ? 'Orders retrieved' : 'Order fetch failed'
       };
 
-      console.log(success ? '✓ Get Orders: PASS' : '✗ Get Orders: FAIL');
-      console.log(success ? `  ✓ Found ${res.body.orders.length} order(s)` : '');
+      console.log(success ? '[PASS] Get orders' : '[FAIL] Get orders');
+      console.log(success ? `  [PASS] Found ${res.body.orders.length} order(s)` : '');
       return success;
     } catch (e) {
       results.steps.getOrders = { status: 'FAIL', error: e.message };
-      console.log('✗ Get Orders: ERROR -', e.message);
+      console.log('[FAIL] Get orders error -', e.message);
       return false;
     }
   },
@@ -320,7 +320,7 @@ const tests = {
   async step8_fulfillOrder() {
     console.log('\n=== Step 8: Mark Order as Fulfilled ===');
     if (!global.orderId) {
-      console.log('✗ Skipped: No order ID from previous steps');
+      console.log('[SKIP] No order ID from previous steps');
       return false;
     }
 
@@ -337,11 +337,11 @@ const tests = {
         message: success ? 'Order marked as fulfilled' : 'Fulfillment failed'
       };
 
-      console.log(success ? '✓ Mark Fulfilled: PASS' : '✗ Mark Fulfilled: FAIL');
+      console.log(success ? '[PASS] Mark fulfilled' : '[FAIL] Mark fulfilled');
       return success;
     } catch (e) {
       results.steps.fulfillOrder = { status: 'FAIL', error: e.message };
-      console.log('✗ Mark Fulfilled: ERROR -', e.message);
+      console.log('[FAIL] Mark fulfilled error -', e.message);
       return false;
     }
   },
@@ -382,17 +382,17 @@ const tests = {
           id_number_not_visible: !idNumberVisible ? 'PASS' : 'FAIL'
         };
 
-        console.log(kycDataType === 'string' ? '  ✓ KYC data encrypted as string' : '  ✗ KYC data not encrypted');
-        console.log(!idNumberVisible ? '  ✓ ID number not readable in plaintext' : '  ⚠ ID number visible (encryption failed)');
+        console.log(kycDataType === 'string' ? '  [PASS] KYC data encrypted as string' : '  [FAIL] KYC data not encrypted');
+        console.log(!idNumberVisible ? '  [PASS] ID number not readable in plaintext' : '  [WARN] ID number visible (encryption failed)');
       } catch (e) {
-        console.log('  ⚠ Could not verify encryption in file');
+        console.log('  [WARN] Could not verify encryption in file');
       }
 
-      console.log(success ? '✓ Submit KYC: PASS' : '✗ Submit KYC: FAIL');
+      console.log(success ? '[PASS] Submit KYC' : '[FAIL] Submit KYC');
       return success;
     } catch (e) {
       results.steps.submitKyc = { status: 'FAIL', error: e.message };
-      console.log('✗ Submit KYC: ERROR -', e.message);
+      console.log('[FAIL] Submit KYC error -', e.message);
       return false;
     }
   },
@@ -416,13 +416,13 @@ const tests = {
         message: success ? 'Notifications retrieved' : 'Notification fetch failed'
       };
 
-      console.log(success ? '✓ Get Notifications: PASS' : '✗ Get Notifications: FAIL');
-      console.log(`  ✓ Found ${notifCount} notification(s)`);
-      console.log(orderNotif ? '  ✓ Order notification present' : '  ⚠ Order notification not found');
+      console.log(success ? '[PASS] Get notifications' : '[FAIL] Get notifications');
+      console.log(`  [PASS] Found ${notifCount} notification(s)`);
+      console.log(orderNotif ? '  [PASS] Order notification present' : '  [WARN] Order notification not found');
       return success;
     } catch (e) {
       results.steps.getNotifications = { status: 'FAIL', error: e.message };
-      console.log('✗ Get Notifications: ERROR -', e.message);
+      console.log('[FAIL] Get notifications error -', e.message);
       return false;
     }
   }
@@ -430,10 +430,10 @@ const tests = {
 
 // Run all tests
 (async () => {
-  console.log('\n╔════════════════════════════════════════════════════════╗');
-  console.log('║       M-STATE COMPLETENESS AUDIT — E2E TEST          ║');
-  console.log('║         Testing full merchant flow on API             ║');
-  console.log('╚════════════════════════════════════════════════════════╝');
+  console.log('\n========================================================');
+  console.log('M-STATE COMPLETENESS AUDIT - E2E TEST');
+  console.log('Testing full merchant flow on API');
+  console.log('========================================================');
 
   console.log(`\nTest email: ${testEmail}`);
   console.log(`API Base: ${API_BASE}`);
@@ -453,9 +453,9 @@ const tests = {
     const passed = Object.values(results.steps).filter(s => s.status === 'PASS').length;
     const total = Object.keys(results.steps).length;
 
-    console.log('\n╔════════════════════════════════════════════════════════╗');
-    console.log(`║           TEST SUMMARY: ${passed}/${total} PASSED                    ║`);
-    console.log('╚════════════════════════════════════════════════════════╝\n');
+    console.log('\n========================================================');
+    console.log(`TEST SUMMARY: ${passed}/${total} PASSED`);
+    console.log('========================================================\n');
 
     // Save results
     fs.writeFileSync(

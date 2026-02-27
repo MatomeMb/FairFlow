@@ -15,7 +15,7 @@
     else allowed++;
   }
   console.log('Control 1 rate limit: allowed=' + allowed + ' blocked=' + blocked);
-  console.log(allowed === 5 && blocked === 1 ? '✓ Rate limit working (5 allowed, 1 blocked)' : '✗ Rate limit mismatch');
+  console.log(allowed === 5 && blocked === 1 ? '[PASS] Rate limit working (5 allowed, 1 blocked)' : '[FAIL] Rate limit mismatch');
 
   // Control 2: High-value order flag
   const piId = 'pi_highvalue_' + Date.now();
@@ -34,12 +34,12 @@
   const fs = await import('fs/promises');
   const orders = JSON.parse(await fs.readFile('./data/orders.json', 'utf8'));
   const hvOrder = Object.values(orders).find(o => o.customer_email === 'highvalue@test.com');
-  console.log('Control 2 high-value flag:', hvOrder?.requires_review === true ? '✓ requires_review set' : '✗ flag missing');
+  console.log('Control 2 high-value flag:', hvOrder?.requires_review === true ? '[PASS] requires_review set' : '[FAIL] flag missing');
 
   const notifs = JSON.parse(await fs.readFile('./data/notifications.json', 'utf8'));
   const hvNotif = (Array.isArray(notifs) ? notifs : Object.values(notifs))
     .find(n => n.type === 'high_value_order' && n.data?.order_id === hvOrder?.id);
-  console.log('Control 2 notification:', hvNotif ? '✓ high_value_order notification created' : '✗ notification missing');
+  console.log('Control 2 notification:', hvNotif ? '[PASS] high_value_order notification created' : '[FAIL] notification missing');
 
   // Control 3: IP logging — check server log manually
   console.log('Control 3 IP logging: check server console for [webhook] Incoming from IP: line');
