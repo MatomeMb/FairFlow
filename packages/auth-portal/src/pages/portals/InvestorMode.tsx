@@ -6,6 +6,7 @@ import { useAuth } from '../../context/AuthContext';
 import { StatusBar } from '../../components/shared/StatusBar';
 import { MetricCard } from '../../components/shared/MetricCard';
 import { SprintStatus } from '../../lib/statusBadges';
+import { platformVersion, platformVersionTag } from '../../lib/config';
 
 type StatusCode = 'complete' | 'in-progress' | 'upcoming';
 
@@ -139,7 +140,7 @@ export const InvestorMode: React.FC = () => {
     <CleanShell
       title={<FairflowLogo markHeight={32} variant="dark" />}
       subtitle="Investor Dashboard"
-      version="v0.6.0"
+      version={platformVersionTag}
       onLogout={signOut}
     >
       <div className="max-w-6xl mx-auto space-y-8 pb-12">
@@ -183,7 +184,7 @@ export const InvestorMode: React.FC = () => {
           <div className="grid grid-cols-4 gap-4">
             <MetricCard
               label="Platform Version"
-              value="0.6.0"
+              value={platformVersion}
               color="green"
             />
             <MetricCard
@@ -211,7 +212,7 @@ export const InvestorMode: React.FC = () => {
           
           {/* StatusBar in read-only mode */}
           <div className="bg-stone-900 border border-stone-800 rounded-lg p-6">
-            <StatusBar apiOnline={true} version="v0.6.0" readOnly />
+            <StatusBar apiOnline={true} version={platformVersionTag} readOnly />
           </div>
 
           {/* Infrastructure Status Table */}

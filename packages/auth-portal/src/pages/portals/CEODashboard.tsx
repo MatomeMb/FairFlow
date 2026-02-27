@@ -11,6 +11,7 @@ import { Toast } from '../../components/shared/Toast';
 import { InvestorMode } from './InvestorMode';
 import { BarChart2, Activity, Users, Store, DollarSign, TrendingUp, Settings2, Star, Lock, RefreshCw } from 'lucide-react';
 import { SprintStatus } from '../../lib/statusBadges';
+import { platformVersion, platformVersionTag } from '../../lib/config';
 
 type Section = 'overview' | 'platform-health' | 'users-roles' | 'merchants' | 'financials' | 'investor-view' | 'settings';
 
@@ -127,7 +128,7 @@ export const CEODashboard: React.FC = () => {
       <div className="grid grid-cols-5 gap-4">
         <MetricCard
           label="Platform Version"
-          value="0.6.0"
+          value={platformVersion}
           trend="neutral"
         />
         <MetricCard
@@ -296,7 +297,7 @@ export const CEODashboard: React.FC = () => {
           <>
             <StatusBar
               apiOnline={apiOnline}
-              version="v0.6.0"
+              version={platformVersionTag}
               secondsSince={secondsSince}
               onRefresh={refreshAnalytics}
             />
@@ -806,7 +807,7 @@ export const CEODashboard: React.FC = () => {
             <div>
               <label className="block text-sm font-medium text-stone-400 mb-1">Version</label>
               <div className="flex items-center gap-2">
-                <span className="text-white font-semibold">0.6.0</span>
+                <span className="text-white font-semibold">{platformVersion}</span>
                 <span className="px-2 py-0.5 bg-emerald-600 text-white text-xs rounded-full">Latest</span>
               </div>
             </div>
@@ -950,7 +951,7 @@ export const CEODashboard: React.FC = () => {
   return (
     <PortalShell
       title={<FairflowLogo markHeight={32} variant="dark" />}
-      version="v0.6.0"
+      version={platformVersionTag}
       nav={sections}
       activeSection={activeSection}
       onNavChange={(id) => setActiveSection(id as Section)}

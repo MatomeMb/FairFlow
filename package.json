@@ -1,7 +1,8 @@
 {
   "name": "things-that-matter",
+  "version": "0.7.0",
   "private": true,
-  "description": ".things that Matter — Object-Oriented Commerce",
+  "description": "fairflow - Object-oriented commerce platform",
   "scripts": {
     "test:e2e": "playwright test",
     "start:api": "cd packages/shadow-index && npm run start",

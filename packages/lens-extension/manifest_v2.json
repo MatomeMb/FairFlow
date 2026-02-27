@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
-  "name": "Lens - .things that Matter",
-  "version": "0.1.0",
+  "name": "Lens - fairflow",
+  "version": "0.7.0",
   "description": "Discover and interact with .thing commerce objects across the web",
   "permissions": ["storage", "activeTab", "scripting", "http://*/*", "https://*/*"],
   "background": {

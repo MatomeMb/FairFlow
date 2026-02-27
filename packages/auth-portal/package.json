@@ -1,7 +1,7 @@
 {
   "name": "@thingsthatmatter/auth-portal",
-  "version": "0.1.0",
-  "description": "fairflow — Role-based Auth Portal",
+  "version": "0.7.0",
+  "description": "fairflow - Role-based auth portal",
   "type": "module",
   "scripts": {
     "dev": "vite",

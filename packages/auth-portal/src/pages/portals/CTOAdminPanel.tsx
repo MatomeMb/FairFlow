@@ -16,6 +16,7 @@ import { OfflineBanner } from "../../components/shared/OfflineBanner";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import { AlertTriangle, BarChart2, Briefcase, Check, Circle, FileText } from "lucide-react";
 import { SectionSkeleton } from "../../lib/statusBadges";
+import { platformVersion, platformVersionTag } from "../../lib/config";
 import type { AppRole } from "../../types/portal";
 
 export function CTOAdminPanel() {
@@ -68,7 +69,7 @@ export function CTOAdminPanel() {
             <EmptyState
               icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
               title="API Offline"
-              description="Cannot fetch analytics. Run: cd mcj && npm run demo, then refresh this panel."
+              description="Cannot fetch analytics. Run npm run demo from the repository root, then refresh this panel."
               action={{ label: "Try Again", onClick: refresh }}
             />
           </div>
@@ -80,7 +81,7 @@ export function CTOAdminPanel() {
       <div>
         <StatusBar
           apiOnline={apiOnline}
-          version="v0.6.0"
+          version={platformVersionTag}
           secondsSince={secondsSince}
           onRefresh={refresh}
         />
@@ -373,7 +374,7 @@ export function CTOAdminPanel() {
             </div>
             <div>
               <span className="text-stone-400">Version:</span>
-              <span className="text-white ml-2">0.6.0</span>
+              <span className="text-white ml-2">{platformVersion}</span>
             </div>
             <div>
               <span className="text-stone-400">Status:</span>
@@ -489,7 +490,7 @@ export function CTOAdminPanel() {
             </div>
             <div className="flex justify-between">
               <span className="text-stone-400">Version:</span>
-              <span className="text-white">0.6.0</span>
+              <span className="text-white">{platformVersion}</span>
             </div>
           </div>
         </div>
@@ -576,7 +577,7 @@ export function CTOAdminPanel() {
           <EmptyState
             icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
             title="API Offline"
-            description="Cannot fetch logs. Run: cd mcj && npm run demo. Then refresh this panel."
+            description="Cannot fetch logs. Run npm run demo from the repository root, then refresh this panel."
             action={{ label: "Try Again", onClick: refresh }}
           />
         </div>
@@ -711,7 +712,7 @@ export function CTOAdminPanel() {
     <>
       <PortalShell
         title={<FairflowLogo markHeight={32} variant="dark" />}
-        version="v0.6.0"
+        version={platformVersionTag}
         nav={navigation}
         activeSection={activeSection}
         onNavChange={setActiveSection}
