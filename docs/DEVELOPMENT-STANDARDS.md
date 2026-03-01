@@ -70,11 +70,11 @@ describe('Feature: <component>', () => {
 ### Critical Path Testing
 
 **Must have tests:**
-- ✅ Authentication flow (register, login, OAuth)
-- ✅ Payment processing (checkout, webhook)
-- ✅ Analytics ingestion & reporting
-- ✅ Error handling & edge cases
-- ✅ Rate limiting & abuse prevention
+- [REQUIRED] Authentication flow (register, login, OAuth)
+- [REQUIRED] Payment processing (checkout, webhook)
+- [REQUIRED] Analytics ingestion & reporting
+- [REQUIRED] Error handling & edge cases
+- [REQUIRED] Rate limiting & abuse prevention
 
 **Execution:**
 ```bash
@@ -279,10 +279,10 @@ chore(deps): update Hono to v4.1.0
 ### Branch Protection Rules
 
 `main` branch requires:
-- ✅ All tests passing
-- ✅ Code review approval
-- ✅ Branch up-to-date with latest main
-- ✅ No direct pushes (PRs only)
+- [VERIFIED] All tests passing
+- [VERIFIED] Code review approval
+- [VERIFIED] Branch up-to-date with latest main
+- [VERIFIED] No direct pushes (PRs only)
 
 ### Pull Request Checklist
 

@@ -712,12 +712,12 @@ POST /v1/admin/payouts/batch
 ```
 
 **Weekend Implementation Scope:**
-- ✓ Merchant account DB schema
-- ✓ KYC status tracking (basic form, no external service integration)
-- ✓ Payout log schema
-- ✓ Commission calculation logic
-- ⏳ Stripe Connect integration (may defer to early next week)
-- ⏳ Automated payout scheduler (can be manual initially)
+- [DONE] Merchant account DB schema
+- [DONE] KYC status tracking (basic form, no external service integration)
+- [DONE] Payout log schema
+- [DONE] Commission calculation logic
+- [IN-PROGRESS] Stripe Connect integration (may defer to early next week)
+- [IN-PROGRESS] Automated payout scheduler (can be manual initially)
 
 **Effort Estimate:** 18-22 hours  
 **Dependencies:**

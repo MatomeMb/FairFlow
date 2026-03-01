@@ -26,7 +26,7 @@ if (!useHTML && outputFile.endsWith('.pdf')) {
   try {
     execSync('wkhtmltopdf --version', { stdio: 'ignore' });
   } catch {
-    console.log('⚠️  pdflatex/wkhtmltopdf not found. Converting to HTML instead.');
+    console.log('[WARNING] pdflatex/wkhtmltopdf not found. Converting to HTML instead.');
     outputFile = inputFile.replace('.md', '.html');
   }
 }
@@ -43,7 +43,7 @@ try {
   try {
     execSync('pandoc --version', { stdio: 'ignore' });
   } catch {
-    console.error('❌ pandoc not found. Install with: choco install pandoc');
+    console.error('[ERROR] pandoc not found. Install with: choco install pandoc');
     console.error('   Or download from: https://pandoc.org/installing.html');
     process.exit(1);
   }
@@ -54,9 +54,9 @@ try {
   console.log(`📦 Converting to: ${path.extname(outputFile) === '.html' ? 'HTML' : 'PDF'}`);
   execSync(command, { stdio: 'inherit' });
 
-  console.log(`✅ PDF created: ${outputFile}`);
-  console.log(`📊 File size: ${(fs.statSync(outputFile).size / 1024).toFixed(1)} KB`);
+  console.log(`[SUCCESS] PDF created: ${outputFile}`);
+  console.log(`[INFO] File size: ${(fs.statSync(outputFile).size / 1024).toFixed(1)} KB`);
 } catch (error) {
-  console.error('❌ Conversion failed:', error.message);
+  console.error('[ERROR] Conversion failed:', error.message);
   process.exit(1);
 }

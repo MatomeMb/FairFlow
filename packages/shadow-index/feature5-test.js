@@ -21,8 +21,8 @@
 
     const data = await res.json();
     if (res.ok && data.token) {
-      console.log("✓ Registration successful");
-      console.log("✓ Token returned:", data.token.substring(0, 20) + "...");
+      console.log("[PASS] Registration successful");
+      console.log("[PASS] Token returned:", data.token.substring(0, 20) + "...");
 
       // Test 2: Login with same credentials
       console.log("\n2. Testing POST /v1/auth/merchant/login");
@@ -37,8 +37,8 @@
 
       const loginData = await loginRes.json();
       if (loginRes.ok && loginData.token) {
-        console.log("✓ Login successful");
-        console.log("✓ Token returned:", loginData.token.substring(0, 20) + "...");
+        console.log("[PASS] Login successful");
+        console.log("[PASS] Token returned:", loginData.token.substring(0, 20) + "...");
 
         // Test 3: Use token to access /v1/auth/merchant/me
         console.log("\n3. Testing GET /v1/auth/merchant/me");
@@ -50,10 +50,10 @@
 
         const meData = await meRes.json();
         if (meRes.ok && meData.account) {
-          console.log("✓ /me endpoint accessible with JWT");
-          console.log("✓ Account returned with business_name:", meData.account.business_name);
-          console.log("✓ password_hash hidden:", !meData.account.password_hash ? "✓" : "✗");
-          console.log("✓ kyc_data excluded:", !meData.account.kyc_data ? "✓" : "✗");
+          console.log("[PASS] /me endpoint accessible with JWT");
+          console.log("[PASS] Account returned with business_name:", meData.account.business_name);
+          console.log("[PASS] password_hash hidden:", !meData.account.password_hash ? "[Y]" : "[N]");
+          console.log("[PASS] kyc_data excluded:", !meData.account.kyc_data ? "[Y]" : "[N]");
         } else {
           console.log("✗ /me endpoint failed:", meData.error);
         }

@@ -172,7 +172,7 @@ grep WARN shadow-index.log | tail -20
 ### Notify Stakeholders
 
 ```
-✅ Deployment successful
+[SUCCESS] Deployment successful
    - Version: v0.6.0+1
    - Deployed at: [timestamp]
    - Key changes: [summary]
@@ -229,7 +229,7 @@ grep "version" health-pre-deploy.json  # Compare with current
 
 ### With Schema Changes
 
-⚠️ **These cannot be rolled back easily.** Coordinate with team.
+[WARNING] **These cannot be rolled back easily.** Coordinate with team.
 
 ```bash
 # 1. Take full backup

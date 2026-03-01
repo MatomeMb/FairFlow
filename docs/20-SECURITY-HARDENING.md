@@ -34,8 +34,8 @@ const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toStrin
 const storedHash = `${salt}:${derived}`;
 
 // Incorrect:
-const storedHash = password;  // ❌ Plain text
-const storedHash = Buffer.from(password).toString('base64');  // ❌ Easily reversible
+const storedHash = password;  // [UNSAFE] Plain text
+const storedHash = Buffer.from(password).toString('base64');  // [UNSAFE] Easily reversible
 ```
 
 ### JWT Security
@@ -283,16 +283,16 @@ return c.json({ ok: true, message: 'If account exists, reset sent' }, 200);
 
 | Topic | Status | Implementation |
 |-------|--------|---|
-| Injection | ✅ | Zod schema validation, parameterized queries |
-| Broken Authentication | ✅ | JWT + password hashing |
-| Sensitive Data Exposure | ⚠️ | Implement TLS in production |
-| XML External Entities | ✅ | No XML parsing |
-| Broken Access Control | ✅ | Merchant auth middleware |
-| Security Misconfiguration | ✅ | Environment validation |
-| Cross-Site Scripting | ✅ | No user input in DOM |
-| Insecure Deserialization | ✅ | Only JSON parsing |
-| Using Components with Known Vuln | ⚠️ | Regular `npm audit` |
-| Insufficient Logging | ✅ | Structured logging |
+| Injection | [MITIGATED] | Zod schema validation, parameterized queries |
+| Broken Authentication | [MITIGATED] | JWT + password hashing |
+| Sensitive Data Exposure | [IN-PROGRESS] | Implement TLS in production |
+| XML External Entities | [MITIGATED] | No XML parsing |
+| Broken Access Control | [MITIGATED] | Merchant auth middleware |
+| Security Misconfiguration | [MITIGATED] | Environment validation |
+| Cross-Site Scripting | [MITIGATED] | No user input in DOM |
+| Insecure Deserialization | [MITIGATED] | Only JSON parsing |
+| Using Components with Known Vuln | [IN-PROGRESS] | Regular `npm audit` |
+| Insufficient Logging | [MITIGATED] | Structured logging |
 
 ### PCI DSS (Payment Security)
 
