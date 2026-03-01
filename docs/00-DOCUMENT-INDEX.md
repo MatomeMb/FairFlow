@@ -48,7 +48,9 @@ Overview of all project documentation. Primary status: [PROGRESS-AND-VERSION.md]
 |----------|-------------|
 | [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) | API key setup for shadow-index and auth-portal |
 | [DEPLOYMENT.md](./DEPLOYMENT.md) | Production deployment procedures |
+| [11-DEPLOYMENT-RUNBOOK.md](./11-DEPLOYMENT-RUNBOOK.md) | Step-by-step deployment with pre-checks, rollback |
 | [STAGING-DEPLOYMENT-RUNBOOK.md](./STAGING-DEPLOYMENT-RUNBOOK.md) | Staging deployment steps |
+| [DEVELOPMENT-STANDARDS.md](./DEVELOPMENT-STANDARDS.md) | Code quality, testing, error handling standards |
 | [GIT-WORKFLOW-STANDARDS.md](./GIT-WORKFLOW-STANDARDS.md) | Commit format, branch strategy, PR requirements |
 | [RUST_WINDOWS_SETUP.md](./RUST_WINDOWS_SETUP.md) | Rust installation on Windows |
 
@@ -61,6 +63,8 @@ Overview of all project documentation. Primary status: [PROGRESS-AND-VERSION.md]
 | [MVP-14-EVENT-SPEC-AND-STORAGE.md](./MVP-14-EVENT-SPEC-AND-STORAGE.md) | Event schema and storage design |
 | [ANALYTICS-REPORTING-ENGINE-SPEC.md](./ANALYTICS-REPORTING-ENGINE-SPEC.md) | GET /v1/analytics/report specification |
 | [ANALYTICS-PRODUCTION-READINESS.md](./ANALYTICS-PRODUCTION-READINESS.md) | Analytics deployment checklist |
+| [19-PERFORMANCE-AND-OBSERVABILITY.md](./19-PERFORMANCE-AND-OBSERVABILITY.md) | Monitoring, profiling, performance targets |
+| [20-SECURITY-HARDENING.md](./20-SECURITY-HARDENING.md) | Security principles, hardening, compliance |
 
 ---
 
