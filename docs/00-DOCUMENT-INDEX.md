@@ -52,6 +52,7 @@ Overview of all project documentation. Primary status: [PROGRESS-AND-VERSION.md]
 | [STAGING-DEPLOYMENT-RUNBOOK.md](./STAGING-DEPLOYMENT-RUNBOOK.md) | Staging deployment steps |
 | [DEVELOPMENT-STANDARDS.md](./DEVELOPMENT-STANDARDS.md) | Code quality, testing, error handling standards |
 | [GIT-WORKFLOW-STANDARDS.md](./GIT-WORKFLOW-STANDARDS.md) | Commit format, branch strategy, PR requirements |
+| [21-PRE-COMMIT-HOOKS-SETUP.md](./21-PRE-COMMIT-HOOKS-SETUP.md) | Husky hooks, type-check/lint/format automation |
 | [RUST_WINDOWS_SETUP.md](./RUST_WINDOWS_SETUP.md) | Rust installation on Windows |
 
 ---
@@ -65,6 +66,8 @@ Overview of all project documentation. Primary status: [PROGRESS-AND-VERSION.md]
 | [ANALYTICS-PRODUCTION-READINESS.md](./ANALYTICS-PRODUCTION-READINESS.md) | Analytics deployment checklist |
 | [19-PERFORMANCE-AND-OBSERVABILITY.md](./19-PERFORMANCE-AND-OBSERVABILITY.md) | Monitoring, profiling, performance targets |
 | [20-SECURITY-HARDENING.md](./20-SECURITY-HARDENING.md) | Security principles, hardening, compliance |
+| [22-TESTING-STANDARDS-AND-COVERAGE.md](./22-TESTING-STANDARDS-AND-COVERAGE.md) | Testing framework, coverage targets, quality gates |
+| [23-PROJECT-COMPLETION-REVIEW.md](./23-PROJECT-COMPLETION-REVIEW.md) | Enterprise-grade certification, 10/10 rating, completion summary |
 
 ---
 

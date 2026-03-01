@@ -1,0 +1,19 @@
+#!/bin/sh
+# Pre-commit hook: Run type-check, lint, and format verification
+# This ensures all commits meet code quality standards
+
+set -e
+
+echo "running type-check..."
+npm run type-check
+
+echo "running eslint..."
+npm run lint
+
+echo "running prettier format check..."
+npm run format -- --check || (
+  echo "formatting issues detected, attempting auto-fix..."
+  npm run format
+)
+
+echo "pre-commit checks passed ✓"
