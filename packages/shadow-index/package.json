@@ -9,12 +9,14 @@
     "build": "tsc",
     "start": "node run-with-env.mjs",
     "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "verify-r2": "node scripts/verify-r2.mjs",
     "pre-aggregate": "npm run build && node scripts/run-pre-aggregation.mjs",
     "load-test": "node scripts/sustained-load-test.mjs",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write \"**/*.{ts,json,md}\""
+    "format": "prettier --write \"**/*.{ts,json,md}\"",
+    "prepare": "npx husky install"
   },
   "keywords": [
     "api",
@@ -37,6 +39,7 @@
     "@typescript-eslint/eslint-plugin": "^6.13.0",
     "@typescript-eslint/parser": "^6.13.0",
     "eslint": "^8.54.0",
+    "husky": "^9.0.0",
     "prettier": "^3.1.0",
     "tsx": "^4.7.0",
     "typescript": "^5.3.0",

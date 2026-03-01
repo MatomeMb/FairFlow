@@ -8,7 +8,6 @@ import {
   runAggregationForDateRange,
   loadAggregate,
   hasAggregate,
-  getAggregatePath,
   getPreAggregationStatus,
 } from '../lib/pre-aggregation.js';
 

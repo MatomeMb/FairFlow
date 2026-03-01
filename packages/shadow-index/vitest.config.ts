@@ -8,6 +8,7 @@ export default defineConfig({
     pool: 'forks',
     testTimeout: 10000,
     resolveTimeout: 10000,
+    globalSetup: ['./tests/setup.ts'],
   },
   resolve: {
     extensions: ['.ts', '.js'],

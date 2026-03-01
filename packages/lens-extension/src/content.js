@@ -4,7 +4,7 @@
  * Detects .thing objects in images (XMP beacon) and matter:// links
  */
 
-console.log('Lens extension content script loaded');
+// Content script initialized
 
 let activeOverlay = null;
 

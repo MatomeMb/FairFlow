@@ -187,8 +187,8 @@ export function ProductPage() {
 
       const { url } = await response.json();
       window.location.href = url;
-    } catch (err) {
-      alert('Failed to start checkout. Please try again.');
+    } catch {
+      setError('Failed to start checkout. Please try again.');
       setCheckoutLoading(false);
     }
   };

@@ -1,0 +1,1258 @@
+openapi: 3.0.3
+info:
+  title: Shadow Index API
+  version: 0.6.0
+  description: |
+    Fairflow commerce infrastructure — the Shadow Index powers product
+    compilation, merchant management, analytics, and checkout for the
+    Things-That-Matter ecosystem. Built on Hono (Node.js).
+  contact:
+    name: Fairflow
+  license:
+    name: UNLICENSED
+
+servers:
+  - url: http://localhost:3000
+    description: Local development
+  - url: https://api.fairflow.com
+    description: Production
+
+tags:
+  - name: Health
+  - name: Auth
+  - name: Merchant
+  - name: Commerce
+  - name: Analytics
+  - name: Checkout
+  - name: Admin
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+
+  schemas:
+    # ── Shared ──────────────────────────────────────────────
+    Error:
+      type: object
+      required: [ok, error]
+      properties:
+        ok:
+          type: boolean
+          example: false
+        error:
+          type: string
+        code:
+          type: string
+
+    Ok:
+      type: object
+      required: [ok]
+      properties:
+        ok:
+          type: boolean
+          example: true
+
+    # ── Health ──────────────────────────────────────────────
+    HealthResponse:
+      type: object
+      required: [status, service, company, version, timestamp]
+      properties:
+        status:
+          type: string
+          example: ok
+        service:
+          type: string
+          example: shadow-index
+        company:
+          type: string
+          example: fairflow
+        version:
+          type: string
+          example: 0.6.0
+        timestamp:
+          type: string
+          format: date-time
+
+    # ── Auth / Merchant identity ───────────────────────────
+    Merchant:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        business_name:
+          type: string
+        email:
+          type: string
+          format: email
+        created_at:
+          type: string
+          format: date-time
+
+    RegisterRequest:
+      type: object
+      required: [business_name, email, password]
+      properties:
+        business_name:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+          format: password
+
+    ForgotPasswordRequest:
+      type: object
+      required: [email]
+      properties:
+        email:
+          type: string
+          format: email
+
+    AuthResponse:
+      type: object
+      required: [ok, merchant, token]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        merchant:
+          $ref: "#/components/schemas/Merchant"
+        token:
+          type: string
+
+    MerchantMeResponse:
+      type: object
+      required: [ok, merchant]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        merchant:
+          $ref: "#/components/schemas/Merchant"
+
+    # ── Products ───────────────────────────────────────────
+    Product:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+          example: USD
+        stock:
+          type: integer
+        created_at:
+          type: string
+          format: date-time
+
+    ProductBody:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+        description:
+          type: string
+        price:
+          type: number
+          format: float
+        currency:
+          type: string
+        stock:
+          type: integer
+
+    ProductListResponse:
+      type: object
+      required: [ok, products]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+
+    ProductResponse:
+      type: object
+      required: [ok, product]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        product:
+          $ref: "#/components/schemas/Product"
+
+    RestockRequest:
+      type: object
+      required: [quantity]
+      properties:
+        quantity:
+          type: integer
+          minimum: 1
+
+    # ── Orders ─────────────────────────────────────────────
+    Order:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        session_id:
+          type: string
+        status:
+          type: string
+          enum: [pending, fulfilled, cancelled]
+        total:
+          type: number
+          format: float
+        created_at:
+          type: string
+          format: date-time
+
+    OrderListResponse:
+      type: object
+      required: [ok, orders]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        orders:
+          type: array
+          items:
+            $ref: "#/components/schemas/Order"
+
+    OrderResponse:
+      type: object
+      required: [ok, order]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        order:
+          $ref: "#/components/schemas/Order"
+
+    # ── Payouts ────────────────────────────────────────────
+    Payout:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        amount:
+          type: number
+          format: float
+        status:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+
+    PayoutListResponse:
+      type: object
+      required: [ok, payouts]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        payouts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Payout"
+
+    # ── KYC ────────────────────────────────────────────────
+    KycSubmitRequest:
+      type: object
+      properties:
+        legal_name:
+          type: string
+        tax_id:
+          type: string
+        address:
+          type: object
+          properties:
+            line1:
+              type: string
+            city:
+              type: string
+            state:
+              type: string
+            postal_code:
+              type: string
+            country:
+              type: string
+
+    # ── Notifications ──────────────────────────────────────
+    Notification:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+        message:
+          type: string
+        read:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    NotificationListResponse:
+      type: object
+      required: [ok, notifications]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        notifications:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notification"
+
+    # ── Commerce / Compile ─────────────────────────────────
+    CompileRequest:
+      type: object
+      required: [product]
+      properties:
+        product:
+          type: object
+          description: Arbitrary product JSON to compile into a Thing.
+
+    CompileResponse:
+      type: object
+      required: [ok, hash, matter_uri, thing_url, gist]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        hash:
+          type: string
+        matter_uri:
+          type: string
+        thing_url:
+          type: string
+        gist:
+          type: object
+
+    StoredThing:
+      type: object
+      description: The full resolved Thing payload.
+
+    GistResponse:
+      type: object
+      required: [ok, gist]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        gist:
+          type: object
+
+    BatchRequest:
+      type: object
+      required: [products]
+      properties:
+        products:
+          type: array
+          items:
+            type: object
+
+    BatchResponse:
+      type: object
+      required: [ok, results]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        results:
+          type: array
+          items:
+            type: object
+
+    CatalogImportResponse:
+      type: object
+      required: [ok, results]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        results:
+          type: array
+          items:
+            type: object
+
+    CatalogPublicResponse:
+      type: object
+      required: [ok, products]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        products:
+          type: array
+          items:
+            $ref: "#/components/schemas/Product"
+
+    # ── Analytics ──────────────────────────────────────────
+    AnalyticsEventRequest:
+      type: object
+      required: [event, hash]
+      properties:
+        event:
+          type: string
+        hash:
+          type: string
+        source_url:
+          type: string
+          format: uri
+        metadata:
+          type: object
+
+    AnalyticsReportResponse:
+      type: object
+      required: [ok, data]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        data:
+          type: array
+          items:
+            type: object
+
+    # ── Checkout ───────────────────────────────────────────
+    CreateSessionRequest:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+        success_url:
+          type: string
+          format: uri
+        cancel_url:
+          type: string
+          format: uri
+
+    CreateSessionResponse:
+      type: object
+      required: [ok, url]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        url:
+          type: string
+          format: uri
+
+    # ── Admin ──────────────────────────────────────────────
+    MorStatusResponse:
+      type: object
+      required: [ok, status]
+      properties:
+        ok:
+          type: boolean
+          example: true
+        status:
+          type: object
+
+  responses:
+    BadRequest:
+      description: Validation / client error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    Unauthorized:
+      description: Missing or invalid credentials
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    NotFound:
+      description: Resource not found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+    InternalError:
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/Error"
+
+# ════════════════════════════════════════════════════════════
+# Paths
+# ════════════════════════════════════════════════════════════
+paths:
+  # ── Health ───────────────────────────────────────────────
+  /health:
+    get:
+      tags: [Health]
+      summary: Service health check
+      operationId: getHealth
+      responses:
+        "200":
+          description: Healthy
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/HealthResponse"
+
+  # ── Auth ─────────────────────────────────────────────────
+  /v1/auth/merchant/register:
+    post:
+      tags: [Auth]
+      summary: Register a new merchant
+      operationId: registerMerchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: Merchant created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /v1/auth/merchant/login:
+    post:
+      tags: [Auth]
+      summary: Merchant login
+      operationId: loginMerchant
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: Authenticated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AuthResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/auth/merchant/me:
+    get:
+      tags: [Auth]
+      summary: Get current merchant profile
+      operationId: getMerchantMe
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Current merchant
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantMeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/auth/merchant/forgot-password:
+    post:
+      tags: [Auth]
+      summary: Request password reset email
+      operationId: forgotPassword
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ForgotPasswordRequest"
+      responses:
+        "200":
+          description: Reset email sent (always succeeds to avoid enumeration)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+
+  /v1/auth/google:
+    get:
+      tags: [Auth]
+      summary: Initiate Google OAuth flow
+      operationId: googleOAuth
+      responses:
+        "302":
+          description: Redirect to Google consent screen
+
+  /v1/auth/google/callback:
+    get:
+      tags: [Auth]
+      summary: Google OAuth callback
+      operationId: googleOAuthCallback
+      parameters:
+        - name: code
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: state
+          in: query
+          schema:
+            type: string
+      responses:
+        "302":
+          description: Redirect to frontend with token
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  # ── Merchant ─────────────────────────────────────────────
+  /v1/merchant/products:
+    get:
+      tags: [Merchant]
+      summary: List merchant products
+      operationId: listMerchantProducts
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+    post:
+      tags: [Merchant]
+      summary: Create a product
+      operationId: createMerchantProduct
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductBody"
+      responses:
+        "201":
+          description: Product created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/products/{id}:
+    parameters:
+      - name: id
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Merchant]
+      summary: Update a product
+      operationId: updateMerchantProduct
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProductBody"
+      responses:
+        "200":
+          description: Product updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProductResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Merchant]
+      summary: Delete a product
+      operationId: deleteMerchantProduct
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Product deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/merchant/products/{productId}/restock:
+    parameters:
+      - name: productId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    post:
+      tags: [Merchant]
+      summary: Restock a product
+      operationId: restockProduct
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RestockRequest"
+      responses:
+        "200":
+          description: Stock updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/merchant/orders:
+    get:
+      tags: [Merchant]
+      summary: List merchant orders
+      operationId: listMerchantOrders
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Order list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/orders/{orderId}/fulfill:
+    parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Merchant]
+      summary: Mark an order as fulfilled
+      operationId: fulfillOrder
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Order fulfilled
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /v1/merchant/account:
+    get:
+      tags: [Merchant]
+      summary: Get merchant account details
+      operationId: getMerchantAccount
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Merchant account
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MerchantMeResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/payouts:
+    get:
+      tags: [Merchant]
+      summary: List merchant payouts
+      operationId: listMerchantPayouts
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Payout list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/kyc/submit:
+    post:
+      tags: [Merchant]
+      summary: Submit KYC verification data
+      operationId: submitKyc
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/KycSubmitRequest"
+      responses:
+        "200":
+          description: KYC submitted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/notifications:
+    get:
+      tags: [Merchant]
+      summary: List merchant notifications
+      operationId: listMerchantNotifications
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Notification list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NotificationListResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/notifications/{notificationId}:
+    parameters:
+      - name: notificationId
+        in: path
+        required: true
+        schema:
+          type: string
+          format: uuid
+    patch:
+      tags: [Merchant]
+      summary: Update a notification (e.g. mark read)
+      operationId: updateNotification
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Notification updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ── Commerce ─────────────────────────────────────────────
+  /compile:
+    post:
+      tags: [Commerce]
+      summary: Compile product JSON into a Thing
+      operationId: compileProduct
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CompileRequest"
+      responses:
+        "200":
+          description: Compiled Thing
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CompileResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /resolve/{hash}:
+    parameters:
+      - name: hash
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Commerce]
+      summary: Resolve a compiled Thing by hash
+      operationId: resolveThing
+      responses:
+        "200":
+          description: Stored Thing payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoredThing"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /gist/{hash}:
+    parameters:
+      - name: hash
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Commerce]
+      summary: Get the gist for a compiled Thing
+      operationId: getGist
+      responses:
+        "200":
+          description: Gist payload
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GistResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /thing/{hash}.json:
+    parameters:
+      - name: hash
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Commerce]
+      summary: Download the Thing file as JSON
+      operationId: getThingFile
+      responses:
+        "200":
+          description: Thing JSON file
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/StoredThing"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /batch:
+    post:
+      tags: [Commerce]
+      summary: Batch compile multiple products
+      operationId: batchCompile
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BatchRequest"
+      responses:
+        "200":
+          description: Batch results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BatchResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /catalog/import:
+    post:
+      tags: [Commerce]
+      summary: Import a product catalog (JSON or CSV)
+      operationId: importCatalog
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+          text/csv:
+            schema:
+              type: string
+      responses:
+        "200":
+          description: Import results
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogImportResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /catalog/public:
+    get:
+      tags: [Commerce]
+      summary: List all publicly visible products
+      operationId: listPublicCatalog
+      responses:
+        "200":
+          description: Public product list
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CatalogPublicResponse"
+
+  # ── Analytics ────────────────────────────────────────────
+  /v1/analytics/event:
+    post:
+      tags: [Analytics]
+      summary: Record an analytics event
+      operationId: recordAnalyticsEvent
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AnalyticsEventRequest"
+      responses:
+        "200":
+          description: Event recorded
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /v1/analytics/report:
+    get:
+      tags: [Analytics]
+      summary: Query analytics report
+      operationId: getAnalyticsReport
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: from
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          schema:
+            type: string
+            format: date-time
+        - name: groupBy
+          in: query
+          schema:
+            type: string
+            enum: [day, week, month]
+      responses:
+        "200":
+          description: Report data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AnalyticsReportResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/analytics/dashboard:
+    get:
+      tags: [Analytics]
+      summary: Render analytics dashboard (HTML)
+      operationId: getAnalyticsDashboard
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: HTML dashboard page
+          content:
+            text/html:
+              schema:
+                type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  # ── Checkout ─────────────────────────────────────────────
+  /checkout/create-session:
+    post:
+      tags: [Checkout]
+      summary: Create a Stripe checkout session
+      operationId: createCheckoutSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CreateSessionRequest"
+      responses:
+        "200":
+          description: Checkout session URL
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CreateSessionResponse"
+        "400":
+          $ref: "#/components/responses/BadRequest"
+
+  /webhooks/stripe:
+    post:
+      tags: [Checkout]
+      summary: Stripe webhook handler
+      operationId: stripeWebhook
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        "200":
+          description: Webhook processed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+
+  /orders/{sessionId}:
+    parameters:
+      - name: sessionId
+        in: path
+        required: true
+        schema:
+          type: string
+    get:
+      tags: [Checkout]
+      summary: Get order by checkout session ID
+      operationId: getOrderBySession
+      responses:
+        "200":
+          description: Order details
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/OrderResponse"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  # ── Admin ────────────────────────────────────────────────
+  /v1/admin/payouts/release:
+    post:
+      tags: [Admin]
+      summary: Release pending payouts
+      operationId: releasePayouts
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Payouts released
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/admin/mor-status:
+    get:
+      tags: [Admin]
+      summary: Get Merchant of Record status
+      operationId: getMorStatus
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: MoR status
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MorStatusResponse"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/admin/retention/run:
+    post:
+      tags: [Admin]
+      summary: Run data retention job
+      operationId: runRetention
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Retention job completed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /v1/admin/cache/clear:
+    post:
+      tags: [Admin]
+      summary: Clear server caches
+      operationId: clearCache
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Cache cleared
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+        "401":
+          $ref: "#/components/responses/Unauthorized"

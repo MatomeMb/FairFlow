@@ -1,324 +1,166 @@
 /**
  * Merchant Products API
- * 
- * Template-based product creation (replaces CSV upload for pivot)
+ *
+ * CRUD for merchant-managed products with stock, status, and thing_file linkage.
+ * Products are stored in data/merchant_products.json (sync I/O for request-time reads).
  */
 
 import { Hono } from 'hono';
-import { z } from 'zod';
-import crypto from 'node:crypto';
-import { promises as fs } from 'node:fs';
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
 const dataRoot = path.join(__dirname, '..', 'data');
-const merchantProductsFile = path.join(dataRoot, 'merchant-products.json');
-const thingsDir = path.join(dataRoot, 'things');
-const indexFile = path.join(dataRoot, 'index.json');
+const productsFile = path.join(dataRoot, 'merchant_products.json');
 
-// TypeScript interface
-export interface MerchantProduct {
+/** Merchant product with stock, status, and thing linkage */
+export type MerchantProduct = {
   id: string;
-  merchant_id: string;
   title: string;
-  description?: string;
   price_cents: number;
-  currency: 'ZAR';
+  currency: string;
+  status?: 'draft' | 'published';
+  stock_count?: number;
+  thing_file?: { hash: string };
   category?: string;
-  stock_count: number;
+  merchant_id?: string;
   image_url?: string;
-  shipping_available: boolean;
-  certifications: string[];
-  thing_file: {
-    hash: string;
-    matter_uri: string;
-    thing_url: string;
-    generated_at: string;
-  };
-  status: 'draft' | 'published' | 'archived';
-  created_at: string;
-  updated_at: string;
-}
-
-// Zod validation schema
-const CreateProductSchema = z.object({
-  title: z.string().min(1, 'Title is required').max(255, 'Title must be 255 characters or less'),
-  description: z.string().optional(),
-  price_cents: z.number().int().positive('Price must be greater than 0'),
-  category: z.enum(['coffee', 'textiles', 'food', 'crafts', 'other']).optional(),
-  stock_count: z.number().int().nonnegative('Stock count must be 0 or greater'),
-  image_url: z.string().url('Must be a valid URL').optional().or(z.literal('')),
-  shipping_available: z.boolean().default(false),
-  certifications: z.array(z.string()).default([]),
-});
-
-type CreateProductInput = z.infer<typeof CreateProductSchema>;
-
-// Index types (from main index.ts)
-type StoredThing = {
-  hash: string;
-  matter_uri: string;
-  thing_url: string;
-  thing_path: string;
-  thing_file: any;
-  image_url?: string;
-  checkout_url?: string;
-  gist: {
-    title: string;
-    price: number;
-    currency: string;
-    image_url?: string;
-  };
-  created_at: string;
+  created_at?: string;
+  updated_at?: string;
 };
 
-type IndexStore = Record<string, StoredThing>;
+function loadProductsFromDisk(): MerchantProduct[] {
+  try {
+    if (!existsSync(productsFile)) return [];
+    const raw = readFileSync(productsFile, 'utf8');
+    const parsed = JSON.parse(raw) as unknown;
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+}
 
-// Pure functions for data persistence
+function saveProductsToDisk(products: MerchantProduct[]): void {
+  mkdirSync(path.dirname(productsFile), { recursive: true });
+  writeFileSync(productsFile, JSON.stringify(products, null, 2), 'utf8');
+}
 
+/** Sync read of merchant products (used by index.ts for restock, catalog, checkout) */
 export function readProducts(): MerchantProduct[] {
-  try {
-    if (!existsSync(merchantProductsFile)) {
-      return [];
-    }
-    const raw = readFileSync(merchantProductsFile, 'utf8');
-    return JSON.parse(raw) as MerchantProduct[];
-  } catch (error) {
-    const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') {
-      return [];
-    }
-    throw error;
-  }
+  return loadProductsFromDisk();
 }
 
+/** Sync write of merchant products */
 export function writeProducts(products: MerchantProduct[]): void {
-  const dirPath = path.dirname(merchantProductsFile);
-  if (!existsSync(dirPath)) {
-    throw new Error(`Data directory does not exist: ${dirPath}`);
-  }
-  const json = JSON.stringify(products, null, 2);
-  writeFileSync(merchantProductsFile, json, 'utf8');
+  saveProductsToDisk(products);
 }
 
-// Index management functions
-export function readIndex(): IndexStore {
-  try {
-    if (!existsSync(indexFile)) {
-      return {};
-    }
-    const raw = readFileSync(indexFile, 'utf8');
-    return JSON.parse(raw) as IndexStore;
-  } catch (error) {
-    const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') {
-      return {};
-    }
-    throw error;
-  }
-}
+const err = (code: string, message: string) => ({ code, message });
 
-export function writeIndex(index: IndexStore): void {
-  writeFileSync(indexFile, JSON.stringify(index, null, 2), 'utf8');
-}
-
-export function compileThing(
-  input: CreateProductInput,
-  merchant_id: string,
-  baseUrl: string
-): {
-  hash: string;
-  matter_uri: string;
-  thing_url: string;
-  thing_json: any;
-  generated_at: string;
-} {
-  const generated_at = new Date().toISOString();
-  
-  // Build .thing file payload matching existing ThingFile structure
-  const thing_json: any = {
-    product: {
-      title: input.title,
-      description: input.description,
-      price: input.price_cents,
-      currency: 'ZAR',
-      image_url: input.image_url,
-      category: input.category,
-    },
-    commerce: {
-      merchant_id,
-      payment_gateway: 'stripe' as const,
-      supported_currencies: ['ZAR'],
-      shipping_available: input.shipping_available,
-    },
-    metadata: {
-      schema_version: '1.0' as const,
-      created_at: generated_at,
-      certifications: input.certifications,
-      stock_count: input.stock_count,
-    },
-  };
-
-  // Create deterministic hash (stable stringify with sorted keys)
-  const stableStringify = (obj: any): string => {
-    if (Array.isArray(obj)) {
-      return `[${obj.map(stableStringify).join(',')}]`;
-    }
-    if (obj && typeof obj === 'object') {
-      const entries = Object.entries(obj).sort(([a], [b]) => a.localeCompare(b));
-      return `{${entries.map(([k, v]) => `${JSON.stringify(k)}:${stableStringify(v)}`).join(',')}}`;
-    }
-    return JSON.stringify(obj);
-  };
-
-  const payload = stableStringify(thing_json);
-  const hash = crypto.createHash('sha256').update(payload).digest('hex');
-  const matter_uri = `matter://${hash}`;
-  const thing_url = `${baseUrl}/thing/${hash}.json`;
-
-  // Add matter_uri and thing_url to metadata
-  (thing_json.metadata as any).matter_uri = matter_uri;
-  (thing_json.metadata as any).thing_url = thing_url;
-
-  return {
-    hash,
-    matter_uri,
-    thing_url,
-    thing_json,
-    generated_at,
-  };
-}
-
-// Hono router
 export const merchantProductsRouter = new Hono();
 
-// POST / - Create product
-merchantProductsRouter.post('/', async (c) => {
-  try {
-    const body = await c.req.json();
-    
-    // Validate input
-    const parsed = CreateProductSchema.safeParse(body);
-    if (!parsed.success) {
-      return c.json(
-        {
-          code: 'validation_error',
-          message: 'Invalid product data',
-          details: parsed.error.format(),
-        },
-        400
-      );
-    }
-
-    const input = parsed.data;
-    
-    // Get merchant_id from header or use fallback
-    const merchant_id = c.req.header('x-merchant-id') || 'dev-merchant-001';
-    
-    // Get base URL from env or use default
-    const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-    
-    // Compile .thing file
-    const { hash, matter_uri, thing_url, thing_json, generated_at } = compileThing(
-      input,
-      merchant_id,
-      baseUrl
-    );
-    
-    // Write .thing file to data/things/<hash>.json
-    await fs.mkdir(thingsDir, { recursive: true });
-    const thingFilePath = path.join(thingsDir, `${hash}.json`);
-    await fs.writeFile(thingFilePath, JSON.stringify(thing_json, null, 2), 'utf8');
-    
-    // Update index.json to register the product
-    const index = readIndex();
-    index[hash] = {
-      hash,
-      matter_uri,
-      thing_url,
-      thing_path: thingFilePath,
-      thing_file: thing_json,
-      image_url: input.image_url,
-      checkout_url: undefined,
-      gist: {
-        title: input.title,
-        price: input.price_cents,
-        currency: 'ZAR',
-        image_url: input.image_url,
-      },
-      created_at: generated_at,
-    };
-    writeIndex(index);
-    
-    // Create product record
-    const product: MerchantProduct = {
-      id: crypto.randomUUID(),
-      merchant_id,
-      title: input.title,
-      description: input.description,
-      price_cents: input.price_cents,
-      currency: 'ZAR',
-      category: input.category,
-      stock_count: input.stock_count,
-      image_url: input.image_url || undefined,
-      shipping_available: input.shipping_available,
-      certifications: input.certifications,
-      thing_file: {
-        hash,
-        matter_uri,
-        thing_url,
-        generated_at,
-      },
-      status: 'published',
-      created_at: generated_at,
-      updated_at: generated_at,
-    };
-    
-    // Insert into merchant-products.json
-    const products = readProducts();
-    products.push(product);
-    writeProducts(products);
-    
-    return c.json(product, 201);
-  } catch (error) {
-    console.error('Error creating product:', error);
-    return c.json(
-      {
-        code: 'internal_error',
-        message: 'Failed to create product',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      500
-    );
-  }
+/** GET /v1/merchant/products — list products (filtered by merchant when auth present) */
+merchantProductsRouter.get('/', (c) => {
+  const products = readProducts();
+  return c.json({ products }, 200);
 });
 
-// GET / - List products
-merchantProductsRouter.get('/', (c) => {
-  try {
-    const products = readProducts();
-    
-    // Optional: filter by merchant_id from header
-    const merchant_id = c.req.header('x-merchant-id');
-    if (merchant_id) {
-      const filtered = products.filter((p) => p.merchant_id === merchant_id);
-      return c.json(filtered);
-    }
-    
-    return c.json(products);
-  } catch (error) {
-    console.error('Error reading products:', error);
-    return c.json(
-      {
-        code: 'internal_error',
-        message: 'Failed to read products',
-        details: error instanceof Error ? error.message : 'Unknown error',
-      },
-      500
-    );
+/** POST /v1/merchant/products — create product */
+merchantProductsRouter.post('/', async (c) => {
+  const body = await c.req.json().catch(() => null);
+  if (body === null || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
   }
+
+  const title = typeof (body as Record<string, unknown>).title === 'string'
+    ? ((body as Record<string, unknown>).title as string).trim()
+    : '';
+  const priceRaw = (body as Record<string, unknown>).price_cents ?? (body as Record<string, unknown>).price;
+  const priceCents = typeof priceRaw === 'number' ? Math.max(0, Math.floor(priceRaw)) : 0;
+  const currency = typeof (body as Record<string, unknown>).currency === 'string'
+    ? ((body as Record<string, unknown>).currency as string).toUpperCase().slice(0, 3)
+    : 'USD';
+  const hash = typeof (body as Record<string, unknown>).thing_hash === 'string'
+    ? ((body as Record<string, unknown>).thing_hash as string)
+    : undefined;
+
+  if (!title) {
+    return c.json(err('invalid_product', 'title is required'), 400);
+  }
+
+  const products = readProducts();
+  const product: MerchantProduct = {
+    id: crypto.randomUUID(),
+    title,
+    price_cents: priceCents,
+    currency: currency || 'USD',
+    status: 'draft',
+    stock_count: 0,
+    thing_file: hash ? { hash } : undefined,
+    merchant_id: (body as Record<string, unknown>).merchant_id as string | undefined,
+    image_url: (body as Record<string, unknown>).image_url as string | undefined,
+    category: (body as Record<string, unknown>).category as string | undefined,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  };
+  products.push(product);
+  writeProducts(products);
+
+  return c.json(product, 201);
+});
+
+/** GET /v1/merchant/products/:id — get single product */
+merchantProductsRouter.get('/:id', (c) => {
+  const id = c.req.param('id');
+  const products = readProducts();
+  const product = products.find((p) => p.id === id);
+  if (!product) {
+    return c.json(err('not_found', 'Product not found'), 404);
+  }
+  return c.json(product, 200);
+});
+
+/** PATCH /v1/merchant/products/:id — update product */
+merchantProductsRouter.patch('/:id', async (c) => {
+  const id = c.req.param('id');
+  const body = await c.req.json().catch(() => null);
+  if (body === null || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const products = readProducts();
+  const idx = products.findIndex((p) => p.id === id);
+  if (idx < 0) {
+    return c.json(err('not_found', 'Product not found'), 404);
+  }
+
+  const product = products[idx];
+  const updates = body as Record<string, unknown>;
+  if (typeof updates.title === 'string') product.title = updates.title.trim();
+  if (typeof updates.price_cents === 'number') product.price_cents = Math.max(0, Math.floor(updates.price_cents));
+  if (typeof updates.currency === 'string') product.currency = updates.currency.toUpperCase().slice(0, 3);
+  if (updates.status === 'draft' || updates.status === 'published') product.status = updates.status;
+  if (typeof updates.stock_count === 'number') product.stock_count = Math.max(0, Math.floor(updates.stock_count));
+  if (typeof updates.thing_hash === 'string') product.thing_file = { hash: updates.thing_hash };
+  if (typeof updates.image_url === 'string') product.image_url = updates.image_url;
+  if (typeof updates.category === 'string') product.category = updates.category;
+  product.updated_at = new Date().toISOString();
+
+  writeProducts(products);
+  return c.json(product, 200);
+});
+
+/** DELETE /v1/merchant/products/:id */
+merchantProductsRouter.delete('/:id', (c) => {
+  const id = c.req.param('id');
+  const products = readProducts();
+  const filtered = products.filter((p) => p.id !== id);
+  if (filtered.length === products.length) {
+    return c.json(err('not_found', 'Product not found'), 404);
+  }
+  writeProducts(filtered);
+  return c.json({ ok: true }, 200);
 });

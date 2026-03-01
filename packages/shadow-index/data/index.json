@@ -1,34 +1,4 @@
 {
-  "1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc": {
-    "hash": "1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
-    "matter_uri": "matter://1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
-    "thing_url": "http://localhost:3000/thing/1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc",
-    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\1a5f3799684d79a1c78df5fe9a4647c6ee255475684e419fcc411790a8a735bc.thing",
-    "image_url": "https://example.com/demo.jpg",
-    "checkout_url": "https://example.com/buy",
-    "gist": {
-      "title": "Demo Product",
-      "price": 14999,
-      "currency": "USD",
-      "image_url": "https://example.com/demo.jpg"
-    },
-    "created_at": "2026-02-01T03:22:12.889Z"
-  },
-  "212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4": {
-    "hash": "212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
-    "matter_uri": "matter://212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
-    "thing_url": "http://localhost:3000/thing/212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4",
-    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4.thing",
-    "image_url": "https://example.com/demo.jpg",
-    "checkout_url": "https://example.com/buy",
-    "gist": {
-      "title": "Demo Product",
-      "price": 14999,
-      "currency": "USD",
-      "image_url": "https://example.com/demo.jpg"
-    },
-    "created_at": "2026-02-01T03:23:56.468Z"
-  },
   "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96": {
     "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
     "matter_uri": "matter://bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
@@ -42,7 +12,7 @@
       "currency": "USD",
       "image_url": "https://example.com/demo.jpg"
     },
-    "created_at": "2026-02-11T00:45:02.334Z"
+    "created_at": "2026-03-01T22:39:11.411Z"
   },
   "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0": {
     "hash": "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
@@ -54,7 +24,7 @@
       "price": 1999,
       "currency": "USD"
     },
-    "created_at": "2026-02-11T00:45:02.785Z"
+    "created_at": "2026-03-01T22:39:11.494Z"
   },
   "1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7": {
     "hash": "1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7",
@@ -66,7 +36,7 @@
       "price": 100,
       "currency": "USD"
     },
-    "created_at": "2026-02-11T00:45:04.175Z"
+    "created_at": "2026-03-01T22:39:11.790Z"
   },
   "d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d": {
     "hash": "d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d",
@@ -78,7 +48,31 @@
       "price": 200,
       "currency": "USD"
     },
-    "created_at": "2026-02-11T00:45:04.486Z"
+    "created_at": "2026-03-01T22:39:11.842Z"
+  },
+  "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724": {
+    "hash": "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
+    "matter_uri": "matter://e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
+    "thing_url": "http://localhost:3000/thing/e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
+    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724.thing",
+    "gist": {
+      "title": "Valid",
+      "price": 50,
+      "currency": "USD"
+    },
+    "created_at": "2026-03-01T22:39:11.940Z"
+  },
+  "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee": {
+    "hash": "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
+    "matter_uri": "matter://ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
+    "thing_url": "http://localhost:3000/thing/ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
+    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee.thing",
+    "gist": {
+      "title": "Also valid",
+      "price": 75,
+      "currency": "EUR"
+    },
+    "created_at": "2026-03-01T22:39:12.015Z"
   },
   "01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8": {
     "hash": "01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8",
@@ -90,7 +84,7 @@
       "price": 111,
       "currency": "USD"
     },
-    "created_at": "2026-02-11T00:45:05.086Z"
+    "created_at": "2026-03-01T22:39:12.175Z"
   },
   "b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb": {
     "hash": "b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb",
@@ -102,7 +96,7 @@
       "price": 222,
       "currency": "EUR"
     },
-    "created_at": "2026-02-11T00:45:05.166Z"
+    "created_at": "2026-03-01T22:39:12.353Z"
   },
   "a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f": {
     "hash": "a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f",
@@ -117,7 +111,7 @@
       "currency": "USD",
       "image_url": "https://example.com/w.jpg"
     },
-    "created_at": "2026-02-11T00:45:05.270Z"
+    "created_at": "2026-03-01T22:39:12.955Z"
   },
   "20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9": {
     "hash": "20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9",
@@ -129,7 +123,7 @@
       "price": 199,
       "currency": "EUR"
     },
-    "created_at": "2026-02-11T00:45:05.428Z"
+    "created_at": "2026-03-01T22:39:13.476Z"
   },
   "4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a": {
     "hash": "4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a",
@@ -141,19 +135,7 @@
       "price": 10,
       "currency": "USD"
     },
-    "created_at": "2026-02-11T00:45:05.515Z"
-  },
-  "600d2b45b34e8bba7501bcd412ea2b479d74b5d12ca5849a64b254d4d855f636": {
-    "hash": "600d2b45b34e8bba7501bcd412ea2b479d74b5d12ca5849a64b254d4d855f636",
-    "matter_uri": "matter://600d2b45b34e8bba7501bcd412ea2b479d74b5d12ca5849a64b254d4d855f636",
-    "thing_url": "http://localhost:3000/thing/600d2b45b34e8bba7501bcd412ea2b479d74b5d12ca5849a64b254d4d855f636",
-    "thing_path": "C:\\Users\\matom\\OneDrive\\Desktop\\.Things-That-Matter\\packages\\shadow-index\\data\\things\\600d2b45b34e8bba7501bcd412ea2b479d74b5d12ca5849a64b254d4d855f636.thing",
-    "gist": {
-      "title": "BadTitleMissing",
-      "price": 20,
-      "currency": "USD"
-    },
-    "created_at": "2026-02-05T09:01:05.323Z"
+    "created_at": "2026-03-01T22:39:13.712Z"
   },
   "ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9": {
     "hash": "ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9",
@@ -165,30 +147,18 @@
       "price": 30,
       "currency": "EUR"
     },
-    "created_at": "2026-02-11T00:45:05.557Z"
+    "created_at": "2026-03-01T22:39:14.022Z"
   },
-  "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724": {
-    "hash": "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
-    "matter_uri": "matter://e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
-    "thing_url": "http://localhost:3000/thing/e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724.thing",
+  "327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1": {
+    "hash": "327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
+    "matter_uri": "matter://327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
+    "thing_url": "http://localhost:3000/thing/327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
+    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1.thing",
     "gist": {
-      "title": "Valid",
-      "price": 50,
-      "currency": "USD"
+      "title": "Test Product",
+      "price": 2999,
+      "currency": "ZAR"
     },
-    "created_at": "2026-02-11T00:45:04.780Z"
-  },
-  "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee": {
-    "hash": "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
-    "matter_uri": "matter://ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
-    "thing_url": "http://localhost:3000/thing/ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee.thing",
-    "gist": {
-      "title": "Also valid",
-      "price": 75,
-      "currency": "EUR"
-    },
-    "created_at": "2026-02-11T00:45:04.931Z"
+    "created_at": "2026-03-01T22:39:21.768Z"
   }
 }

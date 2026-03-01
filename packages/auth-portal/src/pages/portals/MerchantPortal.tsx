@@ -569,7 +569,7 @@ export const MerchantPortal: React.FC = () => {
   const handleCopyPage = async (productId: string, hash?: string) => {
     if (!hash) return;
     try {
-      await navigator.clipboard.writeText(`http://localhost:5178/product/${hash}`);
+      await navigator.clipboard.writeText(`${window.location.origin}/product/${hash}`);
       setCopiedPageId(productId);
       window.setTimeout(() => setCopiedPageId(null), 1500);
     } catch {
