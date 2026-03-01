@@ -43,18 +43,27 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      const appRole = extractRoleFromSession(session);
-      setRole(appRole);
-      if (session && appRole) {
-        setUser(buildUser(session, appRole));
-      }
-      setLoading(false);
-    });
+    supabase.auth
+      .getSession()
+      .then(({ data: { session } }) => {
+        setSession(session);
+        const appRole = extractRoleFromSession(session);
+        setRole(appRole);
+        if (session && appRole) {
+          setUser(buildUser(session, appRole));
+        }
+      })
+      .catch((err) => {
+        console.error("[fairflow] Failed to restore session:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      try {
         setSession(session);
         const appRole = extractRoleFromSession(session);
         setRole(appRole);
@@ -63,8 +72,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         } else {
           setUser(null);
         }
+      } catch (err) {
+        console.error("[fairflow] Auth state change error:", err);
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);

@@ -1,2 +1,10 @@
+# Environment variables (never commit secrets)
+.env
+.env.local
+.env.*.local
+*.env
+
+# Runtime data
 data/orders.json
 data/payout_logs.json
+data/merchant_products.json

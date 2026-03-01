@@ -47,7 +47,7 @@ export const ConsumerShop: React.FC = () => {
   const [minScore, setMinScore] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const apiBase = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000';
+  const apiBase = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:3000' : '');
 
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });

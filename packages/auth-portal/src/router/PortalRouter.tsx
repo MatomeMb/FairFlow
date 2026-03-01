@@ -7,8 +7,6 @@ import { LoginPage } from "../pages/LoginPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 import { ProductPage } from "../pages/ProductPage";
 import { OrderConfirmation } from "../pages/OrderConfirmation";
-import { MerchantRegister } from "../pages/MerchantRegister";
-import { MerchantLogin } from "../pages/MerchantLogin";
 
 // Portals
 import { CEODashboard } from "../pages/portals/CEODashboard";
@@ -47,10 +45,6 @@ export function PortalRouter() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
         
-        {/* Merchant Self-Serve Auth */}
-        <Route path="/merchant/register" element={<MerchantRegister />} />
-        <Route path="/merchant/login" element={<MerchantLogin />} />
-        
         {/* Public Product & Order Pages */}
         <Route path="/product/:hash" element={<ProductPage />} />
         <Route path="/order/success" element={<OrderConfirmation />} />
@@ -78,7 +72,7 @@ export function PortalRouter() {
           }
         />
 
-        {/* Merchant Portal - accessible via role OR JWT token */}
+        {/* Merchant Portal */}
         <Route
           path="/dashboard/merchant"
           element={
@@ -87,9 +81,6 @@ export function PortalRouter() {
             </RoleGuard>
           }
         />
-        
-        {/* Merchant shorthand route */}
-        <Route path="/merchant" element={<MerchantPortal />} />
 
         {/* Investor Mode — read-only */}
         <Route

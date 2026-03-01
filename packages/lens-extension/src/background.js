@@ -9,20 +9,21 @@
 const DB_NAME = 'lens-matter-cache';
 const DB_VERSION = 1;
 const STORE_NAME = 'resolve';
-const DEFAULT_API_BASE = 'http://localhost:3000';
+const DEFAULT_API_BASE = 'https://api.fairflow.co.za';
 const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+const DEBUG = false;
 
-// Logging helpers
+const noop = () => {};
 const log = {
-  cacheHit: (hash, ms = 0) => console.log(`[Cache HIT] Hash: ${hash}${ms ? ` (${ms}ms)` : ''}`),
-  cacheMiss: (hash) => console.log(`[Cache MISS] Hash: ${hash}, proceeding to API`),
-  cacheWrite: (hash, bytes, ms = 0) => console.log(`[Cache WRITE] Hash: ${hash} (${bytes} bytes${ms ? `, ${ms}ms` : ''})`),
-  cacheWriteError: (hash, err) => console.error(`[Cache WRITE FAILED] Hash: ${hash}: ${err.message}`),
-  apiError: (hash, status) => console.error(`[API ERROR] Hash: ${hash}: ${status}`),
-  perf: (hash, ms) => console.log(`[Lens Perf] Hash: ${hash} resolved in ${ms}ms`),
-  invalidHash: (hash) => console.warn(`[Lens] Invalid hash attempted: ${hash}`),
+  cacheHit: DEBUG ? (hash, ms = 0) => console.log(`[Cache HIT] ${hash}${ms ? ` (${ms}ms)` : ''}`) : noop,
+  cacheMiss: DEBUG ? (hash) => console.log(`[Cache MISS] ${hash}`) : noop,
+  cacheWrite: DEBUG ? (hash, bytes, ms = 0) => console.log(`[Cache WRITE] ${hash} (${bytes}b${ms ? `, ${ms}ms` : ''})`) : noop,
+  cacheWriteError: (hash, err) => console.error(`[Cache WRITE FAILED] ${hash}: ${err.message}`),
+  apiError: (hash, status) => console.error(`[API ERROR] ${hash}: ${status}`),
+  perf: DEBUG ? (hash, ms) => console.log(`[Lens Perf] ${hash} in ${ms}ms`) : noop,
+  invalidHash: (hash) => console.warn(`[Lens] Invalid hash: ${hash}`),
   error: (msg) => console.error(`[Cache ERROR] ${msg}`),
-  init: (msg) => console.log(`[Cache] ${msg}`),
+  init: DEBUG ? (msg) => console.log(`[Cache] ${msg}`) : noop,
 };
 
 /** @returns {Promise<IDBDatabase>} */

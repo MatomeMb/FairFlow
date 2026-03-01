@@ -19,10 +19,16 @@ import { getReport, validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
 import { getCached, setCached, invalidateCache, buildCacheKey } from '../lib/query-cache.js';
 import { logError } from '../lib/error-logger.js';
+import { logger } from '../lib/logger.js';
 import { dashboardHandler } from './dashboard.js';
 import { RetentionPolicy } from '../lib/retention-policy.js';
 import { isApiKeyValid } from '../lib/api-key-registry.js';
-import { merchantProductsRouter, readProducts, writeProducts } from './merchant-products.js';
+import {
+  merchantProductsRouter,
+  readProducts,
+  writeProducts,
+  type MerchantProduct,
+} from './merchant-products.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -216,7 +222,7 @@ type StoredThing = {
   matter_uri: string;
   thing_url: string;
   thing_path: string;
-  thing_file?: any;
+  thing_file?: { hash: string; [key: string]: unknown };
   image_url?: string;
   checkout_url?: string;
   gist: {
@@ -240,7 +246,10 @@ const loadIndex = async (): Promise<IndexStore> => {
     return JSON.parse(raw) as IndexStore;
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') {
+    if (nodeError.code === 'ENOENT') return {};
+    if (error instanceof SyntaxError) {
+      logger.warn('data/index.json is malformed — resetting to empty store');
+      await fs.writeFile(indexFile, '{}', 'utf8').catch(() => {});
       return {};
     }
     throw error;
@@ -455,14 +464,19 @@ type MerchantOrder = {
   fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
   fulfilled_at?: string | null;
   updated_at?: string;
-  [key: string]: any;
+  payout_log_id?: string;
+  [key: string]: unknown;
 };
 
 type MerchantNotification = {
   id: string;
   merchant_id?: string;
+  type?: 'order' | 'payout' | 'kyc' | 'system';
+  title?: string;
+  message?: string;
   read?: boolean;
-  [key: string]: any;
+  created_at?: string;
+  [key: string]: unknown;
 };
 
 type PayoutLog = {
@@ -479,7 +493,7 @@ type PayoutLog = {
   initiated_by?: string;
   created_at?: string;
   transferred_at?: string | null;
-  [key: string]: any;
+  [key: string]: unknown;
 };
 
 interface MerchantOrderBackend extends MerchantOrder {}
@@ -558,14 +572,14 @@ async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
   const orderStatus = order.status ?? 'unknown';
   const fulfillmentStatus = order.fulfillment_status ?? 'unknown';
   if (orderStatus !== 'paid' || fulfillmentStatus !== 'fulfilled') {
-    console.info(`[MoR] Order ${orderId} not eligible for payout: status=${orderStatus} fulfillment=${fulfillmentStatus}`);
+    logger.info('Order not eligible for payout', { orderId, orderStatus, fulfillmentStatus });
     return null;
   }
 
   const existingLogs = await loadPayoutLogs();
   const existing = existingLogs.find((log) => Array.isArray(log.orders_included) && log.orders_included.includes(orderId));
   if (existing) {
-    console.info(`[MoR] Order ${orderId} already queued in payout ${existing.id} — skipping`);
+    logger.info('Order already queued — skipping', { orderId, payoutId: existing.id });
     return existing;
   }
 
@@ -598,7 +612,7 @@ async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
   order.updated_at = new Date().toISOString();
   await saveOrders(orders);
 
-  console.info('[MoR] Payout queued', {
+  logger.info('Payout queued', {
     orderId,
     payoutLogId: payoutLog.id,
     amount: payoutLog.net_amount,
@@ -647,7 +661,7 @@ async function releasePayoutLog(payoutLogId: string, initiatedBy: string): Promi
   });
   await saveAllOrders(updatedOrders);
 
-  console.info('[MoR] Payout released', {
+  logger.info('Payout released', {
     payoutLogId,
     merchant_id: target.merchant_id,
     amount: target.net_amount,
@@ -722,7 +736,8 @@ function validateAdminAuth(authHeader: string | undefined): boolean {
 }
 
 const sanitizeMerchantAccount = (account: MerchantAccount) => {
-  const { password_hash, reset_token, reset_expires_at, ...safe } = account;
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { password_hash: _ph, reset_token: _rt, reset_expires_at: _re, ...safe } = account;
   return safe;
 };
 
@@ -974,13 +989,28 @@ async function compileAndPersistProduct(product: ProductInput): Promise<{
 }
 
 // Health check endpoint
-app.get('/health', (c) => {
+app.get('/health', async (c) => {
+  const checks: Record<string, string> = {};
+
+  try {
+    await fs.access(dataRoot);
+    checks.storage = 'ok';
+  } catch {
+    checks.storage = 'unavailable';
+  }
+
+  checks.r2 = useR2 ? 'enabled' : 'disabled';
+  checks.stripe = process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured';
+
+  const allOk = checks.storage === 'ok';
+
   return c.json({
-    status: 'ok',
+    status: allOk ? 'ok' : 'degraded',
     service: 'shadow-index',
     company: 'fairflow',
     version: '0.6.0',
     timestamp: new Date().toISOString(),
+    checks,
   });
 });
 
@@ -1217,7 +1247,7 @@ app.post('/v1/merchant/products/:productId/restock', async (c) => {
   const quantity = typeof quantityRaw === 'number' && Number.isFinite(quantityRaw) ? Math.max(1, Math.floor(quantityRaw)) : 10;
 
   const products = readProducts();
-  const target = products.find((product) => product.id === productId);
+  const target = products.find((product: MerchantProduct) => product.id === productId);
   if (!target) {
     return c.json(err('not_found', 'Product not found'), 404);
   }
@@ -1262,7 +1292,7 @@ app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
   if (order.status === 'paid') {
     const payoutLog = await queueOrderForPayout(order.id);
     if (payoutLog) {
-      console.info('[MoR] Order queued for payout:', {
+      logger.info('Order queued for payout', {
         orderId: order.id,
         payoutLogId: payoutLog.id,
         amount: payoutLog.net_amount,
@@ -1297,7 +1327,7 @@ app.post('/v1/admin/payouts/release', async (c) => {
     if (currentStatus) {
       return c.json({ ok: false, error: 'Payout already processed', current_status: currentStatus }, 400);
     }
-    console.error('[MoR] Release failed', { payout_log_id: payoutLogId, error: message });
+    logger.error('Payout release failed', { payout_log_id: payoutLogId, error: message });
     return c.json({ ok: false, error: 'Release failed', detail: message }, 500);
   }
 });
@@ -1312,7 +1342,7 @@ app.get('/v1/admin/mor-status', async (c) => {
     return c.json({ ok: true, ...status });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[MoR] Status check failed', { error: message });
+    logger.error('MoR status check failed', { error: message });
     return c.json({ ok: false, error: 'Status check failed', detail: message }, 500);
   }
 });
@@ -1338,7 +1368,7 @@ app.post('/v1/admin/payouts/backfill', async (c) => {
 
     const queued = results.filter((item) => item.result === 'queued').length;
     const errors = results.filter((item) => item.result.startsWith('error:')).length;
-    console.info('[MoR] Backfill complete', { queued, errors, total: status.gap_order_ids.length });
+    logger.info('Backfill complete', { queued, errors, total: status.gap_order_ids.length });
     return c.json({ ok: true, queued, errors, results });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -1660,9 +1690,9 @@ app.post('/catalog/import', async (c) => {
 // Public catalog endpoint for consumer storefront
 app.get('/catalog/public', (c) => {
   const products = readProducts()
-    .filter((product) => product.status === 'published' && product.stock_count > 0 && !!product.thing_file?.hash)
-    .map((product) => ({
-      hash: product.thing_file.hash,
+    .filter((product: MerchantProduct) => product.status === 'published' && (product.stock_count ?? 0) > 0 && !!product.thing_file?.hash)
+    .map((product: MerchantProduct) => ({
+      hash: product.thing_file!.hash,
       title: product.title,
       price: product.price_cents,
       currency: product.currency,
@@ -1699,7 +1729,7 @@ app.post('/v1/analytics/event', async (c) => {
     invalidateCache();
     return c.json({ ok: true }, 201);
   } catch (error) {
-    console.error(`[Analytics Error] ${error}`);
+    logger.error('Analytics event storage failed', { error: String(error) });
     return c.json(err('storage_error', 'Failed to persist analytics event'), 500);
   }
 });
@@ -1882,7 +1912,7 @@ app.post('/checkout/create-session', async (c) => {
 
     // Get product details from merchant products
     const products = readProducts();
-    const product = products.find(p => p.thing_file?.hash === product_hash);
+    const product = products.find((p: MerchantProduct) => p.thing_file?.hash === product_hash);
 
     if (!product) {
       return c.json(err('product_not_found', `Product not found: ${product_hash}`), 404);
@@ -1949,7 +1979,7 @@ app.post('/checkout/create-session', async (c) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('Checkout session creation failed:', message);
+    logger.error('Checkout session creation failed', { error: message });
     return c.json(err('checkout_failed', 'Failed to create checkout session'), 500);
   }
 });
@@ -1984,7 +2014,7 @@ app.post('/webhooks/stripe', async (c) => {
           order.paid_at = now;
           order.updated_at = now;
           await saveOrders(orders);
-          console.info('[MoR] Order payment settled via webhook', {
+          logger.info('Order payment settled via webhook', {
             orderId: order.id,
             payoutLogId: order.payout_log_id ?? null,
             amount: order.amount,
@@ -1995,7 +2025,7 @@ app.post('/webhooks/stripe', async (c) => {
         if (order.fulfillment_status === 'fulfilled') {
           const payoutLog = await queueOrderForPayout(order.id);
           if (payoutLog) {
-            console.info('[MoR] Order queued after webhook settlement', {
+            logger.info('Order queued after webhook settlement', {
               orderId: order.id,
               payoutLogId: payoutLog.id,
               amount: payoutLog.net_amount,
@@ -2009,7 +2039,7 @@ app.post('/webhooks/stripe', async (c) => {
     return c.json({ ok: true }, 200);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('[MoR] Stripe webhook processing failed', { error: message });
+    logger.error('Stripe webhook processing failed', { error: message });
     return c.json(err('webhook_processing_failed', message), 500);
   }
 });
@@ -2037,26 +2067,52 @@ app.get('/orders/:sessionId', async (c) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    console.error('Failed to fetch order:', message);
+    logger.error('Failed to fetch order', { error: message });
     return c.json(err('order_fetch_failed', 'Failed to fetch order details'), 500);
   }
 });
 
-// Development server - skip when NODE_ENV=test so tests can import app without starting server
+app.onError((error, c) => {
+  const msg = error instanceof Error ? error.message : String(error);
+  const stack = error instanceof Error ? error.stack : undefined;
+  logError({ path: c.req.path, method: c.req.method }, msg, stack);
+  logger.error('Unhandled error', { error: msg });
+  return c.json(err('internal_error', 'An unexpected error occurred'), 500);
+});
+
+// Rate limiter cleanup — prevent unbounded growth of stale entries
+const RATE_LIMIT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
+let rateLimitCleanupTimer: ReturnType<typeof setInterval> | null = null;
+
+function startRateLimitCleanup() {
+  rateLimitCleanupTimer = setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of rateLimitMap) {
+      if (now >= entry.resetAt) rateLimitMap.delete(key);
+    }
+  }, RATE_LIMIT_CLEANUP_INTERVAL_MS);
+}
+
+// Development server — skip when NODE_ENV=test so tests can import app without starting server
 const port = Number(process.env.PORT) || 3000;
 if (process.env.NODE_ENV !== 'test') {
-  console.log('');
-  console.log('  fairflow - Shadow Index API');
-  console.log('  ---------------------------');
-  console.log(`  API:       http://localhost:${port}`);
-  console.log(`  Health:    http://localhost:${port}/health`);
-  console.log(`  Dashboard: http://localhost:${port}/v1/analytics/dashboard`);
-  if (useR2) console.log('  Storage:   R2 enabled');
-  console.log('');
-  serve({
-    fetch: app.fetch,
+  logger.info('Server starting', {
     port,
+    storage: useR2 ? 'r2' : 'local',
+    url: `http://localhost:${port}`,
   });
+
+  const server = serve({ fetch: app.fetch, port });
+  startRateLimitCleanup();
+
+  const shutdown = () => {
+    logger.info('Shutting down gracefully');
+    if (rateLimitCleanupTimer) clearInterval(rateLimitCleanupTimer);
+    server.close(() => process.exit(0));
+    setTimeout(() => process.exit(1), 5000);
+  };
+  process.on('SIGTERM', shutdown);
+  process.on('SIGINT', shutdown);
 }
 
 // Export for Vercel Edge Functions and tests

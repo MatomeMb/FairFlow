@@ -1,0 +1,8 @@
+{
+  "hash": "327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
+  "title": "Test Product",
+  "description": "A test product for unit testing",
+  "price": 2999,
+  "currency": "ZAR",
+  "created_at": "2026-03-01T22:39:21.768Z"
+}

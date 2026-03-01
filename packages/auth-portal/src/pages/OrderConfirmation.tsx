@@ -75,7 +75,10 @@ export function OrderConfirmation() {
           // Fetch product title
           return fetch(`${apiBase}/thing/${orderData.product_hash}.json`);
         })
-        .then((res) => res.json())
+        .then((res) => {
+          if (!res.ok) throw new Error('Product details unavailable');
+          return res.json();
+        })
         .then((thing: ThingFile) => {
           setProductTitle(thing.product.title);
           setLoading(false);
