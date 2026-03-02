@@ -125,6 +125,14 @@ app.use('*', async (c, next) => {
 
   const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
   const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
+  
+  // Development mode: allow merchant routes without auth when in dev OAuth mode
+  const isDev = process.env.GOOGLE_OAUTH_MODE === 'dev';
+  if ((isMerchantRoute || isMerchantAnalyticsRoute) && isDev) {
+    console.log('[DEV MODE] Allowing merchant route without token:', requestPath);
+    return next();
+  }
+  
   if (isMerchantRoute || isMerchantAnalyticsRoute) {
     const auth = c.req.header('Authorization');
     const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;

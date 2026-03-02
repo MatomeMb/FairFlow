@@ -153,9 +153,10 @@ export const MerchantPortal: React.FC = () => {
     const urlToken = params.get('token');
     const urlError = params.get('error');
 
-    console.log('[MerchantPortal] Mount effect - urlToken:', urlToken ? 'present' : 'absent');
+    console.log('[MerchantPortal] Mount effect - urlToken:', urlToken ? `present (${urlToken.slice(0, 20)}...)` : 'absent');
 
     if (urlToken) {
+      console.log('[MerchantPortal] Setting authToken from URL');
       sessionStorage.setItem('merchantToken', urlToken);
       sessionStorage.setItem('merchant_token', urlToken);
       setAuthToken(urlToken);
@@ -163,7 +164,7 @@ export const MerchantPortal: React.FC = () => {
     } else {
       // Load existing token from storage
       const existingToken = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
-      console.log('[MerchantPortal] No URL token, using stored:', existingToken ? 'present' : 'absent');
+      console.log('[MerchantPortal] No URL token, using stored:', existingToken ? `present (${existingToken.slice(0, 20)}...)` : 'absent');
       setAuthToken(existingToken);
     }
 
@@ -214,10 +215,14 @@ export const MerchantPortal: React.FC = () => {
     };
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
+      console.log('[merchantFetch] Sending Bearer token for:', url, 'token:', authToken.slice(0, 20) + '...');
+    } else {
+      console.log('[merchantFetch] NO authToken for:', url);
     }
     // Always send x-api-key when available so backend can fall back if JWT is stale
     if (import.meta.env.VITE_API_KEY) {
       headers['x-api-key'] = import.meta.env.VITE_API_KEY;
+      console.log('[merchantFetch] Sending x-api-key for:', url);
     }
     return fetch(url, { ...options, headers });
   };
