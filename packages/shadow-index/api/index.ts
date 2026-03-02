@@ -803,11 +803,24 @@ const extractBearerToken = (authHeader: string | undefined): string | null => {
 };
 
 const getGoogleOAuthConfig = () => {
+  const mode = process.env.GOOGLE_OAUTH_MODE;
+  
+  // Development mode: allow testing without real Google credentials
+  if (mode === 'dev') {
+    return {
+      clientId: 'dev-client-id',
+      clientSecret: 'dev-client-secret',
+      redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/v1/auth/google/callback',
+      isDev: true,
+    };
+  }
+  
+  // Production mode: require real credentials
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
   if (!clientId || !clientSecret || !redirectUri) return null;
-  return { clientId, clientSecret, redirectUri };
+  return { clientId, clientSecret, redirectUri, isDev: false };
 };
 
 const exchangeGoogleCode = async (
@@ -1148,11 +1161,45 @@ app.post('/v1/auth/merchant/forgot-password', async (c) => {
   });
 });
 
-app.get('/v1/auth/google', (c) => {
+app.get('/v1/auth/google', async (c) => {
   const portalBaseUrl = inferPortalBaseUrl(c);
   const config = getGoogleOAuthConfig();
   if (!config) {
     return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
+  }
+
+  // Development mode: skip real Google OAuth and create a dev account
+  if (config.isDev) {
+    const now = new Date().toISOString();
+    const devEmail = 'dev-merchant@fairflow.dev';
+    const accounts = await loadMerchantAccounts();
+    
+    let account = accounts.find((candidate) => candidate.email.toLowerCase() === devEmail);
+    if (!account) {
+      account = {
+        id: crypto.randomUUID(),
+        business_name: 'Dev Merchant Test',
+        email: devEmail,
+        auth_provider: 'google',
+        kyc_status: 'not_started',
+        commission_rate: 0.03,
+        payout_frequency: 'weekly',
+        payout_minimum: 50000,
+        total_earnings: 0,
+        pending_payout: 0,
+        created_at: now,
+        updated_at: now,
+      };
+      accounts.push(account);
+      await saveMerchantAccounts(accounts);
+    } else {
+      account.auth_provider = 'google';
+      account.updated_at = now;
+      await saveMerchantAccounts(accounts);
+    }
+
+    const merchantToken = issueMerchantToken(account);
+    return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
   }
 
   const params = new URLSearchParams({
