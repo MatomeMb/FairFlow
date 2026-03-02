@@ -276,7 +276,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setProductsLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   const fetchAnalytics = useCallback(async () => {
     const formatDate = (date: Date) => date.toISOString().slice(0, 10);
@@ -320,7 +320,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setAnalyticsLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   useEffect(() => {
     console.log('[MerchantPortal] Analytics effect - activeTab:', activeTab);
@@ -348,7 +348,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setOrdersLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   useEffect(() => {
     console.log('[MerchantPortal] Orders/Products effect - activeTab:', activeTab, 'hasApiAuth:', hasApiAuth);
@@ -393,7 +393,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setAccountLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   const fetchPayoutLogs = useCallback(async () => {
     setPayoutsLoading(true);
@@ -412,7 +412,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setPayoutsLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
@@ -468,7 +468,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setNotificationsLoading(false);
     }
-  }, [apiBase, authToken]);
+  }, [apiBase]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
@@ -498,12 +498,18 @@ export const MerchantPortal: React.FC = () => {
   }, [apiBase]);
 
   const markAllNotificationsRead = useCallback(async () => {
-    const unread = notifications.filter((n) => !n.read);
-    if (unread.length === 0) return;
     try {
+      // Capture current unread IDs without making notifications a dependency
+      let unreadIds: string[] = [];
+      setNotifications((prev) => {
+        unreadIds = prev.filter((n) => !n.read).map((n) => n.id);
+        return prev; // Don't modify state, just read it
+      });
+      if (unreadIds.length === 0) return;
+      
       await Promise.all(
-        unread.map((notification) =>
-          merchantFetch(`${apiBase}/v1/merchant/notifications/${notification.id}`, {
+        unreadIds.map((id) =>
+          merchantFetch(`${apiBase}/v1/merchant/notifications/${id}`, {
             method: 'PATCH',
             headers: { Accept: 'application/json' },
           })
@@ -515,7 +521,7 @@ export const MerchantPortal: React.FC = () => {
       setNotificationsError(msg);
       showToast(msg, 'error');
     }
-  }, [apiBase, notifications]);
+  }, [apiBase]);
 
   useEffect(() => {
     if (activeTab !== 'notifications') return;
