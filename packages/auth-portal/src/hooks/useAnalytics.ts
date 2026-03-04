@@ -36,11 +36,16 @@ export function useAnalytics(refreshInterval = 30000) {
 
   const checkHealth = useCallback(async () => {
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
       const res = await fetch(`${apiBase}/health`, {
         headers: buildHeaders(),
+        signal: controller.signal,
       });
+      clearTimeout(timeoutId);
       return res.ok;
-    } catch {
+    } catch (error) {
+      console.error('Health check failed:', error);
       return false;
     }
   }, []);

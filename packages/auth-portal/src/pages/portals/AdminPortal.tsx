@@ -83,9 +83,22 @@ export const AdminPortal: React.FC = () => {
     document.title = 'fairflow — Admin Portal';
   }, []);
 
-  // Check health on mount
+  // Check health on mount with retry
   useEffect(() => {
-    checkHealth().then(setApiOnline);
+    const performHealthCheck = async () => {
+      let isOnline = false;
+      for (let i = 0; i < 3; i++) {
+        const result = await checkHealth();
+        if (result) {
+          isOnline = true;
+          break;
+        }
+        // Wait 500ms before retrying
+        await new Promise(resolve => setTimeout(resolve, 500));
+      }
+      setApiOnline(isOnline);
+    };
+    performHealthCheck();
   }, [checkHealth]);
 
   // Fetch pending KYC
