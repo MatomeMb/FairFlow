@@ -4,6 +4,16 @@ import { jwtDecode } from "jwt-decode";
 import { supabase } from "../lib/supabase";
 import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
 
+// Admin email configuration — emails listed here get CEO role
+const ADMIN_EMAILS = new Set([
+  "matome@fairflow.dev",
+  "sobuhle@fairflow.dev",
+  "matome.mb@fairflow.dev",
+  "sobuhle.n@fairflow.dev",
+  "matome",
+  "sobuhle",
+]);
+
 interface AuthContextType {
   user: AuthUser | null;
   session: Session | null;
@@ -26,6 +36,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!session?.access_token) return null;
     try {
       const decoded = jwtDecode<JWTClaims>(session.access_token);
+      const userEmail = session.user.email?.toLowerCase() || "";
+      
+      // Override role to CEO if email is in admin list
+      if (ADMIN_EMAILS.has(userEmail)) {
+        return "ceo";
+      }
+      
       return decoded.user_role ?? "consumer";
     } catch {
       return "consumer";
