@@ -988,9 +988,9 @@ async function compileAndPersistProduct(product: ProductInput): Promise<{
     thingUrl = await uploadThing(hash, buffer);
   } else {
     await fs.writeFile(thingPath, JSON.stringify(thingPayload, null, 2), 'utf8');
-    const port = Number(process.env.PORT) || 3000;
-    const baseUrl = `http://localhost:${port}`;
-    thingUrl = `${baseUrl}/thing/${hash}`;
+    const baseUrl = process.env.PUBLIC_API_BASE_URL
+      || `http://localhost:${Number(process.env.PORT) || 3000}`;
+    thingUrl = `${baseUrl.replace(/\/$/, '')}/thing/${hash}`;
   }
 
   const index = await loadIndex();

@@ -68,7 +68,6 @@ const ErrorBanner: React.FC<{ message: string; onDismiss: () => void }> = ({ mes
 );
 
 export const MerchantPortal: React.FC = () => {
-  console.log('[MerchantPortal] Component body executing');
   const { signOut } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>('products');
@@ -157,18 +156,13 @@ export const MerchantPortal: React.FC = () => {
     const urlToken = params.get('token');
     const urlError = params.get('error');
 
-    console.log('[MerchantPortal] Mount effect - urlToken:', urlToken ? `present (${urlToken.slice(0, 20)}...)` : 'absent');
-
     if (urlToken) {
-      console.log('[MerchantPortal] Setting authToken from URL');
       sessionStorage.setItem('merchantToken', urlToken);
       sessionStorage.setItem('merchant_token', urlToken);
       setAuthToken(urlToken);
       window.history.replaceState({}, '', '/dashboard/merchant');
     } else {
-      // Load existing token from storage
       const existingToken = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
-      console.log('[MerchantPortal] No URL token, using stored:', existingToken ? `present (${existingToken.slice(0, 20)}...)` : 'absent');
       setAuthToken(existingToken);
     }
 
@@ -186,17 +180,12 @@ export const MerchantPortal: React.FC = () => {
     }
   }, []);
   
-  // Redirect to login only when we're sure there is no token (avoids race: URL/storage are set before state updates)
-  // Note: Only redirect if authToken was explicitly checked and is still missing after a delay
   React.useEffect(() => {
-    console.log('[MerchantPortal] Redirect check - authToken:', authToken ? 'present' : 'absent');
     const timer = setTimeout(() => {
       const fromUrl = new URLSearchParams(window.location.search).get('token');
       const fromStorage = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
-      // Only redirect if we've waited and still have no token from any source
       if (!fromUrl && !fromStorage && !authToken && !import.meta.env.VITE_API_KEY) {
-        console.log('[MerchantPortal] Redirecting to login - no token found');
-        window.location.href = '/login';
+        window.location.href = '/merchant/login';
       }
     }, 500); // Wait 500ms to allow URL/storage to be processed
     return () => clearTimeout(timer);
@@ -208,25 +197,15 @@ export const MerchantPortal: React.FC = () => {
     }
   }, [merchantAccount?.kyc_status, products.length]);
 
-  // DEBUG: Track activeTab changes 
-  useEffect(() => {
-    console.log('[MerchantPortal] activeTab changed to:', activeTab);
-  }, [activeTab]);
-
   const merchantFetch = (url: string, options: RequestInit = {}) => {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
     };
     if (authToken) {
       headers['Authorization'] = `Bearer ${authToken}`;
-      console.log('[merchantFetch] Sending Bearer token for:', url, 'token:', authToken.slice(0, 20) + '...');
-    } else {
-      console.log('[merchantFetch] NO authToken for:', url);
     }
-    // Always send x-api-key when available so backend can fall back if JWT is stale
     if (import.meta.env.VITE_API_KEY) {
       headers['x-api-key'] = import.meta.env.VITE_API_KEY;
-      console.log('[merchantFetch] Sending x-api-key for:', url);
     }
     return fetch(url, { ...options, headers });
   };
@@ -266,7 +245,6 @@ export const MerchantPortal: React.FC = () => {
   };
 
   const fetchMerchantProducts = useCallback(async () => {
-    console.log('[MerchantPortal.fetchMerchantProducts] Running...');
     setProductsLoading(true);
     setProductsError(null);
     try {
@@ -332,7 +310,6 @@ export const MerchantPortal: React.FC = () => {
   }, [apiBase]);
 
   useEffect(() => {
-    console.log('[MerchantPortal] Analytics effect - activeTab:', activeTab);
     if (activeTab !== 'analytics') return;
     fetchAnalytics();
   }, [activeTab]);
@@ -358,14 +335,12 @@ export const MerchantPortal: React.FC = () => {
   }, [apiBase]);
 
   useEffect(() => {
-    console.log('[MerchantPortal] Orders/Products effect - activeTab:', activeTab, 'hasApiAuth:', hasApiAuth);
     if (!hasApiAuth) return;
     if (activeTab !== 'orders' && activeTab !== 'products') return;
     fetchMerchantOrders();
   }, [activeTab, fetchMerchantOrders, hasApiAuth]);
 
   useEffect(() => {
-    console.log('[MerchantPortal] Products/Analytics effect - activeTab:', activeTab, 'hasApiAuth:', hasApiAuth);
     if (!hasApiAuth) return;
     if (activeTab !== 'products' && activeTab !== 'analytics') return;
     fetchMerchantProducts();
@@ -609,9 +584,19 @@ export const MerchantPortal: React.FC = () => {
     }
   };
 
-  const handleRemoveProduct = (id: string) => {
-    setProducts(products.filter(p => p.id !== id));
-    showToast('Product removed', 'success');
+  const handleRemoveProduct = async (id: string) => {
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/products/${id}`, { method: 'DELETE' });
+      if (!res.ok) {
+        const msg = await apiError(res, 'Failed to remove product');
+        showToast(msg, 'error');
+        return;
+      }
+      setProducts(products.filter(p => p.id !== id));
+      showToast('Product removed', 'success');
+    } catch (e) {
+      showToast(e instanceof Error ? e.message : 'Failed to remove product', 'error');
+    }
   };
 
   const stats = useMemo(() => ({

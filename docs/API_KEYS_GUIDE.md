@@ -39,7 +39,8 @@ Step-by-step setup for API keys used by fairflow. Never commit real keys to the 
 | VITE_SUPABASE_URL | Supabase project URL |
 | VITE_SUPABASE_ANON_KEY | Supabase anon key |
 | VITE_API_BASE_URL | Shadow Index API base |
-| VITE_API_KEY | Must match SHADOW_INDEX_API_KEY |
+| VITE_API_KEY | Optional; must match SHADOW_INDEX_API_KEY |
+| VITE_ADMIN_SECRET | Admin KYC API; must match ADMIN_SECRET_KEY |
 
 ---
 

@@ -205,5 +205,72 @@ export async function dashboardHandler(c: Context, config?: DashboardConfig): Pr
 </body>
 </html>`;
 
+  // Return JSON when Accept: application/json (for Admin Portal)
+  const accept = c.req.header('Accept') ?? '';
+  if (accept.includes('application/json')) {
+    const eventsDirSize = storageStats.directories.find((d) => d.path === 'events')?.sizeBytes ?? 0;
+    const thingsDirSize = storageStats.directories.find((d) => d.path === 'things')?.sizeBytes ?? 0;
+    const histogramData = buildHistogramData(durations, 10);
+    return c.json({
+      status: alertStatus.errorRateAlert || alertStatus.slowQueryAlert ? 'warning' : 'ok',
+      lastUpdated: new Date().toISOString(),
+      storage: {
+        totalSize: storageStats.totalSizeBytes,
+        events: eventsDirSize,
+        things: thingsDirSize,
+        quota: storageStats.quotaBytes,
+      },
+      cache: {
+        enabled: cacheStats.enabled,
+        hitRate: cacheStats.hitRate,
+        hits: cacheStats.hits,
+        misses: cacheStats.misses,
+        entries: cacheStats.entries,
+        size: cacheStats.sizeBytes,
+        evictions: cacheStats.evictions,
+      },
+      preAggregation: {
+        status: preAggStatus.enabled ? 'enabled' : 'disabled',
+        files: preAggStatus.fileCount,
+        lastRun: preAggStatus.lastRun,
+      },
+      system: {
+        memoryHeap: mem.heapUsed,
+        memoryRss: mem.rss,
+        concurrentQueries: concurrentQueries,
+        totalQueries: totalQueries,
+      },
+      errors: {
+        count: errors24h.length,
+        period: '24h',
+      },
+      queryHistogram: histogramData,
+      recentQueries: last100.slice(0, 100).map((q) => ({
+        timestamp: q.timestamp,
+        duration: q.durationMs,
+        params: q.params,
+        results: q.resultCount,
+        status: q.error ? 'error' : q.durationMs >= ALERT_THRESHOLDS.queryTimeMs ? 'slow' : 'ok',
+      })),
+    });
+  }
+
   return c.html(html);
+}
+
+function buildHistogramData(durations: number[], buckets = 10): Array<{ duration: number; count: number }> {
+  if (durations.length === 0) return [];
+  const max = Math.max(...durations);
+  const min = Math.min(...durations);
+  const span = max - min || 1;
+  const bucketSize = span / buckets;
+  const counts = new Array(buckets).fill(0);
+  for (const d of durations) {
+    const idx = Math.min(Math.floor((d - min) / bucketSize), buckets - 1);
+    counts[idx]++;
+  }
+  return counts.map((c, i) => ({
+    duration: Math.round(min + (i + 0.5) * bucketSize),
+    count: c,
+  }));
 }

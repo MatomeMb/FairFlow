@@ -16,13 +16,9 @@
 git clone https://github.com/fairflow/fairflow.git
 cd fairflow
 
-# Install API dependencies
-cd packages/shadow-index
-npm install
-
-# Install portal dependencies
-cd ../auth-portal
-npm install
+# Install dependencies (from repo root)
+cd packages/shadow-index && npm install
+cd ../auth-portal && npm install
 ```
 
 ## Environment Variables
@@ -39,10 +35,10 @@ STRIPE_WEBHOOK_SECRET=whsec_...
 R2_ACCOUNT_ID=your-r2-account-id
 R2_ACCESS_KEY_ID=your-r2-access-key
 R2_SECRET_ACCESS_KEY=your-r2-secret-key
-STORAGE_PROVIDER=local
+STORAGE_MODE=local
 ```
 
-Set `STORAGE_PROVIDER=local` for development to use file-based storage instead of R2.
+Set `STORAGE_MODE=local` for development to use file-based storage instead of R2.
 
 ### auth-portal
 
@@ -51,38 +47,34 @@ Create `packages/auth-portal/.env`:
 ```env
 VITE_SUPABASE_URL=https://your-project.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJ...
-VITE_API_URL=http://localhost:3000
+VITE_API_BASE_URL=http://localhost:3000
 ```
 
 ## Starting Dev Servers
 
 ```bash
 # Terminal 1: API server (http://localhost:3000)
-cd packages/shadow-index
-npm run dev
+cd packages/shadow-index && npm run dev
 
 # Terminal 2: Portal (http://localhost:5178)
-cd packages/auth-portal
-npm run dev
+cd packages/auth-portal && npm run dev
 ```
 
-Both servers support hot reload. The portal proxies API requests to `localhost:3000` via the `VITE_API_URL` variable.
+Both servers support hot reload. See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md) for full environment configuration.
 
 ## Running Tests
 
 ```bash
-# shadow-index unit and integration tests
-cd packages/shadow-index
-npm test
+# Unit/integration (shadow-index)
+cd packages/shadow-index && npm test
+cd packages/shadow-index && npm run test:watch   # watch mode
 
-# Watch mode for active development
-npm run test:watch
-
-# auth-portal end-to-end tests (requires dev servers running)
-cd packages/auth-portal
+# E2E (run from repo root; start dev servers first)
 npx playwright install   # first time only
-npx playwright test
+npm run test:e2e
 ```
+
+Run each block from the repository root.
 
 ## Building for Production
 
@@ -113,7 +105,7 @@ Kill the existing process or set a different port: `PORT=3001 npm run dev`.
 Verify that `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` are set correctly. Check that your Supabase project has the site URL `http://localhost:5178` in the auth redirect allowlist.
 
 **Stripe webhooks not received in dev**
-Use the Stripe CLI to forward events locally: `stripe listen --forward-to localhost:3000/commerce/webhook`.
+Use the Stripe CLI to forward events locally: `stripe listen --forward-to localhost:3000/webhooks/stripe`.
 
 **Rust compiler fails to build**
 Ensure Rust 1.70+ is installed (`rustup update`). Run `cargo clean` before retrying the build.

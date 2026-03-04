@@ -1,12 +1,15 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { RoleGuard } from "../components/RoleGuard";
+import { MerchantPortalGuard } from "../components/MerchantPortalGuard";
 
 // Pages
 import { LoginPage } from "../pages/LoginPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 import { ProductPage } from "../pages/ProductPage";
 import { OrderConfirmation } from "../pages/OrderConfirmation";
+import { MerchantLogin } from "../pages/MerchantLogin";
+import { MerchantRegister } from "../pages/MerchantRegister";
 
 // Portals
 import { AdminPortal } from "../pages/portals/AdminPortal";
@@ -45,6 +48,8 @@ export function PortalRouter() {
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="/merchant/login" element={<MerchantLogin />} />
+        <Route path="/merchant/register" element={<MerchantRegister />} />
         
         {/* Public Product & Order Pages */}
         <Route path="/product/:hash" element={<ProductPage />} />
@@ -83,13 +88,13 @@ export function PortalRouter() {
           }
         />
 
-        {/* Merchant Portal */}
+        {/* Merchant Portal (role or token-based auth) */}
         <Route
           path="/dashboard/merchant"
           element={
-            <RoleGuard allowedRoles={["merchant", "ceo", "cto"]}>
+            <MerchantPortalGuard>
               <MerchantPortal />
-            </RoleGuard>
+            </MerchantPortalGuard>
           }
         />
 

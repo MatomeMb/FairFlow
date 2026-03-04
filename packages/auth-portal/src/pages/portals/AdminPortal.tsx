@@ -11,6 +11,7 @@ import { EmptyState } from '../../components/shared/EmptyState';
 import { OfflineBanner } from '../../components/shared/OfflineBanner';
 import { ConfirmModal } from '../../components/shared/ConfirmModal';
 import { formatBytes, truncateId } from '../../lib/format';
+import { apiBase, adminSecret } from '../../lib/config';
 import { 
   BarChart2, Activity, Users, Store, DollarSign, TrendingUp, Settings2, 
   AlertTriangle, Check, X, Clock, Shield, FileCheck, LogOut, RefreshCw,
@@ -105,9 +106,9 @@ export const AdminPortal: React.FC = () => {
   const fetchPendingKYC = async () => {
     setLoadingKYC(true);
     try {
-      const response = await fetch('http://localhost:3000/v1/admin/kyc/pending', {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, {
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local'
+          'Authorization': `Bearer ${adminSecret}`
         }
       });
       const data = await response.json();
@@ -134,10 +135,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/v1/admin/kyc/approve/${selectedKYC.id}`, {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/approve/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local',
+          'Authorization': `Bearer ${adminSecret}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ notes: approvalNotes })
@@ -162,10 +163,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC || !rejectionReason.trim()) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/v1/admin/kyc/reject/${selectedKYC.id}`, {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/reject/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local',
+          'Authorization': `Bearer ${adminSecret}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ reason: rejectionReason })
@@ -526,9 +527,13 @@ export const AdminPortal: React.FC = () => {
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
           <div className="p-4 border-b border-stone-800">
-            <div className="flex items-center justify-between">
-              <FairflowLogo width={32} height={32} />
-              {sidebarOpen && <span className="text-xs font-bold text-stone-400">ADMIN</span>}
+            <div className={`flex items-center gap-3 min-w-0 ${sidebarOpen ? '' : 'justify-center'}`}>
+              <FairflowLogo markHeight={28} showWordmark={sidebarOpen} variant="dark" />
+              {sidebarOpen && (
+                <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90 bg-blue-500/10 rounded">
+                  Admin
+                </span>
+              )}
             </div>
           </div>
 

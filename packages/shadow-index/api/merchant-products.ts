@@ -64,13 +64,14 @@ const err = (code: string, message: string) => ({ code, message });
 const enrichProductWithThingFile = (product: MerchantProduct): MerchantProduct => {
   if (!product.thing_file?.hash) return product;
   const hash = product.thing_file.hash;
-  const port = process.env.PORT || 3000;
+  const baseUrl = process.env.PUBLIC_API_BASE_URL
+    || `http://localhost:${process.env.PORT || 3000}`;
   return {
     ...product,
     thing_file: {
       hash,
       matter_uri: `matter://${hash}`,
-      thing_url: `http://localhost:${port}/thing/${hash}`,
+      thing_url: `${baseUrl.replace(/\/$/, '')}/thing/${hash}`,
     },
   };
 };

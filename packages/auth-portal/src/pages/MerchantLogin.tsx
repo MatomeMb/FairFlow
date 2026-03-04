@@ -23,8 +23,8 @@ export function MerchantLogin() {
     if (urlToken) {
       sessionStorage.setItem("merchantToken", urlToken);
       sessionStorage.setItem("merchant_token", urlToken);
-      window.history.replaceState({}, "", "/merchant");
-      navigate("/merchant");
+      window.history.replaceState({}, "", "/dashboard/merchant");
+      navigate("/dashboard/merchant");
       return;
     }
 
@@ -73,7 +73,7 @@ export function MerchantLogin() {
       sessionStorage.setItem("merchantToken", data.token);
 
       // Redirect to merchant portal
-      navigate("/merchant");
+      navigate("/dashboard/merchant");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {

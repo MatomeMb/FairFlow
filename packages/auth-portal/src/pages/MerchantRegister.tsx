@@ -75,7 +75,7 @@ export function MerchantRegister() {
       sessionStorage.setItem("merchantToken", data.token);
 
       // Redirect to merchant portal
-      navigate("/merchant");
+      navigate("/dashboard/merchant");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Registration failed");
     } finally {
@@ -92,7 +92,7 @@ export function MerchantRegister() {
         <p className="text-stone-400 mb-8 text-sm">Create your merchant account</p>
 
         <a
-          href="/v1/auth/google"
+          href={`${apiBase}/v1/auth/google`}
           className="flex w-full items-center justify-center gap-3 rounded-xl border border-stone-700 bg-stone-800 px-4 py-3 text-sm font-medium text-white transition hover:bg-stone-700 min-h-[44px]"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">

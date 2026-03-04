@@ -12,7 +12,7 @@ fairflow reimagines digital commerce by treating every product, service, and tra
 | **auth-portal** | `packages/auth-portal/` | React/Vite frontend with Supabase auth and role-based portals (CEO, CTO, merchant, investor, consumer) |
 | **lens-extension** | `packages/lens-extension/` | Chrome Manifest V3 browser extension for in-page artifact overlay |
 | **matter-core** | `packages/matter-core/` | Rust commerce compiler for the `.thing` file format |
-| **docs** | `docs/` | 80+ documentation files covering architecture, protocols, and guides |
+| **docs** | `docs/` | Architecture, deployment, beta, and standards |
 | **scripts** | `scripts/` | Utility scripts for development, deployment, and maintenance |
 
 ## Quick Start
@@ -21,14 +21,14 @@ fairflow reimagines digital commerce by treating every product, service, and tra
 git clone https://github.com/fairflow/fairflow.git
 cd fairflow
 
-# Install dependencies for the API and portal
+# Install dependencies
 cd packages/shadow-index && npm install
 cd ../auth-portal && npm install
 
-# Start the API server (port 3000)
-cd ../shadow-index && npm run dev
+# Terminal 1: Start API (http://localhost:3000)
+cd packages/shadow-index && npm run dev
 
-# In a separate terminal, start the portal (port 5178)
+# Terminal 2: Start portal (http://localhost:5178)
 cd packages/auth-portal && npm run dev
 ```
 
@@ -47,25 +47,26 @@ cd packages/auth-portal && npm run dev
 
 ## Environment Variables
 
-### shadow-index (`packages/shadow-index/.env`)
+Copy `.env.example` to `.env` in each package. See [docs/API_KEYS_GUIDE.md](./docs/API_KEYS_GUIDE.md) for full setup.
+
+### shadow-index
 
 | Variable | Purpose |
 |---|---|
 | `PORT` | API server port (default: 3000) |
-| `STRIPE_SECRET_KEY` | Stripe API secret key |
-| `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret |
-| `R2_ACCOUNT_ID` | Cloudflare R2 account identifier |
-| `R2_ACCESS_KEY_ID` | R2 access key |
-| `R2_SECRET_ACCESS_KEY` | R2 secret key |
-| `JWT_SECRET` | Signing secret for merchant JWTs |
+| `JWT_SECRET` | Merchant JWT signing (≥32 chars) |
+| `ADMIN_SECRET_KEY` | Admin API access |
+| `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET` | Stripe |
+| `STORAGE_MODE` | `local` or `r2` |
+| `PUBLIC_API_BASE_URL` | Production API URL for thing_url |
 
-### auth-portal (`packages/auth-portal/.env`)
+### auth-portal
 
 | Variable | Purpose |
 |---|---|
-| `VITE_SUPABASE_URL` | Supabase project URL |
-| `VITE_SUPABASE_ANON_KEY` | Supabase anonymous/public key |
-| `VITE_API_URL` | shadow-index API base URL |
+| `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY` | Supabase |
+| `VITE_API_BASE_URL` | shadow-index API URL |
+| `VITE_ADMIN_SECRET` | Must match ADMIN_SECRET_KEY (for KYC) |
 
 ## Testing
 
@@ -76,18 +77,14 @@ cd packages/shadow-index && npm test
 # Run tests in watch mode
 cd packages/shadow-index && npm run test:watch
 
-# End-to-end tests (auth-portal)
-cd packages/auth-portal && npx playwright test
+# End-to-end tests (from repo root)
+npm run test:e2e
 ```
 
-## Deployment
+## Setup & Deployment
 
-- **shadow-index** deploys as a standard Node.js service. Build with `npm run build` and run the compiled output.
-- **auth-portal** produces a static build via `npm run build`, suitable for any static hosting provider or CDN.
-- **lens-extension** is packaged as a `.zip` for Chrome Web Store submission.
-- **matter-core** compiles to a native binary via `cargo build --release`.
-
-Artifact storage uses Cloudflare R2 in production with local JSON fallback for development.
+- **Development:** [SETUP.md](./SETUP.md)
+- **Deployment:** [docs/DEPLOYMENT.md](./docs/DEPLOYMENT.md)
 
 ## Team
 
