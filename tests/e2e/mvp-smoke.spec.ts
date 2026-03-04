@@ -14,10 +14,10 @@
 
 import { test, expect } from '@playwright/test';
 
-const DEMO_HASH = '212a521e392989d262488f62e7698717c8198be6dfe19fccfdb384fd8c2328e4';
+const DEMO_HASH = 'bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96';
 const API_BASE = 'http://localhost:3000';
-const EXPECTED_TITLE = 'Demo Product';
-const EXPECTED_PRICE_CENTS = 14999;
+const EXPECTED_TITLE = 'Vitest Demo Product';
+const EXPECTED_PRICE_CENTS = 9999;
 
 test.describe('MVP smoke', () => {
   test('demo page loads and matter:// link is present', async ({ page }) => {

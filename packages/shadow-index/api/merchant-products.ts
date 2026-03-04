@@ -24,7 +24,7 @@ export type MerchantProduct = {
   currency: string;
   status?: 'draft' | 'published';
   stock_count?: number;
-  thing_file?: { hash: string };
+  thing_file?: { hash: string; matter_uri?: string; thing_url?: string };
   category?: string;
   merchant_id?: string;
   image_url?: string;
@@ -60,12 +60,28 @@ export function writeProducts(products: MerchantProduct[]): void {
 
 const err = (code: string, message: string) => ({ code, message });
 
+// Helper to construct thing_file with matter_uri and thing_url from hash
+const enrichProductWithThingFile = (product: MerchantProduct): MerchantProduct => {
+  if (!product.thing_file?.hash) return product;
+  const hash = product.thing_file.hash;
+  const port = process.env.PORT || 3000;
+  return {
+    ...product,
+    thing_file: {
+      hash,
+      matter_uri: `matter://${hash}`,
+      thing_url: `http://localhost:${port}/thing/${hash}`,
+    },
+  };
+};
+
 export const merchantProductsRouter = new Hono();
 
 /** GET /v1/merchant/products — list products (filtered by merchant when auth present) */
 merchantProductsRouter.get('/', (c) => {
   const products = readProducts();
-  return c.json({ products }, 200);
+  const enriched = products.map(enrichProductWithThingFile);
+  return c.json({ products: enriched }, 200);
 });
 
 /** POST /v1/merchant/products — create product */
@@ -83,9 +99,6 @@ merchantProductsRouter.post('/', async (c) => {
   const currency = typeof (body as Record<string, unknown>).currency === 'string'
     ? ((body as Record<string, unknown>).currency as string).toUpperCase().slice(0, 3)
     : 'USD';
-  const hash = typeof (body as Record<string, unknown>).thing_hash === 'string'
-    ? ((body as Record<string, unknown>).thing_hash as string)
-    : undefined;
 
   if (!title) {
     return c.json(err('invalid_product', 'title is required'), 400);
@@ -99,17 +112,20 @@ merchantProductsRouter.post('/', async (c) => {
     currency: currency || 'USD',
     status: 'draft',
     stock_count: 0,
-    thing_file: hash ? { hash } : undefined,
+    thing_file: undefined,
     merchant_id: (body as Record<string, unknown>).merchant_id as string | undefined,
     image_url: (body as Record<string, unknown>).image_url as string | undefined,
     category: (body as Record<string, unknown>).category as string | undefined,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
+  
   products.push(product);
   writeProducts(products);
 
-  return c.json(product, 201);
+  // Return enriched product (will have empty thing_file until compiled)
+  const enriched = enrichProductWithThingFile(product);
+  return c.json(enriched, 201);
 });
 
 /** GET /v1/merchant/products/:id — get single product */

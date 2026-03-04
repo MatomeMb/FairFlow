@@ -1,0 +1,131 @@
+{
+  "timestamp": "2026-03-02T19:17:34.644Z",
+  "sections": {
+    "Health": {
+      "tests": [
+        {
+          "name": "GET /health",
+          "passed": true,
+          "details": "v0.6.0"
+        }
+      ],
+      "passed": 1,
+      "failed": 0
+    },
+    "Endpoints": {
+      "tests": [
+        {
+          "name": "GET /catalog/public",
+          "passed": true,
+          "details": "200"
+        },
+        {
+          "name": "GET /v1/analytics/dashboard",
+          "passed": true,
+          "details": "200"
+        },
+        {
+          "name": "GET /v1/merchant/account",
+          "passed": false,
+          "details": "0 (fetch failed)"
+        },
+        {
+          "name": "POST /v1/analytics/event",
+          "passed": false,
+          "details": "0 (fetch failed)"
+        }
+      ],
+      "passed": 2,
+      "failed": 2
+    },
+    "Frontend": {
+      "tests": [
+        {
+          "name": "GET /",
+          "passed": true,
+          "details": "200"
+        },
+        {
+          "name": "GET /login",
+          "passed": true,
+          "details": "200"
+        },
+        {
+          "name": "GET /dashboard",
+          "passed": true,
+          "details": "200"
+        }
+      ],
+      "passed": 3,
+      "failed": 0
+    },
+    "Auth": {
+      "tests": [
+        {
+          "name": "Google OAuth redirect",
+          "passed": false,
+          "details": "0"
+        },
+        {
+          "name": "JWT required (unauthenticated)",
+          "passed": false,
+          "details": "0"
+        },
+        {
+          "name": "Dev-mode merchant account",
+          "passed": false,
+          "details": "0"
+        }
+      ],
+      "passed": 0,
+      "failed": 3
+    },
+    "Analytics": {
+      "tests": [
+        {
+          "name": "Event submission",
+          "passed": false,
+          "details": "0"
+        },
+        {
+          "name": "Report generation",
+          "passed": false,
+          "details": "0"
+        },
+        {
+          "name": "Dashboard data",
+          "passed": false,
+          "details": "0"
+        }
+      ],
+      "passed": 0,
+      "failed": 3
+    },
+    "Integration": {
+      "tests": [
+        {
+          "name": "Error handling (404)",
+          "passed": false,
+          "details": "0"
+        },
+        {
+          "name": "Response headers",
+          "passed": false,
+          "details": ""
+        },
+        {
+          "name": "Concurrent requests",
+          "passed": false,
+          "details": "3/3 successful"
+        }
+      ],
+      "passed": 0,
+      "failed": 3
+    }
+  },
+  "summary": {
+    "passed": 6,
+    "failed": 11,
+    "skipped": 0
+  }
+}

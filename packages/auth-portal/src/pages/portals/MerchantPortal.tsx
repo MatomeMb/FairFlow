@@ -124,7 +124,11 @@ export const MerchantPortal: React.FC = () => {
     phone: '+27 21 555 1234',
     address: '123 Main St, Cape Town, 8000',
     certifications: 'Fair Trade Certified, B-Corp Verified',
-    yearEstablished: '2019'
+    yearEstablished: '2019',
+    accountHolderName: '',
+    bankName: '',
+    accountNumber: '',
+    branchCode: ''
   });
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
   const [authToken, setAuthToken] = useState<string | null>(null);
@@ -273,7 +277,7 @@ export const MerchantPortal: React.FC = () => {
         throw new Error(await apiError(res, 'Failed to load products'));
       }
       const data = await res.json();
-      const list = Array.isArray(data) ? data : [];
+      const list = Array.isArray(data) ? data : (data.products || []);
       setProducts(list.map(mapProduct));
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load products';
@@ -331,9 +335,7 @@ export const MerchantPortal: React.FC = () => {
     console.log('[MerchantPortal] Analytics effect - activeTab:', activeTab);
     if (activeTab !== 'analytics') return;
     fetchAnalytics();
-    const intervalId = setInterval(fetchAnalytics, 10000);
-    return () => clearInterval(intervalId);
-  }, [activeTab, fetchAnalytics]);
+  }, [activeTab]);
 
   const fetchMerchantOrders = useCallback(async () => {
     setOrdersLoading(true);
@@ -1209,6 +1211,99 @@ export const MerchantPortal: React.FC = () => {
           className="mt-6 bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl font-medium transition"
         >
           Save Changes
+        </button>
+      </div>
+      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+        <h3 className="font-bold mb-6">Bank Account Details</h3>
+        <p className="text-stone-400 text-sm mb-4">For receiving weekly payouts to your merchant account</p>
+        <div className="space-y-4">
+          <div>
+            <label className="text-stone-400 text-sm block mb-2">Account Holder Name</label>
+            <input
+              type="text"
+              value={businessProfile.accountHolderName || ''}
+              onChange={(e) => setBusinessProfile({ ...businessProfile, accountHolderName: e.target.value })}
+              placeholder="Full name on bank account"
+              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+            />
+          </div>
+          <div>
+            <label className="text-stone-400 text-sm block mb-2">Bank Name</label>
+            <input
+              type="text"
+              value={businessProfile.bankName || ''}
+              onChange={(e) => setBusinessProfile({ ...businessProfile, bankName: e.target.value })}
+              placeholder="e.g., Standard Bank"
+              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+            />
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
+              <label className="text-stone-400 text-sm block mb-2">Account Number</label>
+              <input
+                type="text"
+                value={businessProfile.accountNumber || ''}
+                onChange={(e) => setBusinessProfile({ ...businessProfile, accountNumber: e.target.value })}
+                placeholder="Account number"
+                className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              />
+            </div>
+            <div>
+              <label className="text-stone-400 text-sm block mb-2">Branch Code</label>
+              <input
+                type="text"
+                value={businessProfile.branchCode || ''}
+                onChange={(e) => setBusinessProfile({ ...businessProfile, branchCode: e.target.value })}
+                placeholder="Branch code"
+                className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              />
+            </div>
+          </div>
+          {merchantAccount?.bank_account?.bank_name && (
+            <div className="bg-stone-800/50 border border-stone-700/50 rounded-lg p-4 mt-4">
+              <p className="text-stone-400 text-sm mb-2">Current Bank Details:</p>
+              <p className="text-white text-sm">{merchantAccount.bank_account.account_holder_name}</p>
+              <p className="text-stone-400 text-sm">{merchantAccount.bank_account.bank_name}</p>
+              <p className="text-stone-500 text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
+            </div>
+          )}
+        </div>
+        <button
+          onClick={async () => {
+            if (!businessProfile.accountHolderName || !businessProfile.accountNumber || !businessProfile.branchCode || !businessProfile.bankName) {
+              showToast('Please fill in all bank account fields', 'error');
+              return;
+            }
+            try {
+              const apiBase = localStorage.getItem('apiBase') || 'http://localhost:3000';
+              const token = localStorage.getItem('merchantToken');
+              const res = await fetch(`${apiBase}/v1/merchant/account/bank`, {
+                method: 'PATCH',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                  account_name: businessProfile.accountHolderName,
+                  account_number: businessProfile.accountNumber,
+                  branch_code: businessProfile.branchCode,
+                  bank_name: businessProfile.bankName,
+                }),
+              });
+              const data = await res.json();
+              if (!res.ok) {
+                showToast(data.message || 'Failed to update bank account', 'error');
+                return;
+              }
+              setMerchantAccount(data.account);
+              showToast('Bank account updated successfully', 'success');
+            } catch (error) {
+              showToast(`Error: ${error instanceof Error ? error.message : 'Failed to update'}`, 'error');
+            }
+          }}
+          className="mt-6 bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl font-medium transition"
+        >
+          Update Bank Details
         </button>
       </div>
       <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">

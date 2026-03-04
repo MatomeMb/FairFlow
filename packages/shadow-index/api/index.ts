@@ -95,7 +95,12 @@ app.use('*', async (c, next) => {
     return next();
   }
 
-  if (requestPath === '/v1/admin/payouts/release' || requestPath === '/v1/admin/mor-status' || requestPath === '/v1/admin/payouts/backfill') {
+  if (requestPath === '/v1/admin/payouts/release' 
+    || requestPath === '/v1/admin/mor-status' 
+    || requestPath === '/v1/admin/payouts/backfill'
+    || requestPath === '/v1/admin/kyc/pending'
+    || requestPath.startsWith('/v1/admin/kyc/approve/')
+    || requestPath.startsWith('/v1/admin/kyc/reject/')) {
     return next();
   }
 
@@ -746,6 +751,11 @@ function validateAdminAuth(authHeader: string | undefined): boolean {
 const sanitizeMerchantAccount = (account: MerchantAccount) => {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { password_hash: _ph, reset_token: _rt, reset_expires_at: _re, ...safe } = account;
+  // Mask bank account number
+  if (safe.bank_account?.account_number) {
+    const masked = safe.bank_account.account_number.slice(-4).padStart(safe.bank_account.account_number.length, '*');
+    safe.bank_account = { ...safe.bank_account, account_number: masked };
+  }
   return safe;
 };
 
@@ -1387,6 +1397,96 @@ app.post('/v1/admin/payouts/release', async (c) => {
   }
 });
 
+// POST /v1/admin/payouts/release-to-merchant - Release payout to a specific merchant's bank account
+app.post('/v1/admin/payouts/release-to-merchant', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const body = await c.req.json().catch(() => null) as { merchant_id?: string; amount_cents?: number } | null;
+  if (!body?.merchant_id) {
+    return c.json(err('invalid_request', 'Missing merchant_id'), 400);
+  }
+
+  try {
+    const merchants = await loadMerchantAccounts();
+    const merchant = merchants.find((m) => m.id === body.merchant_id);
+    
+    if (!merchant) {
+      return c.json(err('not_found', `Merchant not found: ${body.merchant_id}`), 404);
+    }
+
+    if (!merchant.bank_account?.account_number) {
+      return c.json(
+        err('invalid_request', 'Merchant has no bank account configured'),
+        400
+      );
+    }
+
+    // Calculate pending payout or use provided amount
+    const payoutAmount = body.amount_cents ?? (merchant.pending_payout ?? 0);
+    
+    if (payoutAmount <= 0) {
+      return c.json(
+        err('invalid_request', 'No pending payout amount to release'),
+        400
+      );
+    }
+
+    // Find pending payouts for this merchant
+    const payoutLogs = await loadPayoutLogs();
+    const pendingPayouts = payoutLogs.filter(
+      (log) => log.merchant_id === body.merchant_id && log.status === 'pending'
+    );
+
+    if (pendingPayouts.length === 0) {
+      return c.json(
+        err('not_found', 'No pending payouts found for merchant'),
+        404
+      );
+    }
+
+    // Release all pending payouts for this merchant
+    const released = [];
+    for (const payout of pendingPayouts) {
+      const updated = await releasePayoutLog(payout.id, 'admin_manual_batch');
+      released.push(updated);
+    }
+
+    // Update merchant pending_payout balance
+    merchant.pending_payout = Math.max(0, (merchant.pending_payout ?? 0) - payoutAmount);
+    merchant.updated_at = new Date().toISOString();
+    await saveMerchantAccounts(merchants);
+
+    logger.info('Merchant payouts released', {
+      merchant_id: body.merchant_id,
+      amount: payoutAmount,
+      count: released.length,
+      bank_name: merchant.bank_account.bank_name,
+    });
+
+    return c.json({
+      ok: true,
+      message: `Released ${released.length} payout(s) to merchant's bank account`,
+      merchant: {
+        id: merchant.id,
+        business_name: merchant.business_name,
+        bank_account: {
+          account_name: merchant.bank_account.account_holder_name,
+          bank_name: merchant.bank_account.bank_name,
+          account_number: merchant.bank_account.account_number.slice(-4).padStart(merchant.bank_account.account_number.length, '*'),
+        },
+      },
+      payouts_released: released,
+      total_amount: payoutAmount,
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    logger.error('Merchant payout release failed', { merchant_id: body?.merchant_id, error: message });
+    return c.json(err('release_failed', `Release failed: ${message}`), 500);
+  }
+});
+
 app.get('/v1/admin/mor-status', async (c) => {
   if (!validateAdminAuth(c.req.header('authorization'))) {
     return c.json({ ok: false, error: 'Forbidden' }, 403);
@@ -1505,6 +1605,222 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
   await saveMerchantAccounts(accounts);
   return c.json({ ok: true, account: sanitizeMerchantAccount(target) });
 });
+
+// PATCH /v1/merchant/account/bank - Update bank account details for payouts
+app.patch('/v1/merchant/account/bank', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  const accounts = await loadMerchantAccounts();
+  const target = account ?? accounts[0];
+  
+  if (!target) {
+    return c.json(err('not_found', 'Merchant account not found'), 404);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const payload = body as {
+    account_name?: string;
+    account_number?: string;
+    branch_code?: string;
+    bank_name?: string;
+  };
+
+  // Validate required fields
+  if (!payload.account_name || !payload.account_number || !payload.branch_code || !payload.bank_name) {
+    return c.json(
+      err('invalid_request', 'All bank fields required: account_name, account_number, branch_code, bank_name'),
+      400
+    );
+  }
+
+  // Update bank account
+  target.bank_account = {
+    account_holder_name: payload.account_name,
+    account_number: payload.account_number,
+    branch_code: payload.branch_code,
+    bank_name: payload.bank_name,
+    account_type: 'cheque', // Default  to cheque account
+  };
+  target.updated_at = new Date().toISOString();
+
+  await saveMerchantAccounts(accounts);
+  
+  logger.info('Merchant bank account updated', { merchant_id: target.id, bank_name: payload.bank_name });
+  
+  return c.json({ 
+    ok: true, 
+    message: 'Bank account updated successfully',
+    account: sanitizeMerchantAccount(target) 
+  });
+});
+
+// ==================== ADMIN KYC MANAGEMENT ====================
+
+// GET /v1/admin/kyc/pending - List all pending KYC submissions
+app.get('/v1/admin/kyc/pending', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const pending = accounts
+    .filter((account) => account.kyc_status === 'pending')
+    .map((account) => ({
+      id: account.id,
+      business_name: account.business_name,
+      email: account.email,
+      kyc_status: account.kyc_status,
+      submitted_at: account.updated_at,
+      kyc_data: account.kyc_data,
+      bank_account: account.bank_account ? {
+        account_holder_name: account.bank_account.account_holder_name,
+        bank_name: account.bank_account.bank_name,
+        account_number: account.bank_account.account_number.slice(-4).padStart(account.bank_account.account_number.length, '*'),
+        branch_code: account.bank_account.branch_code,
+        account_type: account.bank_account.account_type,
+      } : null,
+    }))
+    .sort((a, b) => {
+      const aTime = typeof a.submitted_at === 'string' ? new Date(a.submitted_at).getTime() : 0;
+      const bTime = typeof b.submitted_at === 'string' ? new Date(b.submitted_at).getTime() : 0;
+      return aTime - bTime; // Oldest first
+    });
+
+  return c.json({ ok: true, pending, count: pending.length });
+});
+
+// PATCH /v1/admin/kyc/approve/:merchantId - Approve KYC submission
+app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const merchantId = c.req.param('merchantId');
+  const body = await c.req.json().catch(() => null) as { notes?: string } | null;
+  const approvalNotes = (body?.notes || '').trim();
+
+  if (!merchantId) {
+    return c.json(err('invalid_request', 'Missing merchantId'), 400);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const merchant = accounts.find((m) => m.id === merchantId);
+
+  if (!merchant) {
+    return c.json(err('not_found', `Merchant ${merchantId} not found`), 404);
+  }
+
+  if (merchant.kyc_status === 'approved') {
+    return c.json(err('invalid_request', 'KYC already approved'), 400);
+  }
+
+  if (merchant.kyc_status !== 'pending') {
+    return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
+  }
+
+  // Validate required KYC data before approval
+  if (!merchant.kyc_data?.id_number || !merchant.kyc_data?.date_of_birth || !merchant.kyc_data?.phone) {
+    return c.json(err('invalid_request', 'Incomplete KYC data - missing required fields'), 400);
+  }
+
+  if (!merchant.bank_account?.account_number || !merchant.bank_account?.account_holder_name) {
+    return c.json(err('invalid_request', 'Incomplete bank account - missing required fields'), 400);
+  }
+
+  // Approve merchant
+  merchant.kyc_status = 'approved';
+  merchant.updated_at = new Date().toISOString();
+  
+  // Store approval metadata
+  if (!merchant.kyc_data) {
+    merchant.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
+  }
+
+  await saveMerchantAccounts(accounts);
+  
+  logger.info('Merchant KYC approved', {
+    merchant_id: merchantId,
+    business_name: merchant.business_name,
+    approval_notes: approvalNotes,
+  });
+
+  return c.json({
+    ok: true,
+    message: 'KYC approved successfully',
+    merchant: sanitizeMerchantAccount(merchant),
+  });
+});
+
+// PATCH /v1/admin/kyc/reject/:merchantId - Reject KYC submission
+app.patch('/v1/admin/kyc/reject/:merchantId', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const merchantId = c.req.param('merchantId');
+  const body = await c.req.json().catch(() => null) as { reason?: string } | null;
+  const rejectionReason = (body?.reason || '').trim();
+
+  if (!merchantId) {
+    return c.json(err('invalid_request', 'Missing merchantId'), 400);
+  }
+
+  if (!rejectionReason) {
+    return c.json(err('invalid_request', 'Rejection reason is required'), 400);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const merchant = accounts.find((m) => m.id === merchantId);
+
+  if (!merchant) {
+    return c.json(err('not_found', `Merchant ${merchantId} not found`), 404);
+  }
+
+  if (merchant.kyc_status === 'rejected') {
+    return c.json(err('invalid_request', 'KYC already rejected'), 400);
+  }
+
+  if (merchant.kyc_status !== 'pending') {
+    return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
+  }
+
+  // Reject merchant
+  merchant.kyc_status = 'rejected';
+  merchant.updated_at = new Date().toISOString();
+
+  await saveMerchantAccounts(accounts);
+
+  // Notify merchant of rejection
+  const notification = {
+    id: crypto.randomUUID(),
+    merchant_id: merchant.id,
+    type: 'kyc' as const,
+    title: 'KYC Verification Rejected',
+    message: `Your KYC verification was rejected. Reason: ${rejectionReason}. Please resubmit with corrected information.`,
+    read: false,
+    created_at: new Date().toISOString(),
+  };
+  const notifications = await loadNotifications();
+  notifications.push(notification);
+  await saveNotifications(notifications);
+
+  logger.info('Merchant KYC rejected', {
+    merchant_id: merchantId,
+    business_name: merchant.business_name,
+    rejection_reason: rejectionReason,
+  });
+
+  return c.json({
+    ok: true,
+    message: 'KYC rejected. Merchant has been notified.',
+    merchant: sanitizeMerchantAccount(merchant),
+  });
+});
+
+// ==================== END ADMIN KYC MANAGEMENT ====================
 
 app.get('/v1/merchant/notifications', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
