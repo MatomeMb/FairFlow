@@ -1,0 +1,653 @@
+import React, { useEffect, useState, useMemo } from 'react';
+import { PortalShell } from '../../components/layout/PortalShell';
+import { FairflowLogo } from '../../components/FairflowLogo';
+import { useAuth } from '../../context/AuthContext';
+import { useAnalytics } from '../../hooks/useAnalytics';
+import { useSupabaseUsers } from '../../hooks/useSupabaseUsers';
+import { MetricCard } from '../../components/shared/MetricCard';
+import { RoleBadge } from '../../components/shared/RoleBadge';
+import { StatusBar } from '../../components/shared/StatusBar';
+import { Toast } from '../../components/shared/Toast';
+import { EmptyState } from '../../components/shared/EmptyState';
+import { OfflineBanner } from '../../components/shared/OfflineBanner';
+import { ConfirmModal } from '../../components/shared/ConfirmModal';
+import { formatBytes, truncateId } from '../../lib/format';
+import { 
+  BarChart2, Activity, Users, Store, DollarSign, TrendingUp, Settings2, 
+  AlertTriangle, Check, X, Clock, Shield, FileCheck, LogOut, RefreshCw,
+  ChevronDown, Menu, Bell, Zap
+} from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+
+type AdminSection = 
+  | 'overview' 
+  | 'kyc-management' 
+  | 'users-roles' 
+  | 'merchants' 
+  | 'financials' 
+  | 'platform-health' 
+  | 'system' 
+  | 'settings';
+
+interface KYCSubmission {
+  id: string;
+  businessName: string;
+  email: string;
+  kycStatus: 'pending' | 'approved' | 'rejected';
+  submittedAt: string;
+  kycData: {
+    id_number: string;
+    date_of_birth: string;
+    phone: string;
+    address: string;
+  };
+  bankAccount: {
+    account_holder_name: string;
+    bank_name: string;
+    account_number: string;
+    branch_code: string;
+    account_type: string;
+  };
+}
+
+interface Merchant {
+  id: string;
+  businessName: string;
+  email: string;
+  role: 'merchant';
+  kyc_status: 'not_started' | 'pending' | 'approved' | 'rejected';
+  status: 'Active' | 'Pending' | 'Inactive';
+  products: number;
+  memberSince: string;
+}
+
+export const AdminPortal: React.FC = () => {
+  const { signOut } = useAuth();
+  const [activeSection, setActiveSection] = useState<AdminSection>('overview');
+  const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [apiOnline, setApiOnline] = useState(true);
+  
+  // KYC Management State
+  const [pendingKYC, setPendingKYC] = useState<KYCSubmission[]>([]);
+  const [loadingKYC, setLoadingKYC] = useState(false);
+  const [selectedKYC, setSelectedKYC] = useState<KYCSubmission | null>(null);
+  const [kycAction, setKYCAction] = useState<'approve' | 'reject' | null>(null);
+  const [rejectionReason, setRejectionReason] = useState('');
+  const [approvalNotes, setApprovalNotes] = useState('');
+
+  const { data: analytics, error: apiError, secondsSince, refresh, checkHealth } = useAnalytics();
+  const { users, loading: usersLoading, refresh: refreshUsers } = useSupabaseUsers();
+
+  // Update page title
+  useEffect(() => {
+    document.title = 'fairflow — Admin Portal';
+  }, []);
+
+  // Check health on mount
+  useEffect(() => {
+    checkHealth().then(setApiOnline);
+  }, [checkHealth]);
+
+  // Fetch pending KYC
+  const fetchPendingKYC = async () => {
+    setLoadingKYC(true);
+    try {
+      const response = await fetch('http://localhost:3000/v1/admin/kyc/pending', {
+        headers: {
+          'Authorization': 'Bearer mor-admin-secret-local'
+        }
+      });
+      const data = await response.json();
+      if (data.ok && data.pending) {
+        setPendingKYC(data.pending);
+      }
+    } catch (error) {
+      console.error('Error fetching KYC:', error);
+      setToast({ message: 'Failed to fetch pending KYC', type: 'error' });
+    } finally {
+      setLoadingKYC(false);
+    }
+  };
+
+  // Load KYC when switching to that section
+  useEffect(() => {
+    if (activeSection === 'kyc-management') {
+      fetchPendingKYC();
+    }
+  }, [activeSection]);
+
+  // Handle KYC approval
+  const handleApproveKYC = async () => {
+    if (!selectedKYC) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/v1/admin/kyc/approve/${selectedKYC.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': 'Bearer mor-admin-secret-local',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ notes: approvalNotes })
+      });
+      
+      const data = await response.json();
+      if (data.ok) {
+        setToast({ message: `KYC approved for ${selectedKYC.businessName}`, type: 'success' });
+        setSelectedKYC(null);
+        setApprovalNotes('');
+        fetchPendingKYC();
+      } else {
+        setToast({ message: data.error || 'Failed to approve KYC', type: 'error' });
+      }
+    } catch (error) {
+      setToast({ message: 'Error approving KYC', type: 'error' });
+    }
+  };
+
+  // Handle KYC rejection
+  const handleRejectKYC = async () => {
+    if (!selectedKYC || !rejectionReason.trim()) return;
+    
+    try {
+      const response = await fetch(`http://localhost:3000/v1/admin/kyc/reject/${selectedKYC.id}`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': 'Bearer mor-admin-secret-local',
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ reason: rejectionReason })
+      });
+      
+      const data = await response.json();
+      if (data.ok) {
+        setToast({ message: `KYC rejected for ${selectedKYC.businessName} — merchant notified`, type: 'success' });
+        setSelectedKYC(null);
+        setRejectionReason('');
+        fetchPendingKYC();
+      } else {
+        setToast({ message: data.error || 'Failed to reject KYC', type: 'error' });
+      }
+    } catch (error) {
+      setToast({ message: 'Error rejecting KYC', type: 'error' });
+    }
+  };
+
+  const roleStats = useMemo(() => {
+    const stats = { ceo: 0, cto: 0, merchant: 0, investor: 0, consumer: 0 };
+    users.forEach(user => {
+      if (user.role in stats) stats[user.role as keyof typeof stats]++;
+    });
+    return stats;
+  }, [users]);
+
+  const navigation: { id: AdminSection; label: string; icon: React.ComponentType<any> }[] = [
+    { id: 'overview', label: 'Dashboard', icon: BarChart2 },
+    { id: 'kyc-management', label: 'KYC Approvals', icon: FileCheck },
+    { id: 'merchants', label: 'Merchants', icon: Store },
+    { id: 'users-roles', label: 'Users & Roles', icon: Users },
+    { id: 'platform-health', label: 'Platform Health', icon: Activity },
+    { id: 'financials', label: 'Financials', icon: DollarSign },
+    { id: 'system', label: 'System', icon: Zap },
+    { id: 'settings', label: 'Settings', icon: Settings2 },
+  ];
+
+  const renderOverview = () => {
+    if (apiError) {
+      return (
+        <>
+          <OfflineBanner />
+          <div className="p-6">
+            <EmptyState
+              icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
+              title="API Offline"
+              description="Cannot fetch analytics. Run: cd mcj && npm run demo, then refresh this panel."
+              action={{ label: "Try Again", onClick: refresh }}
+            />
+          </div>
+        </>
+      );
+    }
+
+    return (
+      <div className="space-y-6">
+        <StatusBar
+          apiOnline={apiOnline}
+          version="v0.6.0"
+          secondsSince={secondsSince}
+          onRefresh={refresh}
+        />
+
+        <div className="p-6 space-y-6">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-5 gap-4">
+            <MetricCard label="Active Merchants" value={roleStats.merchant.toString()} color="blue" />
+            <MetricCard label="Heap Memory" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
+            <MetricCard label="Storage Used" value={formatBytes(analytics?.storage.totalSize || 0)} />
+            <MetricCard label="Pending KYC" value={pendingKYC.length.toString()} color={pendingKYC.length > 0 ? 'orange' : 'green'} />
+            <MetricCard label="Errors (24h)" value={analytics?.errors.count || 0} color={analytics?.errors.count === 0 ? "green" : "red"} />
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-4 gap-4">
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-400">Platform Users</p>
+                  <p className="text-2xl font-bold text-white mt-1">{users.length}</p>
+                </div>
+                <Users className="w-8 h-8 text-blue-500" />
+              </div>
+            </div>
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-400">CEOs</p>
+                  <p className="text-2xl font-bold text-white mt-1">{roleStats.ceo}</p>
+                </div>
+                <Shield className="w-8 h-8 text-purple-500" />
+              </div>
+            </div>
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-400">CTOs</p>
+                  <p className="text-2xl font-bold text-white mt-1">{roleStats.cto}</p>
+                </div>
+                <Zap className="w-8 h-8 text-yellow-500" />
+              </div>
+            </div>
+            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-stone-400">KYC Pending</p>
+                  <p className="text-2xl font-bold text-white mt-1">{pendingKYC.length}</p>
+                </div>
+                <Clock className="w-8 h-8 text-orange-500" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderKYCManagement = () => {
+    if (loadingKYC) {
+      return (
+        <div className="p-6 flex items-center justify-center min-h-[400px]">
+          <div className="animate-spin">
+            <RefreshCw className="w-5 h-5" />
+          </div>
+        </div>
+      );
+    }
+
+    if (pendingKYC.length === 0) {
+      return (
+        <div className="p-6">
+          <EmptyState
+            icon={<Check className="w-10 h-10 text-green-400" />}
+            title="No Pending KYC Submissions"
+            description="All merchants have been verified!"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-white">KYC Approvals</h2>
+            <p className="text-sm text-stone-400 mt-1">{pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}</p>
+          </div>
+          <button
+            onClick={fetchPendingKYC}
+            className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Refresh
+          </button>
+        </div>
+
+        <div className="space-y-4">
+          {pendingKYC.map((kyc) => (
+            <div key={kyc.id} className="bg-stone-900 border border-stone-800 rounded-xl p-5 hover:border-stone-700 transition">
+              <div className="flex items-start justify-between">
+                <div className="flex-1">
+                  <div className="flex items-center gap-3">
+                    <div>
+                      <h3 className="font-semibold text-white">{kyc.businessName}</h3>
+                      <p className="text-sm text-stone-400">{kyc.email}</p>
+                    </div>
+                  </div>
+                  <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                    <div>
+                      <p className="text-stone-400">ID Number</p>
+                      <p className="text-white font-mono">{kyc.kycData?.id_number || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-stone-400">DOB</p>
+                      <p className="text-white">{kyc.kycData?.date_of_birth || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-stone-400">Bank</p>
+                      <p className="text-white">{kyc.bankAccount?.bank_name || 'N/A'}</p>
+                    </div>
+                    <div>
+                      <p className="text-stone-400">Account</p>
+                      <p className="text-white font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
+                    </div>
+                  </div>
+                  <p className="text-xs text-stone-500 mt-3">
+                    Submitted: {new Date(kyc.submittedAt).toLocaleDateString()} at {new Date(kyc.submittedAt).toLocaleTimeString()}
+                  </p>
+                </div>
+                <div className="flex gap-2 ml-4">
+                  <button
+                    onClick={() => {
+                      setSelectedKYC(kyc);
+                      setKYCAction('approve');
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+                  >
+                    <Check className="w-4 h-4" />
+                    Approve
+                  </button>
+                  <button
+                    onClick={() => {
+                      setSelectedKYC(kyc);
+                      setKYCAction('reject');
+                    }}
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                  >
+                    <X className="w-4 h-4" />
+                    Reject
+                  </button>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderMerchants = () => {
+    const merchants = users.filter(u => u.role === 'merchant').slice(0, 10);
+    
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">Merchant Management</h2>
+        <div className="space-y-4">
+          {merchants.map(merchant => (
+            <div key={merchant.id} className="bg-stone-900 border border-stone-800 rounded-xl p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-semibold text-white">{merchant.id}</p>
+                  <p className="text-sm text-stone-400">{merchant.role}</p>
+                </div>
+                <RoleBadge role={merchant.role} />
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderUsersRoles = () => {
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">Users & Roles</h2>
+        <div className="grid grid-cols-5 gap-4">
+          <MetricCard label="CEOs" value={roleStats.ceo.toString()} />
+          <MetricCard label="CTOs" value={roleStats.cto.toString()} />
+          <MetricCard label="Merchants" value={roleStats.merchant.toString()} />
+          <MetricCard label="Investors" value={roleStats.investor.toString()} />
+          <MetricCard label="Consumers" value={roleStats.consumer.toString()} />
+        </div>
+        <div className="space-y-4">
+          {users.slice(0, 10).map(user => (
+            <div key={user.id} className="bg-stone-900 border border-stone-800 rounded-xl p-4 flex items-center justify-between">
+              <div>
+                <p className="font-semibold text-white">{user.id}</p>
+                <p className="text-sm text-stone-400">{user.email}</p>
+              </div>
+              <RoleBadge role={user.role} />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  };
+
+  const renderPlatformHealth = () => {
+    if (apiError) {
+      return (
+        <div className="p-6">
+          <EmptyState
+            icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
+            title="API Offline"
+            description="Run: cd mcj && npm run demo"
+          />
+        </div>
+      );
+    }
+
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">Platform Health</h2>
+        <div className="grid grid-cols-3 gap-4">
+          <MetricCard label="API Status" value={apiOnline ? "Online" : "Offline"} color={apiOnline ? "green" : "red"} />
+          <MetricCard label="Memory (Heap)" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
+          <MetricCard label="Memory (RSS)" value={(analytics?.system.memoryRss || 0).toFixed(2)} unit="MB" />
+        </div>
+      </div>
+    );
+  };
+
+  const renderSystem = () => {
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">System</h2>
+        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
+          <p className="text-sm text-stone-400">System features coming soon</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderFinancials = () => {
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">Financials</h2>
+        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
+          <p className="text-sm text-stone-400">Financial reporting coming soon</p>
+        </div>
+      </div>
+    );
+  };
+
+  const renderSettings = () => {
+    return (
+      <div className="p-6 space-y-6">
+        <h2 className="text-xl font-bold text-white">Settings</h2>
+        <button
+          onClick={signOut}
+          className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+        >
+          <LogOut className="w-4 h-4" />
+          Sign Out
+        </button>
+      </div>
+    );
+  };
+
+  const renderContent = () => {
+    switch (activeSection) {
+      case 'overview':
+        return renderOverview();
+      case 'kyc-management':
+        return renderKYCManagement();
+      case 'merchants':
+        return renderMerchants();
+      case 'users-roles':
+        return renderUsersRoles();
+      case 'platform-health':
+        return renderPlatformHealth();
+      case 'system':
+        return renderSystem();
+      case 'financials':
+        return renderFinancials();
+      case 'settings':
+        return renderSettings();
+      default:
+        return renderOverview();
+    }
+  };
+
+  return (
+    <PortalShell>
+      <div className="flex h-full bg-stone-950">
+        {/* Sidebar */}
+        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
+          <div className="p-4 border-b border-stone-800">
+            <div className="flex items-center justify-between">
+              <FairflowLogo width={32} height={32} />
+              {sidebarOpen && <span className="text-xs font-bold text-stone-400">ADMIN</span>}
+            </div>
+          </div>
+
+          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+            {navigation.map(item => {
+              const Icon = item.icon;
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => setActiveSection(item.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                    activeSection === item.id
+                      ? 'bg-blue-600 text-white'
+                      : 'text-stone-400 hover:text-white hover:bg-stone-800'
+                  }`}
+                >
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+                </button>
+              );
+            })}
+          </nav>
+
+          <div className="border-t border-stone-800 p-4">
+            <button
+              onClick={() => setSidebarOpen(!sidebarOpen)}
+              className="w-full flex items-center justify-center px-4 py-2 text-stone-400 hover:text-white transition"
+            >
+              {sidebarOpen ? '←' : '→'}
+            </button>
+          </div>
+        </div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col overflow-hidden">
+          {/* Header */}
+          <div className="border-b border-stone-800 bg-stone-900 px-6 py-4">
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold text-white">
+                {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
+              </h1>
+              <div className="flex items-center gap-4">
+                <button className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg">
+                  <Bell className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Content */}
+          <div className="flex-1 overflow-y-auto">
+            {renderContent()}
+          </div>
+        </div>
+      </div>
+
+      {/* KYC Action Modal */}
+      {selectedKYC && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-stone-900 border border-stone-800 rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-bold text-white mb-4">
+              {kycAction === 'approve' ? 'Approve KYC' : 'Reject KYC'}
+            </h3>
+            
+            <div className="space-y-4">
+              <div>
+                <p className="text-sm text-stone-400">Merchant</p>
+                <p className="text-white font-semibold">{selectedKYC.businessName}</p>
+              </div>
+
+              {kycAction === 'approve' ? (
+                <div>
+                  <label className="block text-sm text-stone-400 mb-2">Approval Notes (Optional)</label>
+                  <textarea
+                    value={approvalNotes}
+                    onChange={(e) => setApprovalNotes(e.target.value)}
+                    className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-white text-sm placeholder-stone-500 focus:outline-none focus:border-blue-500"
+                    placeholder="Add any notes about this approval..."
+                    rows={3}
+                  />
+                </div>
+              ) : (
+                <div>
+                  <label className="block text-sm text-stone-400 mb-2">Rejection Reason *</label>
+                  <textarea
+                    value={rejectionReason}
+                    onChange={(e) => setRejectionReason(e.target.value)}
+                    className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-white text-sm placeholder-stone-500 focus:outline-none focus:border-red-500"
+                    placeholder="Explain why this KYC is being rejected..."
+                    rows={3}
+                  />
+                </div>
+              )}
+            </div>
+
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={() => {
+                  setSelectedKYC(null);
+                  setKYCAction(null);
+                  setRejectionReason('');
+                  setApprovalNotes('');
+                }}
+                className="flex-1 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg transition"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={kycAction === 'approve' ? handleApproveKYC : handleRejectKYC}
+                disabled={kycAction === 'reject' && !rejectionReason.trim()}
+                className={`flex-1 px-4 py-2 rounded-lg transition text-white font-medium ${
+                  kycAction === 'approve'
+                    ? 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
+                    : 'bg-red-600 hover:bg-red-700 disabled:opacity-50'
+                }`}
+              >
+                {kycAction === 'approve' ? 'Approve' : 'Reject'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Toast */}
+      {toast && (
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() => setToast(null)}
+        />
+      )}
+    </PortalShell>
+  );
+};

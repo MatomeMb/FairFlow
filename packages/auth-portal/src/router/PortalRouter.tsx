@@ -9,6 +9,7 @@ import { ProductPage } from "../pages/ProductPage";
 import { OrderConfirmation } from "../pages/OrderConfirmation";
 
 // Portals
+import { AdminPortal } from "../pages/portals/AdminPortal";
 import { CEODashboard } from "../pages/portals/CEODashboard";
 import { CTOAdminPanel } from "../pages/portals/CTOAdminPanel";
 import { MerchantPortal } from "../pages/portals/MerchantPortal";
@@ -17,8 +18,8 @@ import { ConsumerShop } from "../pages/portals/ConsumerShop";
 
 // Role → portal path mapping
 const ROLE_HOME: Record<string, string> = {
-  ceo: "/dashboard/ceo",
-  cto: "/dashboard/cto",
+  ceo: "/dashboard/admin",
+  cto: "/dashboard/admin",
   merchant: "/dashboard/merchant",
   investor: "/dashboard/investor",
   consumer: "/shop",
@@ -52,22 +53,32 @@ export function PortalRouter() {
         {/* Smart redirect based on role */}
         <Route path="/" element={<AuthRedirect />} />
 
-        {/* CEO Portal */}
+        {/* Unified Admin Portal (CEO & CTO) */}
         <Route
-          path="/dashboard/ceo"
+          path="/dashboard/admin"
           element={
-            <RoleGuard allowedRoles={["ceo"]}>
-              <CEODashboard />
+            <RoleGuard allowedRoles={["ceo", "cto"]}>
+              <AdminPortal />
             </RoleGuard>
           }
         />
 
-        {/* CTO Portal */}
+        {/* Legacy CEO Portal (backward compatibility) */}
+        <Route
+          path="/dashboard/ceo"
+          element={
+            <RoleGuard allowedRoles={["ceo"]}>
+              <AdminPortal />
+            </RoleGuard>
+          }
+        />
+
+        {/* Legacy CTO Portal (backward compatibility) */}
         <Route
           path="/dashboard/cto"
           element={
             <RoleGuard allowedRoles={["cto"]}>
-              <CTOAdminPanel />
+              <AdminPortal />
             </RoleGuard>
           }
         />
