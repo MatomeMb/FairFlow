@@ -1,0 +1,106 @@
+{
+  "generated_at": "2026-03-04T10:23:00.425Z",
+  "count": 20,
+  "clips": [
+    {
+      "file": "00-sign-in-google.webm",
+      "description": "Login page to merchant dashboard via Google sign-in.",
+      "size_bytes": 451429
+    },
+    {
+      "file": "01-products-overview.webm",
+      "description": "My Products tab overview and inventory table scan.",
+      "size_bytes": 528772
+    },
+    {
+      "file": "02-products-copy-matter-link.webm",
+      "description": "Copy matter:// link action on a product.",
+      "size_bytes": 400392
+    },
+    {
+      "file": "03-products-copy-page-link.webm",
+      "description": "Copy public product page link action.",
+      "size_bytes": 411833
+    },
+    {
+      "file": "04-products-open-public-page.webm",
+      "description": "Open public product page from merchant portal.",
+      "size_bytes": 462136
+    },
+    {
+      "file": "05-products-restock.webm",
+      "description": "Restock action on a low-stock product.",
+      "size_bytes": 434596
+    },
+    {
+      "file": "06-products-remove.webm",
+      "description": "Remove product action from products table.",
+      "size_bytes": 419068
+    },
+    {
+      "file": "07-products-create-form-fill.webm",
+      "description": "Open Create Product modal and fill fields.",
+      "size_bytes": 687887
+    },
+    {
+      "file": "08-products-create-success-copy-links.webm",
+      "description": "Submit product creation and copy generated links.",
+      "size_bytes": 756895
+    },
+    {
+      "file": "09-analytics-overview.webm",
+      "description": "Analytics tab charts, funnel, and metrics walkthrough.",
+      "size_bytes": 533315
+    },
+    {
+      "file": "10-orders-overview.webm",
+      "description": "Orders tab detailed order cards walkthrough.",
+      "size_bytes": 285370
+    },
+    {
+      "file": "11-orders-mark-fulfilled.webm",
+      "description": "Mark a pending order as fulfilled.",
+      "size_bytes": 281183
+    },
+    {
+      "file": "12-notifications-open-via-bell.webm",
+      "description": "Open notifications using header bell action.",
+      "size_bytes": 239528
+    },
+    {
+      "file": "13-notifications-mark-single-read.webm",
+      "description": "Mark a single notification as read.",
+      "size_bytes": 241058
+    },
+    {
+      "file": "14-notifications-mark-all-read.webm",
+      "description": "Mark all notifications as read action.",
+      "size_bytes": 251027
+    },
+    {
+      "file": "15-kyc-fill-submit.webm",
+      "description": "Fill and submit KYC verification form.",
+      "size_bytes": 458673
+    },
+    {
+      "file": "16-payouts-review-panel.webm",
+      "description": "Review payout metrics and payout history table.",
+      "size_bytes": 446800
+    },
+    {
+      "file": "17-account-edit-save.webm",
+      "description": "Edit business profile fields and save changes.",
+      "size_bytes": 421336
+    },
+    {
+      "file": "18-account-enable-2fa.webm",
+      "description": "Open account settings and trigger 2FA enable action.",
+      "size_bytes": 350261
+    },
+    {
+      "file": "19-sign-out.webm",
+      "description": "Sign out from merchant portal.",
+      "size_bytes": 225671
+    }
+  ]
+}
