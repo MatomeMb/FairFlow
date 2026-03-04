@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { PortalShell } from '../../components/layout/PortalShell';
 import { FairflowLogo } from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
@@ -509,7 +508,7 @@ export const AdminPortal: React.FC = () => {
   };
 
   return (
-    <PortalShell>
+    <>
       <div className="flex h-full bg-stone-950">
         {/* Sidebar */}
         <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
@@ -648,6 +647,6 @@ export const AdminPortal: React.FC = () => {
           onClose={() => setToast(null)}
         />
       )}
-    </PortalShell>
+    </>
   );
 };

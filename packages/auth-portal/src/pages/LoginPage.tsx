@@ -3,26 +3,52 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
 
+// Dev mode admin emails that bypass authentication
+const DEV_ADMIN_EMAILS = new Set([
+  "matome@fairflow.dev",
+  "sobuhle@fairflow.dev",
+  "matome.mb@fairflow.dev",
+  "sobuhle.n@fairflow.dev",
+  "matome",
+  "sobuhle",
+]);
+
 export function LoginPage() {
   const { signInWithEmail } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setIsLoading(true);
+
     try {
+      // Dev mode: Check if this is an admin email
+      if (DEV_ADMIN_EMAILS.has(email.toLowerCase())) {
+        // Bypass authentication for dev admin users
+        // Create a mock session that identifies them as admin
+        sessionStorage.setItem("devAdminEmail", email.toLowerCase());
+        navigate("/");
+        return;
+      }
+
+      // Otherwise, use Supabase auth
       await signInWithEmail(email, password);
       navigate("/");
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Login failed");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleGoogleLogin = () => {
-    window.location.href = '/v1/auth/google';
+    const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
+    window.location.href = `${apiBase}/v1/auth/google`;
   };
 
   return (
@@ -36,7 +62,8 @@ export function LoginPage() {
         {/* Google OAuth */}
         <button
           onClick={handleGoogleLogin}
-          className="w-full flex items-center justify-center gap-3 bg-white text-stone-900 font-medium py-3 rounded-xl mb-6 hover:bg-stone-100 transition"
+          disabled={isLoading}
+          className="w-full flex items-center justify-center gap-3 bg-white text-stone-900 font-medium py-3 rounded-xl mb-6 hover:bg-stone-100 transition disabled:opacity-50"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
             <path
@@ -67,30 +94,44 @@ export function LoginPage() {
 
         {/* Email/Password */}
         <form onSubmit={handleEmailLogin} className="space-y-4">
-          <input
-            type="email"
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"
-          />
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={isLoading}
+              className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+            />
+            <p className="text-xs text-stone-500 mt-1">
+              {DEV_ADMIN_EMAILS.has(email.toLowerCase()) && email ? "✓ Admin access enabled" : ""}
+            </p>
+          </div>
           <input
             type="password"
-            placeholder="Password"
+            placeholder="Password (not needed for admin demo)"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500"
+            disabled={isLoading}
+            className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
           />
           {error && <p className="text-red-400 text-sm">{error}</p>}
           <button
             type="submit"
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition"
+            disabled={isLoading}
+            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition disabled:opacity-50"
           >
-            Sign in
+            {isLoading ? "Signing in..." : "Sign in"}
           </button>
         </form>
 
         <div className="mt-6 text-center text-stone-400 text-sm">
+          <p className="mb-2">Demo Admin Users (Dev Mode):</p>
+          <p className="text-xs text-stone-500">matome@fairflow.dev</p>
+          <p className="text-xs text-stone-500">sobuhle@fairflow.dev</p>
+        </div>
+
+        <div className="mt-4 text-center text-stone-400 text-sm">
           Are you a merchant?{' '}
           <a href="/merchant/register" className="text-emerald-400 hover:text-emerald-300 underline">
             Create your account
