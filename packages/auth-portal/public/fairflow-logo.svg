@@ -1,18 +1,8 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" fill="none" aria-label="fairflow">
-  <!-- Geo-Tech variant: Engineering CAD aesthetic with enhanced boldness and creative detail -->
-  <!-- Left "f": bold angled geometry with chevron accents -->
-  <path d="M 14 4 L 8 14 L 8 34 L 14 44" stroke="#F5F5F0" stroke-width="3.84" stroke-linejoin="miter" fill="none"/>
-  <!-- Right "f": mirrored -->
-  <path d="M 34 4 L 40 14 L 40 34 L 34 44" stroke="#F5F5F0" stroke-width="3.84" stroke-linejoin="miter" fill="none"/>
-  <!-- Double crossbars upper: creates geometric complexity -->
-  <line x1="6" y1="14" x2="18" y2="14" stroke="#F5F5F0" stroke-width="2.88" stroke-linecap="butt"/>
-  <line x1="30" y1="14" x2="42" y2="14" stroke="#F5F5F0" stroke-width="2.88" stroke-linecap="butt"/>
-  <!-- Double crossbars lower -->
-  <line x1="6" y1="34" x2="18" y2="34" stroke="#F5F5F0" stroke-width="2.88" stroke-linecap="butt"/>
-  <line x1="30" y1="34" x2="42" y2="34" stroke="#F5F5F0" stroke-width="2.88" stroke-linecap="butt"/>
-  <!-- Chevron accents for visual interest -->
-  <line x1="10" y1="24" x2="14" y2="28" stroke="#F5F5F0" stroke-width="2.16" stroke-linecap="round"/>
-  <line x1="14" y1="28" x2="18" y2="24" stroke="#F5F5F0" stroke-width="2.16" stroke-linecap="round"/>
-  <line x1="30" y1="24" x2="34" y2="28" stroke="#F5F5F0" stroke-width="2.16" stroke-linecap="round"/>
-  <line x1="34" y1="28" x2="38" y2="24" stroke="#F5F5F0" stroke-width="2.16" stroke-linecap="round"/>
+  <path d="M14 5 C12 9.5 12 14.5 14 19.5 L14 43" stroke="#F5F5F0" stroke-width="2.8" stroke-linecap="square" stroke-linejoin="miter"/>
+  <path d="M30 5 C28 9.5 28 14.5 30 19.5 L30 43" stroke="#F5F5F0" stroke-width="2.8" stroke-linecap="square" stroke-linejoin="miter"/>
+  <line x1="8.5" y1="11.5" x2="18" y2="11.5" stroke="#F5F5F0" stroke-width="2.1" stroke-linecap="square"/>
+  <line x1="24.5" y1="11.5" x2="34" y2="11.5" stroke="#F5F5F0" stroke-width="2.1" stroke-linecap="square"/>
+  <line x1="10" y1="24" x2="17" y2="24" stroke="#F5F5F0" stroke-width="1.9" stroke-linecap="square"/>
+  <line x1="26" y1="24" x2="33" y2="24" stroke="#F5F5F0" stroke-width="1.9" stroke-linecap="square"/>
 </svg>
