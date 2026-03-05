@@ -1,5 +1,10 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { FairflowLogo } from '../../components/FairflowLogo';
+import {
+  FAIRFLOW_LOGO_STYLES,
+  FairflowLogo,
+  FairflowLogoStyle,
+  isFairflowLogoStyle,
+} from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useSupabaseUsers } from '../../hooks/useSupabaseUsers';
@@ -67,6 +72,11 @@ export const AdminPortal: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [apiOnline, setApiOnline] = useState(true);
+  const [logoStyle, setLogoStyle] = useState<FairflowLogoStyle>(() => {
+    if (typeof window === 'undefined') return 'luxury';
+    const fromUrl = new URLSearchParams(window.location.search).get('logoStyle');
+    return isFairflowLogoStyle(fromUrl) ? fromUrl : 'luxury';
+  });
   
   // KYC Management State
   const [pendingKYC, setPendingKYC] = useState<KYCSubmission[]>([]);
@@ -204,6 +214,25 @@ export const AdminPortal: React.FC = () => {
     { id: 'system', label: 'System', icon: Zap },
     { id: 'settings', label: 'Settings', icon: Settings2 },
   ];
+
+  const logoStyleLabels: Record<FairflowLogoStyle, string> = {
+    luxury: 'Luxury',
+    'geo-tech': 'Geo-Tech',
+    'soft-premium': 'Soft Premium',
+    executive: 'Executive',
+    precision: 'Precision',
+    aero: 'Aero',
+    'bold-minimal': 'Bold Minimal',
+  };
+
+  const handleLogoStyleChange = (next: FairflowLogoStyle) => {
+    setLogoStyle(next);
+    if (typeof window !== 'undefined') {
+      const url = new URL(window.location.href);
+      url.searchParams.set('logoStyle', next);
+      window.history.replaceState({}, '', `${url.pathname}${url.search}${url.hash}`);
+    }
+  };
 
   const renderOverview = () => {
     if (apiError) {
@@ -528,7 +557,7 @@ export const AdminPortal: React.FC = () => {
         <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
           <div className="p-4 border-b border-stone-800">
             <div className={`flex items-center gap-3 min-w-0 ${sidebarOpen ? '' : 'justify-center'}`}>
-              <FairflowLogo markHeight={30} showWordmark={sidebarOpen} variant="dark" style="luxury" />
+              <FairflowLogo markHeight={30} showWordmark={sidebarOpen} variant="dark" style={logoStyle} />
               {sidebarOpen && (
                 <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90 bg-blue-500/10 rounded">
                   Admin
@@ -575,7 +604,24 @@ export const AdminPortal: React.FC = () => {
               <h1 className="text-2xl font-bold text-white">
                 {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
               </h1>
-              <div className="flex items-center gap-4">
+              <div className="flex items-center gap-3">
+                <div className="hidden sm:flex items-center gap-2">
+                  <label htmlFor="logo-style-select" className="text-xs font-medium text-stone-400 uppercase tracking-wide">
+                    Logo
+                  </label>
+                  <select
+                    id="logo-style-select"
+                    value={logoStyle}
+                    onChange={(e) => handleLogoStyleChange(e.target.value as FairflowLogoStyle)}
+                    className="bg-stone-800 border border-stone-700 text-stone-100 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-blue-500"
+                  >
+                    {FAIRFLOW_LOGO_STYLES.map((option) => (
+                      <option key={option} value={option}>
+                        {logoStyleLabels[option]}
+                      </option>
+                    ))}
+                  </select>
+                </div>
                 <button className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg">
                   <Bell className="w-5 h-5" />
                 </button>
