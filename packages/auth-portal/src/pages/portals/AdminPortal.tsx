@@ -528,7 +528,7 @@ export const AdminPortal: React.FC = () => {
         <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
           <div className="p-4 border-b border-stone-800">
             <div className={`flex items-center gap-3 min-w-0 ${sidebarOpen ? '' : 'justify-center'}`}>
-              <FairflowLogo markHeight={28} showWordmark={sidebarOpen} variant="dark" />
+              <FairflowLogo markHeight={30} showWordmark={sidebarOpen} variant="dark" style="luxury" />
               {sidebarOpen && (
                 <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90 bg-blue-500/10 rounded">
                   Admin

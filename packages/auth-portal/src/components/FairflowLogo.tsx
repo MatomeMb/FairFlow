@@ -60,6 +60,10 @@ function getLogoStyleConfig(
   };
 }
 
+function isLogoStyle(value: string | null): value is "luxury" | "geo-tech" | "soft-premium" {
+  return value === "luxury" || value === "geo-tech" || value === "soft-premium";
+}
+
 /** Stylized "ff" as crossed double-integral mark for fairflow. */
 function LogoMark({ size, color, style }: LogoMarkProps) {
   const cfg = getLogoStyleConfig(style, size);
@@ -124,13 +128,20 @@ export function FairflowLogo({
   variant = "light",
   style = "geo-tech",
 }: FairflowLogoProps) {
+  const urlStyle =
+    typeof window !== "undefined"
+      ? new URLSearchParams(window.location.search).get("logoStyle")
+      : null;
+  const activeStyle = isLogoStyle(urlStyle) ? urlStyle : style;
+
   const wordSize = Math.round(
-    markHeight * (style === "luxury" ? 0.435 : style === "soft-premium" ? 0.445 : 0.44),
+    markHeight * (activeStyle === "luxury" ? 0.435 : activeStyle === "soft-premium" ? 0.445 : 0.44),
   );
   const markColor = variant === "dark" ? "#F8F6F1" : "#1B2330";
   const wordColor = markColor;
-  const wordWeight = style === "soft-premium" ? 600 : 700;
-  const wordTracking = style === "luxury" ? "-0.014em" : style === "soft-premium" ? "-0.008em" : "-0.01em";
+  const wordWeight = activeStyle === "soft-premium" ? 600 : 700;
+  const wordTracking =
+    activeStyle === "luxury" ? "-0.014em" : activeStyle === "soft-premium" ? "-0.008em" : "-0.01em";
 
   return (
     <div
@@ -150,7 +161,7 @@ export function FairflowLogo({
           mixBlendMode: "normal",
         }}
       >
-        <LogoMark size={markHeight} color={markColor} style={style} />
+        <LogoMark size={markHeight} color={markColor} style={activeStyle} />
       </div>
       {showWordmark && (
         <span
