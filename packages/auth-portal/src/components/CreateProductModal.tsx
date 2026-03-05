@@ -25,6 +25,7 @@ type FormErrors = {
   price_cents?: string;
   category?: string;
   stock_count?: string;
+  image_url?: string;
 };
 
 type SuccessPayload = {
@@ -141,6 +142,20 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
       nextErrors.stock_count = 'Stock count must be 0 or greater';
     }
 
+    const trimmedImageUrl = form.image_url.trim();
+    if (!trimmedImageUrl) {
+      nextErrors.image_url = 'Product image is required';
+    } else {
+      try {
+        const parsed = new URL(trimmedImageUrl);
+        if (!['http:', 'https:'].includes(parsed.protocol)) {
+          nextErrors.image_url = 'Image URL must start with http:// or https://';
+        }
+      } catch {
+        nextErrors.image_url = 'Enter a valid image URL';
+      }
+    }
+
     return nextErrors;
   };
 
@@ -170,7 +185,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           price_cents: form.price_cents,
           category: form.category,
           stock_count: Number(form.stock_count),
-          image_url: form.image_url.trim() || undefined,
+          image_url: form.image_url.trim(),
           shipping_available: form.shipping_available,
           certifications: form.certifications,
         }),
@@ -326,14 +341,16 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Image URL</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Image URL *</label>
               <input
-                type="text"
+                type="url"
                 value={form.image_url}
                 onChange={(e) => setField('image_url', e.target.value)}
                 className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
                 placeholder="https://example.com/image.jpg"
+                required
               />
+              {errors.image_url && <p className="mt-1 text-xs text-red-400">{errors.image_url}</p>}
             </div>
           </div>
 

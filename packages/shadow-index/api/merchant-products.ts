@@ -100,9 +100,25 @@ merchantProductsRouter.post('/', async (c) => {
   const currency = typeof (body as Record<string, unknown>).currency === 'string'
     ? ((body as Record<string, unknown>).currency as string).toUpperCase().slice(0, 3)
     : 'USD';
+  const imageUrl = typeof (body as Record<string, unknown>).image_url === 'string'
+    ? ((body as Record<string, unknown>).image_url as string).trim()
+    : '';
 
   if (!title) {
     return c.json(err('invalid_product', 'title is required'), 400);
+  }
+
+  if (!imageUrl) {
+    return c.json(err('invalid_product', 'image_url is required'), 400);
+  }
+
+  try {
+    const parsed = new URL(imageUrl);
+    if (!['http:', 'https:'].includes(parsed.protocol)) {
+      return c.json(err('invalid_product', 'image_url must use http or https'), 400);
+    }
+  } catch {
+    return c.json(err('invalid_product', 'image_url must be a valid URL'), 400);
   }
 
   const products = readProducts();
@@ -115,7 +131,7 @@ merchantProductsRouter.post('/', async (c) => {
     stock_count: 0,
     thing_file: undefined,
     merchant_id: (body as Record<string, unknown>).merchant_id as string | undefined,
-    image_url: (body as Record<string, unknown>).image_url as string | undefined,
+    image_url: imageUrl,
     category: (body as Record<string, unknown>).category as string | undefined,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -162,7 +178,27 @@ merchantProductsRouter.patch('/:id', async (c) => {
   if (updates.status === 'draft' || updates.status === 'published') product.status = updates.status;
   if (typeof updates.stock_count === 'number') product.stock_count = Math.max(0, Math.floor(updates.stock_count));
   if (typeof updates.thing_hash === 'string') product.thing_file = { hash: updates.thing_hash };
-  if (typeof updates.image_url === 'string') product.image_url = updates.image_url;
+  if (Object.prototype.hasOwnProperty.call(updates, 'image_url')) {
+    if (typeof updates.image_url !== 'string') {
+      return c.json(err('invalid_product', 'image_url must be a string'), 400);
+    }
+
+    const imageUrl = updates.image_url.trim();
+    if (!imageUrl) {
+      return c.json(err('invalid_product', 'image_url cannot be empty'), 400);
+    }
+
+    try {
+      const parsed = new URL(imageUrl);
+      if (!['http:', 'https:'].includes(parsed.protocol)) {
+        return c.json(err('invalid_product', 'image_url must use http or https'), 400);
+      }
+    } catch {
+      return c.json(err('invalid_product', 'image_url must be a valid URL'), 400);
+    }
+
+    product.image_url = imageUrl;
+  }
   if (typeof updates.category === 'string') product.category = updates.category;
   product.updated_at = new Date().toISOString();
 
