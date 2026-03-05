@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" fill="none">
+  <!-- Dark background: stone-950 (#0C0A09) -->
+  <rect width="32" height="32" rx="6" fill="#0C0A09"/>
+  <!-- Bold-Minimal variant: Bold brutalist geometry optimized for favicon rendering -->
+  <!-- Left rectangle: bolder solid form (10px width, increased from 5px) -->
+  <rect x="4" y="4" width="10" height="24" fill="#F5F5F0" rx="1"/>
+  <!-- Right rectangle: mirrored (10px width) -->
+  <rect x="18" y="4" width="10" height="24" fill="#F5F5F0" rx="1"/>
+  <!-- Shared crossbar: thicker (8px height, increased from 3px) -->
+  <rect x="4" y="13" width="24" height="8" fill="#F5F5F0" rx="1"/>
+</svg>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { FairflowLogo } from '../../components/FairflowLogo';
+import { FairflowLogo, LogoStyle, LOGO_STYLES } from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useSupabaseUsers } from '../../hooks/useSupabaseUsers';
@@ -11,7 +11,6 @@ import { EmptyState } from '../../components/shared/EmptyState';
 import { OfflineBanner } from '../../components/shared/OfflineBanner';
 import { ConfirmModal } from '../../components/shared/ConfirmModal';
 import { formatBytes, truncateId } from '../../lib/format';
-import { apiBase, adminSecret } from '../../lib/config';
 import { 
   BarChart2, Activity, Users, Store, DollarSign, TrendingUp, Settings2, 
   AlertTriangle, Check, X, Clock, Shield, FileCheck, LogOut, RefreshCw,
@@ -67,6 +66,8 @@ export const AdminPortal: React.FC = () => {
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [apiOnline, setApiOnline] = useState(true);
+  const [logoStyle, setLogoStyle] = useState<LogoStyle>('geo-tech');
+  const [logoMenuOpen, setLogoMenuOpen] = useState(false);
   
   // KYC Management State
   const [pendingKYC, setPendingKYC] = useState<KYCSubmission[]>([]);
@@ -82,6 +83,13 @@ export const AdminPortal: React.FC = () => {
   // Update page title
   useEffect(() => {
     document.title = 'fairflow — Admin Portal';
+    
+    // Check URL for logo style
+    const params = new URLSearchParams(window.location.search);
+    const style = params.get('logoStyle') as LogoStyle;
+    if (style) {
+      setLogoStyle(style);
+    }
   }, []);
 
   // Check health on mount with retry
@@ -106,9 +114,9 @@ export const AdminPortal: React.FC = () => {
   const fetchPendingKYC = async () => {
     setLoadingKYC(true);
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, {
+      const response = await fetch('http://localhost:3000/v1/admin/kyc/pending', {
         headers: {
-          'Authorization': `Bearer ${adminSecret}`
+          'Authorization': 'Bearer mor-admin-secret-local'
         }
       });
       const data = await response.json();
@@ -135,10 +143,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC) return;
     
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/approve/${selectedKYC.id}`, {
+      const response = await fetch(`http://localhost:3000/v1/admin/kyc/approve/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${adminSecret}`,
+          'Authorization': 'Bearer mor-admin-secret-local',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ notes: approvalNotes })
@@ -163,10 +171,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC || !rejectionReason.trim()) return;
     
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/reject/${selectedKYC.id}`, {
+      const response = await fetch(`http://localhost:3000/v1/admin/kyc/reject/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': `Bearer ${adminSecret}`,
+          'Authorization': 'Bearer mor-admin-secret-local',
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ reason: rejectionReason })
@@ -224,6 +232,7 @@ export const AdminPortal: React.FC = () => {
 
     return (
       <div className="space-y-6">
+        <h1 className="sr-only">Admin Dashboard</h1>
         <StatusBar
           apiOnline={apiOnline}
           version="v0.6.0"
@@ -522,71 +531,110 @@ export const AdminPortal: React.FC = () => {
   };
 
   return (
-    <>
-      <div className="flex h-full bg-stone-950">
-        {/* Sidebar */}
-        <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
-          <div className="p-4 border-b border-stone-800">
-            <div className={`flex items-center gap-3 min-w-0 ${sidebarOpen ? '' : 'justify-center'}`}>
-              <FairflowLogo markHeight={28} showWordmark={sidebarOpen} variant="dark" />
-              {sidebarOpen && (
-                <span className="shrink-0 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400/90 bg-blue-500/10 rounded">
-                  Admin
-                </span>
-              )}
-            </div>
-          </div>
-
-          <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
-            {navigation.map(item => {
-              const Icon = item.icon;
-              return (
-                <button
-                  key={item.id}
-                  onClick={() => setActiveSection(item.id)}
-                  className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
-                    activeSection === item.id
-                      ? 'bg-blue-600 text-white'
-                      : 'text-stone-400 hover:text-white hover:bg-stone-800'
-                  }`}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
-                </button>
-              );
-            })}
-          </nav>
-
-          <div className="border-t border-stone-800 p-4">
-            <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="w-full flex items-center justify-center px-4 py-2 text-stone-400 hover:text-white transition"
-            >
-              {sidebarOpen ? '←' : '→'}
-            </button>
+    <div className="flex h-screen bg-stone-950 overflow-hidden" data-testid="admin-portal">
+      {/* Sidebar */}
+      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
+        <div className="p-4 border-b border-stone-800">
+          <div className="flex items-center justify-between">
+            <FairflowLogo markHeight={42} style={logoStyle} variant="dark" />
+            {sidebarOpen && <span className="text-xs font-bold text-stone-400">ADMIN</span>}
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Header */}
-          <div className="border-b border-stone-800 bg-stone-900 px-6 py-4">
-            <div className="flex items-center justify-between">
-              <h1 className="text-2xl font-bold text-white">
-                {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
-              </h1>
-              <div className="flex items-center gap-4">
-                <button className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg">
-                  <Bell className="w-5 h-5" />
+        <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
+          {navigation.map(item => {
+            const Icon = item.icon;
+            return (
+              <button
+                key={item.id}
+                aria-label={item.label}
+                onClick={() => setActiveSection(item.id)}
+                className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
+                  activeSection === item.id
+                    ? 'bg-blue-600 text-white'
+                    : 'text-stone-400 hover:text-white hover:bg-stone-800'
+                }`}
+              >
+                <Icon className="w-5 h-5 flex-shrink-0" />
+                {sidebarOpen && <span className="text-sm font-medium">{item.label}</span>}
+              </button>
+            );
+          })}
+        </nav>
+
+        <div className="border-t border-stone-800 p-4">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="w-full flex items-center justify-center px-4 py-2 text-stone-400 hover:text-white transition"
+          >
+            {sidebarOpen ? '←' : '→'}
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col overflow-hidden">
+        {/* Header */}
+        <div className="border-b border-stone-800 bg-stone-900 px-6 py-4">
+          <div className="flex items-center justify-between">
+            <h1 className="text-2xl font-bold text-white">
+              {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
+            </h1>
+            <div className="flex items-center gap-4">
+              <div className="relative">
+                <button 
+                  onClick={() => setLogoMenuOpen(!logoMenuOpen)}
+                  className="flex items-center gap-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg px-3 py-1.5 transition-colors border border-stone-700"
+                >
+                  <Zap className="w-4 h-4 text-yellow-500" />
+                  <span className="text-xs font-bold uppercase tracking-wider">{logoStyle.replace('-', ' ')}</span>
+                  <ChevronDown className={`w-3 h-3 text-stone-400 transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
+
+                {logoMenuOpen && (
+                  <>
+                    <div 
+                      className="fixed inset-0 z-10" 
+                      onClick={() => setLogoMenuOpen(false)} 
+                    />
+                    <div className="absolute right-0 mt-2 w-56 bg-stone-900 border border-stone-800 rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-3 py-2 border-b border-stone-800 mb-1">
+                        <span className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Select Brand Identity</span>
+                      </div>
+                      {LOGO_STYLES.map((styleOption) => (
+                        <button
+                          key={styleOption.id}
+                          onClick={() => {
+                            setLogoStyle(styleOption.id);
+                            setLogoMenuOpen(false);
+                            const url = new URL(window.location.href);
+                            url.searchParams.set('logoStyle', styleOption.id);
+                            window.history.replaceState({}, '', url.toString());
+                          }}
+                          className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-all ${
+                            logoStyle === styleOption.id 
+                              ? 'bg-blue-600/10 text-blue-400 font-bold' 
+                              : 'text-stone-300 hover:bg-stone-800 hover:text-white'
+                          }`}
+                        >
+                          <span className="capitalize">{styleOption.label}</span>
+                          {logoStyle === styleOption.id && <Check className="w-4 h-4" />}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
               </div>
+              <button className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg">
+                <Bell className="w-5 h-5" />
+              </button>
             </div>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="flex-1 overflow-y-auto">
-            {renderContent()}
-          </div>
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto">
+          {renderContent()}
         </div>
       </div>
 
@@ -665,6 +713,6 @@ export const AdminPortal: React.FC = () => {
           onClose={() => setToast(null)}
         />
       )}
-    </>
+    </div>
   );
 };
