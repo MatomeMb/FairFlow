@@ -24,3 +24,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+/* Keep logo rendering clean even inside tinted parent containers. */
+.fairflow-logo,
+.fairflow-logo svg {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}
