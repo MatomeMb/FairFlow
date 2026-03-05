@@ -56,6 +56,9 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState('');
+  const [selectedImageName, setSelectedImageName] = useState('');
   const [step, setStep] = useState<'form' | 'success'>('form');
   const [successPayload, setSuccessPayload] = useState<SuccessPayload | null>(null);
   const [createdProduct, setCreatedProduct] = useState<MerchantProductApi | null>(null);
@@ -67,6 +70,9 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
       setErrors({});
       setSubmitError('');
       setIsSubmitting(false);
+      setIsUploadingImage(false);
+      setImageUploadError('');
+      setSelectedImageName('');
       setStep('form');
       setSuccessPayload(null);
       setCreatedProduct(null);
@@ -159,9 +165,51 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     return nextErrors;
   };
 
+  const handleImageFileUpload = async (file: File) => {
+    setImageUploadError('');
+    setSubmitError('');
+    setSelectedImageName(file.name);
+    setIsUploadingImage(true);
+    setField('image_url', '');
+    setErrors((prev) => ({ ...prev, image_url: undefined }));
+
+    try {
+      const headers: HeadersInit = { 'x-merchant-id': 'dev-merchant-001' };
+      if (apiKey) {
+        headers['x-api-key'] = apiKey;
+      }
+
+      const payload = new FormData();
+      payload.append('image', file);
+
+      const response = await fetch(`${apiBase}/v1/merchant/uploads/image`, {
+        method: 'POST',
+        headers,
+        body: payload,
+      });
+      const data = await response.json().catch(() => null);
+
+      if (!response.ok || !data?.image_url || typeof data.image_url !== 'string') {
+        setImageUploadError(data?.message || 'Failed to upload image');
+        return;
+      }
+
+      setField('image_url', data.image_url);
+    } catch {
+      setImageUploadError('Network error while uploading image');
+    } finally {
+      setIsUploadingImage(false);
+    }
+  };
+
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault();
     setSubmitError('');
+
+    if (isUploadingImage) {
+      setSubmitError('Image is still uploading. Please wait.');
+      return;
+    }
 
     const validationErrors = validate();
     setErrors(validationErrors);
@@ -235,6 +283,9 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     setErrors({});
     setSubmitError('');
     setIsSubmitting(false);
+    setIsUploadingImage(false);
+    setImageUploadError('');
+    setSelectedImageName('');
     setStep('form');
     setSuccessPayload(null);
     setCreatedProduct(null);
@@ -341,15 +392,36 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Image URL *</label>
+              <label className="mb-1 block text-sm font-medium text-stone-300">Product Image *</label>
               <input
-                type="url"
-                value={form.image_url}
-                onChange={(e) => setField('image_url', e.target.value)}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    void handleImageFileUpload(file);
+                  } else {
+                    setSelectedImageName('');
+                    setField('image_url', '');
+                  }
+                }}
                 className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
-                placeholder="https://example.com/image.jpg"
-                required
               />
+              <p className="mt-1 text-xs text-stone-400">
+                {isUploadingImage
+                  ? `Uploading ${selectedImageName || 'image'}...`
+                  : form.image_url
+                    ? `Uploaded from disk: ${selectedImageName || 'image'}`
+                    : 'Choose an image file from your device'}
+              </p>
+              {form.image_url && (
+                <img
+                  src={form.image_url}
+                  alt="Product preview"
+                  className="mt-2 h-24 w-24 rounded-md object-cover border border-stone-700"
+                />
+              )}
+              {imageUploadError && <p className="mt-1 text-xs text-red-400">{imageUploadError}</p>}
               {errors.image_url && <p className="mt-1 text-xs text-red-400">{errors.image_url}</p>}
             </div>
           </div>
@@ -444,10 +516,10 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <button
                 type="submit"
                 form="create-product-form"
-                disabled={isSubmitting}
+                disabled={isSubmitting || isUploadingImage}
                 className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                {isSubmitting ? 'Creating product...' : 'Create Product'}
+                {isUploadingImage ? 'Uploading image...' : isSubmitting ? 'Creating product...' : 'Create Product'}
               </button>
             </>
           ) : (

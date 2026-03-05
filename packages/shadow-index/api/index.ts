@@ -128,6 +128,11 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  // Allow public access to uploaded product images
+  if (requestPath.startsWith('/uploads/')) {
+    return next();
+  }
+
   const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
   const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
   
@@ -190,6 +195,7 @@ app.use('*', async (c, next) => {
 const dataRoot = path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
 const indexFile = path.join(dataRoot, 'index.json');
+const uploadsDir = path.join(dataRoot, 'uploads');
 
 /** Events dir: override via ANALYTICS_EVENTS_DIR for tests */
 function getEventsDir(): string {
@@ -251,6 +257,7 @@ type IndexStore = Record<string, StoredThing>;
 
 const ensureDataDirs = async () => {
   await fs.mkdir(thingsDir, { recursive: true });
+  await fs.mkdir(uploadsDir, { recursive: true });
 };
 
 const loadIndex = async (): Promise<IndexStore> => {
@@ -1300,6 +1307,109 @@ app.get('/v1/auth/google/callback', async (c) => {
 
   const merchantToken = issueMerchantToken(account);
   return c.redirect(buildPortalUrl('/merchant', { token: merchantToken }, portalBaseUrl));
+});
+
+type UploadedImageFile = {
+  name: string;
+  type: string;
+  size: number;
+  arrayBuffer: () => Promise<ArrayBuffer>;
+};
+
+const isUploadedImageFile = (value: unknown): value is UploadedImageFile => {
+  if (!value || typeof value !== 'object') return false;
+  const candidate = value as Record<string, unknown>;
+  return typeof candidate.name === 'string'
+    && typeof candidate.type === 'string'
+    && typeof candidate.size === 'number'
+    && typeof candidate.arrayBuffer === 'function';
+};
+
+const imageMimeByExtension: Record<string, string> = {
+  '.png': 'image/png',
+  '.jpg': 'image/jpeg',
+  '.jpeg': 'image/jpeg',
+  '.webp': 'image/webp',
+  '.gif': 'image/gif',
+  '.avif': 'image/avif',
+  '.svg': 'image/svg+xml',
+};
+
+const imageExtensionByMime: Record<string, string> = {
+  'image/png': '.png',
+  'image/jpeg': '.jpg',
+  'image/webp': '.webp',
+  'image/gif': '.gif',
+  'image/avif': '.avif',
+  'image/svg+xml': '.svg',
+};
+
+app.post('/v1/merchant/uploads/image', async (c) => {
+  const parsedBody = await c.req.parseBody().catch(() => null);
+  if (!parsedBody || typeof parsedBody !== 'object') {
+    return c.json(err('invalid_upload', 'Expected multipart form data'), 400);
+  }
+
+  const body = parsedBody as Record<string, unknown>;
+  const rawFile = body.image ?? body.file ?? body.upload;
+  const firstRaw = Array.isArray(rawFile) ? rawFile[0] : rawFile;
+  if (!isUploadedImageFile(firstRaw)) {
+    return c.json(err('invalid_upload', 'Image file is required'), 400);
+  }
+
+  const file = firstRaw;
+  const mimeType = file.type.toLowerCase();
+  if (!mimeType.startsWith('image/')) {
+    return c.json(err('invalid_upload', 'Only image files are allowed'), 400);
+  }
+
+  const maxBytes = 8 * 1024 * 1024;
+  if (file.size <= 0 || file.size > maxBytes) {
+    return c.json(err('invalid_upload', 'Image file must be between 1 byte and 8MB'), 400);
+  }
+
+  const extFromMime = imageExtensionByMime[mimeType];
+  const extFromName = path.extname(file.name || '').toLowerCase();
+  const extension = extFromMime || (imageMimeByExtension[extFromName] ? extFromName : '.png');
+  const imageBuffer = Buffer.from(await file.arrayBuffer());
+
+  await fs.mkdir(uploadsDir, { recursive: true });
+  const fileName = `${Date.now()}-${crypto.randomUUID()}${extension}`;
+  const filePath = path.join(uploadsDir, fileName);
+  await fs.writeFile(filePath, imageBuffer);
+
+  const baseUrl = process.env.PUBLIC_API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
+  return c.json(
+    {
+      image_url: `${baseUrl.replace(/\/$/, '')}/uploads/${fileName}`,
+      bytes: imageBuffer.length,
+    },
+    201,
+  );
+});
+
+app.get('/uploads/:filename', async (c) => {
+  const requested = c.req.param('filename');
+  if (!/^[A-Za-z0-9._-]+$/.test(requested)) {
+    return c.json(err('invalid_request', 'Invalid file name'), 400);
+  }
+
+  const safeName = path.basename(requested);
+  const filePath = path.join(uploadsDir, safeName);
+
+  try {
+    const imageBuffer = await fs.readFile(filePath);
+    const ext = path.extname(safeName).toLowerCase();
+    c.header('Content-Type', imageMimeByExtension[ext] || 'application/octet-stream');
+    c.header('Cache-Control', 'public, max-age=31536000, immutable');
+    return c.body(imageBuffer);
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOENT') {
+      return c.json(err('not_found', 'Uploaded image not found'), 404);
+    }
+    return c.json(err('internal_error', 'Failed to load uploaded image'), 500);
+  }
 });
 
 // Merchant dashboard endpoints
