@@ -7,6 +7,8 @@ import { LoginPage } from "../pages/LoginPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 import { ProductPage } from "../pages/ProductPage";
 import { OrderConfirmation } from "../pages/OrderConfirmation";
+import { MerchantLogin } from "../pages/MerchantLogin";
+import { MerchantRegister } from "../pages/MerchantRegister";
 
 // Portals
 import { CEODashboard } from "../pages/portals/CEODashboard";
@@ -44,6 +46,10 @@ export function PortalRouter() {
         {/* Public */}
         <Route path="/login" element={<LoginPage />} />
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        <Route path="/merchant/login" element={<MerchantLogin />} />
+        <Route path="/merchant/register" element={<MerchantRegister />} />
+        {/* Merchant JWT portal flow (email/password + Google redirect token) */}
+        <Route path="/merchant" element={<MerchantPortal />} />
         
         {/* Public Product & Order Pages */}
         <Route path="/product/:hash" element={<ProductPage />} />

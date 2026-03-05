@@ -129,6 +129,13 @@ export const MerchantPortal: React.FC = () => {
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
   const [authToken, setAuthToken] = useState<string | null>(null);
 
+  const handleSignOut = async () => {
+    sessionStorage.removeItem('merchantToken');
+    sessionStorage.removeItem('merchant_token');
+    await signOut();
+    window.location.href = '/login';
+  };
+
   const tabs = [
     { id: 'products', label: 'My Products' },
     { id: 'analytics', label: 'Analytics' },
@@ -213,9 +220,13 @@ export const MerchantPortal: React.FC = () => {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
     };
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-      console.log('[merchantFetch] Sending Bearer token for:', url, 'token:', authToken.slice(0, 20) + '...');
+    const tokenFromStorage =
+      sessionStorage.getItem('merchantToken')
+      || sessionStorage.getItem('merchant_token');
+    const tokenToUse = authToken || tokenFromStorage;
+    if (tokenToUse) {
+      headers['Authorization'] = `Bearer ${tokenToUse}`;
+      console.log('[merchantFetch] Sending Bearer token for:', url, 'token:', tokenToUse.slice(0, 20) + '...');
     } else {
       console.log('[merchantFetch] NO authToken for:', url);
     }
@@ -420,17 +431,17 @@ export const MerchantPortal: React.FC = () => {
   }, [apiBase]);
 
   useEffect(() => {
-    if (!hasApiAuth) return;
+    if (!hasApiAuth && !authToken) return;
     fetchMerchantAccount();
     fetchPayoutLogs();
-  }, [fetchMerchantAccount, fetchPayoutLogs, hasApiAuth]);
+  }, [fetchMerchantAccount, fetchPayoutLogs, hasApiAuth, authToken]);
 
   useEffect(() => {
-    if (!hasApiAuth) return;
+    if (!hasApiAuth && !authToken) return;
     if (activeTab !== 'kyc-payouts') return;
     fetchMerchantAccount();
     fetchPayoutLogs();
-  }, [activeTab, fetchMerchantAccount, fetchPayoutLogs, hasApiAuth]);
+  }, [activeTab, fetchMerchantAccount, fetchPayoutLogs, hasApiAuth, authToken]);
 
   const handleStartKyc = async (payload: KycSubmitPayload = kycForm) => {
     setKycSubmitting(true);
@@ -1229,7 +1240,7 @@ export const MerchantPortal: React.FC = () => {
       tabs={tabs}
       activeTab={activeTab as string}
       onTabChange={(tab) => setActiveTab(tab as Tab)}
-      onLogout={signOut}
+      onLogout={handleSignOut}
       headerActions={(
         <button
           onClick={() => setActiveTab('notifications')}

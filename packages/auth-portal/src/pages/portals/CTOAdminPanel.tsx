@@ -22,6 +22,7 @@ export function CTOAdminPanel() {
   const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState("overview");
   const [toast, setToast] = useState<{ message: string; type: "success" | "error" | "info" } | null>(null);
+  const apiBase = import.meta.env.VITE_API_BASE_URL ?? "";
 
   // Update page title
   useEffect(() => {
@@ -31,6 +32,7 @@ export function CTOAdminPanel() {
   const navigation = [
     { id: "overview", label: "Overview" },
     { id: "users", label: "User Management" },
+    { id: "kyc-approvals", label: "KYC Approvals" },
     { id: "system", label: "System" },
     { id: "permissions", label: "Roles & Permissions" },
     { id: "logs", label: "Logs" },
@@ -700,12 +702,176 @@ export function CTOAdminPanel() {
     );
   };
 
+  const KycApprovalsSectionBase = ({
+    onToast,
+  }: {
+    onToast: (message: string, type: "success" | "error" | "info") => void;
+  }) => {
+    type KycAccount = {
+      id: string;
+      business_name?: string;
+      email?: string;
+      kyc_status?: string;
+      kyc_data?: {
+        id_number?: string;
+        date_of_birth?: string;
+        address?: string;
+        phone?: string;
+      };
+      bank_account?: {
+        account_holder_name?: string;
+        bank_name?: string;
+        account_number?: string;
+        branch_code?: string;
+        account_type?: string;
+      };
+    };
+
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+    const [accounts, setAccounts] = useState<KycAccount[]>([]);
+    const [notesById, setNotesById] = useState<Record<string, string>>({});
+    const [approvingId, setApprovingId] = useState<string | null>(null);
+
+    const loadPending = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const res = await fetch(`${apiBase}/v1/admin/kyc/pending`, {
+          headers: { Accept: "application/json" },
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Failed to load pending KYC");
+        setAccounts(Array.isArray(data?.accounts) ? data.accounts : []);
+      } catch (e) {
+        setError(e instanceof Error ? e.message : "Failed to load pending KYC");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    useEffect(() => {
+      loadPending();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const approve = async (merchantId: string) => {
+      setApprovingId(merchantId);
+      setError(null);
+      try {
+        const res = await fetch(`${apiBase}/v1/admin/kyc/${merchantId}/approve`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify({ notes: notesById[merchantId] || "" }),
+        });
+        const data = await res.json();
+        if (!res.ok) throw new Error(data?.error || "Failed to approve KYC");
+        setAccounts((prev) => prev.filter((account) => account.id !== merchantId));
+        onToast("KYC approved successfully", "success");
+      } catch (e) {
+        const message = e instanceof Error ? e.message : "Failed to approve KYC";
+        setError(message);
+        onToast(message, "error");
+      } finally {
+        setApprovingId(null);
+      }
+    };
+
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-semibold text-white">KYC Approvals</h2>
+            <p className="text-sm text-stone-400 mt-1">Review and approve pending merchant KYC submissions</p>
+          </div>
+          <button
+            onClick={loadPending}
+            disabled={loading}
+            className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+          >
+            {loading ? "Refreshing..." : "Refresh"}
+          </button>
+        </div>
+
+        {error && (
+          <div className="bg-red-700/30 border border-red-600 rounded-lg px-4 py-3 text-sm text-red-200">
+            {error}
+          </div>
+        )}
+
+        {loading && accounts.length === 0 ? (
+          <div className="text-stone-400 text-sm">Loading pending KYC...</div>
+        ) : accounts.length === 0 ? (
+          <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 text-stone-400">
+            No pending KYC approvals.
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {accounts.map((account) => (
+              <div key={account.id} className="bg-stone-900 border border-stone-800 rounded-xl p-5 space-y-4">
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{account.business_name || "Unknown business"}</h3>
+                    <p className="text-sm text-stone-400">{account.email}</p>
+                    <p className="text-xs text-amber-400 mt-1">Status: {account.kyc_status || "pending"}</p>
+                  </div>
+                  <button
+                    onClick={() => approve(account.id)}
+                    disabled={approvingId === account.id}
+                    className="bg-emerald-600 hover:bg-emerald-500 disabled:bg-stone-700 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+                  >
+                    {approvingId === account.id ? "Approving..." : "Approve"}
+                  </button>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div className="space-y-1">
+                    <p className="text-stone-500">ID Number</p>
+                    <p className="text-stone-200">{account.kyc_data?.id_number || "—"}</p>
+                    <p className="text-stone-500 mt-2">Date of Birth</p>
+                    <p className="text-stone-200">{account.kyc_data?.date_of_birth || "—"}</p>
+                    <p className="text-stone-500 mt-2">Address</p>
+                    <p className="text-stone-200">{account.kyc_data?.address || "—"}</p>
+                    <p className="text-stone-500 mt-2">Phone</p>
+                    <p className="text-stone-200">{account.kyc_data?.phone || "—"}</p>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-stone-500">Account Holder</p>
+                    <p className="text-stone-200">{account.bank_account?.account_holder_name || "—"}</p>
+                    <p className="text-stone-500 mt-2">Bank</p>
+                    <p className="text-stone-200">{account.bank_account?.bank_name || "—"}</p>
+                    <p className="text-stone-500 mt-2">Account Number</p>
+                    <p className="text-stone-200">{account.bank_account?.account_number || "—"}</p>
+                    <p className="text-stone-500 mt-2">Branch Code</p>
+                    <p className="text-stone-200">{account.bank_account?.branch_code || "—"}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-stone-400 text-xs mb-2">Approval Notes (optional)</label>
+                  <textarea
+                    value={notesById[account.id] || ""}
+                    onChange={(e) => setNotesById((prev) => ({ ...prev, [account.id]: e.target.value }))}
+                    className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-sm text-white"
+                    rows={3}
+                    placeholder="Notes for compliance trail..."
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const OverviewSection = lazy(() => Promise.resolve({ default: OverviewSectionBase }));
   const UserManagementSection = lazy(() => Promise.resolve({ default: UserManagementSectionBase }));
   const SystemSection = lazy(() => Promise.resolve({ default: SystemSectionBase }));
   const PermissionsSection = lazy(() => Promise.resolve({ default: PermissionsSectionBase }));
   const LogsSection = lazy(() => Promise.resolve({ default: LogsSectionBase }));
   const TalentSection = lazy(() => Promise.resolve({ default: TalentSectionBase }));
+  const KycApprovalsSection = lazy(() => Promise.resolve({ default: KycApprovalsSectionBase }));
 
   return (
     <>
@@ -723,6 +889,9 @@ export function CTOAdminPanel() {
           )}
           {activeSection === "users" && (
             <UserManagementSection onToast={(message, type) => setToast({ message, type })} />
+          )}
+          {activeSection === "kyc-approvals" && (
+            <KycApprovalsSection onToast={(message, type) => setToast({ message, type })} />
           )}
           {activeSection === "system" && (
             <SystemSection onPreAggregate={handlePreAggregate} />

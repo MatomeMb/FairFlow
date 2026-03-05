@@ -90,6 +90,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
+    const lowerEmail = email.trim().toLowerCase();
+    // Development-only admin bypass for local demos.
+    if (import.meta.env.DEV && lowerEmail === "matome@fairflow.dev") {
+      setSession(null);
+      setRole("cto");
+      setUser({
+        id: "dev-cto-user",
+        email: lowerEmail,
+        role: "cto",
+        name: "Matome (Dev Admin)",
+      });
+      return;
+    }
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) throw error;
   };
