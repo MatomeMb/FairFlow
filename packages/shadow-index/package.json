@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:coverage": "vitest --coverage",
     "verify-r2": "node scripts/verify-r2.mjs",
+    "smoke:prod": "node scripts/smoke-vercel.mjs",
     "pre-aggregate": "npm run build && node scripts/run-pre-aggregation.mjs",
     "load-test": "node scripts/sustained-load-test.mjs",
     "type-check": "tsc --noEmit",

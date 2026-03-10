@@ -59,12 +59,28 @@ npm run test:e2e
 
 | Check | Command |
 |-------|---------|
+| Smoke suite (recommended first) | `cd packages/shadow-index && npm run smoke:prod -- https://your-api-domain` |
 | API health | `curl https://your-api/health` |
 | Compile | `curl -X POST https://your-api/compile -H "Content-Type: application/json" -d '{"title":"Test","price":100,"currency":"USD"}'` |
 | Admin KYC | `curl -H "Authorization: Bearer $ADMIN_SECRET_KEY" https://your-api/v1/admin/kyc/pending` |
 | Portal login | Sign in at portal URL |
 | Merchant flow | Register at /merchant/register, submit KYC |
 | Admin KYC | Approve KYC at /dashboard/admin → KYC Approvals |
+
+---
+
+## Uptime Monitoring (Production)
+
+Use this minimum monitor set for the backend:
+
+1. `GET /health` every 60s (critical liveness check)
+2. `GET /healthz` every 60s (function-level probe)
+3. `GET /` every 5m (basic routing + status check)
+
+Trigger alert when any endpoint fails 2 consecutive checks or latency exceeds 4s for 5 minutes.
+Send alerts to both email and Slack/WhatsApp pager channel.
+
+For full setup template, see `docs/VERCEL-UPTIME-RUNBOOK.md`.
 
 ---
 
