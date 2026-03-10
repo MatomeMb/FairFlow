@@ -1,13 +1,12 @@
 /**
  * Vercel serverless entry point.
- * Wraps the Hono app with the hono/vercel handle adapter so all routes
+ * Wraps the Hono app with the Node server adapter so all routes
  * are handled by a single Node.js Lambda function.
  */
-import { handle } from 'hono/vercel';
+import { handle } from '@hono/node-server/vercel';
 import app from './index.js';
 
 export const config = {
-  runtime: 'nodejs',
   maxDuration: 30,
 };
 
