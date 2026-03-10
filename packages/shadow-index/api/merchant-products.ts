@@ -60,6 +60,17 @@ export function writeProducts(products: MerchantProduct[]): void {
   saveProductsToDisk(products);
 }
 
+/** Consumer-facing price (what the buyer pays). Currently same as merchant price_cents. */
+export function getConsumerPriceCents(product: MerchantProduct): number {
+  return product.price_cents;
+}
+
+/** Merchant net amount after platform commission is deducted. */
+export function getMerchantPriceCents(product: MerchantProduct): number {
+  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.06');
+  return Math.round(product.price_cents * (1 - commissionRate));
+}
+
 const err = (code: string, message: string) => ({ code, message });
 
 // Helper to construct thing_file with matter_uri and thing_url from hash
