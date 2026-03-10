@@ -3,9 +3,9 @@
  *
  * Cloudflare R2 via S3-compatible API. Used when STORAGE_MODE=r2.
  * Local file system remains the default (STORAGE_MODE=local or unset).
+ *
+ * AWS SDK is loaded lazily to avoid bloating cold-start on Vercel.
  */
-
-import { GetObjectCommand, PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 const accountId = process.env.CLOUDFLARE_R2_ACCOUNT_ID;
 const accessKeyId = process.env.CLOUDFLARE_R2_ACCESS_KEY_ID;
@@ -25,7 +25,8 @@ export function isR2Configured(): boolean {
   );
 }
 
-function getClient(): S3Client {
+async function getClient() {
+  const { S3Client } = await import('@aws-sdk/client-s3');
   if (!accountId || !accessKeyId || !secretAccessKey) {
     throw new Error('R2 credentials not configured (CLOUDFLARE_R2_ACCOUNT_ID, ACCESS_KEY_ID, SECRET_ACCESS_KEY)');
   }
@@ -44,12 +45,13 @@ function getClient(): S3Client {
  * @returns Public URL of the uploaded object
  */
 export async function uploadThing(hash: string, data: Buffer): Promise<string> {
+  const { PutObjectCommand } = await import('@aws-sdk/client-s3');
   const bucket = bucketName ?? process.env.CLOUDFLARE_R2_BUCKET;
   if (!bucket || !publicUrl) {
     throw new Error('R2 bucket or public URL not configured');
   }
   const key = `things/${hash}.thing`;
-  const client = getClient();
+  const client = await getClient();
   await client.send(
     new PutObjectCommand({
       Bucket: bucket,
@@ -71,13 +73,14 @@ export async function uploadImage(
   imageData: Buffer,
   mimeType: string
 ): Promise<string> {
+  const { PutObjectCommand } = await import('@aws-sdk/client-s3');
   const bucket = bucketName ?? process.env.CLOUDFLARE_R2_BUCKET;
   if (!bucket || !publicUrl) {
     throw new Error('R2 bucket or public URL not configured');
   }
   const ext = mimeType.includes('png') ? 'png' : 'jpg';
   const key = `images/${hash}.${ext}`;
-  const client = getClient();
+  const client = await getClient();
   await client.send(
     new PutObjectCommand({
       Bucket: bucket,
@@ -94,12 +97,13 @@ export async function uploadImage(
  * Get .thing bytes from R2. Returns null if key does not exist.
  */
 export async function getThing(hash: string): Promise<Buffer | null> {
+  const { GetObjectCommand } = await import('@aws-sdk/client-s3');
   const bucket = bucketName ?? process.env.CLOUDFLARE_R2_BUCKET;
   if (!bucket) {
     throw new Error('R2 bucket not configured');
   }
   const key = `things/${hash}.thing`;
-  const client = getClient();
+  const client = await getClient();
   try {
     const result = await client.send(
       new GetObjectCommand({

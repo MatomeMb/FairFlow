@@ -13,8 +13,15 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-// @ts-expect-error - Paystack SDK has no types
-import Paystack from '@paystack/paystack-sdk';
+// @ts-expect-error - Paystack SDK has no types — lazy-loaded to reduce cold start
+let _paystack: ReturnType<typeof Object> | null = null;
+async function getPaystack() {
+  if (!_paystack) {
+    const { default: Paystack } = await import('@paystack/paystack-sdk');
+    _paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY || '');
+  }
+  return _paystack;
+}
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
 import { getReport, validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
@@ -69,8 +76,7 @@ if (process.env.NODE_ENV === 'test') {
   delete process.env.SHADOW_INDEX_API_KEYS;
 }
 
-// Initialize Paystack
-const paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY || '');
+// Paystack is lazy-loaded via getPaystack() to reduce cold start
 
 /** Paystack routing stub — ready for Peach Payments later when selectRail() chooses provider. */
 export function selectRail(): 'paystack' {
@@ -2690,6 +2696,7 @@ app.post('/checkout/create-session', async (c) => {
       delivery_address: JSON.stringify(delivery_address || {}),
     };
 
+    const paystack = await getPaystack();
     const init = await paystack.transaction.initialize({
       email: customer_email,
       amount: consumerPriceCents, // Paystack expects amount in subunit (ZAR cents)
