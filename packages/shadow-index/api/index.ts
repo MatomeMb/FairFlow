@@ -1138,6 +1138,17 @@ async function compileAndPersistProduct(product: ProductInput): Promise<{
   };
 }
 
+// Root endpoint for platform checks and quick verification in browsers.
+app.get('/', (c) =>
+  c.json({
+    status: 'ok',
+    service: 'shadow-index',
+    company: 'fairflow',
+    version: '0.6.0',
+    docs_hint: 'Use /health for liveness and /resolve/:hash for lookups',
+  })
+);
+
 // Health check endpoint
 app.get('/health', async (c) => {
   const checks: Record<string, string> = {};
@@ -2912,6 +2923,17 @@ app.onError((error, c) => {
   logger.error('Unhandled error', { error: msg });
   return c.json(err('internal_error', 'An unexpected error occurred'), 500);
 });
+
+app.notFound((c) =>
+  c.json(
+    err('not_found', 'Route not found', {
+      path: c.req.path,
+      method: c.req.method,
+      health: '/health',
+    }),
+    404
+  )
+);
 
 // Rate limiter cleanup — prevent unbounded growth of stale entries
 const RATE_LIMIT_CLEANUP_INTERVAL_MS = 5 * 60 * 1000;
