@@ -209,7 +209,9 @@ app.use('*', async (c, next) => {
   return next();
 });
 
-const dataRoot = path.join(__dirname, '..', 'data');
+const dataRoot = process.env.VERCEL
+  ? path.join('/tmp', 'data')
+  : path.join(__dirname, '..', 'data');
 const thingsDir = path.join(dataRoot, 'things');
 const indexFile = path.join(dataRoot, 'index.json');
 const uploadsDir = path.join(dataRoot, 'uploads');

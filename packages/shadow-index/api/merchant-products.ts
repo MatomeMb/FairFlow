@@ -13,7 +13,9 @@ import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const dataRoot = path.join(__dirname, '..', 'data');
+const dataRoot = process.env.VERCEL
+  ? path.join('/tmp', 'data')
+  : path.join(__dirname, '..', 'data');
 const productsFile = path.join(dataRoot, 'merchant_products.json');
 
 /** Merchant product with stock, status, and thing linkage */
