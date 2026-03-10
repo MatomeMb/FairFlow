@@ -1,0 +1,34 @@
+name: Post-Deploy Smoke Verify
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: 'Deployed shadow-index base URL (e.g. https://api.example.com)'
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test deployed backend
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install shadow-index dependencies
+        run: npm install
+        working-directory: packages/shadow-index
+
+      - name: Run production smoke suite
+        run: npm run smoke:prod -- "${{ inputs.base_url }}"
+        working-directory: packages/shadow-index
