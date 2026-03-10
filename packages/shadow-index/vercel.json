@@ -1,5 +1,8 @@
 {
   "version": 2,
+  "buildCommand": null,
+  "outputDirectory": null,
+  "framework": null,
   "functions": {
     "api/vercel-entry.ts": {
       "maxDuration": 30
