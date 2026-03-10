@@ -9,14 +9,12 @@ import { StatusBar } from '../../components/shared/StatusBar';
 import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { OfflineBanner } from '../../components/shared/OfflineBanner';
-import { ConfirmModal } from '../../components/shared/ConfirmModal';
-import { formatBytes, truncateId } from '../../lib/format';
+import { formatBytes } from '../../lib/format';
 import { 
-  BarChart2, Activity, Users, Store, DollarSign, TrendingUp, Settings2, 
+  BarChart2, Activity, Users, Store, DollarSign, Settings2, 
   AlertTriangle, Check, X, Clock, Shield, FileCheck, LogOut, RefreshCw,
-  ChevronDown, Menu, Bell, Zap
+  ChevronDown, Bell, Zap
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 type AdminSection = 
   | 'overview' 
@@ -49,17 +47,6 @@ interface KYCSubmission {
   };
 }
 
-interface Merchant {
-  id: string;
-  businessName: string;
-  email: string;
-  role: 'merchant';
-  kyc_status: 'not_started' | 'pending' | 'approved' | 'rejected';
-  status: 'Active' | 'Pending' | 'Inactive';
-  products: number;
-  memberSince: string;
-}
-
 export const AdminPortal: React.FC = () => {
   const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('overview');
@@ -78,7 +65,7 @@ export const AdminPortal: React.FC = () => {
   const [approvalNotes, setApprovalNotes] = useState('');
 
   const { data: analytics, error: apiError, secondsSince, refresh, checkHealth } = useAnalytics();
-  const { users, loading: usersLoading, refresh: refreshUsers } = useSupabaseUsers();
+  const { users, loading: _usersLoading, refresh: _refreshUsers } = useSupabaseUsers();
 
   // Update page title
   useEffect(() => {
@@ -246,7 +233,7 @@ export const AdminPortal: React.FC = () => {
             <MetricCard label="Active Merchants" value={roleStats.merchant.toString()} color="blue" />
             <MetricCard label="Heap Memory" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
             <MetricCard label="Storage Used" value={formatBytes(analytics?.storage.totalSize || 0)} />
-            <MetricCard label="Pending KYC" value={pendingKYC.length.toString()} color={pendingKYC.length > 0 ? 'orange' : 'green'} />
+            <MetricCard label="Pending KYC" value={pendingKYC.length.toString()} color={pendingKYC.length > 0 ? 'amber' : 'green'} />
             <MetricCard label="Errors (24h)" value={analytics?.errors.count || 0} color={analytics?.errors.count === 0 ? "green" : "red"} />
           </div>
 
@@ -435,7 +422,7 @@ export const AdminPortal: React.FC = () => {
             <div key={user.id} className="bg-stone-900 border border-stone-800 rounded-xl p-4 flex items-center justify-between">
               <div>
                 <p className="font-semibold text-white">{user.id}</p>
-                <p className="text-sm text-stone-400">{user.email}</p>
+                <p className="text-sm text-stone-400">{user.user_id}</p>
               </div>
               <RoleBadge role={user.role} />
             </div>
@@ -710,7 +697,7 @@ export const AdminPortal: React.FC = () => {
         <Toast
           message={toast.message}
           type={toast.type}
-          onClose={() => setToast(null)}
+          onDismiss={() => setToast(null)}
         />
       )}
     </div>

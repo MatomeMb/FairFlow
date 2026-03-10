@@ -75,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             appRole = 'ceo';
             console.log("[fairflow] Setting dev admin role:", appRole);
             setRole(appRole);
-            setUser({ id: 'dev-admin', email: devEmail, role: 'ceo', name: null, avatarUrl: null });
+            setUser({ id: 'dev-admin', email: devEmail, role: 'ceo', name: undefined, avatarUrl: undefined });
           } else {
             console.log("[fairflow] No session or dev admin email found");
             setRole(appRole);

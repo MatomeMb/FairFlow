@@ -31,13 +31,13 @@ export function MerchantOrders({
   ordersError,
   fulfillingOrderId,
   uploadingSlipOrderId,
-  commissionRate,
+  commissionRate: _commissionRate,
   onDismissOrdersError,
-  onMarkAsFulfilled,
+  onMarkAsFulfilled: _onMarkAsFulfilled,
   onUploadSlip,
   onMarkAsShipped,
   getPayoutStatusLabel,
-  apiBase,
+  apiBase: _apiBase,
 }: MerchantOrdersProps) {
   return (
     <div className="space-y-4">

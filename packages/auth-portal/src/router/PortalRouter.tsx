@@ -14,8 +14,6 @@ import { MerchantRegister } from "../pages/MerchantRegister";
 
 // Portals
 import { AdminPortal } from "../pages/portals/AdminPortal";
-import { CEODashboard } from "../pages/portals/CEODashboard";
-import { CTOAdminPanel } from "../pages/portals/CTOAdminPanel";
 import { MerchantPortal } from "../pages/portals/MerchantPortal";
 import { InvestorMode } from "../pages/portals/InvestorMode";
 import { ConsumerShop } from "../pages/portals/ConsumerShop";

@@ -48,7 +48,7 @@ export function OrderConfirmation() {
   const [productTitle, setProductTitle] = useState<string>('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [retryCount, setRetryCount] = useState(0);
+  const [, setRetryCount] = useState(0);
 
   useEffect(() => {
     document.title = 'fairflow — Order Confirmation';
@@ -185,7 +185,7 @@ export function OrderConfirmation() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-stone-600">Product</span>
-                  <span className="font-medium text-stone-900">{productTitle || order.product_hash.slice(0, 12) + '...'}</span>
+                  <span className="font-medium text-stone-900">{productTitle || (order.product_hash ?? '').slice(0, 12) + '...'}</span>
                 </div>
                 <div className="flex justify-between border-t border-stone-200 pt-3">
                   <span className="text-stone-900 font-semibold">Amount Paid</span>
