@@ -13,7 +13,6 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-// @ts-expect-error - Paystack SDK has no types — lazy-loaded to reduce cold start
 let _paystack: ReturnType<typeof Object> | null = null;
 async function getPaystack() {
   if (!_paystack) {
@@ -69,7 +68,10 @@ const loadEnvForShadowIndex = async () => {
   await loadEnvFromFile(path.join(packageRoot, '.env.local'));
 };
 
-await loadEnvForShadowIndex();
+// Vercel provides env vars through the platform; avoid top-level await on serverless.
+if (!process.env.VERCEL) {
+  void loadEnvForShadowIndex();
+}
 
 if (process.env.NODE_ENV === 'test') {
   delete process.env.SHADOW_INDEX_API_KEY;
