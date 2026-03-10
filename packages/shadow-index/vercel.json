@@ -12,7 +12,7 @@
   ],
   "routes": [
     {
-      "src": "/health",
+      "src": "/healthz",
       "dest": "/api/health.ts"
     },
     {
