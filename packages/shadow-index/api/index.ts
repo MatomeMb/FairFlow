@@ -28,8 +28,6 @@ import {
   merchantProductsRouter,
   readProducts,
   writeProducts,
-  getConsumerPriceCents,
-  getMerchantPriceCents,
   type MerchantProduct,
 } from './merchant-products.js';
 
