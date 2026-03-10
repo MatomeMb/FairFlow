@@ -1,4 +1,4 @@
-import { Package } from 'lucide-react';
+import { Package, Upload, Truck } from 'lucide-react';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import type { MerchantOrder } from '../../../types/merchant';
 
@@ -7,21 +7,37 @@ interface MerchantOrdersProps {
   ordersLoading: boolean;
   ordersError: string | null;
   fulfillingOrderId: string | null;
+  uploadingSlipOrderId: string | null;
   commissionRate: number;
   onDismissOrdersError: () => void;
   onMarkAsFulfilled: (orderId: string) => void;
+  onUploadSlip: (orderId: string, file: File) => void;
+  onMarkAsShipped: (orderId: string, slipUrl: string) => void;
   getPayoutStatusLabel: (order: MerchantOrder) => string;
+  apiBase: string;
 }
+
+const PAYMENT_BADGE: Record<string, { label: string; className: string }> = {
+  held: { label: 'Held', className: 'bg-amber-900/50 text-amber-400' },
+  shipped: { label: 'Shipped', className: 'bg-blue-900/50 text-blue-400' },
+  confirmed: { label: 'Confirmed', className: 'bg-emerald-900/50 text-emerald-400' },
+  released: { label: 'Released', className: 'bg-emerald-900/50 text-emerald-400' },
+  disputed: { label: 'Disputed', className: 'bg-red-900/50 text-red-400' },
+};
 
 export function MerchantOrders({
   orders,
   ordersLoading,
   ordersError,
   fulfillingOrderId,
+  uploadingSlipOrderId,
   commissionRate,
   onDismissOrdersError,
   onMarkAsFulfilled,
+  onUploadSlip,
+  onMarkAsShipped,
   getPayoutStatusLabel,
+  apiBase,
 }: MerchantOrdersProps) {
   return (
     <div className="space-y-4">
@@ -78,43 +94,68 @@ export function MerchantOrders({
                   <p className="text-sm text-stone-300">Ordered: {new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                 </div>
 
-                {order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered' ? (
-                  <span className="text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400">Fulfilled ✓</span>
-                ) : (
-                  <button
-                    onClick={() => onMarkAsFulfilled(order.id)}
-                    disabled={fulfillingOrderId === order.id}
-                    className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-700 px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
-                  >
-                    {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Fulfilled'}
-                  </button>
-                )}
+                <div className="flex items-center gap-2">
+                  {order.payment_status && PAYMENT_BADGE[order.payment_status] && (
+                    <span className={`text-xs px-2 py-1 rounded ${PAYMENT_BADGE[order.payment_status].className}`}>
+                      {PAYMENT_BADGE[order.payment_status].label}
+                    </span>
+                  )}
+                  {(order.fulfillment_status === 'shipped' || order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered') ? (
+                    <span className="text-xs px-2 py-1 rounded bg-emerald-900/50 text-emerald-400">Shipped ✓</span>
+                  ) : (
+                    <div className="flex gap-2">
+                      <label className="bg-stone-700 hover:bg-stone-600 px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium cursor-pointer flex items-center gap-2">
+                        <Upload className="w-4 h-4" />
+                        {order.shipment_slip_url ? 'Slip uploaded' : 'Upload slip'}
+                        <input
+                          type="file"
+                          accept=".pdf,.jpg,.jpeg,.png"
+                          className="hidden"
+                          disabled={uploadingSlipOrderId === order.id}
+                          onChange={(e) => {
+                            const f = e.target.files?.[0];
+                            if (f) onUploadSlip(order.id, f);
+                            e.target.value = '';
+                          }}
+                        />
+                      </label>
+                      <button
+                        onClick={() => order.shipment_slip_url && onMarkAsShipped(order.id, order.shipment_slip_url)}
+                        disabled={!order.shipment_slip_url || fulfillingOrderId === order.id}
+                        title={!order.shipment_slip_url ? 'Upload shipment slip first' : ''}
+                        className="bg-emerald-600 hover:bg-emerald-700 disabled:bg-stone-700 disabled:cursor-not-allowed px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition flex items-center gap-2"
+                      >
+                        <Truck className="w-4 h-4" />
+                        {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Shipped'}
+                      </button>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm">
                 <p className="text-stone-300"><span className="text-stone-500">Customer:</span> {order.customer_email}</p>
                 <p className="text-stone-300">
-                  <span className="text-stone-500">Amount:</span> R {(order.amount / 100).toFixed(2)}
-                  <span className="text-stone-500"> (Platform takes R {(Math.round(order.amount * commissionRate) / 100).toFixed(2)} · Merchant receives R {((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)})</span>
+                  <span className="text-stone-500">Your payout:</span> R {((order.merchant_price_cents ?? order.amount ?? 0) / 100).toFixed(2)}
                 </p>
                 <p className="text-stone-300 md:col-span-2">
                   <span className="text-stone-500">Fulfillment:</span>{' '}
                   {order.fulfillment_status === 'pending' || !order.fulfillment_status
                     ? 'Pending'
-                    : `${order.fulfillment_status === 'delivered' ? 'Fulfilled ✓' : 'Fulfilled ✓'}${order.merchant_marked_fulfilled_at ? ` — ${new Date(order.merchant_marked_fulfilled_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}`}
+                    : `Shipped ✓${order.shipped_at ? ` — ${new Date(order.shipped_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}` : ''}`}
                 </p>
                 <p className="text-stone-300 md:col-span-2">
                   <span className="text-stone-500">Delivery:</span>{' '}
-                  {order.consumer_confirmed_delivery
-                    ? `Delivered ✓ — consumer confirmed ${order.consumer_confirmed_at ? new Date(order.consumer_confirmed_at).toLocaleDateString('en-ZA', { dateStyle: 'medium' }) : ''}`
-                    : order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered'
-                      ? 'Confirmation email sent to customer'
-                      : 'Waiting for consumer confirmation'}
+                  {order.customer_confirmed_at || order.consumer_confirmed_at
+                    ? `Confirmed ✓ — ${(order.customer_confirmed_at || order.consumer_confirmed_at) ? new Date(order.customer_confirmed_at || order.consumer_confirmed_at!).toLocaleDateString('en-ZA', { dateStyle: 'medium' }) : ''}`
+                    : order.fulfillment_status === 'shipped' || order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered'
+                      ? 'Awaiting customer confirmation'
+                      : 'Upload slip and mark shipped'}
                 </p>
                 <p className="text-stone-300 md:col-span-2">
                   <span className="text-stone-500">Payout:</span>{' '}
-                  {order.payout_status === 'pending_release' && order.amount
-                    ? `Queued for transfer — R ${((order.amount - Math.round(order.amount * commissionRate)) / 100).toFixed(2)}`
+                  {order.payment_status === 'released'
+                    ? `Released — R ${((order.merchant_price_cents ?? order.amount ?? 0) / 100).toFixed(2)}`
                     : getPayoutStatusLabel(order)}
                 </p>
               </div>

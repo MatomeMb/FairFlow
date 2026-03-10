@@ -90,6 +90,7 @@ export const MerchantPortal: React.FC = () => {
   const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
   const [fulfillingOrderId, setFulfillingOrderId] = useState<string | null>(null);
+  const [uploadingSlipOrderId, setUploadingSlipOrderId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<MerchantNotification[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
@@ -530,6 +531,58 @@ export const MerchantPortal: React.FC = () => {
       }
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to mark order as fulfilled';
+      setOrdersError(msg);
+      showToast(msg, 'error');
+    } finally {
+      setFulfillingOrderId(null);
+    }
+  };
+
+  const handleUploadSlip = async (orderId: string, file: File) => {
+    setUploadingSlipOrderId(orderId);
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await merchantFetch(`${apiBase}/v1/merchant/orders/${orderId}/upload-slip`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.message || 'Failed to upload slip');
+      }
+      const data = await res.json();
+      if (data.slip_url) {
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, shipment_slip_url: data.slip_url } : o)));
+        showToast('Shipment slip uploaded', 'success');
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to upload slip';
+      showToast(msg, 'error');
+    } finally {
+      setUploadingSlipOrderId(null);
+    }
+  };
+
+  const handleMarkAsShipped = async (orderId: string, slipUrl: string) => {
+    setFulfillingOrderId(orderId);
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/orders/${orderId}/ship`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ shipment_slip_url: slipUrl }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData?.message || 'Failed to mark as shipped');
+      }
+      const data = await res.json();
+      if (data.ok && data.order) {
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? data.order : o)));
+        showToast('Order marked as shipped', 'success');
+      }
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : 'Failed to mark as shipped';
       setOrdersError(msg);
       showToast(msg, 'error');
     } finally {
@@ -1055,19 +1108,16 @@ export const MerchantPortal: React.FC = () => {
     </div>
   );
 
-  const getHoldingStatusLabel = (order: MerchantOrder) => {
-    const kycApproved = merchantAccount?.kyc_status === 'approved';
-    const consumerConfirmed = order.consumer_confirmed_delivery === true;
-    if (kycApproved && !consumerConfirmed) return 'Holding — awaiting consumer confirmation';
-    if (!kycApproved && consumerConfirmed) return 'Holding — awaiting KYC approval';
-    return 'Holding — awaiting KYC + consumer confirmation';
-  };
-
   const getPayoutStatusLabel = (order: MerchantOrder) => {
+    if (order.payment_status === 'released') return 'Released to your account';
+    if (order.payment_status === 'confirmed') return 'Releasing — customer confirmed';
+    if (order.payment_status === 'shipped') return 'Held — awaiting customer confirmation';
+    if (order.payment_status === 'held') return 'Held — upload slip and ship';
+    if (order.payment_status === 'disputed') return 'Disputed — contact support';
     if (order.payout_status === 'pending_release') return 'Queued for bank transfer';
     if (order.payout_status === 'released') return 'Transferred to bank account';
     if (order.payout_status === 'failed') return 'Transfer failed — contact support';
-    return getHoldingStatusLabel(order);
+    return 'Held — awaiting shipment';
   };
 
   const commissionRate = merchantAccount?.commission_rate ?? 0.03;
@@ -1078,10 +1128,14 @@ export const MerchantPortal: React.FC = () => {
       ordersLoading={ordersLoading}
       ordersError={ordersError}
       fulfillingOrderId={fulfillingOrderId}
+      uploadingSlipOrderId={uploadingSlipOrderId}
       commissionRate={commissionRate}
       onDismissOrdersError={() => setOrdersError(null)}
       onMarkAsFulfilled={handleMarkAsFulfilled}
+      onUploadSlip={handleUploadSlip}
+      onMarkAsShipped={handleMarkAsShipped}
       getPayoutStatusLabel={getPayoutStatusLabel}
+      apiBase={apiBase}
     />
   );
 

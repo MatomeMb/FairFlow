@@ -1,28 +1,3 @@
 Subject: Bank Setup + Meeting Needed
 
-Hi Sobuhle,
 
-Quick update: I've completed the bank account integration and payout system. It's live and tested.
-
-**What We Need:**
-Your bank account details to activate payouts:
-- Account holder name
-- Bank name  
-- Account number
-- Branch code
-
-**How It Works:**
-Customer pays → Stripe holds funds → Admin releases weekly → Money to your bank (24-48h)
-
-**Next Steps:**
-Let's meet this week (30 min) to:
-1. Get your banking details
-2. Test first payout
-3. Discuss CIPC timeline
-
-I've attached a PDF with all the details.
-
-When works for you?
-
-Thanks,
-Matome

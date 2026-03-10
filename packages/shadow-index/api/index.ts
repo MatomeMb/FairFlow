@@ -13,7 +13,8 @@ import { promises as fs } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { z } from 'zod';
-import Stripe from 'stripe';
+// @ts-expect-error - Paystack SDK has no types
+import Paystack from '@paystack/paystack-sdk';
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
 import { getReport, validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
@@ -27,6 +28,8 @@ import {
   merchantProductsRouter,
   readProducts,
   writeProducts,
+  getConsumerPriceCents,
+  getMerchantPriceCents,
   type MerchantProduct,
 } from './merchant-products.js';
 
@@ -66,8 +69,13 @@ if (process.env.NODE_ENV === 'test') {
   delete process.env.SHADOW_INDEX_API_KEYS;
 }
 
-// Initialize Stripe
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
+// Initialize Paystack
+const paystack = new Paystack(process.env.PAYSTACK_SECRET_KEY || '');
+
+/** Paystack routing stub — ready for Peach Payments later when selectRail() chooses provider. */
+export function selectRail(): 'paystack' {
+  return 'paystack';
+}
 
 const app = new Hono();
 
@@ -98,13 +106,14 @@ app.use('*', async (c, next) => {
   if (requestPath === '/v1/admin/payouts/release' 
     || requestPath === '/v1/admin/mor-status' 
     || requestPath === '/v1/admin/payouts/backfill'
+    || requestPath === '/v1/admin/cron/release-escrow'
     || requestPath === '/v1/admin/kyc/pending'
     || requestPath.startsWith('/v1/admin/kyc/approve/')
     || requestPath.startsWith('/v1/admin/kyc/reject/')) {
     return next();
   }
 
-  if (requestPath === '/webhooks/stripe') {
+  if (requestPath === '/webhooks/stripe' || requestPath === '/webhooks/paystack') {
     return next();
   }
 
@@ -130,6 +139,14 @@ app.use('*', async (c, next) => {
 
   // Allow public access to uploaded product images
   if (requestPath.startsWith('/uploads/')) {
+    return next();
+  }
+
+  if (requestPath.startsWith('/v1/slips/')) {
+    return next();
+  }
+
+  if (requestPath.match(/^\/v1\/orders\/[^/]+\/confirm-receipt$/) && c.req.method === 'POST') {
     return next();
   }
 
@@ -349,7 +366,9 @@ const merchantAccountsFile = path.join(dataRoot, 'merchant_accounts.json');
 const ordersFile = path.join(dataRoot, 'orders.json');
 const notificationsFile = path.join(dataRoot, 'notifications.json');
 const payoutLogsFile = path.join(dataRoot, 'payout_logs.json');
+const slipsDir = path.join(dataRoot, 'slips');
 const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? 'http://localhost:5178';
+const publicApiBase = process.env.PUBLIC_API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
 const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? 'dev-jwt-secret-change-me';
 
 const registerSchema = z.object({
@@ -469,19 +488,45 @@ const writeJsonFile = async (filePath: string, value: unknown): Promise<void> =>
   await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
 };
 
+type DeliveryAddress = {
+  name?: string;
+  line1?: string;
+  line2?: string;
+  suburb?: string;
+  city?: string;
+  postal_code?: string;
+  phone?: string;
+};
+
 type MerchantOrder = {
   id: string;
+  paystack_reference?: string;
   session_id?: string;
+  product_id?: string;
   product_hash?: string;
+  product_title?: string;
+  merchant_id?: string;
+  merchant_price_cents?: number;
+  consumer_price_cents?: number;
+  platform_revenue_cents?: number;
   amount?: number;
   currency?: string;
+  customer?: { email: string; delivery_address?: DeliveryAddress };
   customer_email?: string;
+  delivery_address?: DeliveryAddress;
   status?: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment_status?: 'held' | 'shipped' | 'confirmed' | 'released' | 'disputed';
+  fulfillment_status?: 'pending' | 'shipped' | 'fulfilled' | 'delivered';
+  shipment_slip_url?: string | null;
+  confirm_token?: string;
+  held_at?: string;
+  shipped_at?: string | null;
+  customer_confirmed_at?: string | null;
+  released_at?: string | null;
+  rail_used?: 'paystack';
   billing_address?: Record<string, unknown> | null;
   created_at?: string;
   paid_at?: string | null;
-  merchant_id?: string;
-  fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
   fulfilled_at?: string | null;
   updated_at?: string;
   payout_log_id?: string;
@@ -640,6 +685,63 @@ async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
   });
 
   return payoutLog;
+}
+
+/**
+ * Release held funds to merchant (escrow release). Called when customer confirms receipt.
+ * TODO: Paystack subaccount creation not built yet — merchants don't have KYC. Payouts processed manually.
+ */
+async function releaseToMerchant(order: MerchantOrder): Promise<void> {
+  const merchantPriceCents = order.merchant_price_cents ?? order.amount ?? 0;
+  const consumerPriceCents = order.consumer_price_cents ?? order.amount ?? 0;
+  const platformRevenueCents = order.platform_revenue_cents ?? (consumerPriceCents - merchantPriceCents);
+
+  const now = new Date().toISOString();
+
+  const payoutLog: PayoutLog = {
+    id: crypto.randomUUID(),
+    merchant_id: order.merchant_id,
+    orders_included: [order.id],
+    gross_amount: consumerPriceCents,
+    commission_amount: platformRevenueCents,
+    net_amount: merchantPriceCents,
+    currency: order.currency ?? 'ZAR',
+    status: 'pending',
+    transfer_reference: null,
+    failure_reason: null,
+    initiated_by: 'customer_confirm_receipt',
+    created_at: now,
+    transferred_at: null,
+  };
+
+  const logs = await loadPayoutLogs();
+  logs.push(payoutLog);
+  await savePayoutLogs(logs);
+
+  order.payment_status = 'released';
+  order.released_at = now;
+  order.payout_log_id = payoutLog.id;
+  order.updated_at = now;
+
+  const orders = await loadOrders();
+  const idx = orders.findIndex((o) => o.id === order.id);
+  if (idx >= 0) orders[idx] = order;
+  await saveOrders(orders);
+
+  const notifs = await loadNotifications();
+  notifs.push({
+    id: crypto.randomUUID(),
+    merchant_id: order.merchant_id,
+    type: 'payout',
+    title: 'Payment released',
+    message: `Payment of R${(merchantPriceCents / 100).toFixed(2)} released for order #${order.id.slice(0, 8)}`,
+    read: false,
+    created_at: now,
+  });
+  await saveNotifications(notifs);
+
+  // TODO: Call Paystack Transfer API when subaccounts are set up
+  logger.info('Released to merchant', { orderId: order.id, merchantPriceCents, merchant_id: order.merchant_id });
 }
 
 /**
@@ -1038,7 +1140,7 @@ app.get('/health', async (c) => {
   }
 
   checks.r2 = useR2 ? 'enabled' : 'disabled';
-  checks.stripe = process.env.STRIPE_SECRET_KEY ? 'configured' : 'not_configured';
+  checks.paystack = process.env.PAYSTACK_SECRET_KEY ? 'configured' : 'not_configured';
 
   const allOk = checks.storage === 'ok';
 
@@ -1441,7 +1543,13 @@ app.post('/v1/merchant/products/:productId/restock', async (c) => {
 app.get('/v1/merchant/orders', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
   const orders = await loadOrders();
-  const filtered = orders.filter((order) => !order.merchant_id || merchantIds.includes(order.merchant_id));
+  const products = readProducts();
+  const filtered = orders
+    .filter((order) => !order.merchant_id || merchantIds.includes(order.merchant_id))
+    .map((o) => {
+      const product = products.find((p) => p.id === o.product_id || p.thing_file?.hash === o.product_hash);
+      return { ...o, product_title: o.product_title ?? product?.title };
+    });
   filtered.sort((a, b) => {
     const aCreated = typeof a.created_at === 'string' ? a.created_at : '';
     const bCreated = typeof b.created_at === 'string' ? b.created_at : '';
@@ -1477,6 +1585,126 @@ app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
   }
 
   return c.json({ ok: true, order });
+});
+
+// POST /v1/merchant/orders/:id/upload-slip - Upload shipment slip (PDF, JPG, PNG, max 5MB)
+const SLIP_MAX_BYTES = 5 * 1024 * 1024;
+const SLIP_ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
+app.post('/v1/merchant/orders/:orderId/upload-slip', async (c) => {
+  const orderId = c.req.param('orderId');
+  const orders = await loadOrders();
+  const order = orders.find((o) => o.id === orderId);
+  if (!order) return c.json(err('not_found', 'Order not found'), 404);
+
+  const body = await c.req.parseBody();
+  const file = body['file'] ?? body['slip'];
+  if (!file || typeof file === 'string') {
+    return c.json(err('invalid_request', 'Missing file in multipart form (field: file or slip)'), 400);
+  }
+
+  const f = file as File;
+  if (f.size > SLIP_MAX_BYTES) {
+    return c.json(err('invalid_request', 'File too large (max 5MB)'), 400);
+  }
+  if (!SLIP_ALLOWED_TYPES.includes(f.type) && !f.name.match(/\.(pdf|jpg|jpeg|png)$/i)) {
+    return c.json(err('invalid_request', 'Only PDF, JPG, PNG allowed'), 400);
+  }
+
+  const ext = f.name.match(/\.(pdf|jpg|jpeg|png)$/i)?.[1] ?? 'pdf';
+  const filename = `${orderId}-${Date.now()}.${ext}`;
+  await fs.mkdir(slipsDir, { recursive: true });
+  const filePath = path.join(slipsDir, filename);
+  const buf = Buffer.from(await f.arrayBuffer());
+  await fs.writeFile(filePath, buf);
+
+  const slipUrl = `${publicApiBase.replace(/\/$/, '')}/v1/slips/${filename}`;
+  return c.json({ ok: true, slip_url: slipUrl, filename }, 201);
+});
+
+// PATCH /v1/merchant/orders/:id/ship - Mark order as shipped (requires shipment_slip_url)
+app.patch('/v1/merchant/orders/:orderId/ship', async (c) => {
+  const orderId = c.req.param('orderId');
+  const body = await c.req.json().catch(() => null) as { shipment_slip_url?: string } | null;
+  const slipUrl = body?.shipment_slip_url?.trim();
+
+  if (!slipUrl) {
+    return c.json(err('invalid_request', 'shipment_slip_url is required'), 400);
+  }
+  try {
+    new URL(slipUrl);
+  } catch {
+    return c.json(err('invalid_request', 'shipment_slip_url must be a valid URL'), 400);
+  }
+
+  const orders = await loadOrders();
+  const order = orders.find((o) => o.id === orderId);
+  if (!order) return c.json(err('not_found', 'Order not found'), 404);
+
+  const confirmToken = crypto.randomBytes(24).toString('hex');
+  const now = new Date().toISOString();
+  order.fulfillment_status = 'shipped';
+  order.shipped_at = now;
+  order.shipment_slip_url = slipUrl;
+  order.confirm_token = confirmToken;
+  order.payment_status = order.payment_status === 'held' ? 'held' : order.payment_status;
+  order.updated_at = now;
+  await saveOrders(orders);
+
+  // TODO: Send customer email "Your order has been shipped. Click here to confirm when it arrives: [link]"
+  const confirmUrl = `${authPortalBaseUrl}/order/${orderId}/confirm?token=${confirmToken}`;
+  logger.info('Order marked shipped', { orderId, confirmUrl });
+
+  return c.json({ ok: true, order });
+});
+
+// POST /v1/orders/:id/confirm-receipt - Customer confirms receipt (releases funds to merchant)
+app.post('/v1/orders/:orderId/confirm-receipt', async (c) => {
+  const orderId = c.req.param('orderId');
+  const orders = await loadOrders();
+  const order = orders.find((o) => o.id === orderId);
+  if (!order) return c.json(err('not_found', 'Order not found'), 404);
+
+  if (order.fulfillment_status !== 'shipped' && order.fulfillment_status !== 'fulfilled') {
+    return c.json(err('invalid_request', 'Order has not been shipped yet'), 400);
+  }
+  if (!order.shipment_slip_url) {
+    return c.json(err('invalid_request', 'Merchant has not confirmed shipment yet'), 400);
+  }
+  if (order.payment_status === 'released') {
+    return c.json({ ok: true, message: 'Already confirmed' }, 200);
+  }
+
+  const now = new Date().toISOString();
+  order.payment_status = 'confirmed';
+  order.customer_confirmed_at = now;
+  order.updated_at = now;
+
+  const idx = orders.findIndex((o) => o.id === orderId);
+  if (idx >= 0) orders[idx] = order;
+  await saveOrders(orders);
+
+  await releaseToMerchant(order);
+
+  return c.json({ ok: true, message: 'Thank you! Payment has been released to the merchant.' }, 200);
+});
+
+// GET /v1/slips/:filename - Serve uploaded slip (public for now)
+app.get('/v1/slips/:filename', async (c) => {
+  const filename = c.req.param('filename');
+  if (!filename || filename.includes('..')) {
+    return c.json(err('invalid_request', 'Invalid filename'), 400);
+  }
+  const filePath = path.join(slipsDir, filename);
+  try {
+    const data = await fs.readFile(filePath);
+    const ext = path.extname(filename).toLowerCase();
+    const ct = ext === '.pdf' ? 'application/pdf' : ext === '.png' ? 'image/png' : 'image/jpeg';
+    return c.body(new Uint8Array(data), 200, { 'Content-Type': ct });
+  } catch (e) {
+    const nodeErr = e as NodeJS.ErrnoException;
+    if (nodeErr.code === 'ENOENT') return c.json(err('not_found', 'Slip not found'), 404);
+    throw e;
+  }
 });
 
 app.post('/v1/admin/payouts/release', async (c) => {
@@ -2175,7 +2403,7 @@ app.get('/catalog/public', (c) => {
     .map((product: MerchantProduct) => ({
       hash: product.thing_file!.hash,
       title: product.title,
-      price: product.price_cents,
+      price: getConsumerPriceCents(product),
       currency: product.currency,
       category: product.category,
       merchant_id: product.merchant_id,
@@ -2321,6 +2549,43 @@ app.post('/v1/admin/retention/run', async (c) => {
   }
 });
 
+// POST /v1/admin/cron/release-escrow - Run 10-day auto-release (call daily via cron)
+app.post('/v1/admin/cron/release-escrow', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const now = Date.now();
+  const tenDaysAgo = new Date(now - 10 * 24 * 60 * 60 * 1000).toISOString();
+  const sevenDaysAgo = new Date(now - 7 * 24 * 60 * 60 * 1000).toISOString();
+
+  const orders = await loadOrders();
+  let released = 0;
+  let reminders = 0;
+
+  for (const order of orders) {
+    const heldAt = order.held_at;
+    if (!heldAt) continue;
+    if (order.payment_status !== 'held') continue;
+    if (order.fulfillment_status !== 'shipped' && order.fulfillment_status !== 'fulfilled') continue;
+
+    if (heldAt < tenDaysAgo) {
+      try {
+        await releaseToMerchant(order);
+        released++;
+      } catch (e) {
+        logger.error('Auto-release failed', { orderId: order.id, error: String(e) });
+      }
+    } else if (heldAt < sevenDaysAgo && !order.customer_confirmed_at) {
+      // Day 7 reminder - TODO: send email with confirm link
+      reminders++;
+      logger.info('Day 7 reminder due', { orderId: order.id, customer: order.customer?.email });
+    }
+  }
+
+  return c.json({ ok: true, released, reminders }, 200);
+});
+
 // Sprint 4 Week 3: Cache invalidation (POST /v1/admin/cache/clear)
 app.post('/v1/admin/cache/clear', (c) => {
   invalidateCache();
@@ -2381,82 +2646,67 @@ app.get('/thing-bin/:hash', async (c) => {
   }
 });
 
-// POST /checkout/create-session - Create a Stripe checkout session
+// POST /checkout/create-session - Create Paystack transaction and return authorization URL
 app.post('/checkout/create-session', async (c) => {
   try {
     const body = await c.req.json();
-    const { product_hash, customer_email, delivery_address, billing_address } = body;
+    const { product_hash, product_id, customer_email, delivery_address } = body;
 
-    if (!product_hash || !customer_email) {
-      return c.json(err('invalid_request', 'Missing product_hash or customer_email'), 400);
+    if (!customer_email) {
+      return c.json(err('invalid_request', 'Missing customer_email'), 400);
+    }
+    const hash = product_hash || product_id;
+    if (!hash) {
+      return c.json(err('invalid_request', 'Missing product_hash or product_id'), 400);
     }
 
-    // Get product details from merchant products
     const products = readProducts();
-    const product = products.find((p: MerchantProduct) => p.thing_file?.hash === product_hash);
+    const product = products.find((p: MerchantProduct) => p.thing_file?.hash === hash || p.id === hash);
 
     if (!product) {
-      return c.json(err('product_not_found', `Product not found: ${product_hash}`), 404);
+      return c.json(err('product_not_found', `Product not found: ${hash}`), 404);
     }
 
-    // Validate stock
-    if (product.stock_count !== undefined && product.stock_count <= 0) {
+    if ((product.stock_count ?? 0) <= 0) {
       return c.json(err('out_of_stock', 'This product is out of stock'), 400);
     }
 
-    const priceInCents = product.price_cents;
-    const title = product.title;
+    const consumerPriceCents = getConsumerPriceCents(product);
+    const merchantPriceCents = getMerchantPriceCents(product);
+    const platformRevenueCents = consumerPriceCents - merchantPriceCents;
 
-    // Create Stripe checkout session
-    const session = await stripe.checkout.sessions.create({
-      payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: (product.currency || 'usd').toLowerCase(),
-            product_data: {
-              name: title,
-              images: product.image_url ? [product.image_url] : [],
-            },
-            unit_amount: priceInCents,
-          },
-          quantity: 1,
-        },
-      ],
-      mode: 'payment',
-      success_url: `${process.env.AUTH_PORTAL_BASE_URL}/order/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${process.env.AUTH_PORTAL_BASE_URL}/product/${product_hash}`,
-      customer_email: customer_email,
-      metadata: {
-        product_hash,
-        product_id: product.id,
-        delivery_address: JSON.stringify(delivery_address || {}),
-        billing_address: JSON.stringify(billing_address || {}),
-      },
-    });
+    const callbackUrl = process.env.PAYSTACK_CALLBACK_URL
+      || `${process.env.AUTH_PORTAL_BASE_URL || authPortalBaseUrl}/order/confirmation`;
 
-    // Create and save order
-    const order: MerchantOrder = {
-      id: session.id,
-      session_id: session.id,
-      product_hash,
-      merchant_id: product.merchant_id,
-      amount: priceInCents,
-      currency: product.currency || 'usd',
-      customer_email,
-      status: 'pending',
-      billing_address: billing_address || null,
-      created_at: new Date().toISOString(),
-      paid_at: null,
+    const metadata: Record<string, string> = {
+      product_hash: product.thing_file?.hash ?? hash,
+      product_id: product.id,
+      merchant_id: product.merchant_id ?? '',
+      merchant_price_cents: String(merchantPriceCents),
+      consumer_price_cents: String(consumerPriceCents),
+      platform_revenue_cents: String(platformRevenueCents),
+      delivery_address: JSON.stringify(delivery_address || {}),
     };
 
-    const existingOrders = await loadOrders();
-    await saveOrders([...existingOrders, order]);
+    const init = await paystack.transaction.initialize({
+      email: customer_email,
+      amount: consumerPriceCents, // Paystack expects amount in subunit (ZAR cents)
+      currency: (product.currency || 'ZAR').toUpperCase().slice(0, 3),
+      callback_url: callbackUrl,
+      metadata,
+    });
+
+    const data = init.data as { authorization_url?: string; reference?: string } | undefined;
+    if (!data?.authorization_url) {
+      logger.error('Paystack init missing authorization_url', { init });
+      return c.json(err('checkout_failed', 'Failed to create payment session'), 500);
+    }
 
     return c.json({
       ok: true,
-      url: session.url,
-      session_id: session.id,
+      authorization_url: data.authorization_url,
+      url: data.authorization_url,
+      reference: data.reference,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -2465,54 +2715,144 @@ app.post('/checkout/create-session', async (c) => {
   }
 });
 
-// POST /webhooks/stripe - Stripe webhook settlement source of truth
-app.post('/webhooks/stripe', async (c) => {
-  const signature = c.req.header('stripe-signature');
-  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-  if (!signature || !webhookSecret) {
-    return c.json(err('webhook_config_error', 'Missing Stripe webhook signature or secret'), 400);
+// POST /webhooks/paystack - Paystack webhook (charge.success, transfer.success, transfer.failed)
+app.post('/webhooks/paystack', async (c) => {
+  const signature = c.req.header('x-paystack-signature');
+  const secret = process.env.PAYSTACK_SECRET_KEY;
+  if (!signature || !secret) {
+    return c.json(err('webhook_config_error', 'Missing Paystack signature or secret'), 400);
   }
 
-  const payload = await c.req.text();
-  let event: Stripe.Event;
+  const rawBody = await c.req.text();
+  const expectedHash = crypto.createHmac('sha512', secret).update(rawBody).digest('hex');
+  let sigValid = false;
+  if (expectedHash.length === signature.length) {
+    try {
+      sigValid = crypto.timingSafeEqual(Buffer.from(expectedHash, 'hex'), Buffer.from(signature, 'hex'));
+    } catch {
+      // ignore
+    }
+  }
+  if (!sigValid) {
+    return c.json(err('webhook_signature_invalid', 'Invalid Paystack signature'), 400);
+  }
+
+  let event: { event?: string; data?: Record<string, unknown> };
   try {
-    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    return c.json(err('webhook_signature_invalid', message), 400);
+    event = JSON.parse(rawBody) as { event?: string; data?: Record<string, unknown> };
+  } catch {
+    return c.json(err('webhook_invalid_json', 'Invalid webhook payload'), 400);
   }
 
   try {
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const sessionId = session.id;
-      const orders = await loadOrders();
-      const order = orders.find((item) => item.id === sessionId || item.session_id === sessionId);
-      if (order) {
-        if (order.status !== 'paid') {
-          const now = new Date().toISOString();
-          order.status = 'paid';
-          order.paid_at = now;
-          order.updated_at = now;
-          await saveOrders(orders);
-          logger.info('Order payment settled via webhook', {
-            orderId: order.id,
-            payoutLogId: order.payout_log_id ?? null,
-            amount: order.amount,
-            merchant_id: order.merchant_id,
-          });
+    if (event.event === 'charge.success') {
+      const data = event.data as { reference?: string; metadata?: Record<string, string>; customer?: { email?: string } } | undefined;
+      if (!data?.reference) {
+        logger.warn('Paystack charge.success missing reference', { event });
+        return c.json({ ok: true }, 200);
+      }
+
+      let meta: Record<string, string> = {};
+      const rawMeta = data.metadata;
+      if (typeof rawMeta === 'string') {
+        try {
+          meta = JSON.parse(rawMeta) as Record<string, string>;
+        } catch {
+          // ignore
         }
+      } else if (rawMeta && typeof rawMeta === 'object') {
+        meta = rawMeta as Record<string, string>;
+      }
+      const productId = meta.product_id;
+      const productHash = meta.product_hash;
+      const merchantId = meta.merchant_id;
+      const merchantPriceCents = parseInt(meta.merchant_price_cents ?? '0', 10);
+      const consumerPriceCents = parseInt(meta.consumer_price_cents ?? '0', 10);
+      const platformRevenueCents = parseInt(meta.platform_revenue_cents ?? '0', 10) || (consumerPriceCents - merchantPriceCents);
 
-        if (order.fulfillment_status === 'fulfilled') {
-          const payoutLog = await queueOrderForPayout(order.id);
-          if (payoutLog) {
-            logger.info('Order queued after webhook settlement', {
-              orderId: order.id,
-              payoutLogId: payoutLog.id,
-              amount: payoutLog.net_amount,
-              merchant_id: payoutLog.merchant_id,
-            });
-          }
+      let deliveryAddress: DeliveryAddress = {};
+      try {
+        const da = meta.delivery_address;
+        if (typeof da === 'string') deliveryAddress = JSON.parse(da) as DeliveryAddress;
+      } catch {
+        // ignore
+      }
+
+      const customerEmail = data.customer?.email ?? '';
+
+      const orders = await loadOrders();
+      const existing = orders.find((o) => o.paystack_reference === data.reference || o.id === data.reference);
+      if (existing) {
+        logger.info('Paystack charge.success order already exists', { reference: data.reference });
+        return c.json({ ok: true }, 200);
+      }
+
+      const now = new Date().toISOString();
+      const orderId = crypto.randomUUID();
+      const order: MerchantOrder = {
+        id: orderId,
+        paystack_reference: data.reference,
+        session_id: data.reference,
+        product_id: productId,
+        product_hash: productHash,
+        merchant_id: merchantId,
+        merchant_price_cents: merchantPriceCents,
+        consumer_price_cents: consumerPriceCents,
+        platform_revenue_cents: platformRevenueCents,
+        amount: consumerPriceCents,
+        currency: 'ZAR',
+        customer: { email: customerEmail, delivery_address: deliveryAddress },
+        customer_email: customerEmail,
+        delivery_address: deliveryAddress,
+        status: 'paid',
+        payment_status: 'held',
+        fulfillment_status: 'pending',
+        held_at: now,
+        rail_used: 'paystack',
+        created_at: now,
+        updated_at: now,
+      };
+
+      const products = readProducts();
+      const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
+      if (product) {
+        product.stock_count = Math.max(0, (product.stock_count ?? 1) - 1);
+        product.updated_at = now;
+        writeProducts(products);
+      }
+
+      const allOrders = await loadOrders();
+      allOrders.push(order);
+      await saveOrders(allOrders);
+
+      const notifs = await loadNotifications();
+      notifs.push({
+        id: crypto.randomUUID(),
+        merchant_id: merchantId,
+        type: 'order',
+        title: 'New order received',
+        message: `Order #${orderId.slice(0, 8)} for ${consumerPriceCents / 100} ZAR. Delivery: ${deliveryAddress.name ?? ''} - ${deliveryAddress.line1 ?? ''}`,
+        read: false,
+        created_at: now,
+      });
+      await saveNotifications(notifs);
+
+      logger.info('Order created from Paystack charge.success', {
+        orderId,
+        reference: data.reference,
+        merchant_id: merchantId,
+        consumer_price_cents: consumerPriceCents,
+      });
+    } else if (event.event === 'transfer.success' || event.event === 'transfer.failed') {
+      const data = event.data as { reference?: string; status?: string } | undefined;
+      if (data?.reference) {
+        const logs = await loadPayoutLogs();
+        const log = logs.find((l) => l.transfer_reference === data.reference);
+        if (log) {
+          log.status = event.event === 'transfer.success' ? 'completed' : 'failed';
+          if (event.event === 'transfer.failed') log.failure_reason = (data as { reason?: string }).reason ?? 'Transfer failed';
+          log.transferred_at = event.event === 'transfer.success' ? new Date().toISOString() : null;
+          await savePayoutLogs(logs);
         }
       }
     }
@@ -2520,26 +2860,27 @@ app.post('/webhooks/stripe', async (c) => {
     return c.json({ ok: true }, 200);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error('Stripe webhook processing failed', { error: message });
+    logger.error('Paystack webhook processing failed', { error: message });
     return c.json(err('webhook_processing_failed', message), 500);
   }
 });
 
-// GET /orders/:sessionId - Fetch order details by session ID
-app.get('/orders/:sessionId', async (c) => {
+// GET /orders/:idOrReference - Fetch order by ID or Paystack reference
+app.get('/orders/:idOrReference', async (c) => {
   try {
-    const sessionId = c.req.param('sessionId');
-    
-    if (!sessionId) {
-      return c.json(err('invalid_request', 'Missing session ID'), 400);
+    const idOrRef = c.req.param('idOrReference');
+    const refFromQuery = c.req.query('reference');
+    const lookup = idOrRef || refFromQuery;
+
+    if (!lookup) {
+      return c.json(err('invalid_request', 'Missing order ID or reference'), 400);
     }
 
     const orders = await loadOrders();
-    const orderIndex = orders.findIndex(o => o.id === sessionId || o.session_id === sessionId);
-    const order = orderIndex >= 0 ? orders[orderIndex] : undefined;
+    const order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
 
     if (!order) {
-      return c.json(err('not_found', `Order not found for session: ${sessionId}`), 404);
+      return c.json(err('not_found', `Order not found: ${lookup}`), 404);
     }
 
     return c.json({
@@ -2576,7 +2917,8 @@ function startRateLimitCleanup() {
 
 // Development server — skip when NODE_ENV=test so tests can import app without starting server
 const port = Number(process.env.PORT) || 3000;
-if (process.env.NODE_ENV !== 'test') {
+// Also skip when running on Vercel (serverless — port binding is not supported)
+if (process.env.NODE_ENV !== 'test' && !process.env.VERCEL) {
   logger.info('Server starting', {
     port,
     storage: useR2 ? 'r2' : 'local',

@@ -8,6 +8,7 @@ import { LoginPage } from "../pages/LoginPage";
 import { UnauthorizedPage } from "../pages/UnauthorizedPage";
 import { ProductPage } from "../pages/ProductPage";
 import { OrderConfirmation } from "../pages/OrderConfirmation";
+import { ConfirmReceipt } from "../pages/ConfirmReceipt";
 import { MerchantLogin } from "../pages/MerchantLogin";
 import { MerchantRegister } from "../pages/MerchantRegister";
 
@@ -54,6 +55,8 @@ export function PortalRouter() {
         {/* Public Product & Order Pages */}
         <Route path="/product/:hash" element={<ProductPage />} />
         <Route path="/order/success" element={<OrderConfirmation />} />
+        <Route path="/order/confirmation" element={<OrderConfirmation />} />
+        <Route path="/order/:id/confirm" element={<ConfirmReceipt />} />
 
         {/* Smart redirect based on role */}
         <Route path="/" element={<AuthRedirect />} />

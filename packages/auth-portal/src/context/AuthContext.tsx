@@ -64,10 +64,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       .getSession()
       .then(({ data: { session } }) => {
         setSession(session);
-        const appRole = extractRoleFromSession(session);
-        setRole(appRole);
+        let appRole = extractRoleFromSession(session);
         if (session && appRole) {
+          setRole(appRole);
           setUser(buildUser(session, appRole));
+        } else {
+          const devEmail = typeof window !== 'undefined' ? sessionStorage.getItem('devAdminEmail') : null;
+          console.log("[fairflow] Checking devAdminEmail:", devEmail);
+          if (devEmail && ADMIN_EMAILS.has(devEmail)) {
+            appRole = 'ceo';
+            console.log("[fairflow] Setting dev admin role:", appRole);
+            setRole(appRole);
+            setUser({ id: 'dev-admin', email: devEmail, role: 'ceo', name: null, avatarUrl: null });
+          } else {
+            console.log("[fairflow] No session or dev admin email found");
+            setRole(appRole);
+          }
         }
       })
       .catch((err) => {
@@ -113,6 +125,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
+    if (typeof window !== 'undefined') sessionStorage.removeItem('devAdminEmail');
     setUser(null);
     setRole(null);
   };

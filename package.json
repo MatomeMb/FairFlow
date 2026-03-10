@@ -3,7 +3,11 @@
   "private": true,
   "description": ".things that Matter — Object-Oriented Commerce",
   "scripts": {
+    "start": "cd packages/shadow-index && npm run build && npm run start",
     "test:e2e": "playwright test",
+    "demo:playwright": "playwright test --config=playwright.demo.config.ts",
+    "demo:record": "node scripts/check-servers.mjs && npm run demo:playwright && node scripts/copy-demo-video.mjs",
+    "demo:run": "powershell -ExecutionPolicy Bypass -File scripts/run-demo-record.ps1",
     "start:api": "cd packages/shadow-index && npm run start",
     "start:demo": "node scripts/demo-server.mjs",
     "demo": "node scripts/launch-demo.mjs",

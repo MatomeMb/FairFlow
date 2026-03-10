@@ -32,20 +32,28 @@ export interface DeliveryAddress {
 
 export interface MerchantOrder {
   id: string;
-  session_id: string;
-  product_hash: string;
+  session_id?: string;
+  paystack_reference?: string;
+  product_hash?: string;
+  product_id?: string;
   product_title?: string;
   customer_email: string;
-  amount: number;
+  amount?: number;
+  merchant_price_cents?: number;
+  consumer_price_cents?: number;
   currency: string;
   created_at: string;
   merchant_marked_fulfilled_at?: string;
-  consumer_confirmed_delivery: boolean;
+  consumer_confirmed_delivery?: boolean;
   consumer_confirmed_at?: string;
-  payout_status: 'holding' | 'pending_release' | 'released' | 'failed';
+  customer_confirmed_at?: string;
+  payout_status?: 'holding' | 'pending_release' | 'released' | 'failed';
+  payment_status?: 'held' | 'shipped' | 'confirmed' | 'released' | 'disputed';
   payout_log_id?: string;
   fulfilled_at?: string | null;
-  fulfillment_status?: 'pending' | 'fulfilled' | 'delivered';
+  shipped_at?: string | null;
+  shipment_slip_url?: string | null;
+  fulfillment_status?: 'pending' | 'shipped' | 'fulfilled' | 'delivered';
   delivery_address?: DeliveryAddress | null;
 }
 

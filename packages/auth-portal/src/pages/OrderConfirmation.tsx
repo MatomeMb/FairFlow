@@ -7,24 +7,23 @@ import { formatPrice } from '../lib/format';
 
 interface Order {
   id: string;
-  session_id: string;
-  product_hash: string;
-  merchant_id: string;
-  amount: number;
+  paystack_reference?: string;
+  session_id?: string;
+  product_hash?: string;
+  product_id?: string;
+  merchant_id?: string;
+  amount?: number;
+  consumer_price_cents?: number;
   currency: string;
-  customer_email: string;
-  status: 'pending' | 'paid' | 'failed' | 'refunded';
-  billing_address?: {
-    name?: string;
-    line1?: string;
-    line2?: string;
-    suburb?: string;
-    city?: string;
-    postal_code?: string;
-    phone?: string;
-  } | null;
+  customer_email?: string;
+  customer?: { email: string; delivery_address?: Record<string, string> };
+  status?: 'pending' | 'paid' | 'failed' | 'refunded';
+  payment_status?: 'held' | 'shipped' | 'confirmed' | 'released' | 'disputed';
+  fulfillment_status?: string;
+  billing_address?: Record<string, string> | null;
+  delivery_address?: Record<string, string>;
   created_at: string;
-  paid_at: string | null;
+  paid_at?: string | null;
 }
 
 interface ThingFile {
@@ -43,7 +42,7 @@ const formatDateTime = (isoString: string): string => {
 
 export function OrderConfirmation() {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('session_id');
+  const sessionId = searchParams.get('reference') || searchParams.get('session_id');
   
   const [order, setOrder] = useState<Order | null>(null);
   const [productTitle, setProductTitle] = useState<string>('');
@@ -60,47 +59,46 @@ export function OrderConfirmation() {
       return;
     }
 
-    const fetchOrder = () => {
-      fetch(`${apiBase}/orders/${sessionId}`)
-        .then((res) => {
-          if (!res.ok) {
-            throw new Error('Order not found');
+    const fetchOrder = async () => {
+      try {
+        const res = await fetch(`${apiBase}/orders/${sessionId}`);
+        if (!res.ok) throw new Error('Order not found');
+        const data: { ok: boolean; order: Order } = await res.json();
+        const orderData = data.order;
+        setOrder(orderData);
+        const hash = orderData.product_hash || orderData.product_id;
+        if (hash) {
+          try {
+            const thingRes = await fetch(`${apiBase}/thing/${hash}.json`);
+            if (thingRes.ok) {
+              const thing: ThingFile = await thingRes.json();
+              if (thing?.product?.title) setProductTitle(thing.product.title);
+            }
+          } catch {
+            // ignore
           }
-          return res.json();
-        })
-        .then((data: { ok: boolean; order: Order }) => {
-          const orderData = data.order;
-          setOrder(orderData);
-          
-          // Fetch product title
-          return fetch(`${apiBase}/thing/${orderData.product_hash}.json`);
-        })
-        .then((res) => {
-          if (!res.ok) throw new Error('Product details unavailable');
-          return res.json();
-        })
-        .then((thing: ThingFile) => {
-          setProductTitle(thing.product.title);
-          setLoading(false);
-        })
-        .catch((err) => {
-          setError(err.message || 'Failed to load order details');
-          setLoading(false);
-        });
+        }
+      } catch (err) {
+        setError(err instanceof Error ? err.message : 'Failed to load order details');
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchOrder();
 
-    // Retry logic for pending payments
     const interval = setInterval(() => {
-      if (order?.status === 'pending' && retryCount < 10) {
-        setRetryCount((c) => c + 1);
-        fetchOrder();
-      }
+      setRetryCount((c) => {
+        if (c < 10) {
+          fetchOrder();
+          return c + 1;
+        }
+        return c;
+      });
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [sessionId, retryCount, order?.status]);
+  }, [sessionId]);
 
   if (loading) {
     return (
@@ -132,6 +130,8 @@ export function OrderConfirmation() {
   }
 
   const isPending = order.status === 'pending';
+  const amount = order.consumer_price_cents ?? order.amount ?? 0;
+  const email = order.customer?.email ?? order.customer_email ?? '';
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
@@ -169,7 +169,7 @@ export function OrderConfirmation() {
               <h2 className="text-3xl font-bold text-stone-900 mb-2">Payment Successful!</h2>
               <p className="text-stone-600">
                 Thank you for your purchase. A confirmation email has been sent to{' '}
-                <span className="font-medium text-stone-900">{order.customer_email}</span>.
+                <span className="font-medium text-stone-900">{email}</span>.
               </p>
             </div>
 
@@ -190,10 +190,17 @@ export function OrderConfirmation() {
                 <div className="flex justify-between border-t border-stone-200 pt-3">
                   <span className="text-stone-900 font-semibold">Amount Paid</span>
                   <span className="text-xl font-bold text-green-600">
-                    {formatPrice(order.amount, order.currency)}
+                    {formatPrice(amount, order.currency)}
                   </span>
                 </div>
               </div>
+            </div>
+
+            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
+              <p className="text-sm text-amber-800">
+                <strong>Your payment is held securely.</strong> It releases to the merchant once you confirm receipt.
+              </p>
+              <p className="text-sm text-amber-700 mt-1">Expected delivery within 10 days.</p>
             </div>
 
             {order.billing_address && (
@@ -231,7 +238,7 @@ export function OrderConfirmation() {
                 <div>
                   <div className="font-medium text-stone-900 mb-1">Email Confirmation</div>
                   <div className="text-sm text-stone-600">
-                    Check {order.customer_email} for your receipt and order details
+                    Check {email} for your receipt and order details
                   </div>
                 </div>
               </div>

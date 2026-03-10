@@ -8,6 +8,7 @@
 | [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md) | Pre/post-deploy verification |
 | [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) | API keys and environment setup |
 | [BETA-TESTING-GUIDE.md](./BETA-TESTING-GUIDE.md) | Beta testing workflow |
+| [DEMO-VIDEO-SCRIPT.md](./DEMO-VIDEO-SCRIPT.md) | Exhaustive functionality demo recording script |
 | [BETA-LAUNCH-READINESS-REPORT.md](./BETA-LAUNCH-READINESS-REPORT.md) | Launch readiness assessment |
 
 See [../SETUP.md](../SETUP.md) for development setup.

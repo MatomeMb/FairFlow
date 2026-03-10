@@ -29,10 +29,8 @@ export function LoginPage() {
     try {
       // Dev mode: Check if this is an admin email
       if (DEV_ADMIN_EMAILS.has(email.toLowerCase())) {
-        // Bypass authentication for dev admin users
-        // Create a mock session that identifies them as admin
         sessionStorage.setItem("devAdminEmail", email.toLowerCase());
-        navigate("/");
+        window.location.href = "/";
         return;
       }
 

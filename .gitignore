@@ -55,6 +55,10 @@ temp/
 coverage/
 .nyc_output/
 
+# Demo recording
+demo-output/
+fairflow-demo.webm
+
 # TypeScript
 *.tsbuildinfo
 

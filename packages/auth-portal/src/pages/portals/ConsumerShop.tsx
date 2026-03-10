@@ -72,7 +72,7 @@ export const ConsumerShop: React.FC = () => {
           category: item.category || 'General',
           ethicalScore: 5,
           inStock: true,
-          badges: ['.thing', 'Portable', 'Stripe Checkout'],
+          badges: ['.thing', 'Portable', 'Paystack Checkout'],
         }));
 
         setProducts(mapped);
@@ -276,7 +276,7 @@ export const ConsumerShop: React.FC = () => {
           <div className="text-center">
             <ShoppingCart className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
             <h4 className="font-bold mb-2">Purchase</h4>
-            <p className="text-sm text-stone-400">Buy directly with secure Stripe checkout</p>
+            <p className="text-sm text-stone-400">Buy directly with secure Paystack checkout</p>
           </div>
           <div className="text-center">
             <Heart className="w-8 h-8 mx-auto mb-3 text-emerald-500 fill-current" />

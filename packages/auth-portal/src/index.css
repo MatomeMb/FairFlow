@@ -24,3 +24,10 @@ body {
   min-width: 320px;
   min-height: 100vh;
 }
+
+/* Prevent logo from inheriting filters or color tints */
+.fairflow-logo,
+.fairflow-logo svg {
+  filter: none !important;
+  mix-blend-mode: normal !important;
+}

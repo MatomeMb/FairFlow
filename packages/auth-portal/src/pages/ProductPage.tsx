@@ -18,7 +18,7 @@ interface ThingFile {
   };
   commerce: {
     merchant_id: string;
-    payment_gateway: 'stripe';
+    payment_gateway: 'paystack';
     supported_currencies: string[];
     shipping_available: boolean;
   };
@@ -185,8 +185,9 @@ export function ProductPage() {
         throw new Error('Failed to create checkout session');
       }
 
-      const { url } = await response.json();
-      window.location.href = url;
+      const data = await response.json();
+      const url = data.authorization_url || data.url;
+      if (url) window.location.href = url;
     } catch {
       setError('Failed to start checkout. Please try again.');
       setCheckoutLoading(false);
