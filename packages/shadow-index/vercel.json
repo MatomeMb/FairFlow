@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "outputDirectory": "",
+  "builds": [
+    {
+      "src": "api/vercel-entry.ts",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "api/vercel-entry.ts"
+    }
+  ]
+}
