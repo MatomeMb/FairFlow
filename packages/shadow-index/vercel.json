@@ -5,10 +5,10 @@
       "maxDuration": 30
     }
   },
-  "routes": [
+  "rewrites": [
     {
-      "src": "/(.*)",
-      "dest": "api/vercel-entry.ts"
+      "source": "/:path*",
+      "destination": "/api/vercel-entry"
     }
   ]
 }
