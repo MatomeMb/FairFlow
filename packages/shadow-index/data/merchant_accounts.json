@@ -25,5 +25,35 @@
       "branch_code": "001",
       "account_type": "business"
     }
+  },
+  {
+    "id": "658abd16-057b-424b-b5a0-e7185f37afc4",
+    "business_name": "Test Shop",
+    "email": "test-1773242148961@example.com",
+    "password_hash": "498f12cf1bd01eddb455435050f92f47:5f31386be6a28479fbd3d56664434b926af5e391249cef6c7345e735c37b0eb0",
+    "auth_provider": "password",
+    "kyc_status": "not_started",
+    "commission_rate": 0.03,
+    "payout_frequency": "weekly",
+    "payout_minimum": 50000,
+    "total_earnings": 0,
+    "pending_payout": 0,
+    "created_at": "2026-03-11T15:15:48.977Z",
+    "updated_at": "2026-03-11T15:15:49.016Z"
+  },
+  {
+    "id": "40b44728-e25f-41b6-a54b-b6e75d36ae16",
+    "business_name": "Test Shop",
+    "email": "test-1773242263601@example.com",
+    "password_hash": "0eeb3ef8f80f8ac9cdfbabc9ce97f524:d62870a16f35793625d0a48d6d5769631a7c743fc877ab29fa35017d0d985eea",
+    "auth_provider": "password",
+    "kyc_status": "not_started",
+    "commission_rate": 0.03,
+    "payout_frequency": "weekly",
+    "payout_minimum": 50000,
+    "total_earnings": 0,
+    "pending_payout": 0,
+    "created_at": "2026-03-11T15:17:43.658Z",
+    "updated_at": "2026-03-11T15:17:43.714Z"
   }
 ]
