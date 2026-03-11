@@ -53,25 +53,27 @@ Production and staging deployment procedures for fairflow.
 - [ ] Staging Stripe keys (test mode)
 - [ ] Staging Supabase project
 
-### 1. Shadow Index API
+### 1. Shadow Index API (Vercel)
 
-1. Set environment variables in hosting platform (Railway, Render, Fly.io, etc.)
+1. Set environment variables in Vercel project → Settings → Environment Variables
 2. Deploy from `packages/shadow-index`:
    ```bash
    cd packages/shadow-index
-   npm ci
-   npm run build
-   npm run start
+   npx vercel
    ```
-3. Verify: `curl https://staging-api.fairflow.co.za/health`
-4. Configure Stripe webhook: `https://staging-api.fairflow.co.za/webhooks/stripe`, event `checkout.session.completed`
+   The API runs as a serverless function via `api/vercel-entry.ts`.
+3. Verify: `curl https://staging-api.fairflow.co.za/healthz`
+4. Configure Paystack webhook: `https://staging-api.fairflow.co.za/webhooks/paystack`
 
-### 2. Auth Portal
+### 2. Auth Portal (Vercel)
 
-1. Set build env: `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ADMIN_SECRET`
-2. Build: `cd packages/auth-portal && npm run build`
-3. Deploy `dist/` to static host (Vercel, Netlify, Cloudflare Pages)
-4. Add staging URL to Supabase Auth redirect allowlist
+1. Set build env in Vercel: `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ADMIN_SECRET`
+2. Deploy from `packages/auth-portal`:
+   ```bash
+   cd packages/auth-portal
+   npx vercel
+   ```
+3. Add staging URL to Supabase Auth redirect allowlist
 
 ### 3. Post-Deploy Verification
 
@@ -105,11 +107,10 @@ npm audit
    cp -r data/ data-backup-$(date +%s)/
    ```
 
-2. **Deploy code**:
+2. **Deploy code** (both projects deploy via Vercel on push to `main`, or manually):
    ```bash
-   git pull origin main
-   npm ci --production
-   npm run build
+   cd packages/shadow-index && npx vercel --prod
+   cd packages/auth-portal && npx vercel --prod
    ```
 
 3. **Migrations** (if needed):
@@ -118,14 +119,14 @@ npm audit
    node scripts/migrate-002-update-merchant-kyc.mjs
    ```
 
-4. **Restart service** and verify:
+4. **Verify**:
    ```bash
-   curl https://api.fairflow.co.za/health
+   curl https://api.fairflow.co.za/healthz
    ```
 
 ### Rollback
 
-1. Revert to previous deployment in hosting platform
+1. Revert to previous deployment in Vercel (Deployments → select previous → Promote to Production)
 2. If data corrupted, restore from backup
 3. Notify team
 

@@ -126,12 +126,12 @@ curl -H "Authorization: Bearer mor-admin-secret-local" http://localhost:3000/v1/
 
 ### 5.1 Shadow-index
 
-1. Set env vars in hosting (Railway, Render, etc.):
+1. Set env vars in Vercel project (Settings → Environment Variables):
    - `ADMIN_SECRET_KEY` — strong random secret
-   - `JWT_SECRET`, `STRIPE_*`, `GOOGLE_*`, etc.
-2. Deploy from `packages/shadow-index`
-3. Verify: `curl https://staging-api.fairflow.co.za/health`
-4. Configure Stripe webhook: `https://staging-api.fairflow.co.za/webhooks/stripe`
+   - `JWT_SECRET`, `PAYSTACK_*`, `GOOGLE_*`, etc.
+2. Deploy from `packages/shadow-index` via `npx vercel --prod`
+3. Verify: `curl https://staging-api.fairflow.co.za/healthz`
+4. Configure Paystack webhook: `https://staging-api.fairflow.co.za/webhooks/paystack`
 
 ### 5.2 Auth-portal
 

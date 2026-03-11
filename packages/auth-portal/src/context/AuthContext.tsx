@@ -6,12 +6,8 @@ import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
 
 // Admin email configuration — emails listed here get CEO role
 const ADMIN_EMAILS = new Set([
-  "matome@fairflow.dev",
-  "sobuhle@fairflow.dev",
-  "matome.mb@fairflow.dev",
-  "sobuhle.n@fairflow.dev",
-  "matome",
-  "sobuhle",
+  "matome@fairflow.co.za",
+  "sobuhle@fairflow.co.za",
 ]);
 
 interface AuthContextType {
@@ -69,17 +65,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           setRole(appRole);
           setUser(buildUser(session, appRole));
         } else {
-          const devEmail = typeof window !== 'undefined' ? sessionStorage.getItem('devAdminEmail') : null;
-          console.log("[fairflow] Checking devAdminEmail:", devEmail);
-          if (devEmail && ADMIN_EMAILS.has(devEmail)) {
-            appRole = 'ceo';
-            console.log("[fairflow] Setting dev admin role:", appRole);
-            setRole(appRole);
-            setUser({ id: 'dev-admin', email: devEmail, role: 'ceo', name: undefined, avatarUrl: undefined });
-          } else {
-            console.log("[fairflow] No session or dev admin email found");
-            setRole(appRole);
-          }
+          setRole(null);
         }
       })
       .catch((err) => {
@@ -125,7 +111,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-    if (typeof window !== 'undefined') sessionStorage.removeItem('devAdminEmail');
     setUser(null);
     setRole(null);
   };

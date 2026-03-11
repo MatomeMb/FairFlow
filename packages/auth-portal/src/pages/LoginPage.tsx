@@ -3,16 +3,6 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
 
-// Dev mode admin emails that bypass authentication
-const DEV_ADMIN_EMAILS = new Set([
-  "matome@fairflow.dev",
-  "sobuhle@fairflow.dev",
-  "matome.mb@fairflow.dev",
-  "sobuhle.n@fairflow.dev",
-  "matome",
-  "sobuhle",
-]);
-
 export function LoginPage() {
   const { signInWithEmail } = useAuth();
   const navigate = useNavigate();
@@ -27,14 +17,6 @@ export function LoginPage() {
     setIsLoading(true);
 
     try {
-      // Dev mode: Check if this is an admin email
-      if (DEV_ADMIN_EMAILS.has(email.toLowerCase())) {
-        sessionStorage.setItem("devAdminEmail", email.toLowerCase());
-        window.location.href = "/";
-        return;
-      }
-
-      // Otherwise, use Supabase auth
       await signInWithEmail(email, password);
       navigate("/");
     } catch (err: unknown) {
@@ -101,13 +83,10 @@ export function LoginPage() {
               disabled={isLoading}
               className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
             />
-            <p className="text-xs text-stone-500 mt-1">
-              {DEV_ADMIN_EMAILS.has(email.toLowerCase()) && email ? "✓ Admin access enabled" : ""}
-            </p>
           </div>
           <input
             type="password"
-            placeholder="Password (not needed for admin demo)"
+            placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             disabled={isLoading}
@@ -122,12 +101,6 @@ export function LoginPage() {
             {isLoading ? "Signing in..." : "Sign in"}
           </button>
         </form>
-
-        <div className="mt-6 text-center text-stone-400 text-sm">
-          <p className="mb-2">Demo Admin Users (Dev Mode):</p>
-          <p className="text-xs text-stone-500">matome@fairflow.dev</p>
-          <p className="text-xs text-stone-500">sobuhle@fairflow.dev</p>
-        </div>
 
         <div className="mt-4 text-center text-stone-400 text-sm">
           Are you a merchant?{' '}
