@@ -3,7 +3,7 @@
     "hash": "bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
     "matter_uri": "matter://bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
     "thing_url": "http://localhost:3000/thing/bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/bfefe5574ca167f98378ef37a123ed07bf00f6bd622c2283e19ac3fbd598ba96.thing",
     "image_url": "https://example.com/demo.jpg",
     "checkout_url": "https://example.com/buy",
     "gist": {
@@ -12,97 +12,97 @@
       "currency": "USD",
       "image_url": "https://example.com/demo.jpg"
     },
-    "created_at": "2026-03-02T18:56:27.431Z"
+    "created_at": "2026-03-11T15:15:46.469Z"
   },
   "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0": {
     "hash": "659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
     "matter_uri": "matter://659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
     "thing_url": "http://localhost:3000/thing/659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/659eaba268c4d2ff75c6126a57cc11908b6a2b29bb4fedff48f023463e70ecf0.thing",
     "gist": {
       "title": "Resolve Test",
       "price": 1999,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.501Z"
+    "created_at": "2026-03-11T15:15:46.473Z"
   },
   "1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7": {
     "hash": "1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7",
     "matter_uri": "matter://1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7",
     "thing_url": "http://localhost:3000/thing/1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/1866ce0160f3efd541c760331c2942e40a22ee40f7186b788ea46993d1b9b1e7.thing",
     "gist": {
       "title": "Batch A",
       "price": 100,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.755Z"
+    "created_at": "2026-03-11T15:15:46.481Z"
   },
   "d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d": {
     "hash": "d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d",
     "matter_uri": "matter://d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d",
     "thing_url": "http://localhost:3000/thing/d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/d037a872a5903f7f98d8da31a24810f5a7fc04cb522180ab35d14010adb7569d.thing",
     "gist": {
       "title": "Batch B",
       "price": 200,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.801Z"
+    "created_at": "2026-03-11T15:15:46.482Z"
   },
   "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724": {
     "hash": "e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
     "matter_uri": "matter://e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
     "thing_url": "http://localhost:3000/thing/e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/e70359f64e3d1750d602056ce1e88764ab61868a8777e7f4aa588ca5bce15724.thing",
     "gist": {
       "title": "Valid",
       "price": 50,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.817Z"
+    "created_at": "2026-03-11T15:15:46.487Z"
   },
   "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee": {
     "hash": "ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
     "matter_uri": "matter://ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
     "thing_url": "http://localhost:3000/thing/ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/ca9a4e65f7886f084233eddafde1242965b73e3aab4579891ba72d439c2ec2ee.thing",
     "gist": {
       "title": "Also valid",
       "price": 75,
       "currency": "EUR"
     },
-    "created_at": "2026-03-02T18:56:27.822Z"
+    "created_at": "2026-03-11T15:15:46.488Z"
   },
   "01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8": {
     "hash": "01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8",
     "matter_uri": "matter://01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8",
     "thing_url": "http://localhost:3000/thing/01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/01d276557c39a7cd8109cbc851504372996629bf866a8c24fbdf4f499434bda8.thing",
     "gist": {
       "title": "Catalog A",
       "price": 111,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.837Z"
+    "created_at": "2026-03-11T15:15:46.492Z"
   },
   "b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb": {
     "hash": "b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb",
     "matter_uri": "matter://b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb",
     "thing_url": "http://localhost:3000/thing/b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/b718275732170837aa8e71a2d922b79029fca52977618c867061b105cff42fcb.thing",
     "gist": {
       "title": "Catalog B",
       "price": 222,
       "currency": "EUR"
     },
-    "created_at": "2026-03-02T18:56:27.842Z"
+    "created_at": "2026-03-11T15:15:46.493Z"
   },
   "a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f": {
     "hash": "a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f",
     "matter_uri": "matter://a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f",
     "thing_url": "http://localhost:3000/thing/a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/a7849f0976a16262bcf513967e99d81ebb82f4db7eaed4556491654a2132ab0f.thing",
     "image_url": "https://example.com/w.jpg",
     "checkout_url": "https://example.com/buy",
     "gist": {
@@ -111,54 +111,54 @@
       "currency": "USD",
       "image_url": "https://example.com/w.jpg"
     },
-    "created_at": "2026-03-02T18:56:27.853Z"
+    "created_at": "2026-03-11T15:15:46.496Z"
   },
   "20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9": {
     "hash": "20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9",
     "matter_uri": "matter://20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9",
     "thing_url": "http://localhost:3000/thing/20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/20fd638b8f768ba0c653a0ea663affc381967d9bd766c1aa937a1e1bb5b2a7f9.thing",
     "gist": {
       "title": "Gadget",
       "price": 199,
       "currency": "EUR"
     },
-    "created_at": "2026-03-02T18:56:27.859Z"
+    "created_at": "2026-03-11T15:15:46.497Z"
   },
   "4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a": {
     "hash": "4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a",
     "matter_uri": "matter://4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a",
     "thing_url": "http://localhost:3000/thing/4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/4c7f724fc2f1e6d26347fcfb19de2be417ea02210c44711341bd9c1788645c0a.thing",
     "gist": {
       "title": "Good",
       "price": 10,
       "currency": "USD"
     },
-    "created_at": "2026-03-02T18:56:27.867Z"
+    "created_at": "2026-03-11T15:15:46.499Z"
   },
   "ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9": {
     "hash": "ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9",
     "matter_uri": "matter://ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9",
     "thing_url": "http://localhost:3000/thing/ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/ea961699171c87a0ec2225501f9159ea7c4689cfec64a1aaf02c036eb7e821b9.thing",
     "gist": {
       "title": "Fine",
       "price": 30,
       "currency": "EUR"
     },
-    "created_at": "2026-03-02T18:56:27.871Z"
+    "created_at": "2026-03-11T15:15:46.500Z"
   },
   "327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1": {
     "hash": "327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
     "matter_uri": "matter://327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
     "thing_url": "http://localhost:3000/thing/327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1",
-    "thing_path": "C:\\Users\\matom\\.cursor\\worktrees\\.Things-That-Matter\\mcj\\packages\\shadow-index\\data\\things\\327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1.thing",
+    "thing_path": "/home/runner/work/.Things-That-Matter/.Things-That-Matter/packages/shadow-index/data/things/327fadd4852d43166092dda0897339aa320d1c26598dd2fa94a4530b1cdc80f1.thing",
     "gist": {
       "title": "Test Product",
       "price": 2999,
       "currency": "ZAR"
     },
-    "created_at": "2026-03-02T18:56:36.331Z"
+    "created_at": "2026-03-11T15:15:50.330Z"
   }
 }
