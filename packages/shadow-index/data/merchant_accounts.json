@@ -40,5 +40,20 @@
     "pending_payout": 0,
     "created_at": "2026-03-11T15:15:48.977Z",
     "updated_at": "2026-03-11T15:15:49.016Z"
+  },
+  {
+    "id": "40b44728-e25f-41b6-a54b-b6e75d36ae16",
+    "business_name": "Test Shop",
+    "email": "test-1773242263601@example.com",
+    "password_hash": "0eeb3ef8f80f8ac9cdfbabc9ce97f524:d62870a16f35793625d0a48d6d5769631a7c743fc877ab29fa35017d0d985eea",
+    "auth_provider": "password",
+    "kyc_status": "not_started",
+    "commission_rate": 0.03,
+    "payout_frequency": "weekly",
+    "payout_minimum": 50000,
+    "total_earnings": 0,
+    "pending_payout": 0,
+    "created_at": "2026-03-11T15:17:43.658Z",
+    "updated_at": "2026-03-11T15:17:43.714Z"
   }
 ]
