@@ -2,21 +2,12 @@
  * Merchant Products API
  *
  * CRUD for merchant-managed products with stock, status, and thing_file linkage.
- * Products are stored in data/merchant_products.json (sync I/O for request-time reads).
+ * Products are stored in Supabase merchant_products.
  */
 
 import { Hono } from 'hono';
-import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import crypto from 'node:crypto';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-const dataRoot = process.env.VERCEL
-  ? path.join('/tmp', 'data')
-  : path.join(__dirname, '..', 'data');
-const productsFile = path.join(dataRoot, 'merchant_products.json');
+import { db } from './db.js';
 
 /** Merchant product with stock, status, and thing linkage */
 export type MerchantProduct = {
@@ -24,40 +15,135 @@ export type MerchantProduct = {
   title: string;
   price_cents: number;
   currency: string;
-  status?: 'draft' | 'published';
+  description?: string;
+  status?: 'draft' | 'published' | 'archived';
   stock_count?: number;
   thing_file?: { hash: string; matter_uri?: string; thing_url?: string };
   category?: string;
   merchant_id?: string;
   image_url?: string;
+  shipping_available?: boolean;
+  certifications?: unknown[];
   created_at?: string;
   updated_at?: string;
 };
 
-function loadProductsFromDisk(): MerchantProduct[] {
-  try {
-    if (!existsSync(productsFile)) return [];
-    const raw = readFileSync(productsFile, 'utf8');
-    const parsed = JSON.parse(raw) as unknown;
-    return Array.isArray(parsed) ? parsed : [];
-  } catch {
-    return [];
+type MerchantProductRow = {
+  id: string;
+  merchant_id: string | null;
+  title: string;
+  description: string | null;
+  price_cents: number;
+  currency: string;
+  category: string | null;
+  stock_count: number;
+  image_url: string | null;
+  shipping_available: boolean;
+  certifications: unknown;
+  thing_file: unknown;
+  status: 'draft' | 'published' | 'archived';
+  created_at: string;
+  updated_at: string;
+};
+
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const isUuid = (value: unknown): value is string => typeof value === 'string' && UUID_RE.test(value);
+
+const resolveMerchantId = async (c: { req: { header: (name: string) => string | undefined } }, body: Record<string, unknown>): Promise<string | null> => {
+  const bodyMerchantId = body.merchant_id;
+  if (isUuid(bodyMerchantId)) return bodyMerchantId;
+
+  const headerMerchantId = c.req.header('x-merchant-id');
+  if (isUuid(headerMerchantId)) return headerMerchantId;
+
+  const auth = c.req.header('Authorization');
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7).trim() : null;
+  if (bearer) {
+    try {
+      const parts = bearer.split('.');
+      if (parts.length === 3) {
+        const payload = JSON.parse(Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')) as { sub?: unknown };
+        if (isUuid(payload.sub)) return payload.sub;
+      }
+    } catch {
+      // ignore malformed tokens
+    }
   }
+
+  const { data } = await db
+    .from('merchant_accounts')
+    .select('id')
+    .limit(1)
+    .maybeSingle();
+
+  if (data && isUuid(data.id)) return data.id;
+  return null;
+};
+
+const rowToProduct = (row: MerchantProductRow): MerchantProduct => ({
+  id: row.id,
+  merchant_id: row.merchant_id ?? undefined,
+  title: row.title,
+  description: row.description ?? undefined,
+  price_cents: row.price_cents,
+  currency: row.currency,
+  category: row.category ?? undefined,
+  stock_count: row.stock_count,
+  image_url: row.image_url ?? undefined,
+  shipping_available: row.shipping_available,
+  certifications: Array.isArray(row.certifications) ? row.certifications : [],
+  thing_file: (row.thing_file as MerchantProduct['thing_file']) ?? undefined,
+  status: row.status,
+  created_at: row.created_at,
+  updated_at: row.updated_at,
+});
+
+const productToUpsertRow = (product: MerchantProduct) => ({
+  id: product.id,
+  merchant_id: product.merchant_id ?? null,
+  title: product.title,
+  description: product.description ?? null,
+  price_cents: product.price_cents,
+  currency: product.currency,
+  category: product.category ?? null,
+  stock_count: product.stock_count ?? 0,
+  image_url: product.image_url ?? null,
+  shipping_available: product.shipping_available ?? false,
+  certifications: product.certifications ?? [],
+  thing_file: product.thing_file ?? null,
+  status: product.status ?? 'draft',
+  updated_at: product.updated_at ?? new Date().toISOString(),
+});
+
+/** Async read of merchant products (used by index.ts for restock, catalog, checkout) */
+export async function readProducts(): Promise<MerchantProduct[]> {
+  const { data, error } = await db
+    .from('merchant_products')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to load merchant products: ${error.message}`);
+  }
+
+  const rows = (data ?? []) as MerchantProductRow[];
+  return rows.map(rowToProduct);
 }
 
-function saveProductsToDisk(products: MerchantProduct[]): void {
-  mkdirSync(path.dirname(productsFile), { recursive: true });
-  writeFileSync(productsFile, JSON.stringify(products, null, 2), 'utf8');
-}
+/** Async write of merchant products list via id-based upsert. */
+export async function writeProducts(products: MerchantProduct[]): Promise<void> {
+  if (products.length === 0) {
+    return;
+  }
 
-/** Sync read of merchant products (used by index.ts for restock, catalog, checkout) */
-export function readProducts(): MerchantProduct[] {
-  return loadProductsFromDisk();
-}
+  const rows = products.map(productToUpsertRow);
+  const { error } = await db
+    .from('merchant_products')
+    .upsert(rows, { onConflict: 'id' });
 
-/** Sync write of merchant products */
-export function writeProducts(products: MerchantProduct[]): void {
-  saveProductsToDisk(products);
+  if (error) {
+    throw new Error(`Failed to save merchant products: ${error.message}`);
+  }
 }
 
 /** Consumer-facing price (what the buyer pays). Currently same as merchant price_cents. */
@@ -93,9 +179,14 @@ export const merchantProductsRouter = new Hono();
 
 /** GET /v1/merchant/products — list products (filtered by merchant when auth present) */
 merchantProductsRouter.get('/', (c) => {
-  const products = readProducts();
-  const enriched = products.map(enrichProductWithThingFile);
-  return c.json({ products: enriched }, 200);
+  return readProducts()
+    .then((products) => {
+      const enriched = products
+        .filter((product) => product.status !== 'archived')
+        .map(enrichProductWithThingFile);
+      return c.json({ products: enriched }, 200);
+    })
+    .catch((error) => c.json(err('storage_error', (error as Error).message), 500));
 });
 
 /** POST /v1/merchant/products — create product */
@@ -116,6 +207,7 @@ merchantProductsRouter.post('/', async (c) => {
   const imageUrl = typeof (body as Record<string, unknown>).image_url === 'string'
     ? ((body as Record<string, unknown>).image_url as string).trim()
     : '';
+  const merchantId = await resolveMerchantId(c, body as Record<string, unknown>);
 
   if (!title) {
     return c.json(err('invalid_product', 'title is required'), 400);
@@ -123,6 +215,10 @@ merchantProductsRouter.post('/', async (c) => {
 
   if (!imageUrl) {
     return c.json(err('invalid_product', 'image_url is required'), 400);
+  }
+
+  if (!merchantId) {
+    return c.json(err('invalid_product', 'merchant_id is required'), 400);
   }
 
   try {
@@ -134,39 +230,68 @@ merchantProductsRouter.post('/', async (c) => {
     return c.json(err('invalid_product', 'image_url must be a valid URL'), 400);
   }
 
-  const products = readProducts();
+  const now = new Date().toISOString();
+  const productId = crypto.randomUUID();
   const product: MerchantProduct = {
-    id: crypto.randomUUID(),
+    id: productId,
     title,
     price_cents: priceCents,
-    currency: currency || 'USD',
+    currency: currency || 'ZAR',
     status: 'draft',
     stock_count: 0,
     thing_file: undefined,
-    merchant_id: (body as Record<string, unknown>).merchant_id as string | undefined,
+    merchant_id: merchantId,
     image_url: imageUrl,
     category: (body as Record<string, unknown>).category as string | undefined,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
+    created_at: now,
+    updated_at: now,
   };
-  
-  products.push(product);
-  writeProducts(products);
 
-  // Return enriched product (will have empty thing_file until compiled)
-  const enriched = enrichProductWithThingFile(product);
+  const { data, error } = await db
+    .from('merchant_products')
+    .insert({
+      id: product.id,
+      merchant_id: product.merchant_id,
+      title: product.title,
+      description: null,
+      price_cents: product.price_cents,
+      currency: product.currency,
+      category: product.category ?? null,
+      stock_count: product.stock_count ?? 0,
+      image_url: product.image_url ?? null,
+      shipping_available: false,
+      certifications: [],
+      thing_file: null,
+      status: product.status ?? 'draft',
+      created_at: now,
+      updated_at: now,
+    })
+    .select('*')
+    .single();
+
+  if (error) {
+    return c.json(err('storage_error', `Failed to create product: ${error.message}`), 500);
+  }
+
+  const enriched = enrichProductWithThingFile(rowToProduct(data as MerchantProductRow));
   return c.json(enriched, 201);
 });
 
 /** GET /v1/merchant/products/:id — get single product */
-merchantProductsRouter.get('/:id', (c) => {
+merchantProductsRouter.get('/:id', async (c) => {
   const id = c.req.param('id');
-  const products = readProducts();
-  const product = products.find((p) => p.id === id);
-  if (!product) {
+
+  const { data, error } = await db
+    .from('merchant_products')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error || !data) {
     return c.json(err('not_found', 'Product not found'), 404);
   }
-  return c.json(product, 200);
+
+  return c.json(rowToProduct(data as MerchantProductRow), 200);
 });
 
 /** PATCH /v1/merchant/products/:id — update product */
@@ -177,13 +302,17 @@ merchantProductsRouter.patch('/:id', async (c) => {
     return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
   }
 
-  const products = readProducts();
-  const idx = products.findIndex((p) => p.id === id);
-  if (idx < 0) {
+  const { data: existingData, error: existingError } = await db
+    .from('merchant_products')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (existingError || !existingData) {
     return c.json(err('not_found', 'Product not found'), 404);
   }
 
-  const product = products[idx];
+  const product = rowToProduct(existingData as MerchantProductRow);
   const updates = body as Record<string, unknown>;
   if (typeof updates.title === 'string') product.title = updates.title.trim();
   if (typeof updates.price_cents === 'number') product.price_cents = Math.max(0, Math.floor(updates.price_cents));
@@ -215,18 +344,34 @@ merchantProductsRouter.patch('/:id', async (c) => {
   if (typeof updates.category === 'string') product.category = updates.category;
   product.updated_at = new Date().toISOString();
 
-  writeProducts(products);
-  return c.json(product, 200);
+  const { data, error } = await db
+    .from('merchant_products')
+    .update(productToUpsertRow(product))
+    .eq('id', id)
+    .select('*')
+    .single();
+
+  if (error || !data) {
+    return c.json(err('storage_error', `Failed to update product: ${error?.message ?? 'unknown error'}`), 500);
+  }
+
+  return c.json(rowToProduct(data as MerchantProductRow), 200);
 });
 
 /** DELETE /v1/merchant/products/:id */
-merchantProductsRouter.delete('/:id', (c) => {
+merchantProductsRouter.delete('/:id', async (c) => {
   const id = c.req.param('id');
-  const products = readProducts();
-  const filtered = products.filter((p) => p.id !== id);
-  if (filtered.length === products.length) {
+
+  const { data, error } = await db
+    .from('merchant_products')
+    .update({ status: 'archived', updated_at: new Date().toISOString() })
+    .eq('id', id)
+    .select('id')
+    .single();
+
+  if (error || !data) {
     return c.json(err('not_found', 'Product not found'), 404);
   }
-  writeProducts(filtered);
+
   return c.json({ ok: true }, 200);
 });

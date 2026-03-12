@@ -22,7 +22,7 @@ async function getPaystack() {
   return _paystack;
 }
 import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
-import { getReport, validateDateRange } from '../lib/analytics-report.js';
+import { validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
 import { getCached, setCached, invalidateCache, buildCacheKey } from '../lib/query-cache.js';
 import { logError } from '../lib/error-logger.js';
@@ -30,6 +30,7 @@ import { logger } from '../lib/logger.js';
 import { dashboardHandler } from './dashboard.js';
 import { RetentionPolicy } from '../lib/retention-policy.js';
 import { isApiKeyValid } from '../lib/api-key-registry.js';
+import { db } from './db.js';
 import {
   merchantProductsRouter,
   readProducts,
@@ -381,10 +382,6 @@ type MerchantAccount = {
   updated_at?: string;
 };
 
-const merchantAccountsFile = path.join(dataRoot, 'merchant_accounts.json');
-const ordersFile = path.join(dataRoot, 'orders.json');
-const notificationsFile = path.join(dataRoot, 'notifications.json');
-const payoutLogsFile = path.join(dataRoot, 'payout_logs.json');
 const slipsDir = path.join(dataRoot, 'slips');
 const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? 'http://localhost:5178';
 const publicApiBase = process.env.PUBLIC_API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
@@ -468,43 +465,62 @@ const verifyPassword = (password: string, storedHash?: string): boolean => {
   return providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf);
 };
 
-const normalizeMerchantAccounts = (value: unknown): MerchantAccount[] => {
-  if (Array.isArray(value)) return value as MerchantAccount[];
-  if (value && typeof value === 'object') return [value as MerchantAccount];
-  return [];
-};
-
 const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
-  try {
-    const raw = await fs.readFile(merchantAccountsFile, 'utf8');
-    const parsed = JSON.parse(raw) as unknown;
-    return normalizeMerchantAccounts(parsed);
-  } catch (error) {
-    const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') return [];
-    throw error;
+  const { data, error } = await db
+    .from('merchant_accounts')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to load merchant accounts: ${error.message}`);
   }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id ?? ''),
+    business_name: String(row.business_name ?? ''),
+    email: String(row.email ?? ''),
+    password_hash: typeof row.password_hash === 'string' ? row.password_hash : undefined,
+    auth_provider: (typeof row.password_hash === 'string' && row.password_hash.length > 0) ? 'password' : 'google',
+    kyc_status: row.kyc_status as MerchantAccount['kyc_status'],
+    commission_rate: typeof row.commission_rate === 'number' ? row.commission_rate : undefined,
+    payout_frequency: row.payout_frequency as MerchantAccount['payout_frequency'],
+    payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
+    total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
+    pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
+    kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
+    bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
+    created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
+    updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
+  }));
 };
 
 const saveMerchantAccounts = async (accounts: MerchantAccount[]) => {
-  await fs.mkdir(dataRoot, { recursive: true });
-  await fs.writeFile(merchantAccountsFile, JSON.stringify(accounts, null, 2), 'utf8');
-};
+  if (accounts.length === 0) return;
 
-const readJsonFile = async <T>(filePath: string, fallback: T): Promise<T> => {
-  try {
-    const raw = await fs.readFile(filePath, 'utf8');
-    return JSON.parse(raw) as T;
-  } catch (error) {
-    const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') return fallback;
-    throw error;
+  const rows = accounts.map((account) => ({
+    id: account.id,
+    business_name: account.business_name,
+    email: account.email.toLowerCase(),
+    password_hash: account.password_hash ?? null,
+    kyc_status: account.kyc_status ?? 'not_started',
+    kyc_data: account.kyc_data ?? null,
+    bank_account: account.bank_account ?? null,
+    commission_rate: account.commission_rate ?? 0.03,
+    payout_frequency: account.payout_frequency ?? 'weekly',
+    payout_minimum: account.payout_minimum ?? 50000,
+    total_earnings: account.total_earnings ?? 0,
+    pending_payout: account.pending_payout ?? 0,
+    created_at: account.created_at ?? new Date().toISOString(),
+    updated_at: account.updated_at ?? new Date().toISOString(),
+  }));
+
+  const { error } = await db
+    .from('merchant_accounts')
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(`Failed to save merchant accounts: ${error.message}`);
   }
-};
-
-const writeJsonFile = async (filePath: string, value: unknown): Promise<void> => {
-  await fs.mkdir(path.dirname(filePath), { recursive: true });
-  await fs.writeFile(filePath, JSON.stringify(value, null, 2), 'utf8');
 };
 
 type DeliveryAddress = {
@@ -555,7 +571,7 @@ type MerchantOrder = {
 type MerchantNotification = {
   id: string;
   merchant_id?: string;
-  type?: 'order' | 'payout' | 'kyc' | 'system';
+  type?: 'order' | 'payout' | 'kyc' | 'system' | 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected';
   title?: string;
   message?: string;
   read?: boolean;
@@ -606,31 +622,195 @@ interface MoRStatusResponse {
 }
 
 const loadOrders = async (): Promise<MerchantOrder[]> => {
-  const parsed = await readJsonFile<Record<string, MerchantOrder> | MerchantOrder[]>(ordersFile, {});
-  if (Array.isArray(parsed)) return parsed;
-  return Object.values(parsed ?? {});
+  const { data, error } = await db
+    .from('orders')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to load orders: ${error.message}`);
+  }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => {
+    const customer = (row.customer as Record<string, unknown> | null) ?? {};
+    const payment = (row.payment as Record<string, unknown> | null) ?? {};
+    const deliveryAddress =
+      (customer.delivery_address as DeliveryAddress | undefined)
+      ?? (payment.delivery_address as DeliveryAddress | undefined)
+      ?? undefined;
+
+    return {
+      id: String(row.id ?? ''),
+      session_id: typeof row.session_id === 'string' ? row.session_id : undefined,
+      product_id: typeof row.product_id === 'string' ? row.product_id : undefined,
+      merchant_id: typeof row.merchant_id === 'string' ? row.merchant_id : undefined,
+      customer: {
+        email: typeof customer.email === 'string' ? customer.email : '',
+        delivery_address: deliveryAddress,
+      },
+      customer_email: typeof customer.email === 'string' ? customer.email : undefined,
+      delivery_address: deliveryAddress,
+      status: (typeof payment.status === 'string' ? payment.status : undefined) as MerchantOrder['status'],
+      payment_status: (typeof payment.payment_status === 'string' ? payment.payment_status : undefined) as MerchantOrder['payment_status'],
+      amount: typeof payment.amount_cents === 'number' ? payment.amount_cents : undefined,
+      merchant_price_cents: typeof payment.merchant_price_cents === 'number' ? payment.merchant_price_cents : undefined,
+      consumer_price_cents: typeof payment.consumer_price_cents === 'number' ? payment.consumer_price_cents : undefined,
+      platform_revenue_cents: typeof payment.platform_revenue_cents === 'number' ? payment.platform_revenue_cents : undefined,
+      currency: typeof payment.currency === 'string' ? payment.currency : undefined,
+      paystack_reference: typeof payment.paystack_reference === 'string' ? payment.paystack_reference : undefined,
+      fulfillment_status: row.fulfillment_status as MerchantOrder['fulfillment_status'] | undefined,
+      created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
+      updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
+    } as MerchantOrder;
+  });
 };
 
 const saveOrders = async (orders: MerchantOrder[]): Promise<void> => {
-  const keyed: Record<string, MerchantOrder> = {};
-  for (const order of orders) {
-    if (order.id) keyed[order.id] = order;
+  if (orders.length === 0) return;
+
+  const rows = orders.map((order) => ({
+    id: order.id,
+    session_id: order.session_id ?? order.paystack_reference ?? order.id,
+    product_id: order.product_id ?? null,
+    merchant_id: order.merchant_id ?? null,
+    customer: {
+      email: order.customer?.email ?? order.customer_email ?? '',
+      billing_address: order.billing_address ?? null,
+      delivery_address: order.delivery_address ?? order.customer?.delivery_address ?? null,
+    },
+    payment: {
+      status: order.status ?? 'pending',
+      payment_status: order.payment_status ?? 'held',
+      session_id: order.session_id ?? order.paystack_reference ?? order.id,
+      amount_cents: order.amount ?? order.consumer_price_cents ?? 0,
+      merchant_price_cents: order.merchant_price_cents ?? null,
+      consumer_price_cents: order.consumer_price_cents ?? null,
+      platform_revenue_cents: order.platform_revenue_cents ?? null,
+      currency: order.currency ?? 'ZAR',
+      paystack_reference: order.paystack_reference ?? null,
+    },
+    fulfillment_status: order.fulfillment_status ?? 'pending',
+    stock_reserved: false,
+    updated_at: order.updated_at ?? new Date().toISOString(),
+  }));
+
+  const { error } = await db
+    .from('orders')
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(`Failed to save orders: ${error.message}`);
   }
-  await writeJsonFile(ordersFile, keyed);
 };
 
-const loadNotifications = async (): Promise<MerchantNotification[]> =>
-  readJsonFile<MerchantNotification[]>(notificationsFile, []);
+const loadNotifications = async (): Promise<MerchantNotification[]> => {
+  const { data, error } = await db
+    .from('merchant_notifications')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to load notifications: ${error.message}`);
+  }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id ?? ''),
+    merchant_id: typeof row.merchant_id === 'string' ? row.merchant_id : undefined,
+    type: row.type as MerchantNotification['type'],
+    title: typeof row.title === 'string' ? row.title : undefined,
+    message: typeof row.message === 'string' ? row.message : undefined,
+    read: Boolean(row.read),
+    created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
+    ...(typeof row.data === 'object' && row.data ? (row.data as Record<string, unknown>) : {}),
+  }));
+};
 
 const saveNotifications = async (items: MerchantNotification[]): Promise<void> => {
-  await writeJsonFile(notificationsFile, items);
+  if (items.length === 0) return;
+
+  const normalizeNotificationType = (type: MerchantNotification['type']) => {
+    if (type === 'order_received' || type === 'low_stock' || type === 'payout_processed' || type === 'kyc_approved' || type === 'kyc_rejected') {
+      return type;
+    }
+    if (type === 'order') return 'order_received';
+    if (type === 'payout') return 'payout_processed';
+    if (type === 'kyc') return 'kyc_approved';
+    return 'order_received';
+  };
+
+  const rows = items.map((item) => {
+    const { id, merchant_id, type, title, message, read, created_at, ...data } = item;
+    return {
+      id,
+      merchant_id: merchant_id ?? null,
+      type: normalizeNotificationType(type),
+      title: title ?? 'Notification',
+      message: message ?? '',
+      data,
+      read: Boolean(read),
+      created_at: created_at ?? new Date().toISOString(),
+    };
+  });
+
+  const { error } = await db
+    .from('merchant_notifications')
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(`Failed to save notifications: ${error.message}`);
+  }
 };
 
-const loadPayoutLogs = async (): Promise<PayoutLog[]> =>
-  readJsonFile<PayoutLog[]>(payoutLogsFile, []);
+const loadPayoutLogs = async (): Promise<PayoutLog[]> => {
+  const { data, error } = await db
+    .from('payout_logs')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    throw new Error(`Failed to load payout logs: ${error.message}`);
+  }
+
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
+    id: String(row.id ?? ''),
+    merchant_id: typeof row.merchant_id === 'string' ? row.merchant_id : undefined,
+    orders_included: Array.isArray(row.orders_included) ? (row.orders_included as string[]) : [],
+    gross_amount: typeof row.gross_amount === 'number' ? row.gross_amount : 0,
+    commission_amount: typeof row.commission_amount === 'number' ? row.commission_amount : 0,
+    net_amount: typeof row.net_amount === 'number' ? row.net_amount : 0,
+    currency: 'ZAR',
+    status: row.status as PayoutLog['status'],
+    transfer_reference: typeof row.reference_id === 'string' ? row.reference_id : null,
+    failure_reason: null,
+    initiated_by: undefined,
+    created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
+    transferred_at: typeof row.transferred_at === 'string' ? row.transferred_at : null,
+  }));
+};
 
 const savePayoutLogs = async (logs: PayoutLog[]): Promise<void> => {
-  await writeJsonFile(payoutLogsFile, logs);
+  if (logs.length === 0) return;
+
+  const rows = logs.map((log) => ({
+    id: log.id,
+    merchant_id: log.merchant_id ?? null,
+    orders_included: log.orders_included ?? [],
+    gross_amount: log.gross_amount ?? 0,
+    commission_amount: log.commission_amount ?? 0,
+    net_amount: log.net_amount ?? 0,
+    status: log.status ?? 'pending',
+    transferred_at: log.transferred_at ?? null,
+    reference_id: log.transfer_reference ?? null,
+    created_at: log.created_at ?? new Date().toISOString(),
+  }));
+
+  const { error } = await db
+    .from('payout_logs')
+    .upsert(rows, { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(`Failed to save payout logs: ${error.message}`);
+  }
 };
 
 async function loadAllOrders(): Promise<MerchantOrderBackend[]> {
@@ -1160,21 +1340,13 @@ app.get('/health', async (c) => {
     checks.storage = 'unavailable';
   }
 
-  // Check Supabase (via REST API — no SDK dependency needed)
+  // Check Supabase using shared client
   try {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
-    if (supabaseUrl && supabaseKey) {
-      const resp = await fetch(`${supabaseUrl}/rest/v1/merchant_accounts?select=id&limit=1`, {
-        headers: {
-          'apikey': supabaseKey,
-          'Authorization': `Bearer ${supabaseKey}`,
-        },
-      });
-      checks.supabase = resp.ok ? 'connected' : `error: ${resp.status}`;
-    } else {
-      checks.supabase = 'not configured';
-    }
+    const { error } = await db
+      .from('merchant_accounts')
+      .select('id')
+      .limit(1);
+    checks.supabase = error ? `error: ${error.message}` : 'connected';
   } catch {
     checks.supabase = 'unavailable';
   }
@@ -1546,15 +1718,29 @@ app.post('/v1/merchant/products/:productId/restock', async (c) => {
   const quantityRaw = typeof body === 'object' && body ? (body as { quantity?: unknown }).quantity : undefined;
   const quantity = typeof quantityRaw === 'number' && Number.isFinite(quantityRaw) ? Math.max(1, Math.floor(quantityRaw)) : 10;
 
-  const products = readProducts();
+  const products = await readProducts();
   const target = products.find((product: MerchantProduct) => product.id === productId);
   if (!target) {
     return c.json(err('not_found', 'Product not found'), 404);
   }
 
-  target.stock_count = Math.max(0, (target.stock_count ?? 0) + quantity);
+  const stockBefore = target.stock_count ?? 0;
+  const stockAfter = Math.max(0, stockBefore + quantity);
+  target.stock_count = stockAfter;
   target.updated_at = new Date().toISOString();
-  writeProducts(products);
+  await writeProducts(products);
+
+  if (target.merchant_id && target.id) {
+    await db.from('inventory_logs').insert({
+      product_id: target.id,
+      merchant_id: target.merchant_id,
+      transaction_type: 'restock',
+      quantity_change: quantity,
+      stock_before: stockBefore,
+      stock_after: stockAfter,
+      reference_id: `restock:${productId}`,
+    });
+  }
 
   return c.json({
     id: target.id,
@@ -1566,7 +1752,7 @@ app.post('/v1/merchant/products/:productId/restock', async (c) => {
 app.get('/v1/merchant/orders', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
   const orders = await loadOrders();
-  const products = readProducts();
+  const products = await readProducts();
   const filtered = orders
     .filter((order) => !order.merchant_id || merchantIds.includes(order.merchant_id))
     .map((o) => {
@@ -2420,8 +2606,8 @@ app.post('/catalog/import', async (c) => {
 });
 
 // Public catalog endpoint for consumer storefront
-app.get('/catalog/public', (c) => {
-  const products = readProducts()
+app.get('/catalog/public', async (c) => {
+  const products = (await readProducts())
     .filter((product: MerchantProduct) => product.status === 'published' && (product.stock_count ?? 0) > 0 && !!product.thing_file?.hash)
     .map((product: MerchantProduct) => ({
       hash: product.thing_file!.hash,
@@ -2451,13 +2637,28 @@ app.post('/v1/analytics/event', async (c) => {
     ...parsed.data,
     timestamp: parsed.data.timestamp ?? new Date().toISOString(),
   };
-  const date = new Date().toISOString().split('T')[0];
-  const eventsDir = getEventsDir();
-  const logFile = path.join(eventsDir, `${date}.jsonl`);
 
   try {
-    await fs.mkdir(eventsDir, { recursive: true });
-    await fs.appendFile(logFile, JSON.stringify(event) + '\n', 'utf8');
+    const metadata: Record<string, unknown> = { ...event };
+    delete metadata.event;
+    delete metadata.hash;
+    delete metadata.timestamp;
+    delete metadata.anon_id;
+
+    const { error } = await db.from('analytics_events').insert({
+      event_type: event.event,
+      hash: event.hash,
+      anon_id: event.anon_id ?? null,
+      merchant_id: null,
+      session_id: null,
+      metadata,
+      created_at: event.timestamp,
+    });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
     invalidateCache();
     return c.json({ ok: true }, 201);
   } catch (error) {
@@ -2500,23 +2701,103 @@ app.get('/v1/analytics/report', async (c) => {
   startQuery();
   const t0 = performance.now();
   try {
-    let result = getCached(cacheKey);
-    if (result) {
+    const cachedResult = getCached(cacheKey);
+    if (cachedResult) {
       const durationMs = Math.round(performance.now() - t0);
-      recordQuery(params, durationMs, result.rows.length);
+      recordQuery(params, durationMs, cachedResult.rows.length);
       endQuery();
-      return c.json(result, 200);
+      return c.json(cachedResult, 200);
     }
 
-    result = await getReport(getEventsDir(), from, to, groupBy, sortBy, limit, offset);
+    const fromIso = `${from}T00:00:00.000Z`;
+    const toIso = `${to}T23:59:59.999Z`;
+
+    const { data, error } = await db
+      .from('analytics_events')
+      .select('event_type, hash, created_at')
+      .gte('created_at', fromIso)
+      .lte('created_at', toIso)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      throw new Error(error.message);
+    }
+
+    const byDate = new Map<string, { views: number; clicks: number }>();
+    const byHash = new Map<string, { views: number; clicks: number }>();
+    const byBoth = new Map<string, { views: number; clicks: number }>();
+
+    const inc = (map: Map<string, { views: number; clicks: number }>, key: string, isView: boolean) => {
+      const cur = map.get(key) ?? { views: 0, clicks: 0 };
+      if (isView) cur.views += 1;
+      else cur.clicks += 1;
+      map.set(key, cur);
+    };
+
+    for (const row of data ?? []) {
+      const createdAt = typeof row.created_at === 'string' ? row.created_at : '';
+      const dateKey = createdAt.slice(0, 10);
+      if (!dateKey) continue;
+
+      const isView = row.event_type === 'view';
+      const isClick = row.event_type === 'click';
+      if (!isView && !isClick) continue;
+
+      const hash = typeof row.hash === 'string' ? row.hash : '';
+      inc(byDate, dateKey, isView);
+      if (hash) {
+        inc(byHash, hash, isView);
+        inc(byBoth, `${hash}|${dateKey}`, isView);
+      }
+    }
+
+    let totalViews = 0;
+    let totalClicks = 0;
+    for (const v of byDate.values()) {
+      totalViews += v.views;
+      totalClicks += v.clicks;
+    }
+
+    let rows: { date: string; views: number; clicks: number }[]
+      | { hash: string; views: number; clicks: number }[]
+      | { hash: string; date: string; views: number; clicks: number }[] = [];
+    if (groupBy === 'day') {
+      const arr = Array.from(byDate.entries()).map(([date, v]) => ({ date, views: v.views, clicks: v.clicks }));
+      if (sortBy === 'date') arr.sort((a, b) => a.date.localeCompare(b.date));
+      else if (sortBy === 'views') arr.sort((a, b) => b.views - a.views);
+      else arr.sort((a, b) => b.clicks - a.clicks);
+      rows = arr.slice(offset, offset + limit);
+    } else if (groupBy === 'hash') {
+      const arr = Array.from(byHash.entries()).map(([hash, v]) => ({ hash, views: v.views, clicks: v.clicks }));
+      if (sortBy === 'date') arr.sort((a, b) => a.hash.localeCompare(b.hash));
+      else if (sortBy === 'views') arr.sort((a, b) => b.views - a.views);
+      else arr.sort((a, b) => b.clicks - a.clicks);
+      rows = arr.slice(offset, offset + limit);
+    } else {
+      const arr = Array.from(byBoth.entries()).map(([key, v]) => {
+        const [hash, date] = key.split('|');
+        return { hash, date, views: v.views, clicks: v.clicks };
+      });
+      if (sortBy === 'date') arr.sort((a, b) => a.date.localeCompare(b.date) || a.hash.localeCompare(b.hash));
+      else if (sortBy === 'views') arr.sort((a, b) => b.views - a.views);
+      else arr.sort((a, b) => b.clicks - a.clicks);
+      rows = arr.slice(offset, offset + limit);
+    }
+
+    const result = {
+      ok: true,
+      groupBy,
+      from,
+      to,
+      rows,
+      summary: {
+        totalViews,
+        totalClicks,
+      },
+    };
+
     const durationMs = Math.round(performance.now() - t0);
     const resultCount = result.ok ? result.rows.length : 0;
-    if (!result.ok) {
-      logError(params, result.error ?? 'Invalid parameters');
-      recordQuery(params, durationMs, 0, result.error ?? '');
-      endQuery();
-      return c.json(err('invalid_params', result.error ?? 'Invalid parameters'), 400);
-    }
     setCached(cacheKey, result);
     recordQuery(params, durationMs, resultCount);
     endQuery();
@@ -2683,7 +2964,7 @@ app.post('/checkout/create-session', async (c) => {
       return c.json(err('invalid_request', 'Missing product_hash or product_id'), 400);
     }
 
-    const products = readProducts();
+    const products = await readProducts();
     const product = products.find((p: MerchantProduct) => p.thing_file?.hash === hash || p.id === hash);
 
     if (!product) {
@@ -2837,12 +3118,40 @@ app.post('/webhooks/paystack', async (c) => {
         updated_at: now,
       };
 
-      const products = readProducts();
+      const products = await readProducts();
       const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
       if (product) {
-        product.stock_count = Math.max(0, (product.stock_count ?? 1) - 1);
+        const stockBefore = product.stock_count ?? 0;
+        const stockAfter = Math.max(0, stockBefore - 1);
+        product.stock_count = stockAfter;
         product.updated_at = now;
-        writeProducts(products);
+        await writeProducts(products);
+
+        if (product.merchant_id && product.id) {
+          await db.from('inventory_logs').insert({
+            product_id: product.id,
+            merchant_id: product.merchant_id,
+            transaction_type: 'order',
+            quantity_change: -1,
+            stock_before: stockBefore,
+            stock_after: stockAfter,
+            reference_id: orderId,
+          });
+
+          if (stockAfter < 5) {
+            const notifs = await loadNotifications();
+            notifs.push({
+              id: crypto.randomUUID(),
+              merchant_id: product.merchant_id,
+              type: 'low_stock',
+              title: `Low stock: ${product.title}`,
+              message: `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`,
+              read: false,
+              created_at: now,
+            });
+            await saveNotifications(notifs);
+          }
+        }
       }
 
       const allOrders = await loadOrders();
