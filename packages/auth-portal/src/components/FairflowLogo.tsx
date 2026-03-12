@@ -129,10 +129,10 @@ function LogoMark({ size, color, style }: { size: number; color: string; style: 
 
       {style === 'derivative' && (
         <>
-          <path {...markStyle} d="M15 6 C20 12 12 33 15 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path {...markStyle} d="M27 6 C32 12 24 33 27 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="8.5" y1="23.5" x2="21.5" y2="23.5" stroke={lineColor} strokeWidth={barStroke * 1.05} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line x1="24.5" y1="23.5" x2="37.5" y2="23.5" stroke={lineColor} strokeWidth={barStroke * 1.05} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <path {...markStyle} d="M17 6 C13.2 8.8 12.6 12.8 14.8 17.3 C16.9 22 16.9 28.8 14.9 34 C13.6 37.4 13.8 40 16.2 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
+          <path {...markStyle} d="M29 6 C25.2 8.8 24.6 12.8 26.8 17.3 C28.9 22 28.9 28.8 26.9 34 C25.6 37.4 25.8 40 28.2 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
+          <line x1="9.5" y1="18.5" x2="20.8" y2="18.5" stroke={lineColor} strokeWidth={barStroke * 1.08} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
+          <line x1="21.5" y1="18.5" x2="32.8" y2="18.5" stroke={lineColor} strokeWidth={barStroke * 1.08} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
         </>
       )}
     </svg>

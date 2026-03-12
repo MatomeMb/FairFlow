@@ -12,6 +12,7 @@ import { OrderStatusPage } from "../pages/OrderStatusPage";
 import { ConfirmReceipt } from "../pages/ConfirmReceipt";
 import { MerchantLogin } from "../pages/MerchantLogin";
 import { MerchantRegister } from "../pages/MerchantRegister";
+import { LandingPage } from "../pages/LandingPage.tsx";
 
 // Portals
 import { AdminPortal } from "../pages/portals/AdminPortal";
@@ -58,8 +59,8 @@ export function PortalRouter() {
         <Route path="/order/:orderId" element={<OrderStatusPage />} />
         <Route path="/order/:id/confirm" element={<ConfirmReceipt />} />
 
-        {/* Smart redirect based on role */}
-        <Route path="/" element={<AuthRedirect />} />
+        {/* Public Landing */}
+        <Route path="/" element={<LandingPage />} />
 
         {/* Unified Admin Portal (CEO & CTO) */}
         <Route
