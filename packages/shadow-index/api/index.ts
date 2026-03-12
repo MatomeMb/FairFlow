@@ -44,6 +44,8 @@ import {
   sendCustomerOrderConfirmation,
   sendLowStockWarning,
   sendKycStatusEmail,
+  sendOrderCheckinEmail,
+  sendDeliveryDateEmail,
 } from './email.js';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -178,6 +180,14 @@ app.use('*', async (c, next) => {
   }
 
   if (requestPath.match(/^\/v1\/orders\/[^/]+\/confirm-receipt$/) && c.req.method === 'POST') {
+    return next();
+  }
+
+  if (requestPath.match(/^\/v1\/orders\/[^/]+\/status$/) && c.req.method === 'GET') {
+    return next();
+  }
+
+  if (requestPath === '/v1/cron/order-checkins' && c.req.method === 'POST') {
     return next();
   }
 
@@ -557,7 +567,10 @@ type MerchantOrder = {
   delivery_address?: DeliveryAddress;
   status?: 'pending' | 'paid' | 'failed' | 'refunded';
   payment_status?: 'held' | 'shipped' | 'confirmed' | 'released' | 'disputed';
-  fulfillment_status?: 'pending' | 'shipped' | 'fulfilled' | 'delivered';
+  fulfillment_status?: 'pending' | 'shipped' | 'fulfilled' | 'delivered' | 'cancelled';
+  estimated_delivery_date?: string | null;
+  checkin_email_count?: number;
+  last_checkin_sent_at?: string | null;
   shipment_slip_url?: string | null;
   confirm_token?: string;
   held_at?: string;
@@ -665,6 +678,9 @@ const loadOrders = async (): Promise<MerchantOrder[]> => {
       currency: typeof payment.currency === 'string' ? payment.currency : undefined,
       paystack_reference: typeof payment.paystack_reference === 'string' ? payment.paystack_reference : undefined,
       fulfillment_status: row.fulfillment_status as MerchantOrder['fulfillment_status'] | undefined,
+      estimated_delivery_date: typeof row.estimated_delivery_date === 'string' ? row.estimated_delivery_date : null,
+      checkin_email_count: typeof row.checkin_email_count === 'number' ? row.checkin_email_count : 0,
+      last_checkin_sent_at: typeof row.last_checkin_sent_at === 'string' ? row.last_checkin_sent_at : null,
       created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
       updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
     } as MerchantOrder;
@@ -696,6 +712,9 @@ const saveOrders = async (orders: MerchantOrder[]): Promise<void> => {
       paystack_reference: order.paystack_reference ?? null,
     },
     fulfillment_status: order.fulfillment_status ?? 'pending',
+    estimated_delivery_date: order.estimated_delivery_date ?? null,
+    checkin_email_count: order.checkin_email_count ?? 0,
+    last_checkin_sent_at: order.last_checkin_sent_at ?? null,
     stock_reserved: false,
     updated_at: order.updated_at ?? new Date().toISOString(),
   }));
@@ -1772,6 +1791,60 @@ app.get('/v1/merchant/orders', async (c) => {
     return bCreated.localeCompare(aCreated);
   });
   return c.json({ orders: filtered });
+});
+
+app.patch('/v1/merchant/orders/:id/delivery-date', async (c) => {
+  const { account, merchantIds } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
+  const orderId = c.req.param('id');
+  const body = await c.req.json().catch(() => null) as { estimated_delivery_date?: string } | null;
+  const estimatedDeliveryDate = body?.estimated_delivery_date;
+
+  if (!estimatedDeliveryDate) {
+    return c.json({ ok: false, error: 'estimated_delivery_date is required (ISO date string)' }, 400);
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(estimatedDeliveryDate)) {
+    return c.json({ ok: false, error: 'Invalid date format. Use YYYY-MM-DD.' }, 400);
+  }
+
+  const orders = await loadOrders();
+  const order = orders.find((candidate) => candidate.id === orderId && !!candidate.merchant_id && merchantIds.includes(candidate.merchant_id));
+  if (!order) {
+    return c.json({ ok: false, error: 'Order not found' }, 404);
+  }
+
+  const nowIso = new Date().toISOString();
+  const { data: updated, error: updateError } = await db
+    .from('orders')
+    .update({ estimated_delivery_date: estimatedDeliveryDate, updated_at: nowIso })
+    .eq('id', orderId)
+    .eq('merchant_id', account.id)
+    .select('*')
+    .single();
+
+  if (updateError || !updated) {
+    return c.json({ ok: false, error: 'Failed to update delivery date' }, 500);
+  }
+
+  order.estimated_delivery_date = estimatedDeliveryDate;
+  order.updated_at = nowIso;
+
+  const customerEmail = order.customer?.email ?? order.customer_email;
+  if (customerEmail) {
+    sendDeliveryDateEmail({
+      customerEmail,
+      orderId,
+      productTitle: order.product_title ?? 'your order',
+      estimatedDeliveryDate,
+      merchantBusinessName: account.business_name,
+    }).catch((error) => console.error('[DeliveryDate] Email error:', error));
+  }
+
+  return c.json({ ok: true, data: updated });
 });
 
 app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
@@ -3214,6 +3287,7 @@ app.post('/webhooks/paystack', async (c) => {
           amountCents: consumerPriceCents,
           customerEmail,
           deliveryAddress: order.customer?.delivery_address ?? null,
+          estimatedDeliveryDate: order.estimated_delivery_date ?? null,
           merchantBusinessName,
         }).catch((error) => console.error('[Webhook] Customer email error:', error));
       }
@@ -3256,6 +3330,104 @@ app.post('/webhooks/paystack', async (c) => {
     logger.error('Paystack webhook processing failed', { error: message });
     return c.json(err('webhook_processing_failed', message), 500);
   }
+});
+
+app.post('/v1/cron/order-checkins', async (c) => {
+  const headerSecret = c.req.header('x-cron-secret');
+  const authHeader = c.req.header('Authorization');
+  const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : undefined;
+  const providedSecret = headerSecret || bearerSecret;
+  if (!process.env.CRON_SECRET || providedSecret !== process.env.CRON_SECRET) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
+  const now = Date.now();
+  const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+  const orders = await loadOrders();
+  const products = await readProducts();
+  const accounts = await loadMerchantAccounts();
+  const accountMap = new Map(accounts.map((account) => [account.id, account]));
+
+  const eligible = orders.filter((order) => {
+    if (order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'cancelled') {
+      return false;
+    }
+
+    const createdAt = order.created_at ? new Date(order.created_at).getTime() : null;
+    const lastCheckin = order.last_checkin_sent_at ? new Date(order.last_checkin_sent_at).getTime() : null;
+    if (lastCheckin !== null) {
+      return now - lastCheckin >= fiveDaysMs;
+    }
+    if (createdAt === null) return false;
+    return now - createdAt >= fiveDaysMs;
+  });
+
+  if (eligible.length === 0) {
+    return c.json({ ok: true, data: { processed: 0, sent: 0 } });
+  }
+
+  let sent = 0;
+
+  for (const order of eligible) {
+    const customerEmail = order.customer?.email ?? order.customer_email;
+    if (!customerEmail) continue;
+
+    const product = products.find((p) => p.id === order.product_id || p.thing_file?.hash === order.product_hash);
+    const merchant = order.merchant_id ? accountMap.get(order.merchant_id) : undefined;
+
+    try {
+      await sendOrderCheckinEmail({
+        customerEmail,
+        orderId: order.id,
+        productTitle: order.product_title ?? product?.title ?? 'your order',
+        estimatedDeliveryDate: order.estimated_delivery_date ?? null,
+        merchantBusinessName: merchant?.business_name ?? 'the merchant',
+        checkinNumber: (order.checkin_email_count ?? 0) + 1,
+        orderStatusUrl: `${authPortalBaseUrl}/order/${order.id}`,
+      });
+
+      await db
+        .from('orders')
+        .update({
+          checkin_email_count: (order.checkin_email_count ?? 0) + 1,
+          last_checkin_sent_at: new Date().toISOString(),
+        })
+        .eq('id', order.id);
+
+      sent += 1;
+    } catch (error) {
+      console.error(`[Cron] Failed check-in for order ${order.id}:`, error);
+    }
+  }
+
+  console.log(`[Cron] Check-in emails sent: ${sent}/${eligible.length}`);
+  return c.json({ ok: true, data: { processed: eligible.length, sent } });
+});
+
+app.get('/v1/orders/:id/status', async (c) => {
+  const orderId = c.req.param('id');
+  const orders = await loadOrders();
+  const order = orders.find((candidate) => candidate.id === orderId);
+
+  if (!order) {
+    return c.json({ ok: false, error: 'Order not found' }, 404);
+  }
+
+  const products = await readProducts();
+  const product = products.find((p) => p.id === order.product_id || p.thing_file?.hash === order.product_hash);
+
+  return c.json({
+    ok: true,
+    data: {
+      id: order.id,
+      product_title: order.product_title ?? product?.title ?? 'Order item',
+      fulfillment_status: order.fulfillment_status ?? 'pending',
+      estimated_delivery_date: order.estimated_delivery_date ?? null,
+      created_at: order.created_at,
+      amount_cents: order.amount ?? order.consumer_price_cents ?? 0,
+      currency: order.currency ?? 'ZAR',
+    },
+  });
 });
 
 // GET /orders/:idOrReference - Fetch order by ID or Paystack reference

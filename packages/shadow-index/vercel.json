@@ -19,5 +19,11 @@
       "src": "/(.*)",
       "dest": "/api/vercel-entry.ts"
     }
+  ],
+  "crons": [
+    {
+      "path": "/v1/cron/order-checkins",
+      "schedule": "0 8 * * *"
+    }
   ]
 }

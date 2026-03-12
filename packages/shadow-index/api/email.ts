@@ -22,6 +22,7 @@ interface OrderDetails {
   amountCents: number;
   customerEmail: string;
   deliveryAddress: DeliveryAddress | null;
+  estimatedDeliveryDate?: string | null;
   merchantBusinessName: string;
   dashboardUrl?: string;
 }
@@ -40,6 +41,24 @@ interface KycStatusDetails {
   approved: boolean;
   notes?: string;
   dashboardUrl?: string;
+}
+
+interface OrderCheckinEmailDetails {
+  customerEmail: string;
+  orderId: string;
+  productTitle: string;
+  estimatedDeliveryDate: string | null;
+  merchantBusinessName: string;
+  checkinNumber: number;
+  orderStatusUrl: string;
+}
+
+interface DeliveryDateEmailDetails {
+  customerEmail: string;
+  orderId: string;
+  productTitle: string;
+  estimatedDeliveryDate: string;
+  merchantBusinessName: string;
 }
 
 const formatRand = (cents: number) => `R${(cents / 100).toFixed(2)}`;
@@ -141,6 +160,10 @@ export async function sendCustomerOrderConfirmation(order: OrderDetails): Promis
   if (!shouldSendEmails()) return;
 
   const addressBlock = formatAddress(order.deliveryAddress);
+  const orderStatusUrl = `${portalUrl}/order/${order.orderId}`;
+  const estimatedDeliveryLine = order.estimatedDeliveryDate
+    ? `<p style="margin:0 0 24px;font-size:15px;color:#18181b;">Estimated delivery date: <strong>${new Date(order.estimatedDeliveryDate).toLocaleDateString('en-ZA', { dateStyle: 'long' })}</strong></p>`
+    : '';
 
   const html = `
 <!DOCTYPE html>
@@ -178,6 +201,14 @@ export async function sendCustomerOrderConfirmation(order: OrderDetails): Promis
             </table>
             <h2 style="margin:0 0 8px;font-size:14px;font-weight:600;color:#71717a;text-transform:uppercase;letter-spacing:0.5px;">Delivering to</h2>
             <p style="margin:0 0 24px;font-size:15px;color:#18181b;white-space:pre-line;line-height:1.6;">${addressBlock}</p>
+            ${estimatedDeliveryLine}
+            <table cellpadding="0" cellspacing="0" style="margin-top:24px;">
+              <tr>
+                <td style="background:#f4f4f5;border-radius:6px;padding:12px 20px;">
+                  <a href="${orderStatusUrl}" style="color:#18181b;font-size:14px;font-weight:500;text-decoration:none;">Track your order</a>
+                </td>
+              </tr>
+            </table>
           </td>
         </tr>
         <tr>
@@ -276,4 +307,95 @@ export async function sendKycStatusEmail(details: KycStatusDetails): Promise<voi
     subject,
     html,
   });
+}
+
+export async function sendOrderCheckinEmail(details: OrderCheckinEmailDetails): Promise<void> {
+  if (!shouldSendEmails()) return;
+
+  const deliveryLine = details.estimatedDeliveryDate
+    ? `<p style="margin:0 0 24px;font-size:15px;color:#18181b;">Your estimated delivery date is <strong>${new Date(details.estimatedDeliveryDate).toLocaleDateString('en-ZA', { dateStyle: 'long' })}</strong>.</p>`
+    : `<p style="margin:0 0 24px;font-size:15px;color:#71717a;">No estimated delivery date has been set yet. ${details.merchantBusinessName} will be in touch soon.</p>`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Order Update</title></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;width:100%;">
+        <tr><td style="background:#18181b;padding:24px 32px;"><span style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.5px;">fairflow</span></td></tr>
+        <tr><td style="padding:32px;">
+          <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">Update on your order</h1>
+          <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${details.productTitle} - Order ${details.orderId.slice(0, 8).toUpperCase()}</p>
+          <p style="margin:0 0 24px;font-size:15px;color:#18181b;">${details.merchantBusinessName} is preparing your order.</p>
+          ${deliveryLine}
+          <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;"><tr><td style="background:#18181b;border-radius:6px;padding:12px 24px;"><a href="${details.orderStatusUrl}" style="color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
+          <p style="margin:0;font-size:13px;color:#a1a1aa;line-height:1.6;">Questions? Reply to this email or contact ${details.merchantBusinessName} directly.</p>
+        </td></tr>
+        <tr><td style="padding:16px 32px;border-top:1px solid #e4e4e7;"><p style="margin:0;font-size:12px;color:#a1a1aa;">Powered by Fairflow.</p></td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    await resend.emails.send({
+      from: FROM_ORDERS,
+      to: details.customerEmail,
+      subject: `Update on your ${details.productTitle} order`,
+      html,
+    });
+    console.log(`[Email] Check-in #${details.checkinNumber} sent to ${details.customerEmail}`);
+  } catch (error) {
+    console.error('[Email] Failed to send order check-in:', error);
+    throw error;
+  }
+}
+
+export async function sendDeliveryDateEmail(details: DeliveryDateEmailDetails): Promise<void> {
+  if (!shouldSendEmails()) return;
+
+  const formattedDate = new Date(details.estimatedDeliveryDate).toLocaleDateString('en-ZA', {
+    dateStyle: 'long',
+  });
+  const orderStatusUrl = `${portalUrl}/order/${details.orderId}`;
+
+  const html = `
+<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8" /><title>Delivery Date Confirmed</title></head>
+<body style="margin:0;padding:0;background:#f4f4f5;font-family:'Helvetica Neue',Helvetica,Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#f4f4f5;padding:32px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="background:#ffffff;border-radius:8px;overflow:hidden;max-width:600px;width:100%;">
+        <tr><td style="background:#18181b;padding:24px 32px;"><span style="color:#ffffff;font-size:20px;font-weight:700;letter-spacing:-0.5px;">fairflow</span></td></tr>
+        <tr><td style="padding:32px;">
+          <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">Delivery date confirmed</h1>
+          <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${details.productTitle} - Order ${details.orderId.slice(0, 8).toUpperCase()}</p>
+          <table width="100%" cellpadding="0" cellspacing="0" style="background:#f0fdf4;border-radius:6px;border:1px solid #bbf7d0;padding:20px;margin-bottom:24px;">
+            <tr><td><p style="margin:0 0 4px;font-size:13px;color:#16a34a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Estimated delivery</p><p style="margin:0;font-size:20px;font-weight:700;color:#14532d;">${formattedDate}</p></td></tr>
+          </table>
+          <p style="margin:0 0 24px;font-size:15px;color:#18181b;">${details.merchantBusinessName} has confirmed your order will arrive by this date. You will receive another update when it is marked as shipped.</p>
+          <table cellpadding="0" cellspacing="0"><tr><td style="background:#18181b;border-radius:6px;padding:12px 24px;"><a href="${orderStatusUrl}" style="color:#ffffff;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
+        </td></tr>
+        <tr><td style="padding:16px 32px;border-top:1px solid #e4e4e7;"><p style="margin:0;font-size:12px;color:#a1a1aa;">Powered by Fairflow.</p></td></tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
+
+  try {
+    await resend.emails.send({
+      from: FROM_ORDERS,
+      to: details.customerEmail,
+      subject: `Your delivery date: ${formattedDate} - ${details.productTitle}`,
+      html,
+    });
+    console.log(`[Email] Delivery date email sent to ${details.customerEmail}`);
+  } catch (error) {
+    console.error('[Email] Failed to send delivery date email:', error);
+  }
 }

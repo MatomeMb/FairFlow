@@ -1132,8 +1132,12 @@ export const MerchantPortal: React.FC = () => {
       onMarkAsFulfilled={handleMarkAsFulfilled}
       onUploadSlip={handleUploadSlip}
       onMarkAsShipped={handleMarkAsShipped}
+      onDeliveryDateSaved={(orderId, date) => {
+        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, estimated_delivery_date: date } : o)));
+      }}
       getPayoutStatusLabel={getPayoutStatusLabel}
       apiBase={apiBase}
+      authToken={authToken}
     />
   );
 

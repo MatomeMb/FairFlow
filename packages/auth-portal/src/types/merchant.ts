@@ -55,6 +55,7 @@ export interface MerchantOrder {
   shipment_slip_url?: string | null;
   fulfillment_status?: 'pending' | 'shipped' | 'fulfilled' | 'delivered';
   delivery_address?: DeliveryAddress | null;
+  estimated_delivery_date?: string | null;
 }
 
 export interface MerchantNotification {

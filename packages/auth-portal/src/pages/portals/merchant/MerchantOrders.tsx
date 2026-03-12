@@ -1,6 +1,7 @@
 import { Package, Upload, Truck } from 'lucide-react';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import type { MerchantOrder } from '../../../types/merchant';
+import { DeliveryDatePicker } from './DeliveryDatePicker';
 
 interface MerchantOrdersProps {
   orders: MerchantOrder[];
@@ -13,8 +14,10 @@ interface MerchantOrdersProps {
   onMarkAsFulfilled: (orderId: string) => void;
   onUploadSlip: (orderId: string, file: File) => void;
   onMarkAsShipped: (orderId: string, slipUrl: string) => void;
+  onDeliveryDateSaved: (orderId: string, date: string) => void;
   getPayoutStatusLabel: (order: MerchantOrder) => string;
   apiBase: string;
+  authToken: string | null;
 }
 
 const PAYMENT_BADGE: Record<string, { label: string; className: string }> = {
@@ -36,8 +39,10 @@ export function MerchantOrders({
   onMarkAsFulfilled: _onMarkAsFulfilled,
   onUploadSlip,
   onMarkAsShipped,
+  onDeliveryDateSaved,
   getPayoutStatusLabel,
   apiBase: _apiBase,
+  authToken,
 }: MerchantOrdersProps) {
   return (
     <div className="space-y-4">
@@ -159,6 +164,13 @@ export function MerchantOrders({
                     : getPayoutStatusLabel(order)}
                 </p>
               </div>
+
+              <DeliveryDatePicker
+                orderId={order.id}
+                token={authToken ?? ''}
+                currentDate={order.estimated_delivery_date ?? null}
+                onSaved={(date) => onDeliveryDateSaved(order.id, date)}
+              />
 
               {order.delivery_address && (
                 <div className="mt-4 bg-stone-800 border border-stone-700 rounded-lg p-3 text-sm text-stone-300">
