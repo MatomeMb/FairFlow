@@ -39,6 +39,12 @@ import {
   getMerchantPriceCents,
   type MerchantProduct,
 } from './merchant-products.js';
+import {
+  sendMerchantOrderNotification,
+  sendCustomerOrderConfirmation,
+  sendLowStockWarning,
+  sendKycStatusEmail,
+} from './email.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -1360,6 +1366,7 @@ app.get('/health', async (c) => {
 
   checks.r2 = useR2 ? 'enabled' : 'disabled';
   checks.paystack = process.env.PAYSTACK_SECRET_KEY ? 'configured' : 'not_configured';
+  checks.resend = process.env.RESEND_API_KEY ? 'configured' : 'not configured';
 
   const allHealthy = Object.values(checks).every(v =>
     v === 'configured' || v === 'connected' || v === 'ok' || v === 'enabled'
@@ -2294,6 +2301,13 @@ app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
     approval_notes: approvalNotes,
   });
 
+  sendKycStatusEmail({
+    merchantEmail: merchant.email,
+    merchantBusinessName: merchant.business_name,
+    approved: true,
+    notes: approvalNotes || undefined,
+  }).catch((error) => console.error('[KYC] Status email error:', error));
+
   return c.json({
     ok: true,
     message: 'KYC approved successfully',
@@ -2359,6 +2373,13 @@ app.patch('/v1/admin/kyc/reject/:merchantId', async (c) => {
     business_name: merchant.business_name,
     rejection_reason: rejectionReason,
   });
+
+  sendKycStatusEmail({
+    merchantEmail: merchant.email,
+    merchantBusinessName: merchant.business_name,
+    approved: false,
+    notes: rejectionReason || undefined,
+  }).catch((error) => console.error('[KYC] Status email error:', error));
 
   return c.json({
     ok: true,
@@ -3150,6 +3171,17 @@ app.post('/webhooks/paystack', async (c) => {
               created_at: now,
             });
             await saveNotifications(notifs);
+
+            const merchantAccounts = await loadMerchantAccounts();
+            const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
+            if (merchant?.email) {
+              sendLowStockWarning({
+                merchantEmail: merchant.email,
+                merchantBusinessName: merchant.business_name,
+                productTitle: product.title,
+                stockCount: stockAfter,
+              }).catch((error) => console.error('[Stock] Low stock email error:', error));
+            }
           }
         }
       }
@@ -3157,6 +3189,34 @@ app.post('/webhooks/paystack', async (c) => {
       const allOrders = await loadOrders();
       allOrders.push(order);
       await saveOrders(allOrders);
+
+      const merchantAccounts = await loadMerchantAccounts();
+      const merchant = merchantAccounts.find(
+        (account) => account.id === (merchantId || product?.merchant_id || ''),
+      );
+      const merchantBusinessName = merchant?.business_name ?? 'Fairflow Merchant';
+
+      if (merchant?.email) {
+        sendMerchantOrderNotification(merchant.email, {
+          orderId: order.id,
+          productTitle: product?.title ?? 'Product',
+          amountCents: consumerPriceCents,
+          customerEmail,
+          deliveryAddress: order.customer?.delivery_address ?? null,
+          merchantBusinessName,
+        }).catch((error) => console.error('[Webhook] Merchant email error:', error));
+      }
+
+      if (customerEmail) {
+        sendCustomerOrderConfirmation({
+          orderId: order.id,
+          productTitle: product?.title ?? 'Product',
+          amountCents: consumerPriceCents,
+          customerEmail,
+          deliveryAddress: order.customer?.delivery_address ?? null,
+          merchantBusinessName,
+        }).catch((error) => console.error('[Webhook] Customer email error:', error));
+      }
 
       const notifs = await loadNotifications();
       notifs.push({
