@@ -73,6 +73,22 @@ if (!process.env.VERCEL) {
   void loadEnvForShadowIndex();
 }
 
+// Startup env validation — log missing required vars loudly
+const REQUIRED_ENV_VARS = [
+  'SUPABASE_URL',
+  'SUPABASE_SERVICE_KEY',
+  'JWT_SECRET',
+  'GOOGLE_CLIENT_ID',
+  'GOOGLE_CLIENT_SECRET',
+  'GOOGLE_REDIRECT_URI',
+  'AUTH_PORTAL_BASE_URL',
+  'PAYSTACK_SECRET_KEY',
+];
+const _missingEnv = REQUIRED_ENV_VARS.filter(key => !process.env[key]);
+if (_missingEnv.length > 0) {
+  console.error(`[FATAL] Missing environment variables: ${_missingEnv.join(', ')}`);
+}
+
 if (process.env.NODE_ENV === 'test') {
   delete process.env.SHADOW_INDEX_API_KEY;
   delete process.env.SHADOW_INDEX_API_KEYS;
@@ -107,7 +123,7 @@ app.use('*', async (c, next) => {
     return next();
   }
 
-  if (requestPath === '/health' || requestPath === '/v1/analytics/dashboard') {
+  if (requestPath === '/health' || requestPath === '/v1/analytics/dashboard' || requestPath === '/debug/oauth-config') {
     return next();
   }
 
@@ -160,13 +176,6 @@ app.use('*', async (c, next) => {
 
   const isMerchantRoute = requestPath.startsWith('/v1/merchant/');
   const isMerchantAnalyticsRoute = requestPath.startsWith('/v1/analytics/report');
-  
-  // Development mode: allow merchant routes without auth when in dev OAuth mode
-  const isDev = process.env.GOOGLE_OAUTH_MODE === 'dev';
-  if ((isMerchantRoute || isMerchantAnalyticsRoute) && isDev) {
-    console.log('[DEV MODE] Allowing merchant route without token:', requestPath);
-    return next();
-  }
   
   if (isMerchantRoute || isMerchantAnalyticsRoute) {
     const auth = c.req.header('Authorization');
@@ -940,24 +949,11 @@ const extractBearerToken = (authHeader: string | undefined): string | null => {
 };
 
 const getGoogleOAuthConfig = () => {
-  const mode = process.env.GOOGLE_OAUTH_MODE;
-  
-  // Development mode: allow testing without real Google credentials
-  if (mode === 'dev') {
-    return {
-      clientId: 'dev-client-id',
-      clientSecret: 'dev-client-secret',
-      redirectUri: process.env.GOOGLE_REDIRECT_URI || 'http://localhost:3000/v1/auth/google/callback',
-      isDev: true,
-    };
-  }
-  
-  // Production mode: require real credentials
   const clientId = process.env.GOOGLE_CLIENT_ID;
   const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
   const redirectUri = process.env.GOOGLE_REDIRECT_URI;
   if (!clientId || !clientSecret || !redirectUri) return null;
-  return { clientId, clientSecret, redirectUri, isDev: false };
+  return { clientId, clientSecret, redirectUri };
 };
 
 const exchangeGoogleCode = async (
@@ -978,7 +974,11 @@ const exchangeGoogleCode = async (
     body: body.toString(),
   });
 
-  if (!response.ok) return null;
+  if (!response.ok) {
+    const errBody = await response.text().catch(() => 'unable to read error body');
+    console.error('[OAuth] Token exchange failed:', response.status, errBody);
+    return null;
+  }
   return (await response.json()) as { access_token?: string };
 };
 
@@ -1160,18 +1160,66 @@ app.get('/health', async (c) => {
     checks.storage = 'unavailable';
   }
 
+  // Check Supabase (via REST API — no SDK dependency needed)
+  try {
+    const supabaseUrl = process.env.SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
+    if (supabaseUrl && supabaseKey) {
+      const resp = await fetch(`${supabaseUrl}/rest/v1/merchant_accounts?select=id&limit=1`, {
+        headers: {
+          'apikey': supabaseKey,
+          'Authorization': `Bearer ${supabaseKey}`,
+        },
+      });
+      checks.supabase = resp.ok ? 'connected' : `error: ${resp.status}`;
+    } else {
+      checks.supabase = 'not configured';
+    }
+  } catch {
+    checks.supabase = 'unavailable';
+  }
+
+  // Check Google OAuth config
+  checks.google_oauth = (
+    process.env.GOOGLE_CLIENT_ID &&
+    process.env.GOOGLE_CLIENT_SECRET &&
+    process.env.GOOGLE_REDIRECT_URI
+  ) ? 'configured' : 'missing env vars';
+
   checks.r2 = useR2 ? 'enabled' : 'disabled';
   checks.paystack = process.env.PAYSTACK_SECRET_KEY ? 'configured' : 'not_configured';
 
-  const allOk = checks.storage === 'ok';
+  const allHealthy = Object.values(checks).every(v =>
+    v === 'configured' || v === 'connected' || v === 'ok' || v === 'enabled'
+  );
 
   return c.json({
-    status: allOk ? 'ok' : 'degraded',
+    status: allHealthy ? 'ok' : 'degraded',
     service: 'shadow-index',
     company: 'fairflow',
     version: '0.6.0',
     timestamp: new Date().toISOString(),
     checks,
+  }, allHealthy ? 200 : 207);
+});
+
+// Temporary debug endpoint — remove after OAuth verification
+app.get('/debug/oauth-config', (c) => {
+  const clientId = process.env.GOOGLE_CLIENT_ID;
+  const clientSecret = process.env.GOOGLE_CLIENT_SECRET;
+  const redirectUri = process.env.GOOGLE_REDIRECT_URI;
+  const oauthMode = process.env.GOOGLE_OAUTH_MODE;
+
+  return c.json({
+    client_id_present: !!clientId,
+    client_id_last_6: clientId ? clientId.slice(-6) : null,
+    client_id_ends_correctly: clientId?.endsWith('.apps.googleusercontent.com') ?? false,
+    client_secret_present: !!clientSecret,
+    client_secret_starts_correctly: clientSecret?.startsWith('GOCSPX-') ?? false,
+    client_secret_length: clientSecret?.length ?? 0,
+    redirect_uri: redirectUri ?? null,
+    oauth_mode: oauthMode ?? 'not set',
+    node_env: process.env.NODE_ENV ?? 'not set',
   });
 });
 
@@ -1313,41 +1361,15 @@ app.get('/v1/auth/google', async (c) => {
   const portalBaseUrl = inferPortalBaseUrl(c);
   const config = getGoogleOAuthConfig();
   if (!config) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
-  }
-
-  // Development mode: skip real Google OAuth and create a dev account
-  if (config.isDev) {
-    const now = new Date().toISOString();
-    const devEmail = 'dev-merchant@fairflow.dev';
-    const accounts = await loadMerchantAccounts();
-    
-    let account = accounts.find((candidate) => candidate.email.toLowerCase() === devEmail);
-    if (!account) {
-      account = {
-        id: crypto.randomUUID(),
-        business_name: 'Dev Merchant Test',
-        email: devEmail,
-        auth_provider: 'google',
-        kyc_status: 'not_started',
-        commission_rate: 0.03,
-        payout_frequency: 'weekly',
-        payout_minimum: 50000,
-        total_earnings: 0,
-        pending_payout: 0,
-        created_at: now,
-        updated_at: now,
-      };
-      accounts.push(account);
-      await saveMerchantAccounts(accounts);
-    } else {
-      account.auth_provider = 'google';
-      account.updated_at = now;
-      await saveMerchantAccounts(accounts);
-    }
-
-    const merchantToken = issueMerchantToken(account);
-    return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
+    return c.json({
+      ok: false,
+      error: 'Google OAuth not configured. Missing GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, or GOOGLE_REDIRECT_URI.',
+      missing: {
+        GOOGLE_CLIENT_ID: !process.env.GOOGLE_CLIENT_ID,
+        GOOGLE_CLIENT_SECRET: !process.env.GOOGLE_CLIENT_SECRET,
+        GOOGLE_REDIRECT_URI: !process.env.GOOGLE_REDIRECT_URI,
+      }
+    }, 500);
   }
 
   const params = new URLSearchParams({
@@ -1356,7 +1378,6 @@ app.get('/v1/auth/google', async (c) => {
     response_type: 'code',
     scope: 'openid email profile',
     access_type: 'offline',
-    include_granted_scopes: 'true',
     prompt: 'select_account',
     state: buildGoogleState(portalBaseUrl),
   });
@@ -1392,6 +1413,7 @@ app.get('/v1/auth/google/callback', async (c) => {
   const tokenResponse = await exchangeGoogleCode(code, config);
   const accessToken = tokenResponse?.access_token;
   if (!accessToken) {
+    console.error('[OAuth] Token exchange failed — no access_token returned');
     return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
   }
 
