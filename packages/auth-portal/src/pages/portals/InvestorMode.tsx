@@ -155,7 +155,7 @@ export const InvestorMode: React.FC = () => {
               <p className="text-2xl text-stone-300 italic">For humans today, AI agents tomorrow</p>
             </div>
             
-            <div className="grid grid-cols-2 gap-6 pt-4 text-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 text-lg">
               <div>
                 <span className="text-stone-500">Category:</span>
                 <span className="ml-3 text-stone-200">Ethical Shopping / AI-Assisted Commerce</span>
@@ -180,7 +180,7 @@ export const InvestorMode: React.FC = () => {
           </div>
 
           {/* Traction Metrics */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard
               label="Platform Version"
               value="0.6.0"
@@ -246,7 +246,7 @@ export const InvestorMode: React.FC = () => {
           {/* Storage & Scale Panel */}
           <div className="bg-stone-900 border border-stone-800 rounded-lg p-6">
             <h3 className="text-xl font-semibold text-stone-100 mb-4">Storage & Scale</h3>
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-stone-950 rounded-lg p-4">
                 <div className="text-sm text-stone-500 mb-1">Current Storage</div>
                 <div className="text-2xl font-bold text-emerald-400">~200 MB</div>
@@ -314,7 +314,7 @@ export const InvestorMode: React.FC = () => {
           <div className="bg-stone-900 border border-stone-800 rounded-lg p-8 space-y-6">
             <h3 className="text-xl font-semibold text-stone-100">Unit Economics</h3>
             
-            <div className="grid grid-cols-2 gap-x-12 gap-y-4 text-lg">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-lg">
               <div>
                 <span className="text-stone-500">Revenue Model:</span>
                 <span className="ml-3 text-stone-200">Commission on ethical purchases</span>

@@ -51,7 +51,7 @@ export const AdminPortal: React.FC = () => {
   const { signOut } = useAuth();
   const [activeSection, setActiveSection] = useState<AdminSection>('overview');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
   const [apiOnline, setApiOnline] = useState(true);
   const [logoStyle, setLogoStyle] = useState<LogoStyle>('geo-tech');
   const [logoMenuOpen, setLogoMenuOpen] = useState(false);
@@ -229,7 +229,7 @@ export const AdminPortal: React.FC = () => {
 
         <div className="p-6 space-y-6">
           {/* KPI Cards */}
-          <div className="grid grid-cols-5 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
             <MetricCard label="Active Merchants" value={roleStats.merchant.toString()} color="blue" />
             <MetricCard label="Heap Memory" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
             <MetricCard label="Storage Used" value={formatBytes(analytics?.storage.totalSize || 0)} />
@@ -238,7 +238,7 @@ export const AdminPortal: React.FC = () => {
           </div>
 
           {/* Quick Stats */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
@@ -410,7 +410,7 @@ export const AdminPortal: React.FC = () => {
     return (
       <div className="p-6 space-y-6">
         <h2 className="text-xl font-bold text-white">Users & Roles</h2>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <MetricCard label="CEOs" value={roleStats.ceo.toString()} />
           <MetricCard label="CTOs" value={roleStats.cto.toString()} />
           <MetricCard label="Merchants" value={roleStats.merchant.toString()} />
@@ -448,7 +448,7 @@ export const AdminPortal: React.FC = () => {
     return (
       <div className="p-6 space-y-6">
         <h2 className="text-xl font-bold text-white">Platform Health</h2>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MetricCard label="API Status" value={apiOnline ? "Online" : "Offline"} color={apiOnline ? "green" : "red"} />
           <MetricCard label="Memory (Heap)" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
           <MetricCard label="Memory (RSS)" value={(analytics?.system.memoryRss || 0).toFixed(2)} unit="MB" />
@@ -519,8 +519,12 @@ export const AdminPortal: React.FC = () => {
 
   return (
     <div className="flex h-screen bg-stone-950 overflow-hidden" data-testid="admin-portal">
+      {/* Mobile backdrop */}
+      {sidebarOpen && (
+        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+      )}
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64' : 'w-20'} bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
         <div className="p-4 border-b border-stone-800">
           <div className="flex items-center justify-between">
             <FairflowLogo markHeight={42} style={logoStyle} variant="dark" />
@@ -562,11 +566,19 @@ export const AdminPortal: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-stone-800 bg-stone-900 px-6 py-4">
+        <div className="border-b border-stone-800 bg-stone-900 px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-white">
-              {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
-            </h1>
+            <div className="flex items-center gap-3">
+              <button
+                className="md:hidden p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg"
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
+              </button>
+              <h1 className="text-xl md:text-2xl font-bold text-white">
+                {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
+              </h1>
+            </div>
             <div className="flex items-center gap-4">
               <div className="relative">
                 <button 

@@ -78,7 +78,7 @@ export function MerchantOrders({
               key={order.id}
               className="rounded-xl border p-5 bg-stone-900 border-stone-800"
             >
-              <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="space-y-1">
                   <p className="font-mono text-xs text-stone-400">Order #{order.id}</p>
                   {order.product_title && (

@@ -20,7 +20,7 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
     <div className="min-h-screen bg-stone-950">
       {/* Header */}
       <div className="bg-stone-900 border-b border-stone-800">
-        <div className="px-6 py-4 flex items-center justify-between">
+        <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-xl font-semibold text-white">{title}</div>
           <div className="flex items-center gap-3">
             {headerActions}
@@ -34,7 +34,7 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
         </div>
         
         {/* Tabs */}
-        <div className="px-6 flex gap-1 border-t border-stone-800">
+        <div className="px-4 md:px-6 flex gap-1 border-t border-stone-800 overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}

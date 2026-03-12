@@ -842,7 +842,7 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         {productsLoading ? (
-          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden">
+          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-stone-800">
                 <tr>
@@ -869,7 +869,7 @@ export const MerchantPortal: React.FC = () => {
         ) : products.length === 0 ? (
           <EmptyState icon={<Package className="w-10 h-10 text-stone-500" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
         ) : (
-          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden">
+          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-stone-800">
                 <tr>

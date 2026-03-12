@@ -124,7 +124,7 @@ export const CEODashboard: React.FC = () => {
   const renderOverview = () => (
     <div className="space-y-6">
       {/* Top KPI Row */}
-      <div className="grid grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         <MetricCard
           label="Platform Version"
           value="0.6.0"
@@ -153,7 +153,7 @@ export const CEODashboard: React.FC = () => {
       </div>
 
       {/* Two Column Layout */}
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Left: Role Distribution */}
         <div className="bg-stone-900 rounded-lg border border-stone-800 p-6">
           <h3 className="text-lg font-semibold text-white mb-4">Role Distribution</h3>
@@ -302,7 +302,7 @@ export const CEODashboard: React.FC = () => {
             />
 
             {/* Analytics Overview */}
-            <div className="mt-6 grid grid-cols-3 gap-4">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
               <MetricCard
                 label="Query Cache Hit Rate"
                 value={analytics?.cache?.hitRate ? (analytics.cache.hitRate * 100).toFixed(1) : 'N/A'}
@@ -374,7 +374,7 @@ export const CEODashboard: React.FC = () => {
   const renderUsersRoles = () => (
     <div className="space-y-6">
       {/* Summary Cards */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <MetricCard
           label="Total Users"
           value={users.length}
@@ -392,7 +392,7 @@ export const CEODashboard: React.FC = () => {
       {/* Role Distribution */}
       <div className="bg-stone-900 rounded-lg border border-stone-800 p-6">
         <h3 className="text-lg font-semibold text-white mb-4">Role Breakdown</h3>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           {[
             { role: 'CEO', count: roleStats?.ceo || 0, color: 'bg-purple-500' },
             { role: 'CTO', count: roleStats?.cto || 0, color: 'bg-blue-500' },
@@ -500,7 +500,7 @@ export const CEODashboard: React.FC = () => {
       </div>
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         <MetricCard
           label="Active Merchants"
           value={merchants.length}

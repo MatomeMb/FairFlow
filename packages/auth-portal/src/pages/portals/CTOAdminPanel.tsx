@@ -87,7 +87,7 @@ export function CTOAdminPanel() {
 
         <div className="p-6 space-y-6">
           {/* KPI Cards */}
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             <MetricCard label="Heap Memory" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
             <MetricCard label="RSS Memory" value={(analytics?.system.memoryRss || 0).toFixed(2)} unit="MB" />
             <MetricCard label="Storage Used" value={formatBytes(analytics?.storage.totalSize || 0)} />
@@ -95,7 +95,7 @@ export function CTOAdminPanel() {
           </div>
 
           {/* Two Column Section */}
-          <div className="grid grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Query Cache */}
             <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
               <h3 className="text-xl font-semibold text-white mb-4">Query Cache</h3>
@@ -682,7 +682,7 @@ export function CTOAdminPanel() {
           </div>
         </div>
 
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-stone-900 rounded-xl border border-stone-800/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Potential</div>
             <div className="text-3xl font-bold text-stone-200">0</div>

@@ -13,12 +13,12 @@ export function CleanShell({ title, subtitle, version, onLogout, children }: Cle
     <div className="min-h-screen bg-stone-950">
       {/* Top Banner */}
       <div className="bg-stone-900 border-b border-stone-800 px-6 py-4">
-        <div className="flex items-center justify-between max-w-7xl mx-auto">
-          <div className="flex items-center gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 max-w-7xl mx-auto">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-4">
             <div className="text-lg font-semibold text-white">{title}</div>
-            <span className="text-stone-500">│</span>
+            <span className="hidden sm:inline text-stone-500">│</span>
             <span className="text-sm text-stone-400">{subtitle}</span>
-            <span className="text-stone-500">│</span>
+            <span className="hidden sm:inline text-stone-500">│</span>
             <span className="text-xs text-stone-500">Read Only</span>
           </div>
           <button
