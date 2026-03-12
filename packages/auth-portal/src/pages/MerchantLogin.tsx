@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FairflowLogo } from "../components/FairflowLogo";
+import { apiBase } from "../lib/config";
 
 export function MerchantLogin() {
   const navigate = useNavigate();
@@ -12,8 +13,6 @@ export function MerchantLogin() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetMessage, setResetMessage] = useState("");
   const [resetError, setResetError] = useState("");
-
-  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);

@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { FairflowLogo } from "../components/FairflowLogo";
+import { apiBase } from "../lib/config";
 
 export function MerchantRegister() {
   const navigate = useNavigate();
@@ -13,8 +14,6 @@ export function MerchantRegister() {
   });
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-
-  const apiBase = import.meta.env.VITE_API_BASE_URL || "http://localhost:3000";
 
   const validateForm = (): boolean => {
     if (!formData.business_name.trim()) {

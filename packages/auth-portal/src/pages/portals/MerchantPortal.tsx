@@ -12,6 +12,7 @@ import type { MerchantProductApi, MerchantOrder, MerchantNotification, MerchantA
 import { MerchantOrders } from './merchant/MerchantOrders';
 import { MerchantNotifications } from './merchant/MerchantNotifications';
 import { MerchantKYCPayouts } from './merchant/MerchantKYCPayouts';
+import { apiBase } from '../../lib/config';
 import {
   Area,
   AreaChart,
@@ -146,9 +147,6 @@ export const MerchantPortal: React.FC = () => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
-
-  // Use relative path in dev so Vite proxy hits backend (avoids CORS, ensures correct host)
-  const apiBase = import.meta.env.VITE_API_BASE_URL ?? '';
   const hasApiAuth = Boolean(authToken || import.meta.env.VITE_API_KEY);
 
   // On mount: pick up token from URL or sessionStorage
