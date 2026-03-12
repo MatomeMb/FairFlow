@@ -1,6 +1,10 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let _resend: InstanceType<typeof Resend> | null = null;
+function getResend() {
+  if (!_resend) _resend = new Resend(process.env.RESEND_API_KEY ?? '');
+  return _resend;
+}
 
 const FROM_ORDERS = process.env.RESEND_FROM_ORDERS ?? 'Fairflow Orders <orders@fairflow.co.za>';
 const FROM_MERCHANTS = process.env.RESEND_FROM_MERCHANTS ?? 'Fairflow <merchants@fairflow.co.za>';
@@ -148,7 +152,7 @@ export async function sendMerchantOrderNotification(
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_MERCHANTS,
     to: merchantEmail,
     subject: `New order: ${order.productTitle} - ${formatRand(order.amountCents)}`,
@@ -222,7 +226,7 @@ export async function sendCustomerOrderConfirmation(order: OrderDetails): Promis
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_ORDERS,
     to: order.customerEmail,
     subject: `Order confirmed: ${order.productTitle}`,
@@ -256,7 +260,7 @@ export async function sendLowStockWarning(details: LowStockDetails): Promise<voi
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_MERCHANTS,
     to: details.merchantEmail,
     subject: `Low stock: ${details.productTitle} (${details.stockCount} left)`,
@@ -301,7 +305,7 @@ export async function sendKycStatusEmail(details: KycStatusDetails): Promise<voi
 </body>
 </html>`;
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM_MERCHANTS,
     to: details.merchantEmail,
     subject,
@@ -341,7 +345,7 @@ export async function sendOrderCheckinEmail(details: OrderCheckinEmailDetails): 
 </html>`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_ORDERS,
       to: details.customerEmail,
       subject: `Update on your ${details.productTitle} order`,
@@ -388,7 +392,7 @@ export async function sendDeliveryDateEmail(details: DeliveryDateEmailDetails): 
 </html>`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: FROM_ORDERS,
       to: details.customerEmail,
       subject: `Your delivery date: ${formattedDate} - ${details.productTitle}`,
