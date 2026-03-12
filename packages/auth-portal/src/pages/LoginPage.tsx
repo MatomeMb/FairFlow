@@ -27,48 +27,59 @@ export function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-stone-950">
-      <div className="w-full max-w-md p-8 bg-stone-900 rounded-2xl border border-stone-800">
-        <div className="mb-2">
-          <FairflowLogo markHeight={48} variant="dark" />
-        </div>
-        <p className="text-stone-400 mb-8 text-sm">Sign in to your portal</p>
+    <div className="ff-grain relative min-h-screen overflow-hidden bg-[var(--ff-bg)]">
+      <div
+        aria-hidden
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(circle at 12% 8%, var(--ff-accent-light) 0%, rgba(216,243,220,0) 36%), radial-gradient(circle at 88% 12%, rgba(183,121,31,0.12) 0%, rgba(183,121,31,0) 30%), linear-gradient(180deg, var(--ff-bg) 0%, var(--ff-surface) 100%)",
+        }}
+      />
 
-        {/* Email/Password */}
-        <form onSubmit={handleEmailLogin} className="space-y-4">
-          <div>
-            <input
-              type="email"
-              placeholder="Email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              disabled={isLoading}
-              className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
-            />
+      <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
+        <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/70 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.10)] backdrop-blur-xl animate-[ff-fade-up_0.4s_ease-out_both]">
+          <div className="mb-2">
+            <FairflowLogo markHeight={48} variant="light" />
           </div>
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            disabled={isLoading}
-            className="w-full bg-stone-800 border border-stone-700 text-white rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
-          />
-          {error && <p className="text-red-400 text-sm">{error}</p>}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-medium py-3 rounded-xl transition disabled:opacity-50"
-          >
-            {isLoading ? "Signing in..." : "Sign in"}
-          </button>
-        </form>
+          <p className="mb-8 text-sm text-stone-500">Sign in to your portal</p>
 
-        <div className="mt-4 text-center text-stone-400 text-sm">
-          Are you a merchant?{' '}
-          <a href="/merchant/login" className="text-emerald-400 hover:text-emerald-300 underline">
-            Sign in here
-          </a>
+          {/* Email/Password */}
+          <form onSubmit={handleEmailLogin} className="space-y-4">
+            <div>
+              <input
+                type="email"
+                placeholder="Email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={isLoading}
+                className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+              />
+            </div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              disabled={isLoading}
+              className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+            />
+            {error && <p className="text-red-600 text-sm">{error}</p>}
+            <button
+              type="submit"
+              disabled={isLoading}
+              className="w-full rounded-xl bg-emerald-600 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50"
+            >
+              {isLoading ? "Signing in..." : "Sign in"}
+            </button>
+          </form>
+
+          <div className="mt-4 text-center text-sm text-stone-500">
+            Are you a merchant?{' '}
+            <a href="/merchant/login" className="text-emerald-600 hover:text-emerald-500 underline">
+              Sign in here
+            </a>
+          </div>
         </div>
       </div>
     </div>
