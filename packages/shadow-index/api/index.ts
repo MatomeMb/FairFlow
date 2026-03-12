@@ -562,7 +562,7 @@ type MerchantOrder = {
   platform_revenue_cents?: number;
   amount?: number;
   currency?: string;
-  customer?: { email: string; delivery_address?: DeliveryAddress };
+  customer?: { email: string; delivery_address?: DeliveryAddress; billing_address?: Record<string, unknown> | null };
   customer_email?: string;
   delivery_address?: DeliveryAddress;
   status?: 'pending' | 'paid' | 'failed' | 'refunded';
@@ -657,6 +657,9 @@ const loadOrders = async (): Promise<MerchantOrder[]> => {
       (customer.delivery_address as DeliveryAddress | undefined)
       ?? (payment.delivery_address as DeliveryAddress | undefined)
       ?? undefined;
+    const billingAddress =
+      (customer.billing_address as Record<string, unknown> | undefined)
+      ?? undefined;
 
     return {
       id: String(row.id ?? ''),
@@ -666,9 +669,11 @@ const loadOrders = async (): Promise<MerchantOrder[]> => {
       customer: {
         email: typeof customer.email === 'string' ? customer.email : '',
         delivery_address: deliveryAddress,
+        billing_address: billingAddress ?? null,
       },
       customer_email: typeof customer.email === 'string' ? customer.email : undefined,
       delivery_address: deliveryAddress,
+      billing_address: billingAddress ?? null,
       status: (typeof payment.status === 'string' ? payment.status : undefined) as MerchantOrder['status'],
       payment_status: (typeof payment.payment_status === 'string' ? payment.payment_status : undefined) as MerchantOrder['payment_status'],
       amount: typeof payment.amount_cents === 'number' ? payment.amount_cents : undefined,
@@ -697,7 +702,7 @@ const saveOrders = async (orders: MerchantOrder[]): Promise<void> => {
     merchant_id: order.merchant_id ?? null,
     customer: {
       email: order.customer?.email ?? order.customer_email ?? '',
-      billing_address: order.billing_address ?? null,
+      billing_address: order.billing_address ?? order.customer?.billing_address ?? null,
       delivery_address: order.delivery_address ?? order.customer?.delivery_address ?? null,
     },
     payment: {
@@ -3048,7 +3053,7 @@ app.get('/thing-bin/:hash', async (c) => {
 app.post('/checkout/create-session', async (c) => {
   try {
     const body = await c.req.json();
-    const { product_hash, product_id, customer_email, delivery_address } = body;
+    const { product_hash, product_id, customer_email, delivery_address, billing_address } = body;
 
     if (!customer_email) {
       return c.json(err('invalid_request', 'Missing customer_email'), 400);
@@ -3084,6 +3089,7 @@ app.post('/checkout/create-session', async (c) => {
       consumer_price_cents: String(consumerPriceCents),
       platform_revenue_cents: String(platformRevenueCents),
       delivery_address: JSON.stringify(delivery_address || {}),
+      billing_address: JSON.stringify(billing_address || {}),
     };
 
     const paystack = await getPaystack();
@@ -3177,6 +3183,14 @@ app.post('/webhooks/paystack', async (c) => {
         // ignore
       }
 
+      let billingAddress: Record<string, unknown> | null = null;
+      try {
+        const ba = meta.billing_address;
+        if (typeof ba === 'string') billingAddress = JSON.parse(ba) as Record<string, unknown>;
+      } catch {
+        // ignore
+      }
+
       const customerEmail = data.customer?.email ?? '';
 
       const orders = await loadOrders();
@@ -3200,9 +3214,14 @@ app.post('/webhooks/paystack', async (c) => {
         platform_revenue_cents: platformRevenueCents,
         amount: consumerPriceCents,
         currency: 'ZAR',
-        customer: { email: customerEmail, delivery_address: deliveryAddress },
+        customer: {
+          email: customerEmail,
+          delivery_address: deliveryAddress,
+          billing_address: billingAddress,
+        },
         customer_email: customerEmail,
         delivery_address: deliveryAddress,
+        billing_address: billingAddress,
         status: 'paid',
         payment_status: 'held',
         fulfillment_status: 'pending',

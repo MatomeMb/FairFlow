@@ -159,6 +159,24 @@ export function getMerchantPriceCents(product: MerchantProduct): number {
 
 const err = (code: string, message: string) => ({ code, message });
 
+const stableStringify = (value: unknown): string => {
+  if (Array.isArray(value)) {
+    return `[${value.map(stableStringify).join(',')}]`;
+  }
+  if (value && typeof value === 'object') {
+    const entries = Object.entries(value as Record<string, unknown>).sort(([a], [b]) =>
+      a.localeCompare(b),
+    );
+    return `{${entries
+      .map(([key, val]) => `${JSON.stringify(key)}:${stableStringify(val)}`)
+      .join(',')}}`;
+  }
+  return JSON.stringify(value);
+};
+
+const buildThingHash = (payload: Record<string, unknown>): string =>
+  crypto.createHash('sha256').update(stableStringify(payload)).digest('hex');
+
 // Helper to construct thing_file with matter_uri and thing_url from hash
 const enrichProductWithThingFile = (product: MerchantProduct): MerchantProduct => {
   if (!product.thing_file?.hash) return product;
@@ -207,6 +225,22 @@ merchantProductsRouter.post('/', async (c) => {
   const imageUrl = typeof (body as Record<string, unknown>).image_url === 'string'
     ? ((body as Record<string, unknown>).image_url as string).trim()
     : '';
+  const description = typeof (body as Record<string, unknown>).description === 'string'
+    ? ((body as Record<string, unknown>).description as string).trim()
+    : undefined;
+  const stockCountRaw = (body as Record<string, unknown>).stock_count;
+  const stockCount = typeof stockCountRaw === 'number' && Number.isFinite(stockCountRaw)
+    ? Math.max(0, Math.floor(stockCountRaw))
+    : 0;
+  const shippingAvailable = typeof (body as Record<string, unknown>).shipping_available === 'boolean'
+    ? (body as Record<string, unknown>).shipping_available as boolean
+    : false;
+  const certifications = Array.isArray((body as Record<string, unknown>).certifications)
+    ? (body as Record<string, unknown>).certifications as unknown[]
+    : [];
+  const category = typeof (body as Record<string, unknown>).category === 'string'
+    ? ((body as Record<string, unknown>).category as string).trim()
+    : undefined;
   const merchantId = await resolveMerchantId(c, body as Record<string, unknown>);
 
   if (!title) {
@@ -232,17 +266,32 @@ merchantProductsRouter.post('/', async (c) => {
 
   const now = new Date().toISOString();
   const productId = crypto.randomUUID();
+  const thingHash = buildThingHash({
+    id: productId,
+    merchant_id: merchantId,
+    title,
+    description: description ?? '',
+    price_cents: priceCents,
+    currency: currency || 'ZAR',
+    image_url: imageUrl,
+    category: category ?? '',
+    shipping_available: shippingAvailable,
+    certifications,
+  });
   const product: MerchantProduct = {
     id: productId,
     title,
     price_cents: priceCents,
     currency: currency || 'ZAR',
+    description,
     status: 'draft',
-    stock_count: 0,
-    thing_file: undefined,
+    stock_count: stockCount,
+    shipping_available: shippingAvailable,
+    certifications,
+    thing_file: { hash: thingHash },
     merchant_id: merchantId,
     image_url: imageUrl,
-    category: (body as Record<string, unknown>).category as string | undefined,
+    category,
     created_at: now,
     updated_at: now,
   };
@@ -253,15 +302,15 @@ merchantProductsRouter.post('/', async (c) => {
       id: product.id,
       merchant_id: product.merchant_id,
       title: product.title,
-      description: null,
+      description: product.description ?? null,
       price_cents: product.price_cents,
       currency: product.currency,
       category: product.category ?? null,
       stock_count: product.stock_count ?? 0,
       image_url: product.image_url ?? null,
-      shipping_available: false,
-      certifications: [],
-      thing_file: null,
+      shipping_available: product.shipping_available ?? false,
+      certifications: product.certifications ?? [],
+      thing_file: product.thing_file ?? null,
       status: product.status ?? 'draft',
       created_at: now,
       updated_at: now,
