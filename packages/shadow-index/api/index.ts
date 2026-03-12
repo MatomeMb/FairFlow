@@ -123,7 +123,7 @@ app.use('*', async (c, next) => {
     return next();
   }
 
-  if (requestPath === '/health' || requestPath === '/v1/analytics/dashboard' || requestPath === '/debug/oauth-config') {
+  if (requestPath === '/health' || requestPath === '/v1/analytics/dashboard') {
     return next();
   }
 
@@ -1203,26 +1203,6 @@ app.get('/health', async (c) => {
   }, allHealthy ? 200 : 207);
 });
 
-// Temporary debug endpoint — remove after OAuth verification
-app.get('/debug/oauth-config', (c) => {
-  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
-  const oauthMode = process.env.GOOGLE_OAUTH_MODE;
-
-  return c.json({
-    client_id_present: !!clientId,
-    client_id_last_6: clientId ? clientId.slice(-6) : null,
-    client_id_ends_correctly: clientId?.endsWith('.apps.googleusercontent.com') ?? false,
-    client_secret_present: !!clientSecret,
-    client_secret_starts_correctly: clientSecret?.startsWith('GOCSPX-') ?? false,
-    client_secret_length: clientSecret?.length ?? 0,
-    redirect_uri: redirectUri ?? null,
-    oauth_mode: oauthMode ?? 'not set',
-    node_env: process.env.NODE_ENV ?? 'not set',
-  });
-});
-
 // Merchant self-serve auth endpoints
 app.post('/v1/auth/merchant/register', async (c) => {
   const body = await c.req.json().catch(() => null);
@@ -1451,7 +1431,7 @@ app.get('/v1/auth/google/callback', async (c) => {
   await saveMerchantAccounts(accounts);
 
   const merchantToken = issueMerchantToken(account);
-  return c.redirect(buildPortalUrl('/merchant', { token: merchantToken }, portalBaseUrl));
+  return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
 });
 
 type UploadedImageFile = {
