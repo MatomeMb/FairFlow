@@ -1,12 +1,11 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import type { AppRole } from "../types/auth";
 
 interface MerchantPortalGuardProps {
   children: React.ReactNode;
 }
 
-/** Allows access if user has merchant/ceo/cto role OR has valid merchant token in URL/storage. */
+/** Allows access if a merchant token (or API key) is present in URL/storage/env. */
 export function MerchantPortalGuard({ children }: MerchantPortalGuardProps) {
   const { loading } = useAuth();
 
