@@ -8,15 +8,9 @@ interface MerchantPortalGuardProps {
 
 /** Allows access if user has merchant/ceo/cto role OR has valid merchant token in URL/storage. */
 export function MerchantPortalGuard({ children }: MerchantPortalGuardProps) {
-  const { role, loading } = useAuth();
+  const { loading } = useAuth();
 
-  // Allow Supabase users with merchant, ceo, or cto role
-  const allowedRoles: AppRole[] = ["merchant", "ceo", "cto"];
-  if (role && allowedRoles.includes(role)) {
-    return <>{children}</>;
-  }
-
-  // Allow token-based merchants (no Supabase session)
+  // Merchant API requires a merchant token (or API key), so gate entry on it.
   const hasToken =
     typeof window !== "undefined" &&
     (new URLSearchParams(window.location.search).get("token") ||

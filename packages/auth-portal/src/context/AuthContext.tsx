@@ -8,8 +8,12 @@ import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
 const STATIC_ADMIN_EMAILS = [
   "matome@fairflow.co.za",
   "sobuhle@fairflow.co.za",
+  "matome@fairflow.com",
+  "sobuhle@fairflow.com",
   "matome@thingsthatmatter.com",
   "sobuhle@thingsthatmatter.com",
+  "matome@thingsthatmatter.co.za",
+  "sobuhle@thingsthatmatter.co.za",
 ];
 
 function normalizeEmail(value: string | null | undefined): string | null {
