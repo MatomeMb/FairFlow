@@ -146,7 +146,8 @@ export function FairflowLogo({
   style = 'geo-tech',
 }: FairflowLogoProps) {
   const urlStyle = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('logoStyle') : null;
-  const currentStyle = isLogoStyle(urlStyle) ? urlStyle : style;
+  const storedStyle = typeof window !== 'undefined' ? window.localStorage.getItem('fairflowLogoStyle') : null;
+  const currentStyle = isLogoStyle(urlStyle) ? urlStyle : isLogoStyle(storedStyle) ? storedStyle : style;
 
   const markColor = variant === 'dark' ? '#F5F5F0' : '#1B2330';
   const wordColor = markColor;

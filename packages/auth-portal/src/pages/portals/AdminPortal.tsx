@@ -74,8 +74,16 @@ export const AdminPortal: React.FC = () => {
     // Check URL for logo style
     const params = new URLSearchParams(window.location.search);
     const style = params.get('logoStyle') as LogoStyle;
-    if (style) {
+    const styleExists = style && LOGO_STYLES.some((entry) => entry.id === style);
+    if (styleExists) {
       setLogoStyle(style);
+      window.localStorage.setItem('fairflowLogoStyle', style);
+      return;
+    }
+
+    const storedStyle = window.localStorage.getItem('fairflowLogoStyle') as LogoStyle | null;
+    if (storedStyle && LOGO_STYLES.some((entry) => entry.id === storedStyle)) {
+      setLogoStyle(storedStyle);
     }
   }, []);
 
@@ -605,6 +613,7 @@ export const AdminPortal: React.FC = () => {
                           key={styleOption.id}
                           onClick={() => {
                             setLogoStyle(styleOption.id);
+                            window.localStorage.setItem('fairflowLogoStyle', styleOption.id);
                             setLogoMenuOpen(false);
                             const url = new URL(window.location.href);
                             url.searchParams.set('logoStyle', styleOption.id);
