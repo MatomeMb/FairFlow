@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
+import { supabase } from "../lib/supabase";
 
 export function LoginPage() {
   const { signInWithEmail } = useAuth();
@@ -9,6 +10,9 @@ export function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [resetMessage, setResetMessage] = useState<string | null>(null);
+  const [resetError, setResetError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
@@ -20,7 +24,38 @@ export function LoginPage() {
       await signInWithEmail(email, password);
       navigate("/");
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Login failed");
+      const message = err instanceof Error ? err.message : "Login failed";
+      if (/invalid login credentials/i.test(message)) {
+        setError("Invalid email or password. Use Forgot password if needed.");
+      } else if (/email not confirmed/i.test(message)) {
+        setError("Email not confirmed. Confirm the account in Supabase Auth.");
+      } else {
+        setError(message);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleForgotPassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setResetMessage(null);
+    setResetError(null);
+
+    if (!email.trim()) {
+      setResetError("Enter your email first, then request a reset link.");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const { error: resetErr } = await supabase.auth.resetPasswordForEmail(email.trim().toLowerCase(), {
+        redirectTo: `${window.location.origin}/login`,
+      });
+      if (resetErr) throw resetErr;
+      setResetMessage("Password reset link sent. Check your inbox.");
+    } catch (err: unknown) {
+      setResetError(err instanceof Error ? err.message : "Failed to send reset email");
     } finally {
       setIsLoading(false);
     }
@@ -66,6 +101,8 @@ export function LoginPage() {
               className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
             />
             {error && <p className="text-red-600 text-sm">{error}</p>}
+            {resetError && <p className="text-red-600 text-sm">{resetError}</p>}
+            {resetMessage && <p className="text-emerald-700 text-sm">{resetMessage}</p>}
             <button
               type="submit"
               disabled={isLoading}
@@ -74,6 +111,29 @@ export function LoginPage() {
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
           </form>
+
+          <div className="mt-3 text-center text-sm">
+            <button
+              type="button"
+              onClick={() => setShowForgotPassword((prev) => !prev)}
+              disabled={isLoading}
+              className="text-emerald-600 hover:text-emerald-500 underline disabled:opacity-50"
+            >
+              {showForgotPassword ? "Hide password reset" : "Forgot password?"}
+            </button>
+          </div>
+
+          {showForgotPassword && (
+            <form onSubmit={handleForgotPassword} className="mt-3 rounded-xl border border-stone-200 bg-white/70 p-3">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100 disabled:opacity-50"
+              >
+                {isLoading ? "Sending..." : "Send reset link to entered email"}
+              </button>
+            </form>
+          )}
 
           <div className="mt-4 text-center text-sm text-stone-500">
             Are you a merchant?{' '}
