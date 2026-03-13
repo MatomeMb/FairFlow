@@ -97,41 +97,41 @@ export function CTOAdminPanel() {
           {/* Two Column Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Query Cache */}
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-              <h3 className="text-xl font-semibold text-white mb-4">Query Cache</h3>
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+              <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Query Cache</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Status</span>
+                  <span className="text-[var(--ff-ink-muted)]">Status</span>
                   <span className="flex items-center gap-2">
                     <span className={`w-2 h-2 rounded-lg ${analytics?.cache.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
                     {analytics?.cache.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Hit Rate</span>
-                  <span className="text-white">{analytics?.cache.hitRate.toFixed(1)}%</span>
+                  <span className="text-[var(--ff-ink-muted)]">Hit Rate</span>
+                  <span className="text-[var(--ff-ink)]">{analytics?.cache.hitRate.toFixed(1)}%</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Hits / Misses</span>
-                  <span className="text-white">{analytics?.cache.hits} / {analytics?.cache.misses}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Hits / Misses</span>
+                  <span className="text-[var(--ff-ink)]">{analytics?.cache.hits} / {analytics?.cache.misses}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Entries</span>
-                  <span className="text-white">{analytics?.cache.entries}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Entries</span>
+                  <span className="text-[var(--ff-ink)]">{analytics?.cache.entries}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Size</span>
-                  <span className="text-white">{analytics?.cache.size} bytes</span>
+                  <span className="text-[var(--ff-ink-muted)]">Size</span>
+                  <span className="text-[var(--ff-ink)]">{analytics?.cache.size} bytes</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Evictions</span>
-                  <span className="text-white">{analytics?.cache.evictions}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Evictions</span>
+                  <span className="text-[var(--ff-ink)]">{analytics?.cache.evictions}</span>
                 </div>
               </div>
               <button
                 onClick={onClearCache}
                 title="Cache management coming in Sprint 8"
-                className="mt-4 w-full bg-stone-800/50 cursor-not-allowed text-stone-500 text-sm font-medium px-4 py-2 rounded-lg border border-stone-700 transition-colors"
+                className="mt-4 w-full bg-stone-200/60 cursor-not-allowed text-stone-500 text-sm font-medium px-4 py-2 rounded-lg border border-[var(--ff-border)] transition-colors"
                 disabled
               >
                 Clear Cache (Sprint 8)
@@ -139,29 +139,29 @@ export function CTOAdminPanel() {
             </div>
 
             {/* Storage Breakdown */}
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-              <h3 className="text-xl font-semibold text-white mb-4">Storage Breakdown</h3>
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+              <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Storage Breakdown</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Events</span>
-                  <span className="text-white font-mono">{formatBytes(analytics?.storage.events || 0)}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Events</span>
+                  <span className="text-[var(--ff-ink)] font-mono">{formatBytes(analytics?.storage.events || 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Things</span>
-                  <span className="text-white font-mono">{formatBytes(analytics?.storage.things || 0)}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Things</span>
+                  <span className="text-[var(--ff-ink)] font-mono">{formatBytes(analytics?.storage.things || 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Total</span>
-                  <span className="text-white font-semibold">{formatBytes(analytics?.storage.totalSize || 0)}</span>
+                  <span className="text-[var(--ff-ink-muted)]">Total</span>
+                  <span className="text-[var(--ff-ink)] font-semibold">{formatBytes(analytics?.storage.totalSize || 0)}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-400">Quota</span>
-                  <span className="text-white">5.0 GB</span>
+                  <span className="text-[var(--ff-ink-muted)]">Quota</span>
+                  <span className="text-[var(--ff-ink)]">5.0 GB</span>
                 </div>
               </div>
               {/* Progress Bar */}
               <div className="mt-4">
-              <div className="w-full bg-stone-800 rounded-lg h-2">
+              <div className="w-full bg-stone-100 rounded-lg h-2">
                 <div
                   className="bg-emerald-500 h-2 rounded-lg"
                     style={{ width: `${((analytics?.storage.totalSize || 0) / (5120 * 1024 * 1024)) * 100}%` }}
@@ -175,8 +175,8 @@ export function CTOAdminPanel() {
           </div>
 
           {/* Query Histogram */}
-          <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-            <h3 className="text-xl font-semibold text-white mb-4">Query Time Histogram</h3>
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+            <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Query Time Histogram</h3>
             {analytics && analytics.queryHistogram.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
                 <BarChart data={analytics.queryHistogram}>
@@ -258,37 +258,37 @@ export function CTOAdminPanel() {
       <>
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
-          <h2 className="text-2xl font-semibold text-white">Users & Roles ({users.length} total)</h2>
+          <h2 className="text-2xl font-semibold text-[var(--ff-ink)]">Users & Roles ({users.length} total)</h2>
           <input
             type="text"
             placeholder="Search..."
-            className="bg-stone-900 border border-stone-800 rounded-lg px-4 py-2 text-sm text-white placeholder-stone-500"
+            className="bg-white/70 border border-[var(--ff-border)] rounded-lg px-4 py-2 text-sm text-[var(--ff-ink)] placeholder-stone-500"
           />
         </div>
 
         {/* Stats Row */}
         <div className="flex gap-4 text-sm">
-          <span className="text-stone-400">CEO: <span className="text-white">{roleCounts.ceo || 0}</span></span>
+          <span className="text-[var(--ff-ink-muted)]">CEO: <span className="text-[var(--ff-ink)]">{roleCounts.ceo || 0}</span></span>
           <span className="text-stone-500">|</span>
-          <span className="text-stone-400">CTO: <span className="text-white">{roleCounts.cto || 0}</span></span>
+          <span className="text-[var(--ff-ink-muted)]">CTO: <span className="text-[var(--ff-ink)]">{roleCounts.cto || 0}</span></span>
           <span className="text-stone-500">|</span>
-          <span className="text-stone-400">Merchants: <span className="text-white">{roleCounts.merchant || 0}</span></span>
+          <span className="text-[var(--ff-ink-muted)]">Merchants: <span className="text-[var(--ff-ink)]">{roleCounts.merchant || 0}</span></span>
           <span className="text-stone-500">|</span>
-          <span className="text-stone-400">Investors: <span className="text-white">{roleCounts.investor || 0}</span></span>
+          <span className="text-[var(--ff-ink-muted)]">Investors: <span className="text-[var(--ff-ink)]">{roleCounts.investor || 0}</span></span>
           <span className="text-stone-500">|</span>
-          <span className="text-stone-400">Consumers: <span className="text-white">{roleCounts.consumer || 0}</span></span>
+          <span className="text-[var(--ff-ink-muted)]">Consumers: <span className="text-[var(--ff-ink)]">{roleCounts.consumer || 0}</span></span>
         </div>
 
         {/* Users Table */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-hidden">
           <table className="w-full">
-            <thead className="bg-stone-800 border-b border-stone-700">
+            <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase tracking-wider">#</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase tracking-wider">User ID</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase tracking-wider">Role</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase tracking-wider">Assigned</th>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase tracking-wider">Actions</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">#</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">User ID</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">Role</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">Assigned</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-stone-800">
@@ -297,20 +297,20 @@ export function CTOAdminPanel() {
                   <td colSpan={5} className="px-4 py-8 text-center text-stone-500">Loading...</td>
                 </tr>
               ) : users.map((user, idx) => (
-                <tr key={user.id} className="hover:bg-stone-800/50 transition-colors">
-                  <td className="px-4 py-3 text-sm text-stone-400">{idx + 1}</td>
-                  <td className="px-4 py-3 text-sm text-white font-mono">{truncateId(user.user_id)}</td>
+                <tr key={user.id} className="hover:bg-stone-200/60 transition-colors">
+                  <td className="px-4 py-3 text-sm text-[var(--ff-ink-muted)]">{idx + 1}</td>
+                  <td className="px-4 py-3 text-sm text-[var(--ff-ink)] font-mono">{truncateId(user.user_id)}</td>
                   <td className="px-4 py-3">
                     <RoleBadge role={user.role} />
                   </td>
-                  <td className="px-4 py-3 text-sm text-stone-400">
+                  <td className="px-4 py-3 text-sm text-[var(--ff-ink-muted)]">
                     {new Date(user.assigned_at).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3 flex gap-2">
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.user_id, user.role, e.target.value as AppRole)}
-                      className="bg-stone-800 border border-stone-700 rounded px-2 py-1 text-xs text-white"
+                      className="bg-stone-100 border border-[var(--ff-border)] rounded px-2 py-1 text-xs text-[var(--ff-ink)]"
                     >
                       <option value="ceo">CEO</option>
                       <option value="cto">CTO</option>
@@ -360,31 +360,31 @@ export function CTOAdminPanel() {
     return (
       <div className="p-6 space-y-6">
         {/* API Status */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <h3 className="text-xl font-semibold text-white mb-4">API Status</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">API Status</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
-              <span className="text-stone-400">Service:</span>
-              <span className="text-white ml-2">shadow-index</span>
+              <span className="text-[var(--ff-ink-muted)]">Service:</span>
+              <span className="text-[var(--ff-ink)] ml-2">shadow-index</span>
             </div>
             <div>
-              <span className="text-stone-400">Company:</span>
-              <span className="text-white ml-2">fairflow</span>
+              <span className="text-[var(--ff-ink-muted)]">Company:</span>
+              <span className="text-[var(--ff-ink)] ml-2">fairflow</span>
             </div>
             <div>
-              <span className="text-stone-400">Version:</span>
-              <span className="text-white ml-2">0.6.0</span>
+              <span className="text-[var(--ff-ink-muted)]">Version:</span>
+              <span className="text-[var(--ff-ink)] ml-2">0.6.0</span>
             </div>
             <div>
-              <span className="text-stone-400">Status:</span>
-              <span className="text-white ml-2 flex items-center gap-2">
+              <span className="text-[var(--ff-ink-muted)]">Status:</span>
+              <span className="text-[var(--ff-ink)] ml-2 flex items-center gap-2">
                 <span className={`w-2 h-2 rounded-lg ${apiOnline ? 'bg-green-500' : 'bg-red-500'}`} />
                 {apiOnline ? 'ok' : 'offline'}
               </span>
             </div>
             <div>
-              <span className="text-stone-400">Timestamp:</span>
-              <span className="text-white ml-2">{analytics?.lastUpdated || 'N/A'}</span>
+              <span className="text-[var(--ff-ink-muted)]">Timestamp:</span>
+              <span className="text-[var(--ff-ink)] ml-2">{analytics?.lastUpdated || 'N/A'}</span>
             </div>
           </div>
           <button
@@ -396,24 +396,24 @@ export function CTOAdminPanel() {
         </div>
 
         {/* Memory Monitor */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <h3 className="text-xl font-semibold text-white mb-4">Memory Monitor</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Memory Monitor</h3>
           <div className="space-y-4">
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-stone-400">Heap Memory</span>
-                <span className="text-white">{(analytics?.system.memoryHeap || 0).toFixed(2)} MB</span>
+                <span className="text-[var(--ff-ink-muted)]">Heap Memory</span>
+                <span className="text-[var(--ff-ink)]">{(analytics?.system.memoryHeap || 0).toFixed(2)} MB</span>
               </div>
-              <div className="w-full bg-stone-800 rounded-lg h-2">
+              <div className="w-full bg-stone-100 rounded-lg h-2">
                 <div className="bg-blue-500 h-2 rounded-lg" style={{ width: '45%' }} />
               </div>
             </div>
             <div>
               <div className="flex justify-between text-sm mb-1">
-                <span className="text-stone-400">RSS Memory</span>
-                <span className="text-white">{(analytics?.system.memoryRss || 0).toFixed(2)} MB</span>
+                <span className="text-[var(--ff-ink-muted)]">RSS Memory</span>
+                <span className="text-[var(--ff-ink)]">{(analytics?.system.memoryRss || 0).toFixed(2)} MB</span>
               </div>
-              <div className="w-full bg-stone-800 rounded-lg h-2">
+              <div className="w-full bg-stone-100 rounded-lg h-2">
                 <div className="bg-purple-500 h-2 rounded-lg" style={{ width: '60%' }} />
               </div>
             </div>
@@ -421,24 +421,24 @@ export function CTOAdminPanel() {
         </div>
 
         {/* Pre-Aggregation */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <h3 className="text-xl font-semibold text-white mb-4">Pre-Aggregation</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Pre-Aggregation</h3>
           <div className="space-y-2 text-sm mb-4">
             <div className="flex justify-between">
-              <span className="text-stone-400">Status:</span>
-              <span className="text-white">{analytics?.preAggregation.status}</span>
+              <span className="text-[var(--ff-ink-muted)]">Status:</span>
+              <span className="text-[var(--ff-ink)]">{analytics?.preAggregation.status}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Files:</span>
-              <span className="text-white">{analytics?.preAggregation.files}</span>
+              <span className="text-[var(--ff-ink-muted)]">Files:</span>
+              <span className="text-[var(--ff-ink)]">{analytics?.preAggregation.files}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Last run:</span>
-              <span className="text-white">{analytics?.preAggregation.lastRun || 'never'}</span>
+              <span className="text-[var(--ff-ink-muted)]">Last run:</span>
+              <span className="text-[var(--ff-ink)]">{analytics?.preAggregation.lastRun || 'never'}</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Schedule:</span>
-              <span className="text-white">npm run pre-aggregate | cron 00:00 UTC</span>
+              <span className="text-[var(--ff-ink-muted)]">Schedule:</span>
+              <span className="text-[var(--ff-ink)]">npm run pre-aggregate | cron 00:00 UTC</span>
             </div>
           </div>
           <button
@@ -450,46 +450,46 @@ export function CTOAdminPanel() {
         </div>
 
         {/* Environment Info */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <h3 className="text-xl font-semibold text-white mb-4">Environment Info</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Environment Info</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
-              <span className="text-stone-400">Frontend Port:</span>
-              <span className="text-white">5179</span>
+              <span className="text-[var(--ff-ink-muted)]">Frontend Port:</span>
+              <span className="text-[var(--ff-ink)]">5179</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">API Port:</span>
-              <span className="text-white">3000</span>
+              <span className="text-[var(--ff-ink-muted)]">API Port:</span>
+              <span className="text-[var(--ff-ink)]">3000</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Supabase Project:</span>
-              <span className="text-white font-mono text-xs">uxvmiyeulgenvxzaobdw</span>
+              <span className="text-[var(--ff-ink-muted)]">Supabase Project:</span>
+              <span className="text-[var(--ff-ink)] font-mono text-xs">uxvmiyeulgenvxzaobdw</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Auth Hook:</span>
-              <span className="text-white flex items-center gap-2">
+              <span className="text-[var(--ff-ink-muted)]">Auth Hook:</span>
+              <span className="text-[var(--ff-ink)] flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-500" /> custom-access-token-hook (HTTPS)
               </span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">RBAC:</span>
-              <span className="text-white flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 5 roles · 16 permissions</span>
+              <span className="text-[var(--ff-ink-muted)]">RBAC:</span>
+              <span className="text-[var(--ff-ink)] flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 5 roles · 16 permissions</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">JWT Claim:</span>
-              <span className="text-white">user_role (injected on every login)</span>
+              <span className="text-[var(--ff-ink-muted)]">JWT Claim:</span>
+              <span className="text-[var(--ff-ink)]">user_role (injected on every login)</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Build:</span>
-              <span className="text-white">Vite + React + TypeScript + Tailwind v3</span>
+              <span className="text-[var(--ff-ink-muted)]">Build:</span>
+              <span className="text-[var(--ff-ink)]">Vite + React + TypeScript + Tailwind v3</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Stack:</span>
-              <span className="text-white">Supabase Auth + PostgreSQL RLS</span>
+              <span className="text-[var(--ff-ink-muted)]">Stack:</span>
+              <span className="text-[var(--ff-ink)]">Supabase Auth + PostgreSQL RLS</span>
             </div>
             <div className="flex justify-between">
-              <span className="text-stone-400">Version:</span>
-              <span className="text-white">0.6.0</span>
+              <span className="text-[var(--ff-ink-muted)]">Version:</span>
+              <span className="text-[var(--ff-ink)]">0.6.0</span>
             </div>
           </div>
         </div>
@@ -504,15 +504,15 @@ export function CTOAdminPanel() {
 
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-2xl font-semibold text-white">RBAC Matrix — 16 permission rules across 5 roles</h2>
+        <h2 className="text-2xl font-semibold text-[var(--ff-ink)]">RBAC Matrix — 16 permission rules across 5 roles</h2>
 
-        <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-x-auto">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-stone-800 border-b border-stone-700">
+            <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
               <tr>
-                <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Resource</th>
+                <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Resource</th>
                 {roles.map(role => (
-                  <th key={role} className="px-4 py-3 text-center text-xs font-medium text-stone-400 uppercase">
+                  <th key={role} className="px-4 py-3 text-center text-xs font-medium text-[var(--ff-ink-muted)] uppercase">
                     {role}
                   </th>
                 ))}
@@ -524,8 +524,8 @@ export function CTOAdminPanel() {
                   <td colSpan={6} className="px-4 py-8 text-center text-stone-500">Loading permissions...</td>
                 </tr>
               ) : resources.map(resource => (
-                <tr key={resource} className="hover:bg-stone-800/50">
-                  <td className="px-4 py-3 text-sm font-medium text-white">{resource}</td>
+                <tr key={resource} className="hover:bg-stone-200/60">
+                  <td className="px-4 py-3 text-sm font-medium text-[var(--ff-ink)]">{resource}</td>
                   {roles.map(role => {
                     const perm = permissions.find(p => p.resource === resource && p.role === role);
                     return (
@@ -554,7 +554,7 @@ export function CTOAdminPanel() {
           </table>
         </div>
 
-        <div className="flex gap-6 text-xs text-stone-400">
+        <div className="flex gap-6 text-xs text-[var(--ff-ink-muted)]">
           <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_select</span>
           <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_insert</span>
           <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_update</span>
@@ -586,8 +586,8 @@ export function CTOAdminPanel() {
     return (
       <div className="p-6 space-y-6">
         {/* Error Summary */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <h3 className="text-xl font-semibold text-white mb-2">Error Summary (24h)</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-2">Error Summary (24h)</h3>
           <div className="text-3xl font-bold tabular-nums mb-2">
             {analytics?.errors.count || 0} errors
           </div>
@@ -597,33 +597,33 @@ export function CTOAdminPanel() {
         </div>
 
         {/* Query History */}
-        <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-stone-800">
-            <h3 className="text-xl font-semibold text-white">Query History</h3>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--ff-border)]">
+            <h3 className="text-xl font-semibold text-[var(--ff-ink)]">Query History</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-stone-800 border-b border-stone-700">
+              <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Time</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Duration</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Params</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Results</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-stone-400 uppercase">Status</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Time</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Duration</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Params</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Results</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-stone-800">
                 {analytics && analytics.recentQueries.length > 0 ? (
                   analytics.recentQueries.map((query, idx) => (
-                    <tr key={idx} className="hover:bg-stone-800/50">
-                      <td className="px-4 py-3 text-sm text-white font-mono">
+                    <tr key={idx} className="hover:bg-stone-200/60">
+                      <td className="px-4 py-3 text-sm text-[var(--ff-ink)] font-mono">
                         {new Date(query.timestamp).toLocaleTimeString()}
                       </td>
-                      <td className="px-4 py-3 text-sm text-white">{query.duration}ms</td>
-                      <td className="px-4 py-3 text-sm text-stone-400 font-mono max-w-xs truncate">
+                      <td className="px-4 py-3 text-sm text-[var(--ff-ink)]">{query.duration}ms</td>
+                      <td className="px-4 py-3 text-sm text-[var(--ff-ink-muted)] font-mono max-w-xs truncate">
                         {JSON.stringify(query.params).substring(0, 60)}...
                       </td>
-                      <td className="px-4 py-3 text-sm text-white">{query.results}</td>
+                      <td className="px-4 py-3 text-sm text-[var(--ff-ink)]">{query.results}</td>
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-1 text-xs rounded-md ${
                           query.status === 'success'
@@ -659,17 +659,17 @@ export function CTOAdminPanel() {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-2xl font-bold text-white">Talent Pipeline</h2>
-            <p className="text-sm text-stone-400 mt-1">Manage potential candidates for future hiring</p>
+            <h2 className="text-2xl font-bold text-[var(--ff-ink)]">Talent Pipeline</h2>
+            <p className="text-sm text-[var(--ff-ink-muted)] mt-1">Manage potential candidates for future hiring</p>
           </div>
           <button className="inline-flex items-center gap-2 h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
             Add Candidate
           </button>
         </div>
 
-        <div className="bg-stone-900 rounded-xl border border-stone-800/60 overflow-hidden">
-          <div className="p-6 border-b border-stone-800/60">
-            <p className="text-sm text-stone-400">
+        <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 overflow-hidden">
+          <div className="p-6 border-b border-[var(--ff-border)]/60">
+            <p className="text-sm text-[var(--ff-ink-muted)]">
               Coming in Sprint 8: Talent database for tracking candidates, managing interviews, and building your hiring pipeline.
             </p>
           </div>
@@ -683,15 +683,15 @@ export function CTOAdminPanel() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-stone-900 rounded-xl border border-stone-800/60 p-5">
+          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Potential</div>
             <div className="text-3xl font-bold text-stone-200">0</div>
           </div>
-          <div className="bg-stone-900 rounded-xl border border-stone-800/60 p-5">
+          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Interviewing</div>
             <div className="text-3xl font-bold text-yellow-400">0</div>
           </div>
-          <div className="bg-stone-900 rounded-xl border border-stone-800/60 p-5">
+          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Hired</div>
             <div className="text-3xl font-bold text-emerald-400">0</div>
           </div>

@@ -45,7 +45,7 @@ type ReportRowHash = { hash: string; views: number; clicks: number };
 type Tab = 'products' | 'analytics' | 'orders' | 'notifications' | 'kyc-payouts' | 'account';
 
 const InlineSpinner: React.FC<{ label: string }> = ({ label }) => (
-  <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 text-sm text-stone-300 flex items-center gap-3">
+  <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4 text-sm text-stone-700 flex items-center gap-3">
     <svg className="w-5 h-5 text-emerald-400 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
       <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
@@ -55,12 +55,12 @@ const InlineSpinner: React.FC<{ label: string }> = ({ label }) => (
 );
 
 const ErrorBanner: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => (
-  <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
+  <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-[var(--ff-ink)] flex items-start justify-between gap-3">
     <p>{message}</p>
     <button
       type="button"
       onClick={onDismiss}
-      className="text-white/90 hover:text-white leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
+      className="text-[var(--ff-ink)]/90 hover:text-[var(--ff-ink)] leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
       aria-label="Dismiss error"
     >
       ✕
@@ -734,13 +734,13 @@ export const MerchantPortal: React.FC = () => {
             <div className="flex items-start justify-between">
               <div>
                 <h3 className="font-semibold text-amber-400">Welcome — let's get you set up</h3>
-                <p className="mt-1 text-sm text-stone-400">
+                <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">
                   Complete these three steps to start selling.
                 </p>
               </div>
               <button
                 onClick={() => setShowOnboardingBanner(false)}
-                className="text-stone-400 hover:text-stone-200"
+                className="text-[var(--ff-ink-muted)] hover:text-stone-200"
               >
                 ✕
               </button>
@@ -769,7 +769,7 @@ export const MerchantPortal: React.FC = () => {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                      step.done ? 'bg-emerald-500 text-white' : 'bg-stone-700 text-stone-400'
+                      step.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-[var(--ff-ink-muted)]'
                     }`}>
                       {step.done ? '✓' : i + 1}
                     </span>
@@ -798,7 +798,7 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
             <h3 className="font-semibold mb-3">Recent Orders</h3>
             {recentOrders.length === 0 ? (
               <p className="text-sm text-stone-500">No recent orders yet.</p>
@@ -806,7 +806,7 @@ export const MerchantPortal: React.FC = () => {
               <div className="space-y-2">
                 {recentOrders.map((order) => (
                   <div key={order.id} className="flex items-center justify-between text-sm">
-                    <span className="text-stone-300 truncate mr-2">{order.customer_email}</span>
+                    <span className="text-stone-700 truncate mr-2">{order.customer_email}</span>
                     <span className={`text-xs px-2 py-1 rounded ${order.fulfillment_status === 'fulfilled' ? 'bg-emerald-900/50 text-emerald-400' : 'bg-amber-900/50 text-amber-400'}`}>
                       {order.fulfillment_status === 'fulfilled' ? 'Fulfilled' : 'Pending'}
                     </span>
@@ -816,7 +816,7 @@ export const MerchantPortal: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
             <h3 className="font-semibold mb-3">Low Stock Alerts</h3>
             {lowStockProducts.length === 0 ? (
               <p className="text-sm text-stone-500">No low stock alerts.</p>
@@ -828,7 +828,7 @@ export const MerchantPortal: React.FC = () => {
                     <button
                       onClick={() => handleRestockProduct(product.id)}
                       disabled={restockingProductId === product.id}
-                      className="bg-amber-600 hover:bg-amber-700 disabled:bg-stone-700 text-white px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
+                      className="bg-amber-600 hover:bg-amber-700 disabled:bg-stone-200 text-[var(--ff-ink)] px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
                     >
                       {restockingProductId === product.id ? 'Restocking...' : 'Restock'}
                     </button>
@@ -840,24 +840,24 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         {productsLoading ? (
-          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-x-auto">
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-800">
+              <thead className="bg-stone-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-stone-300">Product</th>
-                  <th className="px-6 py-3 text-left text-stone-300">Category</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Price</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Stock</th>
-                  <th className="px-6 py-3 text-center text-stone-300">Status</th>
-                  <th className="px-6 py-3 text-left text-stone-300">Links</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Action</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Product</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Category</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Price</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Stock</th>
+                  <th className="px-6 py-3 text-center text-stone-700">Status</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Links</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {[0, 1, 2].map((index) => (
-                  <tr key={index} className="border-t border-stone-800">
+                  <tr key={index} className="border-t border-[var(--ff-border)]">
                     <td className="px-6 py-4" colSpan={7}>
-                      <div className="h-4 bg-stone-800 rounded animate-pulse w-full" />
+                      <div className="h-4 bg-stone-100 rounded animate-pulse w-full" />
                     </td>
                   </tr>
                 ))}
@@ -867,24 +867,24 @@ export const MerchantPortal: React.FC = () => {
         ) : products.length === 0 ? (
           <EmptyState icon={<Package className="w-10 h-10 text-stone-500" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
         ) : (
-          <div className="bg-stone-900 border border-stone-800 rounded-xl overflow-x-auto">
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-800">
+              <thead className="bg-stone-100">
                 <tr>
-                  <th className="px-6 py-3 text-left text-stone-300">Product</th>
-                  <th className="px-6 py-3 text-left text-stone-300">Category</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Price</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Stock</th>
-                  <th className="px-6 py-3 text-center text-stone-300">Status</th>
-                  <th className="px-6 py-3 text-left text-stone-300">Links</th>
-                  <th className="px-6 py-3 text-right text-stone-300">Action</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Product</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Category</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Price</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Stock</th>
+                  <th className="px-6 py-3 text-center text-stone-700">Status</th>
+                  <th className="px-6 py-3 text-left text-stone-700">Links</th>
+                  <th className="px-6 py-3 text-right text-stone-700">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map(p => (
-                  <tr key={p.id} className="border-t border-stone-800 hover:bg-stone-800/50">
+                  <tr key={p.id} className="border-t border-[var(--ff-border)] hover:bg-stone-200/60">
                     <td className="px-6 py-4">{p.name}</td>
-                    <td className="px-6 py-4 text-stone-400">{p.category}</td>
+                    <td className="px-6 py-4 text-[var(--ff-ink-muted)]">{p.category}</td>
                     <td className="px-6 py-4 text-right font-mono">R {p.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">{p.stock}</td>
                     <td className="px-6 py-4 text-center">
@@ -923,7 +923,7 @@ export const MerchantPortal: React.FC = () => {
                           <>
                             <button
                               onClick={() => handleCopyMatter(p.id, p.matterUri)}
-                              className="bg-stone-800 hover:bg-stone-700 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
+                              className="bg-stone-100 hover:bg-stone-200 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
                             >
                               {copiedMatterId === p.id ? 'Copied!' : 'Copy matter://'}
                             </button>
@@ -937,7 +937,7 @@ export const MerchantPortal: React.FC = () => {
                             </a>
                             <button
                               onClick={() => handleCopyPage(p.id, p.hash)}
-                              className="bg-stone-800 hover:bg-stone-700 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
+                              className="bg-stone-100 hover:bg-stone-200 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
                             >
                               {copiedPageId === p.id ? 'Copied!' : 'Copy page'}
                             </button>
@@ -983,7 +983,7 @@ export const MerchantPortal: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 lg:col-span-2">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Engagement Trend (Last 30 Days)</h3>
             <span className="text-xs text-stone-500">Views vs Clicks</span>
@@ -1012,16 +1012,16 @@ export const MerchantPortal: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <h3 className="font-bold mb-4">Checkout Funnel</h3>
           <div className="space-y-4">
             {analyticsSnapshot.funnel.map((stage) => (
               <div key={stage.stage} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-stone-400">{stage.stage}</span>
+                  <span className="text-[var(--ff-ink-muted)]">{stage.stage}</span>
                   <span className="font-mono text-stone-200">{stage.count.toLocaleString()}</span>
                 </div>
-                <div className="h-2 rounded-full bg-stone-800">
+                <div className="h-2 rounded-full bg-stone-100">
                   <div
                     className="h-2 rounded-full bg-emerald-500"
                     style={{ width: `${Math.min(100, (stage.count / analyticsSnapshot.funnel[0].count) * 100)}%` }}
@@ -1035,7 +1035,7 @@ export const MerchantPortal: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Top Products</h3>
             <span className="text-xs text-stone-500">Checkout Clicks</span>
@@ -1053,7 +1053,7 @@ export const MerchantPortal: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Engagement by Category</h3>
             <span className="text-xs text-stone-500">Checkout Clicks</span>
@@ -1072,15 +1072,15 @@ export const MerchantPortal: React.FC = () => {
         </div>
       </div>
 
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold">Inventory Snapshot</h3>
           <span className="text-xs text-stone-500">Stock vs. Clicks</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-stone-400">
-              <tr className="border-b border-stone-800">
+            <thead className="text-[var(--ff-ink-muted)]">
+              <tr className="border-b border-[var(--ff-border)]">
                 <th className="py-2 text-left">Product</th>
                 <th className="py-2 text-right">Stock</th>
                 <th className="py-2 text-right">Clicks</th>
@@ -1088,9 +1088,9 @@ export const MerchantPortal: React.FC = () => {
             </thead>
             <tbody>
               {analyticsSnapshot.topProducts.map((item) => (
-                <tr key={item.name} className="border-b border-stone-800 last:border-0">
+                <tr key={item.name} className="border-b border-[var(--ff-border)] last:border-0">
                   <td className="py-2 text-stone-200">{item.name}</td>
-                  <td className="py-2 text-right text-stone-400">{item.stock}</td>
+                  <td className="py-2 text-right text-[var(--ff-ink-muted)]">{item.stock}</td>
                   <td className="py-2 text-right text-emerald-400">{item.clicks.toLocaleString()}</td>
                 </tr>
               ))}
@@ -1190,60 +1190,60 @@ export const MerchantPortal: React.FC = () => {
 
   const renderMyAccount = () => (
     <div className="space-y-6">
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <h3 className="font-bold mb-6">Business Profile</h3>
         <div className="space-y-4">
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Business Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Name</label>
             <input
               type="text"
               value={businessProfile.businessName}
               onChange={(e) => setBusinessProfile({ ...businessProfile, businessName: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Contact Email</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Contact Email</label>
             <input
               type="email"
               value={businessProfile.contactEmail}
               onChange={(e) => setBusinessProfile({ ...businessProfile, contactEmail: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Phone</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Phone</label>
             <input
               type="tel"
               value={businessProfile.phone}
               onChange={(e) => setBusinessProfile({ ...businessProfile, phone: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Business Address</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Address</label>
             <textarea
               value={businessProfile.address}
               onChange={(e) => setBusinessProfile({ ...businessProfile, address: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white h-20"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)] h-20"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Certifications</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Certifications</label>
             <input
               type="text"
               value={businessProfile.certifications}
               onChange={(e) => setBusinessProfile({ ...businessProfile, certifications: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Year Established</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Year Established</label>
             <input
               type="text"
               value={businessProfile.yearEstablished}
               onChange={(e) => setBusinessProfile({ ...businessProfile, yearEstablished: e.target.value })}
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
         </div>
@@ -1254,57 +1254,57 @@ export const MerchantPortal: React.FC = () => {
           Save Changes
         </button>
       </div>
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <h3 className="font-bold mb-6">Bank Account Details</h3>
-        <p className="text-stone-400 text-sm mb-4">For receiving weekly payouts to your merchant account</p>
+        <p className="text-[var(--ff-ink-muted)] text-sm mb-4">For receiving weekly payouts to your merchant account</p>
         <div className="space-y-4">
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Account Holder Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Holder Name</label>
             <input
               type="text"
               value={businessProfile.accountHolderName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, accountHolderName: e.target.value })}
               placeholder="Full name on bank account"
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div>
-            <label className="text-stone-400 text-sm block mb-2">Bank Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Bank Name</label>
             <input
               type="text"
               value={businessProfile.bankName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, bankName: e.target.value })}
               placeholder="e.g., Standard Bank"
-              className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-stone-400 text-sm block mb-2">Account Number</label>
+              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Number</label>
               <input
                 type="text"
                 value={businessProfile.accountNumber || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, accountNumber: e.target.value })}
                 placeholder="Account number"
-                className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
               />
             </div>
             <div>
-              <label className="text-stone-400 text-sm block mb-2">Branch Code</label>
+              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Branch Code</label>
               <input
                 type="text"
                 value={businessProfile.branchCode || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, branchCode: e.target.value })}
                 placeholder="Branch code"
-                className="w-full bg-stone-800 border border-stone-700 rounded-lg px-4 py-3 text-white"
+                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
               />
             </div>
           </div>
           {merchantAccount?.bank_account?.bank_name && (
-            <div className="bg-stone-800/50 border border-stone-700/50 rounded-lg p-4 mt-4">
-              <p className="text-stone-400 text-sm mb-2">Current Bank Details:</p>
-              <p className="text-white text-sm">{merchantAccount.bank_account.account_holder_name}</p>
-              <p className="text-stone-400 text-sm">{merchantAccount.bank_account.bank_name}</p>
+            <div className="bg-stone-200/60 border border-[var(--ff-border)]/50 rounded-lg p-4 mt-4">
+              <p className="text-[var(--ff-ink-muted)] text-sm mb-2">Current Bank Details:</p>
+              <p className="text-[var(--ff-ink)] text-sm">{merchantAccount.bank_account.account_holder_name}</p>
+              <p className="text-[var(--ff-ink-muted)] text-sm">{merchantAccount.bank_account.bank_name}</p>
               <p className="text-stone-500 text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
             </div>
           )}
@@ -1347,11 +1347,11 @@ export const MerchantPortal: React.FC = () => {
           Update Bank Details
         </button>
       </div>
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6">
+      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <h3 className="font-bold mb-4">Account Settings</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-stone-400">Two-Factor Authentication</span>
+            <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
             <button className="text-emerald-500 hover:text-emerald-400 text-sm">Enable</button>
           </div>
         </div>
@@ -1369,12 +1369,12 @@ export const MerchantPortal: React.FC = () => {
       headerActions={(
         <button
           onClick={() => setActiveTab('notifications')}
-          className="relative p-2 rounded-lg border border-stone-700 bg-stone-800 hover:bg-stone-700 transition-colors"
+          className="relative p-2 rounded-lg border border-[var(--ff-border)] bg-stone-100 hover:bg-stone-200 transition-colors"
           aria-label="Open notifications"
         >
           <Bell className="w-4 h-4 text-stone-200" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-white text-[10px] leading-[18px] font-semibold">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[var(--ff-ink)] text-[10px] leading-[18px] font-semibold">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}

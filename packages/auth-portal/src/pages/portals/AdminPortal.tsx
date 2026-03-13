@@ -239,38 +239,38 @@ export const AdminPortal: React.FC = () => {
 
           {/* Quick Stats */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-400">Platform Users</p>
-                  <p className="text-2xl font-bold text-white mt-1">{users.length}</p>
+                  <p className="text-sm text-[var(--ff-ink-muted)]">Platform Users</p>
+                  <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{users.length}</p>
                 </div>
                 <Users className="w-8 h-8 text-blue-500" />
               </div>
             </div>
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-400">CEOs</p>
-                  <p className="text-2xl font-bold text-white mt-1">{roleStats.ceo}</p>
+                  <p className="text-sm text-[var(--ff-ink-muted)]">CEOs</p>
+                  <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.ceo}</p>
                 </div>
                 <Shield className="w-8 h-8 text-purple-500" />
               </div>
             </div>
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-400">CTOs</p>
-                  <p className="text-2xl font-bold text-white mt-1">{roleStats.cto}</p>
+                  <p className="text-sm text-[var(--ff-ink-muted)]">CTOs</p>
+                  <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.cto}</p>
                 </div>
                 <Zap className="w-8 h-8 text-yellow-500" />
               </div>
             </div>
-            <div className="bg-stone-900 border border-stone-800 rounded-xl p-4">
+            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-stone-400">KYC Pending</p>
-                  <p className="text-2xl font-bold text-white mt-1">{pendingKYC.length}</p>
+                  <p className="text-sm text-[var(--ff-ink-muted)]">KYC Pending</p>
+                  <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{pendingKYC.length}</p>
                 </div>
                 <Clock className="w-8 h-8 text-orange-500" />
               </div>
@@ -308,8 +308,8 @@ export const AdminPortal: React.FC = () => {
       <div className="p-6 space-y-6">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-bold text-white">KYC Approvals</h2>
-            <p className="text-sm text-stone-400 mt-1">{pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}</p>
+            <h2 className="text-xl font-bold text-[var(--ff-ink)]">KYC Approvals</h2>
+            <p className="text-sm text-[var(--ff-ink-muted)] mt-1">{pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}</p>
           </div>
           <button
             onClick={fetchPendingKYC}
@@ -322,31 +322,31 @@ export const AdminPortal: React.FC = () => {
 
         <div className="space-y-4">
           {pendingKYC.map((kyc) => (
-            <div key={kyc.id} className="bg-stone-900 border border-stone-800 rounded-xl p-5 hover:border-stone-700 transition">
+            <div key={kyc.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5 hover:border-[var(--ff-border)] transition">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
                   <div className="flex items-center gap-3">
                     <div>
-                      <h3 className="font-semibold text-white">{kyc.businessName}</h3>
-                      <p className="text-sm text-stone-400">{kyc.email}</p>
+                      <h3 className="font-semibold text-[var(--ff-ink)]">{kyc.businessName}</h3>
+                      <p className="text-sm text-[var(--ff-ink-muted)]">{kyc.email}</p>
                     </div>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-stone-400">ID Number</p>
-                      <p className="text-white font-mono">{kyc.kycData?.id_number || 'N/A'}</p>
+                      <p className="text-[var(--ff-ink-muted)]">ID Number</p>
+                      <p className="text-[var(--ff-ink)] font-mono">{kyc.kycData?.id_number || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-stone-400">DOB</p>
-                      <p className="text-white">{kyc.kycData?.date_of_birth || 'N/A'}</p>
+                      <p className="text-[var(--ff-ink-muted)]">DOB</p>
+                      <p className="text-[var(--ff-ink)]">{kyc.kycData?.date_of_birth || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-stone-400">Bank</p>
-                      <p className="text-white">{kyc.bankAccount?.bank_name || 'N/A'}</p>
+                      <p className="text-[var(--ff-ink-muted)]">Bank</p>
+                      <p className="text-[var(--ff-ink)]">{kyc.bankAccount?.bank_name || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-stone-400">Account</p>
-                      <p className="text-white font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
+                      <p className="text-[var(--ff-ink-muted)]">Account</p>
+                      <p className="text-[var(--ff-ink)] font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
                     </div>
                   </div>
                   <p className="text-xs text-stone-500 mt-3">
@@ -359,7 +359,7 @@ export const AdminPortal: React.FC = () => {
                       setSelectedKYC(kyc);
                       setKYCAction('approve');
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-[var(--ff-ink)] rounded-lg transition"
                   >
                     <Check className="w-4 h-4" />
                     Approve
@@ -369,7 +369,7 @@ export const AdminPortal: React.FC = () => {
                       setSelectedKYC(kyc);
                       setKYCAction('reject');
                     }}
-                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+                    className="flex items-center gap-2 px-4 py-2 bg-red-600 hover:bg-red-700 text-[var(--ff-ink)] rounded-lg transition"
                   >
                     <X className="w-4 h-4" />
                     Reject
@@ -388,14 +388,14 @@ export const AdminPortal: React.FC = () => {
     
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">Merchant Management</h2>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">Merchant Management</h2>
         <div className="space-y-4">
           {merchants.map(merchant => (
-            <div key={merchant.id} className="bg-stone-900 border border-stone-800 rounded-xl p-5">
+            <div key={merchant.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-semibold text-white">{merchant.id}</p>
-                  <p className="text-sm text-stone-400">{merchant.role}</p>
+                  <p className="font-semibold text-[var(--ff-ink)]">{merchant.id}</p>
+                  <p className="text-sm text-[var(--ff-ink-muted)]">{merchant.role}</p>
                 </div>
                 <RoleBadge role={merchant.role} />
               </div>
@@ -409,7 +409,7 @@ export const AdminPortal: React.FC = () => {
   const renderUsersRoles = () => {
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">Users & Roles</h2>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">Users & Roles</h2>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
           <MetricCard label="CEOs" value={roleStats.ceo.toString()} />
           <MetricCard label="CTOs" value={roleStats.cto.toString()} />
@@ -419,10 +419,10 @@ export const AdminPortal: React.FC = () => {
         </div>
         <div className="space-y-4">
           {users.slice(0, 10).map(user => (
-            <div key={user.id} className="bg-stone-900 border border-stone-800 rounded-xl p-4 flex items-center justify-between">
+            <div key={user.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4 flex items-center justify-between">
               <div>
-                <p className="font-semibold text-white">{user.id}</p>
-                <p className="text-sm text-stone-400">{user.user_id}</p>
+                <p className="font-semibold text-[var(--ff-ink)]">{user.id}</p>
+                <p className="text-sm text-[var(--ff-ink-muted)]">{user.user_id}</p>
               </div>
               <RoleBadge role={user.role} />
             </div>
@@ -447,7 +447,7 @@ export const AdminPortal: React.FC = () => {
 
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">Platform Health</h2>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">Platform Health</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <MetricCard label="API Status" value={apiOnline ? "Online" : "Offline"} color={apiOnline ? "green" : "red"} />
           <MetricCard label="Memory (Heap)" value={(analytics?.system.memoryHeap || 0).toFixed(2)} unit="MB" />
@@ -460,9 +460,9 @@ export const AdminPortal: React.FC = () => {
   const renderSystem = () => {
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">System</h2>
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <p className="text-sm text-stone-400">System features coming soon</p>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <p className="text-sm text-[var(--ff-ink-muted)]">System features coming soon</p>
         </div>
       </div>
     );
@@ -471,9 +471,9 @@ export const AdminPortal: React.FC = () => {
   const renderFinancials = () => {
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">Financials</h2>
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-5">
-          <p className="text-sm text-stone-400">Financial reporting coming soon</p>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2>
+        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <p className="text-sm text-[var(--ff-ink-muted)]">Financial reporting coming soon</p>
         </div>
       </div>
     );
@@ -482,10 +482,10 @@ export const AdminPortal: React.FC = () => {
   const renderSettings = () => {
     return (
       <div className="p-6 space-y-6">
-        <h2 className="text-xl font-bold text-white">Settings</h2>
+        <h2 className="text-xl font-bold text-[var(--ff-ink)]">Settings</h2>
         <button
           onClick={signOut}
-          className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition"
+          className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-[var(--ff-ink)] rounded-lg transition"
         >
           <LogOut className="w-4 h-4" />
           Sign Out
@@ -518,17 +518,17 @@ export const AdminPortal: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen bg-stone-950 overflow-hidden" data-testid="admin-portal">
+    <div className="flex h-screen bg-[var(--ff-bg)] overflow-hidden" data-testid="admin-portal">
       {/* Mobile backdrop */}
       {sidebarOpen && (
         <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-stone-900 border-r border-stone-800 transition-all duration-300 flex flex-col`}>
-        <div className="p-4 border-b border-stone-800 flex-shrink-0 overflow-hidden">
+      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-white/70 border-r border-[var(--ff-border)] transition-all duration-300 flex flex-col`}>
+        <div className="p-4 border-b border-[var(--ff-border)] flex-shrink-0 overflow-hidden">
           <div className="flex items-center justify-between">
             <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="dark" />
-            {sidebarOpen && <span className="text-xs font-bold text-stone-400">ADMIN</span>}
+            {sidebarOpen && <span className="text-xs font-bold text-[var(--ff-ink-muted)]">ADMIN</span>}
           </div>
         </div>
 
@@ -543,7 +543,7 @@ export const AdminPortal: React.FC = () => {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeSection === item.id
                     ? 'bg-blue-600 text-white'
-                    : 'text-stone-400 hover:text-white hover:bg-stone-800'
+                    : 'text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -553,10 +553,10 @@ export const AdminPortal: React.FC = () => {
           })}
         </nav>
 
-        <div className="border-t border-stone-800 p-4">
+        <div className="border-t border-[var(--ff-border)] p-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full flex items-center justify-center px-4 py-2 text-stone-400 hover:text-white transition"
+            className="w-full flex items-center justify-center px-4 py-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] transition"
           >
             {sidebarOpen ? '←' : '→'}
           </button>
@@ -566,16 +566,16 @@ export const AdminPortal: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-stone-800 bg-stone-900 px-4 md:px-6 py-4">
+        <div className="border-b border-[var(--ff-border)] bg-white/70 px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
-                className="md:hidden p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg"
+                className="md:hidden p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100 rounded-lg"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
               </button>
-              <h1 className="text-xl md:text-2xl font-bold text-white">
+              <h1 className="text-xl md:text-2xl font-bold text-[var(--ff-ink)]">
                 {navigation.find(n => n.id === activeSection)?.label || 'Admin Portal'}
               </h1>
             </div>
@@ -583,11 +583,11 @@ export const AdminPortal: React.FC = () => {
               <div className="relative">
                 <button 
                   onClick={() => setLogoMenuOpen(!logoMenuOpen)}
-                  className="flex items-center gap-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg px-3 py-1.5 transition-colors border border-stone-700"
+                  className="flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-[var(--ff-ink)] rounded-lg px-3 py-1.5 transition-colors border border-[var(--ff-border)]"
                 >
                   <Zap className="w-4 h-4 text-yellow-500" />
                   <span className="text-xs font-bold uppercase tracking-wider">{logoStyle.replace('-', ' ')}</span>
-                  <ChevronDown className={`w-3 h-3 text-stone-400 transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3 h-3 text-[var(--ff-ink-muted)] transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {logoMenuOpen && (
@@ -596,8 +596,8 @@ export const AdminPortal: React.FC = () => {
                       className="fixed inset-0 z-10" 
                       onClick={() => setLogoMenuOpen(false)} 
                     />
-                    <div className="absolute right-0 mt-2 w-56 bg-stone-900 border border-stone-800 rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-3 py-2 border-b border-stone-800 mb-1">
+                    <div className="absolute right-0 mt-2 w-56 bg-white/70 border border-[var(--ff-border)] rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                      <div className="px-3 py-2 border-b border-[var(--ff-border)] mb-1">
                         <span className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Select Brand Identity</span>
                       </div>
                       {LOGO_STYLES.map((styleOption) => (
@@ -613,7 +613,7 @@ export const AdminPortal: React.FC = () => {
                           className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-all ${
                             logoStyle === styleOption.id 
                               ? 'bg-blue-600/10 text-blue-400 font-bold' 
-                              : 'text-stone-300 hover:bg-stone-800 hover:text-white'
+                              : 'text-stone-700 hover:bg-stone-100 hover:text-[var(--ff-ink)]'
                           }`}
                         >
                           <span className="capitalize">{styleOption.label}</span>
@@ -624,7 +624,7 @@ export const AdminPortal: React.FC = () => {
                   </>
                 )}
               </div>
-              <button className="p-2 text-stone-400 hover:text-white hover:bg-stone-800 rounded-lg">
+              <button className="p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100 rounded-lg">
                 <Bell className="w-5 h-5" />
               </button>
             </div>
@@ -640,35 +640,35 @@ export const AdminPortal: React.FC = () => {
       {/* KYC Action Modal */}
       {selectedKYC && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <div className="bg-stone-900 border border-stone-800 rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
-            <h3 className="text-lg font-bold text-white mb-4">
+          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
+            <h3 className="text-lg font-bold text-[var(--ff-ink)] mb-4">
               {kycAction === 'approve' ? 'Approve KYC' : 'Reject KYC'}
             </h3>
             
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-stone-400">Merchant</p>
-                <p className="text-white font-semibold">{selectedKYC.businessName}</p>
+                <p className="text-sm text-[var(--ff-ink-muted)]">Merchant</p>
+                <p className="text-[var(--ff-ink)] font-semibold">{selectedKYC.businessName}</p>
               </div>
 
               {kycAction === 'approve' ? (
                 <div>
-                  <label className="block text-sm text-stone-400 mb-2">Approval Notes (Optional)</label>
+                  <label className="block text-sm text-[var(--ff-ink-muted)] mb-2">Approval Notes (Optional)</label>
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-white text-sm placeholder-stone-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-stone-500 focus:outline-none focus:border-blue-500"
                     placeholder="Add any notes about this approval..."
                     rows={3}
                   />
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm text-stone-400 mb-2">Rejection Reason *</label>
+                  <label className="block text-sm text-[var(--ff-ink-muted)] mb-2">Rejection Reason *</label>
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    className="w-full bg-stone-800 border border-stone-700 rounded-lg px-3 py-2 text-white text-sm placeholder-stone-500 focus:outline-none focus:border-red-500"
+                    className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-stone-500 focus:outline-none focus:border-red-500"
                     placeholder="Explain why this KYC is being rejected..."
                     rows={3}
                   />
@@ -684,14 +684,14 @@ export const AdminPortal: React.FC = () => {
                   setRejectionReason('');
                   setApprovalNotes('');
                 }}
-                className="flex-1 px-4 py-2 bg-stone-800 hover:bg-stone-700 text-white rounded-lg transition"
+                className="flex-1 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-[var(--ff-ink)] rounded-lg transition"
               >
                 Cancel
               </button>
               <button
                 onClick={kycAction === 'approve' ? handleApproveKYC : handleRejectKYC}
                 disabled={kycAction === 'reject' && !rejectionReason.trim()}
-                className={`flex-1 px-4 py-2 rounded-lg transition text-white font-medium ${
+                className={`flex-1 px-4 py-2 rounded-lg transition text-[var(--ff-ink)] font-medium ${
                   kycAction === 'approve'
                     ? 'bg-green-600 hover:bg-green-700 disabled:opacity-50'
                     : 'bg-red-600 hover:bg-red-700 disabled:opacity-50'
