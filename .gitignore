@@ -77,3 +77,4 @@ local/
 
 # Generated git reporting artifacts
 reports/git/
+.env*.local

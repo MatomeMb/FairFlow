@@ -1,11 +1,19 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
 import { supabase } from "../lib/supabase";
 
+const ROLE_HOME: Record<string, string> = {
+  ceo: "/dashboard/admin",
+  cto: "/dashboard/admin",
+  merchant: "/dashboard/merchant",
+  investor: "/dashboard/investor",
+  consumer: "/shop",
+};
+
 export function LoginPage() {
-  const { signInWithEmail } = useAuth();
+  const { signInWithEmail, role } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -14,6 +22,21 @@ export function LoginPage() {
   const [resetError, setResetError] = useState<string | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
+
+  // After login, wait for the auth state to propagate the role, then navigate.
+  useEffect(() => {
+    if (loginSuccess && role) {
+      navigate(ROLE_HOME[role] ?? "/shop", { replace: true });
+    }
+  }, [loginSuccess, role, navigate]);
+
+  // If already logged in, redirect immediately.
+  useEffect(() => {
+    if (role) {
+      navigate(ROLE_HOME[role] ?? "/shop", { replace: true });
+    }
+  }, [role, navigate]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +45,7 @@ export function LoginPage() {
 
     try {
       await signInWithEmail(email, password);
-      navigate("/");
+      setLoginSuccess(true);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : "Login failed";
       if (/invalid login credentials/i.test(message)) {

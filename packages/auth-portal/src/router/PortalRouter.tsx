@@ -63,6 +63,9 @@ export function PortalRouter() {
         {/* Public Landing */}
         <Route path="/" element={<LandingPage />} />
 
+        {/* Role-aware dashboard redirect */}
+        <Route path="/dashboard" element={<AuthRedirect />} />
+
         {/* Unified Admin Portal (CEO & CTO) */}
         <Route
           path="/dashboard/admin"

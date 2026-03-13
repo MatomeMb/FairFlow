@@ -1330,7 +1330,6 @@ export const MerchantPortal: React.FC = () => {
               return;
             }
             try {
-              const apiBase = localStorage.getItem('apiBase') || 'http://localhost:3000';
               const token = localStorage.getItem('merchantToken');
               const res = await fetch(`${apiBase}/v1/merchant/account/bank`, {
                 method: 'PATCH',
