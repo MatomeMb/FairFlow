@@ -349,7 +349,7 @@ export const AdminPortal: React.FC = () => {
                       <p className="text-[var(--ff-ink)] font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
                     </div>
                   </div>
-                  <p className="text-xs text-stone-500 mt-3">
+                  <p className="text-xs text-[var(--ff-ink-muted)] mt-3">
                     Submitted: {new Date(kyc.submittedAt).toLocaleDateString()} at {new Date(kyc.submittedAt).toLocaleTimeString()}
                   </p>
                 </div>
@@ -521,13 +521,13 @@ export const AdminPortal: React.FC = () => {
     <div className="flex h-screen bg-[var(--ff-bg)] overflow-hidden" data-testid="admin-portal">
       {/* Mobile backdrop */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
+        <div className="fixed inset-0 bg-[rgba(27,35,48,0.24)] z-30 md:hidden" onClick={() => setSidebarOpen(false)} />
       )}
       {/* Sidebar */}
-      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-white/70 border-r border-[var(--ff-border)] transition-all duration-300 flex flex-col`}>
+      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-white border-r border-[var(--ff-border)] transition-all duration-300 flex flex-col`}>
         <div className="p-4 border-b border-[var(--ff-border)] flex-shrink-0 overflow-hidden">
           <div className="flex items-center justify-between">
-            <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="dark" />
+            <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="light" />
             {sidebarOpen && <span className="text-xs font-bold text-[var(--ff-ink-muted)]">ADMIN</span>}
           </div>
         </div>
@@ -542,8 +542,8 @@ export const AdminPortal: React.FC = () => {
                 onClick={() => setActiveSection(item.id)}
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeSection === item.id
-                    ? 'bg-blue-600 text-white'
-                    : 'text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100'
+                    ? 'bg-[var(--ff-accent-light)] text-[var(--ff-ink)] border border-[var(--ff-border)]'
+                    : 'text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -566,11 +566,11 @@ export const AdminPortal: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-[var(--ff-border)] bg-white/70 px-4 md:px-6 py-4">
+        <div className="border-b border-[var(--ff-border)] bg-white px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
-                className="md:hidden p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100 rounded-lg"
+                className="md:hidden p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -583,7 +583,7 @@ export const AdminPortal: React.FC = () => {
               <div className="relative">
                 <button 
                   onClick={() => setLogoMenuOpen(!logoMenuOpen)}
-                  className="flex items-center gap-2 bg-stone-100 hover:bg-stone-200 text-[var(--ff-ink)] rounded-lg px-3 py-1.5 transition-colors border border-[var(--ff-border)]"
+                  className="flex items-center gap-2 bg-[var(--ff-surface)] hover:brightness-95 text-[var(--ff-ink)] rounded-lg px-3 py-1.5 transition-colors border border-[var(--ff-border)]"
                 >
                   <Zap className="w-4 h-4 text-yellow-500" />
                   <span className="text-xs font-bold uppercase tracking-wider">{logoStyle.replace('-', ' ')}</span>
@@ -598,7 +598,7 @@ export const AdminPortal: React.FC = () => {
                     />
                     <div className="absolute right-0 mt-2 w-56 bg-white/70 border border-[var(--ff-border)] rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-3 py-2 border-b border-[var(--ff-border)] mb-1">
-                        <span className="text-[10px] font-black text-stone-500 uppercase tracking-[0.2em]">Select Brand Identity</span>
+                        <span className="text-[10px] font-black text-[var(--ff-ink-muted)] uppercase tracking-[0.2em]">Select Brand Identity</span>
                       </div>
                       {LOGO_STYLES.map((styleOption) => (
                         <button
@@ -613,7 +613,7 @@ export const AdminPortal: React.FC = () => {
                           className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-all ${
                             logoStyle === styleOption.id 
                               ? 'bg-blue-600/10 text-blue-400 font-bold' 
-                              : 'text-stone-700 hover:bg-stone-100 hover:text-[var(--ff-ink)]'
+                                : 'text-[var(--ff-ink-muted)] hover:bg-[var(--ff-surface)] hover:text-[var(--ff-ink)]'
                           }`}
                         >
                           <span className="capitalize">{styleOption.label}</span>
@@ -624,7 +624,7 @@ export const AdminPortal: React.FC = () => {
                   </>
                 )}
               </div>
-              <button className="p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-stone-100 rounded-lg">
+              <button className="p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg">
                 <Bell className="w-5 h-5" />
               </button>
             </div>
@@ -639,7 +639,7 @@ export const AdminPortal: React.FC = () => {
 
       {/* KYC Action Modal */}
       {selectedKYC && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-[rgba(27,35,48,0.24)] flex items-center justify-center z-50">
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl shadow-lg max-w-md w-full mx-4 p-6">
             <h3 className="text-lg font-bold text-[var(--ff-ink)] mb-4">
               {kycAction === 'approve' ? 'Approve KYC' : 'Reject KYC'}
@@ -657,7 +657,7 @@ export const AdminPortal: React.FC = () => {
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
-                    className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-stone-500 focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-[var(--ff-ink-muted)] focus:outline-none focus:border-blue-500"
                     placeholder="Add any notes about this approval..."
                     rows={3}
                   />
@@ -668,7 +668,7 @@ export const AdminPortal: React.FC = () => {
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-stone-500 focus:outline-none focus:border-red-500"
+                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-[var(--ff-ink-muted)] focus:outline-none focus:border-red-500"
                     placeholder="Explain why this KYC is being rejected..."
                     rows={3}
                   />
@@ -684,7 +684,7 @@ export const AdminPortal: React.FC = () => {
                   setRejectionReason('');
                   setApprovalNotes('');
                 }}
-                className="flex-1 px-4 py-2 bg-stone-100 hover:bg-stone-200 text-[var(--ff-ink)] rounded-lg transition"
+                className="flex-1 px-4 py-2 bg-[var(--ff-surface)] hover:brightness-95 text-[var(--ff-ink)] rounded-lg transition"
               >
                 Cancel
               </button>
