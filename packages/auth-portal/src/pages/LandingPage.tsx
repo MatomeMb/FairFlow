@@ -307,19 +307,34 @@ export function LandingPage() {
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Payments</p>
               <p>Powered by trusted payment infrastructure partners.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">PAYSTACK</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">VISA</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">MASTERCARD</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">EFT</div>
+              </div>
               <p className="mt-2">Supported methods: card payments, EFT, and wallet-compatible checkout flows.</p>
             </div>
 
             <div>
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Compliance</p>
               <p>Built with POPIA-aware data handling and audit-friendly merchant workflows.</p>
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">POPIA</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">KYC</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">AML</div>
+                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">PRIVACY</div>
+              </div>
               <p className="mt-2">KYC and payout controls are integrated for responsible marketplace operations.</p>
             </div>
           </div>
 
-          <div className="mt-8 flex flex-col gap-2 border-t border-[var(--ff-border)] pt-4 text-xs text-[var(--ff-ink-muted)] sm:flex-row sm:items-center sm:justify-between">
+          <div className="mt-8 flex flex-col gap-3 border-t border-[var(--ff-border)] pt-4 text-xs text-[var(--ff-ink-muted)] sm:flex-row sm:items-center sm:justify-between">
             <p>© {new Date().getFullYear()} Fairflow. All rights reserved.</p>
-            <p>Supported payments and regulations information available on request.</p>
+            <p className="inline-flex items-center gap-2">
+              <ShieldCheck size={14} className="text-[var(--ff-accent)]" />
+              Powered by trusted payments and built with compliance-first operations.
+            </p>
           </div>
         </div>
       </footer>
