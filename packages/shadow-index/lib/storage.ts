@@ -120,3 +120,19 @@ export async function getThing(hash: string): Promise<Buffer | null> {
     throw err;
   }
 }
+
+/**
+ * Lightweight R2 connectivity check via HeadBucket.
+ */
+export async function checkR2Health(): Promise<boolean> {
+  const { HeadBucketCommand } = await import('@aws-sdk/client-s3');
+  const bucket = bucketName ?? process.env.CLOUDFLARE_R2_BUCKET;
+  if (!bucket) return false;
+  try {
+    const client = await getClient();
+    await client.send(new HeadBucketCommand({ Bucket: bucket }));
+    return true;
+  } catch {
+    return false;
+  }
+}

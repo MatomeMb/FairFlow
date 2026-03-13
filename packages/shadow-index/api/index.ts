@@ -21,7 +21,7 @@ async function getPaystack() {
   }
   return _paystack;
 }
-import { isR2Configured, uploadThing, getThing } from '../lib/storage.js';
+import { isR2Configured, uploadThing, getThing, checkR2Health } from '../lib/storage.js';
 import { validateDateRange } from '../lib/analytics-report.js';
 import { recordQuery, startQuery, endQuery } from '../lib/dashboard-metrics.js';
 import { getCached, setCached, invalidateCache, buildCacheKey } from '../lib/query-cache.js';
@@ -1368,11 +1368,20 @@ app.get('/', (c) =>
 app.get('/health', async (c) => {
   const checks: Record<string, string> = {};
 
-  try {
-    await fs.access(dataRoot);
-    checks.storage = 'ok';
-  } catch {
-    checks.storage = 'unavailable';
+  if (useR2) {
+    try {
+      const r2ok = await checkR2Health();
+      checks.storage = r2ok ? 'ok' : 'r2-unreachable';
+    } catch {
+      checks.storage = 'r2-error';
+    }
+  } else {
+    try {
+      await fs.access(dataRoot);
+      checks.storage = 'ok';
+    } catch {
+      checks.storage = 'unavailable';
+    }
   }
 
   // Check Supabase using shared client
