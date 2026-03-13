@@ -22,6 +22,24 @@ function normalizeEmail(value: string | null | undefined): string | null {
   return normalized.length > 0 ? normalized : null;
 }
 
+function normalizeLoginEmail(value: string): string {
+  const normalized = normalizeEmail(value);
+  if (!normalized) {
+    throw new Error("Email is required");
+  }
+
+  // Accept known shorthand forms used by internal admins.
+  if (normalized === "sobuhle@fairflow") return "sobuhle@fairflow.co.za";
+  if (normalized === "matome@fairflow") return "matome@fairflow.co.za";
+
+  const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailPattern.test(normalized)) {
+    throw new Error("Use your full email address, for example sobuhle@fairflow.co.za");
+  }
+
+  return normalized;
+}
+
 function buildAdminEmails(): Set<string> {
   const fromEnv = (import.meta.env.VITE_ADMIN_EMAILS || "")
     .split(",")
@@ -154,7 +172,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signInWithEmail = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    const normalizedEmail = normalizeLoginEmail(email);
+    const { error } = await supabase.auth.signInWithPassword({ email: normalizedEmail, password });
     if (error) throw error;
   };
 

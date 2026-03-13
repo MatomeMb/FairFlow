@@ -55,6 +55,7 @@ export function LoginPage() {
                 disabled={isLoading}
                 className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
               />
+              <p className="mt-2 text-xs text-stone-500">Use full email format, e.g. name@fairflow.co.za</p>
             </div>
             <input
               type="password"
