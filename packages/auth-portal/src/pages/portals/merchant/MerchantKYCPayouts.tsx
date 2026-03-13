@@ -48,7 +48,7 @@ export function MerchantKYCPayouts({
           <button
             type="button"
             onClick={onDismissAccountError}
-            className="text-white/90 hover:text-white leading-none min-h-[44px] min-w-[44px] flex items-center justify-center"
+            className="leading-none min-h-[44px] min-w-[44px] flex items-center justify-center text-[var(--ff-ink)] hover:opacity-80"
             aria-label="Dismiss error"
           >
             ✕

@@ -6,7 +6,7 @@ export function SprintStatus({ status }: { status: StatusType }) {
   const config = {
     'complete':    { icon: CheckCircle2, label: 'Complete',     className: 'text-emerald-400 bg-emerald-400/10' },
     'in-progress': { icon: RefreshCw,   label: 'In Progress',  className: 'text-yellow-400 bg-yellow-400/10' },
-    'upcoming':    { icon: Clock,       label: 'Upcoming',     className: 'text-stone-400 bg-stone-800' },
+    'upcoming':    { icon: Clock,       label: 'Upcoming',     className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)]' },
   };
   const { icon: Icon, label, className } = config[status];
   return (
@@ -52,11 +52,11 @@ export type TalentStatusType = 'potential' | 'contacted' | 'interviewing' | 'hir
 
 export function TalentStatusBadge({ status }: { status: TalentStatusType }) {
   const config = {
-    'potential':    { label: 'Potential',    className: 'text-stone-400 bg-stone-800 border border-stone-700' },
+    'potential':    { label: 'Potential',    className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border border-[var(--ff-border)]' },
     'contacted':    { label: 'Contacted',    className: 'text-blue-300 bg-blue-500/10 border border-blue-500/20' },
     'interviewing': { label: 'Interviewing', className: 'text-yellow-300 bg-yellow-500/10 border border-yellow-500/20' },
     'hired':        { label: 'Hired',        className: 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20' },
-    'rejected':     { label: 'Not Moving',   className: 'text-stone-600 bg-stone-900 border border-stone-800' },
+    'rejected':     { label: 'Not Moving',   className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border border-[var(--ff-border)]' },
   };
   
   const { label, className } = config[status];
@@ -74,13 +74,13 @@ export function RoleBadge({ role }: { role: string }) {
     'cto':      'text-blue-300 bg-blue-500/10 border-blue-500/20',
     'merchant': 'text-orange-300 bg-orange-500/10 border-orange-500/20',
     'investor': 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20',
-    'consumer': 'text-stone-400 bg-stone-800 border-stone-700',
+    'consumer': 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border-[var(--ff-border)]',
   };
   
   return (
     <span className={`
       inline-flex items-center px-2 py-0.5 rounded text-[11px] font-medium border
-      ${styles[role] || 'text-stone-400 bg-stone-800 border-stone-700'}
+      ${styles[role] || 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border-[var(--ff-border)]'}
     `}>
       {role}
     </span>
@@ -89,7 +89,7 @@ export function RoleBadge({ role }: { role: string }) {
 
 export function SkillTag({ label }: { label: string }) {
   return (
-    <span className="inline-block px-1.5 py-0.5 text-xs rounded bg-stone-800 text-stone-400 border border-stone-700">
+    <span className="inline-block px-1.5 py-0.5 text-xs rounded bg-[var(--ff-surface)] text-[var(--ff-ink-muted)] border border-[var(--ff-border)]">
       {label}
     </span>
   );
@@ -98,13 +98,13 @@ export function SkillTag({ label }: { label: string }) {
 export function SectionSkeleton() {
   return (
     <div className="p-6 space-y-4 animate-pulse">
-      <div className="h-4 w-32 bg-stone-800 rounded" />
+      <div className="h-4 w-32 rounded bg-[var(--ff-surface)]" />
       <div className="grid grid-cols-4 gap-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-24 bg-stone-900 border border-stone-800 rounded-xl" />
+          <div key={i} className="h-24 rounded-xl border border-[var(--ff-border)] bg-white/85" />
         ))}
       </div>
-      <div className="h-64 bg-stone-900 border border-stone-800 rounded-xl" />
+      <div className="h-64 rounded-xl border border-[var(--ff-border)] bg-white/85" />
     </div>
   );
 }

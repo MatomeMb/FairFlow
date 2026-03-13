@@ -685,7 +685,7 @@ export function CTOAdminPanel() {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Potential</div>
-            <div className="text-3xl font-bold text-stone-200">0</div>
+            <div className="text-3xl font-bold text-[var(--ff-ink)]">0</div>
           </div>
           <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
             <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Interviewing</div>
