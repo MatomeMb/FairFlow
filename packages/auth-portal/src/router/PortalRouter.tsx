@@ -19,6 +19,7 @@ import { AdminPortal } from "../pages/portals/AdminPortal";
 import { MerchantPortal } from "../pages/portals/MerchantPortal";
 import { InvestorMode } from "../pages/portals/InvestorMode";
 import { ConsumerShop } from "../pages/portals/ConsumerShop";
+import { AuthDiagnosticsPage } from "../pages/portals/AuthDiagnosticsPage";
 
 // Role → portal path mapping
 const ROLE_HOME: Record<string, string> = {
@@ -88,6 +89,16 @@ export function PortalRouter() {
           element={
             <RoleGuard allowedRoles={["cto"]}>
               <AdminPortal />
+            </RoleGuard>
+          }
+        />
+
+        {/* Hidden auth diagnostics tool for CTO/admin incident debugging */}
+        <Route
+          path="/dashboard/cto/auth-diagnostics"
+          element={
+            <RoleGuard allowedRoles={["ceo", "cto"]}>
+              <AuthDiagnosticsPage />
             </RoleGuard>
           }
         />
