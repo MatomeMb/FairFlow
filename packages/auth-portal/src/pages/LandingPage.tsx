@@ -292,14 +292,35 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer id="contact" className="border-t border-[var(--ff-border)] bg-[rgba(250,250,248,0.9)]">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-8 text-sm text-[var(--ff-ink-muted)] sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <div className="flex items-center gap-3">
-            <FairflowLogo markHeight={30} showWordmark={false} style="derivative" />
-            <span>fairflow</span>
+      <footer id="contact" className="border-t border-[var(--ff-border)] bg-[rgba(250,250,248,0.92)]">
+        <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="grid gap-8 text-sm text-[var(--ff-ink-muted)] md:grid-cols-3">
+            <div>
+              <div className="mb-3 flex items-center gap-3 text-[var(--ff-ink)]">
+                <FairflowLogo markHeight={30} showWordmark={false} style="derivative" />
+                <span className="font-semibold tracking-[0.02em]">fairflow</span>
+              </div>
+              <p>Professional commerce operations for merchants, teams, and trusted customer journeys.</p>
+              <p className="mt-3">Contact: hello@fairflow.co.za</p>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Payments</p>
+              <p>Powered by trusted payment infrastructure partners.</p>
+              <p className="mt-2">Supported methods: card payments, EFT, and wallet-compatible checkout flows.</p>
+            </div>
+
+            <div>
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Compliance</p>
+              <p>Built with POPIA-aware data handling and audit-friendly merchant workflows.</p>
+              <p className="mt-2">KYC and payout controls are integrated for responsible marketplace operations.</p>
+            </div>
           </div>
-          <p>Build better commerce loops. Contact: hello@fairflow.local</p>
-          <p>© {new Date().getFullYear()} Fairflow</p>
+
+          <div className="mt-8 flex flex-col gap-2 border-t border-[var(--ff-border)] pt-4 text-xs text-[var(--ff-ink-muted)] sm:flex-row sm:items-center sm:justify-between">
+            <p>© {new Date().getFullYear()} Fairflow. All rights reserved.</p>
+            <p>Supported payments and regulations information available on request.</p>
+          </div>
         </div>
       </footer>
     </div>

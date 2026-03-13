@@ -724,8 +724,9 @@ export const MerchantPortal: React.FC = () => {
         {(ordersLoading || accountLoading || productsLoading) && <InlineSpinner label="Loading dashboard data..." />}
 
         {merchantAccount?.kyc_status !== 'approved' && (
-          <div className="bg-amber-900/20 border border-amber-800/60 rounded-xl p-4 text-amber-300 text-sm">
-            KYC is not approved yet. Complete KYC in the KYC & Payouts tab to unlock full payout processing.
+          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+            <p className="font-semibold">KYC is not approved yet.</p>
+            <p className="mt-1 text-amber-800">Complete KYC in the KYC & Payouts tab to unlock full payout processing.</p>
           </div>
         )}
 

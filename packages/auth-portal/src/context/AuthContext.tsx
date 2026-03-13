@@ -5,10 +5,53 @@ import { supabase } from "../lib/supabase";
 import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
 
 // Admin email configuration — emails listed here get CEO role
-const ADMIN_EMAILS = new Set([
+const STATIC_ADMIN_EMAILS = [
   "matome@fairflow.co.za",
   "sobuhle@fairflow.co.za",
-]);
+];
+
+function normalizeEmail(value: string | null | undefined): string | null {
+  if (!value) return null;
+  const normalized = value.trim().toLowerCase();
+  return normalized.length > 0 ? normalized : null;
+}
+
+function buildAdminEmails(): Set<string> {
+  const fromEnv = (import.meta.env.VITE_ADMIN_EMAILS || "")
+    .split(",")
+    .map((item: string) => normalizeEmail(item))
+    .filter((item: string | null): item is string => Boolean(item));
+
+  return new Set([
+    ...STATIC_ADMIN_EMAILS.map((item) => normalizeEmail(item)).filter((item): item is string => Boolean(item)),
+    ...fromEnv,
+  ]);
+}
+
+const ADMIN_EMAILS = buildAdminEmails();
+
+function collectSessionEmails(session: Session): Set<string> {
+  const candidates: Array<string | null | undefined> = [
+    session.user.email,
+    session.user.user_metadata?.email,
+    session.user.user_metadata?.preferred_email,
+  ];
+
+  for (const identity of session.user.identities ?? []) {
+    const identityData = identity.identity_data as Record<string, unknown> | undefined;
+    if (!identityData) continue;
+    candidates.push(
+      typeof identityData.email === "string" ? identityData.email : undefined,
+      typeof identityData.preferred_email === "string" ? identityData.preferred_email : undefined
+    );
+  }
+
+  return new Set(
+    candidates
+      .map((value) => normalizeEmail(value))
+      .filter((value): value is string => Boolean(value))
+  );
+}
 
 interface AuthContextType {
   user: AuthUser | null;
@@ -32,10 +75,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!session?.access_token) return null;
     try {
       const decoded = jwtDecode<JWTClaims>(session.access_token);
-      const userEmail = session.user.email?.toLowerCase() || "";
-      
-      // Override role to CEO if email is in admin list
-      if (ADMIN_EMAILS.has(userEmail)) {
+
+      // Override role to CEO if any normalized profile/identity email is in admin list.
+      const sessionEmails = collectSessionEmails(session);
+      if ([...sessionEmails].some((email) => ADMIN_EMAILS.has(email))) {
         return "ceo";
       }
       
