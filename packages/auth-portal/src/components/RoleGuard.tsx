@@ -13,8 +13,8 @@ export function RoleGuard({ allowedRoles, children, redirectTo = "/unauthorized"
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-stone-950">
-        <div className="text-white text-lg">Loading...</div>
+      <div className="min-h-screen flex items-center justify-center bg-[var(--ff-bg)]">
+        <div className="text-lg text-[var(--ff-ink)]">Loading...</div>
       </div>
     );
   }

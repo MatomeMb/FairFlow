@@ -14,10 +14,10 @@ interface MerchantNotificationsProps {
 }
 
 const renderNotificationIcon = (type: MerchantNotification['type']) => {
-  if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-emerald-400" />;
-  if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-amber-400" />;
-  if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-red-400" />;
-  return <Bell className="w-4 h-4 text-stone-400" />;
+  if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-emerald-700" />;
+  if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-amber-700" />;
+  if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-red-700" />;
+  return <Bell className="w-4 h-4 text-[var(--ff-ink-muted)]" />;
 };
 
 export function MerchantNotifications({
@@ -36,7 +36,7 @@ export function MerchantNotifications({
         <h3 className="font-bold">Notifications</h3>
         <button
           onClick={onMarkAllNotificationsRead}
-          className="text-xs text-emerald-400 hover:text-emerald-300"
+          className="text-xs text-emerald-700 hover:text-emerald-800"
         >
           Mark all as read
         </button>
@@ -57,15 +57,15 @@ export function MerchantNotifications({
       )}
 
       {notificationsLoading ? (
-        <div className="bg-stone-900 border border-stone-800 rounded-xl p-4 text-sm text-stone-300 flex items-center gap-3">
-          <svg className="w-5 h-5 text-emerald-400 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+        <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
+          <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
             <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
           </svg>
           <span>Loading notifications...</span>
         </div>
       ) : notifications.length === 0 ? (
-        <EmptyState icon={<Bell className="w-10 h-10 text-stone-500" />} title="No notifications" description="You're all caught up — no notifications." />
+        <EmptyState icon={<Bell className="w-10 h-10 text-[var(--ff-ink-muted)]" />} title="No notifications" description="You're all caught up — no notifications." />
       ) : (
         <div className="space-y-3">
           {notifications.map((notification) => (
@@ -73,26 +73,26 @@ export function MerchantNotifications({
               key={notification.id}
               className={`border rounded-xl p-4 ${
                 notification.type === 'high_value_order'
-                  ? 'border-red-500/40 bg-red-500/10'
+                    ? 'border-red-300 bg-red-50'
                   : notification.read
-                  ? 'bg-stone-900 border-stone-800'
-                  : 'bg-stone-900 border-emerald-700/50 border-l-4 border-l-emerald-500'
+                    ? 'bg-white/85 border-[var(--ff-border)]'
+                    : 'bg-white border-emerald-300 border-l-4 border-l-emerald-600'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
                   <div className="min-w-0">
-                    <p className={`text-sm ${notification.read ? 'text-stone-300' : 'text-white font-semibold'}`}>{notification.title}</p>
-                    <p className="text-xs text-stone-400 mt-1">{notification.message}</p>
-                    <p className="text-xs text-stone-500 mt-2">{formatRelativeTime(notification.created_at)}</p>
+                    <p className={`text-sm ${notification.read ? 'text-[var(--ff-ink)]' : 'text-[var(--ff-ink)] font-semibold'}`}>{notification.title}</p>
+                    <p className="text-xs text-[var(--ff-ink-muted)] mt-1">{notification.message}</p>
+                    <p className="text-xs text-[var(--ff-ink-muted)] mt-2">{formatRelativeTime(notification.created_at)}</p>
                   </div>
                 </div>
                 {!notification.read && (
                   <button
                     onClick={() => onMarkNotificationRead(notification.id)}
                     disabled={updatingNotificationId === notification.id}
-                    className="text-xs text-emerald-400 hover:text-emerald-300 disabled:text-stone-500 px-3 py-3 min-h-[44px] rounded-lg border border-emerald-800/40"
+                    className="text-xs text-emerald-700 hover:text-emerald-800 disabled:text-[var(--ff-ink-muted)] px-3 py-3 min-h-[44px] rounded-lg border border-emerald-300"
                   >
                     {updatingNotificationId === notification.id ? 'Updating...' : 'Mark as read'}
                   </button>

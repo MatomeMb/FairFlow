@@ -304,14 +304,14 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="w-full max-w-2xl rounded-xl border border-stone-800 bg-stone-900 shadow-xl max-h-[90vh] flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(27,35,48,0.34)] p-4">
+      <div className="w-full max-w-2xl rounded-xl border border-[var(--ff-border)] bg-white shadow-xl max-h-[90vh] flex flex-col">
         <div className="px-6 py-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-white">Create Product</h2>
+          <h2 className="text-lg font-semibold text-[var(--ff-ink)]">Create Product</h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded-lg px-3 py-1.5 text-sm text-stone-300 transition-colors hover:bg-stone-800 hover:text-white"
+            className="rounded-lg px-3 py-1.5 text-sm text-[var(--ff-ink-muted)] transition-colors hover:bg-[var(--ff-surface)] hover:text-[var(--ff-ink)]"
             disabled={isSubmitting}
           >
             Close
@@ -321,53 +321,53 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
         {step === 'form' ? (
           <form id="create-product-form" onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-300">Title *</label>
+            <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Title *</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setField('title', e.target.value)}
               maxLength={255}
-              className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
               placeholder="Product title"
             />
             {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title}</p>}
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-300">Description</label>
+            <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
               placeholder="Describe your product"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Price (Rands) *</label>
+              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Price (Rands) *</label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={form.priceRands}
                 onChange={(e) => handlePriceChange(e.target.value)}
-                className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
                 placeholder="125.00"
               />
-              <p className="mt-1 text-xs text-stone-400">Price preview: {prettyPrice}</p>
+              <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">Price preview: {prettyPrice}</p>
               {errors.price_cents && <p className="mt-1 text-xs text-red-400">{errors.price_cents}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Stock Count *</label>
+              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Stock Count *</label>
               <input
                 type="number"
                 min={0}
                 step={1}
                 value={form.stock_count}
                 onChange={(e) => setField('stock_count', e.target.value)}
-                className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
               />
               {errors.stock_count && <p className="mt-1 text-xs text-red-400">{errors.stock_count}</p>}
             </div>
@@ -375,11 +375,11 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Category *</label>
+              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Category *</label>
               <select
                 value={form.category}
                 onChange={(e) => setField('category', e.target.value as FormState['category'])}
-                className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
               >
                 <option value="">Select category</option>
                 {CATEGORY_OPTIONS.map((option) => (
@@ -392,7 +392,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-300">Product Image *</label>
+              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Product Image *</label>
               <input
                 type="file"
                 accept="image/*"
@@ -405,9 +405,9 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                     setField('image_url', '');
                   }
                 }}
-                className="w-full rounded-lg border border-stone-700 bg-stone-800 px-3 py-2 text-sm text-white outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
               />
-              <p className="mt-1 text-xs text-stone-400">
+              <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">
                 {isUploadingImage
                   ? `Uploading ${selectedImageName || 'image'}...`
                   : form.image_url
@@ -418,7 +418,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 <img
                   src={form.image_url}
                   alt="Product preview"
-                  className="mt-2 h-24 w-24 rounded-md object-cover border border-stone-700"
+                  className="mt-2 h-24 w-24 rounded-md object-cover border border-[var(--ff-border)]"
                 />
               )}
               {imageUploadError && <p className="mt-1 text-xs text-red-400">{imageUploadError}</p>}
@@ -427,27 +427,27 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm text-stone-300">
+            <label className="flex items-center gap-2 text-sm text-[var(--ff-ink)]">
               <input
                 type="checkbox"
                 checked={form.shipping_available}
                 onChange={(e) => setField('shipping_available', e.target.checked)}
-                className="h-4 w-4 rounded border-stone-600 bg-stone-800 text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-emerald-500 focus:ring-emerald-500"
               />
               Shipping available
             </label>
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-medium text-stone-300">Certifications</p>
+            <p className="mb-2 text-sm font-medium text-[var(--ff-ink)]">Certifications</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {CERTIFICATION_OPTIONS.map((certification) => (
-                <label key={certification} className="flex items-center gap-2 text-sm text-stone-300">
+                <label key={certification} className="flex items-center gap-2 text-sm text-[var(--ff-ink)]">
                   <input
                     type="checkbox"
                     checked={form.certifications.includes(certification)}
                     onChange={() => toggleCertification(certification)}
-                    className="h-4 w-4 rounded border-stone-600 bg-stone-800 text-emerald-500 focus:ring-emerald-500"
+                    className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-emerald-500 focus:ring-emerald-500"
                   />
                   {certification}
                 </label>
@@ -463,20 +463,20 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <span className="text-sm font-semibold">Product published</span>
             </div>
             <div>
-              <p className="text-lg font-semibold text-white">{successPayload?.title}</p>
-              <p className="text-sm text-stone-400">R{((successPayload?.price_cents ?? 0) / 100).toFixed(2)}</p>
+              <p className="text-lg font-semibold text-[var(--ff-ink)]">{successPayload?.title}</p>
+              <p className="text-sm text-[var(--ff-ink-muted)]">R{((successPayload?.price_cents ?? 0) / 100).toFixed(2)}</p>
             </div>
 
             <div>
-              <p className="mb-1 text-xs text-stone-400">
+              <p className="mb-1 text-xs text-[var(--ff-ink-muted)]">
                 Your portable product link — share this anywhere. It works even if your website changes.
               </p>
-              <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">
+              <div className="flex items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2">
                 <code className="flex-1 text-xs text-emerald-400 break-all">{successPayload?.matter_uri}</code>
                 <button
                   type="button"
                   onClick={() => handleCopy(successPayload?.matter_uri ?? '', 'matter')}
-                  className="rounded-md bg-stone-700 hover:bg-stone-600 px-3 py-2 text-xs text-white min-h-[44px]"
+                  className="min-h-[44px] rounded-md border border-[var(--ff-border)] bg-white px-3 py-2 text-xs text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]"
                 >
                   {copiedField === 'matter' ? 'Copied!' : 'Copy'}
                 </button>
@@ -484,16 +484,16 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
             </div>
 
             <div>
-              <p className="mb-1 text-xs text-stone-400">
+              <p className="mb-1 text-xs text-[var(--ff-ink-muted)]">
                 Direct product page — share this link for consumers to buy immediately.
               </p>
-              <p className="text-xs text-stone-500 mb-2">Product page:</p>
-              <div className="flex items-center gap-2 rounded-lg border border-stone-700 bg-stone-800 px-3 py-2">
+              <p className="text-xs text-[var(--ff-ink-muted)] mb-2">Product page:</p>
+              <div className="flex items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2">
                 <code className="flex-1 text-xs text-blue-400 break-all">{productPageUrl}</code>
                 <button
                   type="button"
                   onClick={() => handleCopy(productPageUrl, 'page')}
-                  className="rounded-md bg-stone-700 hover:bg-stone-600 px-3 py-2 text-xs text-white min-h-[44px]"
+                  className="min-h-[44px] rounded-md border border-[var(--ff-border)] bg-white px-3 py-2 text-xs text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]"
                 >
                   {copiedField === 'page' ? 'Copied!' : 'Copy'}
                 </button>
@@ -502,14 +502,14 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
         )}
 
-        <div className="px-6 py-4 border-t border-stone-200 flex justify-end gap-3 flex-shrink-0">
+        <div className="px-6 py-4 border-t border-[var(--ff-border)] flex justify-end gap-3 flex-shrink-0">
           {step === 'form' ? (
             <>
               <button
                 type="button"
                 onClick={onClose}
                 disabled={isSubmitting}
-                className="rounded-lg bg-stone-800 hover:bg-stone-700 px-4 py-2 text-sm font-medium text-white transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm font-medium text-[var(--ff-ink)] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 Cancel
               </button>
@@ -527,7 +527,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <button
                 type="button"
                 onClick={handleCreateAnother}
-                className="rounded-lg bg-stone-800 hover:bg-stone-700 px-4 py-2 text-sm font-medium text-white transition-colors"
+                className="rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm font-medium text-[var(--ff-ink)] transition-colors hover:brightness-95"
               >
                 Create Another
               </button>

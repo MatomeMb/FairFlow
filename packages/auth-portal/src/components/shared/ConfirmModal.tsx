@@ -18,14 +18,14 @@ export function ConfirmModal({ isOpen, title, message, confirmLabel, onConfirm, 
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50" onKeyDown={handleEscape}>
-      <div className="bg-stone-900 border border-stone-800 rounded-xl p-6 max-w-md w-full mx-4">
-        <h3 className="text-xl font-semibold text-white mb-3">{title}</h3>
-        <p className="text-stone-400 mb-6">{message}</p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-[rgba(27,35,48,0.34)]" onKeyDown={handleEscape}>
+      <div className="mx-4 w-full max-w-md rounded-xl border border-[var(--ff-border)] bg-white p-6 shadow-[0_20px_50px_rgba(27,35,48,0.18)]">
+        <h3 className="mb-3 text-xl font-semibold text-[var(--ff-ink)]">{title}</h3>
+        <p className="mb-6 text-[var(--ff-ink-muted)]">{message}</p>
         <div className="flex gap-3 justify-end">
           <button
             onClick={onCancel}
-            className="px-4 py-2 text-sm font-medium text-stone-300 bg-stone-800 hover:bg-stone-700 rounded-lg border border-stone-700 transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm font-medium text-[var(--ff-ink)] transition-colors hover:brightness-95 focus:outline-none focus:ring-2 focus:ring-[var(--ff-accent)]"
           >
             Cancel
           </button>
@@ -33,7 +33,7 @@ export function ConfirmModal({ isOpen, title, message, confirmLabel, onConfirm, 
             onClick={onConfirm}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
               danger
-                ? 'bg-red-900/50 hover:bg-red-900 text-red-400 border border-red-800'
+                ? 'border border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
                 : 'bg-emerald-600 hover:bg-emerald-500 text-white'
             }`}
           >

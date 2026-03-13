@@ -60,10 +60,10 @@ export function LandingPage() {
         color: "var(--ff-ink)",
       }}
     >
-      <header className="sticky top-0 z-50 border-b border-[var(--ff-border)] bg-[rgba(250,250,248,0.84)] backdrop-blur-md">
+      <header className="sticky top-0 z-[120] border-b border-[var(--ff-border)] bg-[rgba(250,250,248,0.93)] backdrop-blur-[2px]">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="shrink-0" aria-label="Fairflow home">
-            <FairflowLogo markHeight={40} showWordmark />
+          <Link to="/" className="shrink-0 rounded-xl border border-[var(--ff-border)] bg-white/70 px-2.5 py-1.5" aria-label="Fairflow home">
+            <FairflowLogo markHeight={38} showWordmark variant="light" />
           </Link>
 
           <nav className="hidden items-center gap-7 md:flex">

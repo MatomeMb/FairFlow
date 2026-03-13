@@ -17,16 +17,16 @@ interface TabShellProps {
 
 export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, headerActions, children }: TabShellProps) {
   return (
-    <div className="min-h-screen bg-stone-950">
+    <div className="min-h-screen bg-[var(--ff-bg)] text-[var(--ff-ink)]">
       {/* Header */}
-      <div className="bg-stone-900 border-b border-stone-800">
+      <div className="border-b border-[var(--ff-border)] bg-white/90 backdrop-blur-sm">
         <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-          <div className="text-xl font-semibold text-white">{title}</div>
+          <div className="text-xl font-semibold text-[var(--ff-ink)]">{title}</div>
           <div className="flex items-center gap-3">
             {headerActions}
             <button
               onClick={onLogout}
-              className="px-4 py-2 text-sm font-medium text-stone-300 bg-stone-800 hover:bg-stone-700 rounded-lg border border-stone-700 transition-colors"
+              className="rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm font-medium text-[var(--ff-ink)] transition-colors hover:brightness-95"
             >
               Sign Out
             </button>
@@ -34,15 +34,15 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
         </div>
         
         {/* Tabs */}
-        <div className="px-4 md:px-6 flex gap-1 border-t border-stone-800 overflow-x-auto">
+        <div className="px-4 md:px-6 flex gap-1 border-t border-[var(--ff-border)] overflow-x-auto">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => onTabChange(tab.id)}
               className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${
                 activeTab === tab.id
-                  ? 'border-emerald-500 text-white'
-                  : 'border-transparent text-stone-400 hover:text-white'
+                  ? 'border-[var(--ff-accent)] text-[var(--ff-ink)]'
+                  : 'border-transparent text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]'
               }`}
             >
               {tab.label}

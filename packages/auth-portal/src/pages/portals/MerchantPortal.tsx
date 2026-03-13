@@ -740,7 +740,7 @@ export const MerchantPortal: React.FC = () => {
               </div>
               <button
                 onClick={() => setShowOnboardingBanner(false)}
-                className="text-[var(--ff-ink-muted)] hover:text-stone-200"
+                className="text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]"
               >
                 ✕
               </button>
@@ -773,7 +773,7 @@ export const MerchantPortal: React.FC = () => {
                     }`}>
                       {step.done ? '✓' : i + 1}
                     </span>
-                    <span className={`text-sm ${step.done ? 'text-stone-500 line-through' : 'text-stone-200'}`}>
+                    <span className={`text-sm ${step.done ? 'text-[var(--ff-ink-muted)] line-through' : 'text-[var(--ff-ink)]'}`}>
                       {step.label}
                     </span>
                   </div>
@@ -923,7 +923,7 @@ export const MerchantPortal: React.FC = () => {
                           <>
                             <button
                               onClick={() => handleCopyMatter(p.id, p.matterUri)}
-                              className="bg-stone-100 hover:bg-stone-200 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
+                              className="min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2 text-xs text-[var(--ff-ink)] hover:brightness-95"
                             >
                               {copiedMatterId === p.id ? 'Copied!' : 'Copy matter://'}
                             </button>
@@ -937,7 +937,7 @@ export const MerchantPortal: React.FC = () => {
                             </a>
                             <button
                               onClick={() => handleCopyPage(p.id, p.hash)}
-                              className="bg-stone-100 hover:bg-stone-200 text-stone-200 px-3 py-2 min-h-[44px] rounded-lg text-xs"
+                              className="min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2 text-xs text-[var(--ff-ink)] hover:brightness-95"
                             >
                               {copiedPageId === p.id ? 'Copied!' : 'Copy page'}
                             </button>
@@ -1019,7 +1019,7 @@ export const MerchantPortal: React.FC = () => {
               <div key={stage.stage} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
                   <span className="text-[var(--ff-ink-muted)]">{stage.stage}</span>
-                  <span className="font-mono text-stone-200">{stage.count.toLocaleString()}</span>
+                  <span className="font-mono text-[var(--ff-ink)]">{stage.count.toLocaleString()}</span>
                 </div>
                 <div className="h-2 rounded-full bg-stone-100">
                   <div
@@ -1089,9 +1089,9 @@ export const MerchantPortal: React.FC = () => {
             <tbody>
               {analyticsSnapshot.topProducts.map((item) => (
                 <tr key={item.name} className="border-b border-[var(--ff-border)] last:border-0">
-                  <td className="py-2 text-stone-200">{item.name}</td>
+                  <td className="py-2 text-[var(--ff-ink)]">{item.name}</td>
                   <td className="py-2 text-right text-[var(--ff-ink-muted)]">{item.stock}</td>
-                  <td className="py-2 text-right text-emerald-400">{item.clicks.toLocaleString()}</td>
+                  <td className="py-2 text-right text-emerald-700">{item.clicks.toLocaleString()}</td>
                 </tr>
               ))}
               {analyticsSnapshot.topProducts.length === 0 && (
@@ -1361,7 +1361,7 @@ export const MerchantPortal: React.FC = () => {
 
   return (
     <TabShell
-      title={<FairflowLogo markHeight={36} variant="dark" />}
+      title={<FairflowLogo markHeight={36} variant="light" />}
       tabs={tabs}
       activeTab={activeTab as string}
       onTabChange={(tab) => setActiveTab(tab as Tab)}
@@ -1369,10 +1369,10 @@ export const MerchantPortal: React.FC = () => {
       headerActions={(
         <button
           onClick={() => setActiveTab('notifications')}
-          className="relative p-2 rounded-lg border border-[var(--ff-border)] bg-stone-100 hover:bg-stone-200 transition-colors"
+          className="relative rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] p-2 transition-colors hover:brightness-95"
           aria-label="Open notifications"
         >
-          <Bell className="w-4 h-4 text-stone-200" />
+          <Bell className="w-4 h-4 text-[var(--ff-ink)]" />
           {unreadCount > 0 && (
             <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[var(--ff-ink)] text-[10px] leading-[18px] font-semibold">
               {unreadCount > 99 ? '99+' : unreadCount}

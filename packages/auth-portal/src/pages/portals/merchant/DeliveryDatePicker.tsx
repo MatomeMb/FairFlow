@@ -50,19 +50,19 @@ export function DeliveryDatePicker({
   };
 
   return (
-    <div className="mt-3 pt-3 border-t border-stone-700">
-      <p className="text-xs font-medium text-stone-400 uppercase tracking-wide mb-2">
+    <div className="mt-3 border-t border-[var(--ff-border)] pt-3">
+      <p className="mb-2 text-xs font-medium uppercase tracking-wide text-[var(--ff-ink-muted)]">
         Estimated delivery date
       </p>
       <div className="flex items-center gap-2">
         <div className="relative flex-1">
-          <Calendar className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-stone-500 pointer-events-none" />
+          <Calendar className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[var(--ff-ink-muted)]" />
           <input
             type="date"
             value={date}
             min={new Date().toISOString().split('T')[0]}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full pl-8 pr-3 py-1.5 text-sm border border-stone-700 bg-stone-800 text-stone-100 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-md border border-[var(--ff-border)] bg-white py-1.5 pl-8 pr-3 text-sm text-[var(--ff-ink)] focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
         <button
@@ -83,7 +83,7 @@ export function DeliveryDatePicker({
       </div>
       {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
       {currentDate && !saved && (
-        <p className="mt-1.5 text-xs text-stone-500">
+        <p className="mt-1.5 text-xs text-[var(--ff-ink-muted)]">
           Currently set: {new Date(currentDate).toLocaleDateString('en-ZA', { dateStyle: 'medium' })}
         </p>
       )}

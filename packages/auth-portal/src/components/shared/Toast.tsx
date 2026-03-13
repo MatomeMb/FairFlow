@@ -14,9 +14,9 @@ export function Toast({ message, type, onDismiss }: ToastProps) {
   }, [onDismiss]);
 
   const colors = {
-    success: "bg-green-900/90 border-green-700 text-green-300",
-    error: "bg-red-900/90 border-red-700 text-red-300",
-    info: "bg-blue-900/90 border-blue-700 text-blue-300"
+    success: "bg-emerald-50 border-emerald-300 text-emerald-800",
+    error: "bg-red-50 border-red-300 text-red-800",
+    info: "bg-blue-50 border-blue-300 text-blue-800"
   };
 
   return (
@@ -25,7 +25,7 @@ export function Toast({ message, type, onDismiss }: ToastProps) {
         <span className="text-sm font-medium">{message}</span>
         <button
           onClick={onDismiss}
-          className="text-stone-400 hover:text-white transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50 rounded"
+          className="text-[var(--ff-ink-muted)] transition-colors hover:text-[var(--ff-ink)] focus:outline-none focus:ring-2 focus:ring-[var(--ff-accent)]/40 rounded"
         >
           <X className="w-4 h-4" />
         </button>
