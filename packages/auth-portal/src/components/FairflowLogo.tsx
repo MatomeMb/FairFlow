@@ -150,8 +150,10 @@ export function FairflowLogo({
 
   const markColor = variant === 'dark' ? '#F5F5F0' : '#1B2330';
   const wordColor = markColor;
-  const wordSize = Math.round(markHeight * 0.4);
-  const gap = Math.max(4, Math.round(wordSize * 0.22));
+  const wordSize = Math.round(markHeight * 0.38);
+  const fairSize = Math.max(10, Math.round(wordSize * 0.8));
+  const fairDrop = Math.max(1, Math.round(wordSize * 0.08));
+  const gap = Math.max(2, Math.round(wordSize * 0.12));
   const fontWeight = currentStyle === 'soft-premium' || currentStyle === 'aero' ? 600 : 700;
 
   return (
@@ -172,13 +174,25 @@ export function FairflowLogo({
             fontFamily: "'Sora', 'Instrument Sans', system-ui, sans-serif",
             fontWeight,
             fontSize: wordSize,
-            letterSpacing: '-0.02em',
+            letterSpacing: '-0.015em',
             lineHeight: 1,
             color: wordColor,
+            display: 'inline-flex',
+            alignItems: 'flex-end',
+            gap: '0.03em',
             WebkitFontSmoothing: 'antialiased',
           }}
         >
-          fairflow
+          <span
+            style={{
+              fontSize: fairSize,
+              transform: `translateY(${fairDrop}px)`,
+              letterSpacing: '-0.01em',
+            }}
+          >
+            fair
+          </span>
+          <span>flow</span>
         </span>
       )}
     </div>
