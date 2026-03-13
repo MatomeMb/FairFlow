@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { TabShell } from '../../components/layout/TabShell';
-import { FairflowLogo } from '../../components/FairflowLogo';
+import { FairflowLogo, type LogoStyle, LOGO_STYLES } from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
 import { MetricCard } from '../../components/shared/MetricCard';
 import { Toast } from '../../components/shared/Toast';
@@ -72,10 +72,23 @@ export const MerchantPortal: React.FC = () => {
   const { signOut } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>('products');
+  const [logoStyle, setLogoStyle] = useState<LogoStyle>('geo-tech');
 
   // Update page title
   React.useEffect(() => {
     document.title = 'fairflow — Merchant Dashboard';
+
+    const params = new URLSearchParams(window.location.search);
+    const styleParam = params.get('logoStyle') as LogoStyle | null;
+    if (styleParam && LOGO_STYLES.some((entry) => entry.id === styleParam)) {
+      setLogoStyle(styleParam);
+      return;
+    }
+
+    const storedStyle = window.localStorage.getItem('fairflowLogoStyle') as LogoStyle | null;
+    if (storedStyle && LOGO_STYLES.some((entry) => entry.id === storedStyle)) {
+      setLogoStyle(storedStyle);
+    }
   }, []);
   const [products, setProducts] = useState<Product[]>([]);
   const [showCreateModal, setShowCreateModal] = useState(false);
@@ -1362,7 +1375,7 @@ export const MerchantPortal: React.FC = () => {
 
   return (
     <TabShell
-      title={<FairflowLogo markHeight={36} variant="light" />}
+      title={<FairflowLogo markHeight={32} variant="light" style={logoStyle} />}
       tabs={tabs}
       activeTab={activeTab as string}
       onTabChange={(tab) => setActiveTab(tab as Tab)}
