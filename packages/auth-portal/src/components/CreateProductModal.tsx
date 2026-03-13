@@ -36,8 +36,60 @@ type SuccessPayload = {
   hash: string;
 };
 
+type ProductTemplate = {
+  id: string;
+  label: string;
+  subtitle: string;
+  title: string;
+  description: string;
+  category: FormState['category'];
+  priceRands: string;
+  stock_count: string;
+  shipping_available: boolean;
+  certifications: string[];
+};
+
 const CATEGORY_OPTIONS = ['coffee', 'textiles', 'food', 'crafts', 'beauty', 'other'] as const;
 const CERTIFICATION_OPTIONS = ['fair-trade', 'organic', 'b-corp', 'handmade'] as const;
+
+const PRODUCT_TEMPLATES: ProductTemplate[] = [
+  {
+    id: 'coffee-kit',
+    label: 'Coffee Starter Kit',
+    subtitle: 'Coffee',
+    title: 'Single-Origin Starter Kit',
+    description: 'Freshly roasted single-origin beans with brew guide and reusable filter.',
+    category: 'coffee',
+    priceRands: '299.00',
+    stock_count: '25',
+    shipping_available: true,
+    certifications: ['fair-trade', 'organic'],
+  },
+  {
+    id: 'artisan-textile',
+    label: 'Artisan Textile',
+    subtitle: 'Textiles',
+    title: 'Handwoven Table Runner',
+    description: 'Locally handwoven textile with natural dyes and premium finishing.',
+    category: 'textiles',
+    priceRands: '420.00',
+    stock_count: '14',
+    shipping_available: true,
+    certifications: ['handmade'],
+  },
+  {
+    id: 'beauty-bundle',
+    label: 'Beauty Bundle',
+    subtitle: 'Beauty',
+    title: 'Botanical Skin Bundle',
+    description: 'Daily cleanser, hydration mist, and moisturizer made with plant-based ingredients.',
+    category: 'beauty',
+    priceRands: '365.00',
+    stock_count: '18',
+    shipping_available: true,
+    certifications: ['organic'],
+  },
+];
 
 const INITIAL_STATE: FormState = {
   title: '',
@@ -63,6 +115,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
   const [successPayload, setSuccessPayload] = useState<SuccessPayload | null>(null);
   const [createdProduct, setCreatedProduct] = useState<MerchantProductApi | null>(null);
   const [copiedField, setCopiedField] = useState<'matter' | 'page' | null>(null);
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!isOpen) {
@@ -77,6 +130,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
       setSuccessPayload(null);
       setCreatedProduct(null);
       setCopiedField(null);
+      setSelectedTemplateId(null);
     }
   }, [isOpen]);
 
@@ -123,6 +177,28 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           : [...prev.certifications, certification],
       };
     });
+  };
+
+  const applyTemplate = (template: ProductTemplate) => {
+    setSelectedTemplateId(template.id);
+    setForm((prev: FormState) => ({
+      ...prev,
+      title: template.title,
+      description: template.description,
+      priceRands: template.priceRands,
+      price_cents: Math.round(Number(template.priceRands) * 100),
+      category: template.category,
+      stock_count: template.stock_count,
+      shipping_available: template.shipping_available,
+      certifications: [...template.certifications],
+    }));
+    setErrors((prev) => ({
+      ...prev,
+      title: undefined,
+      price_cents: undefined,
+      category: undefined,
+      stock_count: undefined,
+    }));
   };
 
   const validate = (): FormErrors => {
@@ -290,6 +366,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     setSuccessPayload(null);
     setCreatedProduct(null);
     setCopiedField(null);
+    setSelectedTemplateId(null);
   };
 
   const handleDone = () => {
@@ -319,7 +396,44 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
         </div>
 
         {step === 'form' ? (
-          <form id="create-product-form" onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 py-4 space-y-4">
+          <form id="create-product-form" onSubmit={handleSubmit} className="overflow-y-auto flex-1 px-6 py-4 space-y-5">
+          <div className="rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] p-4">
+            <div className="mb-3 flex items-center justify-between">
+              <p className="text-sm font-semibold text-[var(--ff-ink)]">Start from a product template</p>
+              <button
+                type="button"
+                onClick={() => setSelectedTemplateId(null)}
+                className="text-xs font-medium text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]"
+              >
+                Clear selection
+              </button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3">
+              {PRODUCT_TEMPLATES.map((template) => {
+                const isActive = selectedTemplateId === template.id;
+                return (
+                  <button
+                    key={template.id}
+                    type="button"
+                    onClick={() => applyTemplate(template)}
+                    className={`rounded-lg border px-3 py-3 text-left transition ${
+                      isActive
+                        ? 'border-emerald-500 bg-emerald-50/70'
+                        : 'border-[var(--ff-border)] bg-white hover:bg-[var(--ff-surface)]'
+                    }`}
+                  >
+                    <p className="text-xs uppercase tracking-[0.12em] text-[var(--ff-ink-muted)]">{template.subtitle}</p>
+                    <p className="mt-1 text-sm font-semibold text-[var(--ff-ink)]">{template.label}</p>
+                    <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">R {template.priceRands}</p>
+                  </button>
+                );
+              })}
+            </div>
+            <p className="mt-3 text-xs text-[var(--ff-ink-muted)]">
+              Templates prefill title, description, category, price, stock, shipping, and certifications. You can still edit every field.
+            </p>
+          </div>
+
           <div>
             <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Title *</label>
             <input
