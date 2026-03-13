@@ -10,6 +10,7 @@ import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { OfflineBanner } from '../../components/shared/OfflineBanner';
 import { formatBytes } from '../../lib/format';
+import { apiBase, adminSecret } from '../../lib/config';
 import { 
   BarChart2, Activity, Users, Store, DollarSign, Settings2, 
   AlertTriangle, Check, X, Clock, Shield, FileCheck, LogOut, RefreshCw,
@@ -49,6 +50,9 @@ interface KYCSubmission {
 
 export const AdminPortal: React.FC = () => {
   const { signOut } = useAuth();
+  const hasConfiguredAdminSecret = Boolean(import.meta.env.VITE_ADMIN_SECRET);
+  const isUsingDefaultAdminSecret = adminSecret === 'mor-admin-secret-local';
+  const showAdminSecretWarning = !hasConfiguredAdminSecret || isUsingDefaultAdminSecret;
   const [activeSection, setActiveSection] = useState<AdminSection>('overview');
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(() => window.innerWidth >= 768);
@@ -109,9 +113,9 @@ export const AdminPortal: React.FC = () => {
   const fetchPendingKYC = async () => {
     setLoadingKYC(true);
     try {
-      const response = await fetch('http://localhost:3000/v1/admin/kyc/pending', {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, {
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local'
+          Authorization: `Bearer ${adminSecret}`
         }
       });
       const data = await response.json();
@@ -138,10 +142,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/v1/admin/kyc/approve/${selectedKYC.id}`, {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/approve/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local',
+          Authorization: `Bearer ${adminSecret}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ notes: approvalNotes })
@@ -166,10 +170,10 @@ export const AdminPortal: React.FC = () => {
     if (!selectedKYC || !rejectionReason.trim()) return;
     
     try {
-      const response = await fetch(`http://localhost:3000/v1/admin/kyc/reject/${selectedKYC.id}`, {
+      const response = await fetch(`${apiBase}/v1/admin/kyc/reject/${selectedKYC.id}`, {
         method: 'PATCH',
         headers: {
-          'Authorization': 'Bearer mor-admin-secret-local',
+          Authorization: `Bearer ${adminSecret}`,
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({ reason: rejectionReason })
@@ -639,6 +643,14 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
         </div>
+
+        {showAdminSecretWarning && (
+          <div className="mx-4 md:mx-6 mt-4 rounded-lg border border-yellow-300 bg-yellow-50 px-4 py-3">
+            <p className="text-sm text-yellow-900">
+              Admin API secret is not configured. Set `VITE_ADMIN_SECRET` to match backend `ADMIN_SECRET_KEY`.
+            </p>
+          </div>
+        )}
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto">

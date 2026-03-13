@@ -49,31 +49,66 @@ type MerchantProductRow = {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const isUuid = (value: unknown): value is string => typeof value === 'string' && UUID_RE.test(value);
 
-const resolveMerchantId = async (c: { req: { header: (name: string) => string | undefined } }, body: Record<string, unknown>): Promise<string | null> => {
-  const bodyMerchantId = body.merchant_id;
-  if (isUuid(bodyMerchantId)) return bodyMerchantId;
+const base64UrlDecode = (value: string): Buffer => {
+  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
+  const pad = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
+  return Buffer.from(`${normalized}${pad}`, 'base64');
+};
 
-  const headerMerchantId = c.req.header('x-merchant-id');
-  if (isUuid(headerMerchantId)) return headerMerchantId;
+const hmacSha256 = (input: string, secret: string): string =>
+  crypto.createHmac('sha256', secret).update(input).digest('base64url');
+
+const verifyJwt = (token: string, secret: string): Record<string, unknown> | null => {
+  const parts = token.split('.');
+  if (parts.length !== 3) return null;
+  const [headerB64, payloadB64, signatureB64] = parts;
+  const signingInput = `${headerB64}.${payloadB64}`;
+  const expected = hmacSha256(signingInput, secret);
+
+  const providedBuf = Buffer.from(signatureB64, 'utf8');
+  const expectedBuf = Buffer.from(expected, 'utf8');
+  if (providedBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(providedBuf, expectedBuf)) {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(base64UrlDecode(payloadB64).toString('utf8')) as Record<string, unknown>;
+    const exp = payload.exp;
+    if (typeof exp === 'number' && Date.now() >= exp * 1000) return null;
+    return payload;
+  } catch {
+    return null;
+  }
+};
+
+const resolveMerchantId = async (c: {
+  req: { header: (name: string) => string | undefined };
+  get?: (key: string) => unknown;
+}): Promise<string | null> => {
+  const scopedMerchantId = c.get?.('merchantId') ?? c.get?.('merchant_id');
+  if (isUuid(scopedMerchantId)) return scopedMerchantId;
 
   const auth = c.req.header('Authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7).trim() : null;
-  if (bearer) {
-    try {
-      const parts = bearer.split('.');
-      if (parts.length === 3) {
-        const payload = JSON.parse(Buffer.from(parts[1].replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString('utf8')) as { sub?: unknown };
-        if (isUuid(payload.sub)) return payload.sub;
-      }
-    } catch {
-      // ignore malformed tokens
-    }
+  if (!bearer) {
+    return null;
   }
+
+  const jwtSecret = process.env.JWT_SECRET;
+  if (!jwtSecret) return null;
+  const payload = verifyJwt(bearer, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') return null;
+
+  const subject = payload.sub;
+  if (isUuid(subject)) return subject;
+
+  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
+  if (!email) return null;
 
   const { data } = await db
     .from('merchant_accounts')
     .select('id')
-    .limit(1)
+    .eq('email', email)
     .maybeSingle();
 
   if (data && isUuid(data.id)) return data.id;
@@ -196,15 +231,26 @@ const enrichProductWithThingFile = (product: MerchantProduct): MerchantProduct =
 export const merchantProductsRouter = new Hono();
 
 /** GET /v1/merchant/products — list products (filtered by merchant when auth present) */
-merchantProductsRouter.get('/', (c) => {
-  return readProducts()
-    .then((products) => {
-      const enriched = products
-        .filter((product) => product.status !== 'archived')
-        .map(enrichProductWithThingFile);
-      return c.json({ products: enriched }, 200);
-    })
-    .catch((error) => c.json(err('storage_error', (error as Error).message), 500));
+merchantProductsRouter.get('/', async (c) => {
+  const merchantId = await resolveMerchantId(c);
+  if (!merchantId) {
+    return c.json(err('unauthorized', 'Unauthorized'), 401);
+  }
+
+  const { data, error } = await db
+    .from('merchant_products')
+    .select('*')
+    .eq('merchant_id', merchantId)
+    .neq('status', 'archived')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    return c.json(err('storage_error', `Failed to load products: ${error.message}`), 500);
+  }
+
+  const rows = (data ?? []) as MerchantProductRow[];
+  const enriched = rows.map((row) => enrichProductWithThingFile(rowToProduct(row)));
+  return c.json({ products: enriched }, 200);
 });
 
 /** POST /v1/merchant/products — create product */
@@ -241,7 +287,7 @@ merchantProductsRouter.post('/', async (c) => {
   const category = typeof (body as Record<string, unknown>).category === 'string'
     ? ((body as Record<string, unknown>).category as string).trim()
     : undefined;
-  const merchantId = await resolveMerchantId(c, body as Record<string, unknown>);
+  const merchantId = await resolveMerchantId(c);
 
   if (!title) {
     return c.json(err('invalid_product', 'title is required'), 400);
@@ -252,7 +298,7 @@ merchantProductsRouter.post('/', async (c) => {
   }
 
   if (!merchantId) {
-    return c.json(err('invalid_product', 'merchant_id is required'), 400);
+    return c.json(err('unauthorized', 'Unauthorized'), 401);
   }
 
   try {
@@ -328,12 +374,18 @@ merchantProductsRouter.post('/', async (c) => {
 
 /** GET /v1/merchant/products/:id — get single product */
 merchantProductsRouter.get('/:id', async (c) => {
+  const merchantId = await resolveMerchantId(c);
+  if (!merchantId) {
+    return c.json(err('unauthorized', 'Unauthorized'), 401);
+  }
+
   const id = c.req.param('id');
 
   const { data, error } = await db
     .from('merchant_products')
     .select('*')
     .eq('id', id)
+    .eq('merchant_id', merchantId)
     .single();
 
   if (error || !data) {
@@ -345,6 +397,11 @@ merchantProductsRouter.get('/:id', async (c) => {
 
 /** PATCH /v1/merchant/products/:id — update product */
 merchantProductsRouter.patch('/:id', async (c) => {
+  const merchantId = await resolveMerchantId(c);
+  if (!merchantId) {
+    return c.json(err('unauthorized', 'Unauthorized'), 401);
+  }
+
   const id = c.req.param('id');
   const body = await c.req.json().catch(() => null);
   if (body === null || typeof body !== 'object') {
@@ -359,6 +416,10 @@ merchantProductsRouter.patch('/:id', async (c) => {
 
   if (existingError || !existingData) {
     return c.json(err('not_found', 'Product not found'), 404);
+  }
+
+  if ((existingData as MerchantProductRow).merchant_id !== merchantId) {
+    return c.json(err('forbidden', 'Forbidden'), 403);
   }
 
   const product = rowToProduct(existingData as MerchantProductRow);
@@ -397,6 +458,7 @@ merchantProductsRouter.patch('/:id', async (c) => {
     .from('merchant_products')
     .update(productToUpsertRow(product))
     .eq('id', id)
+    .eq('merchant_id', merchantId)
     .select('*')
     .single();
 
@@ -409,12 +471,32 @@ merchantProductsRouter.patch('/:id', async (c) => {
 
 /** DELETE /v1/merchant/products/:id */
 merchantProductsRouter.delete('/:id', async (c) => {
+  const merchantId = await resolveMerchantId(c);
+  if (!merchantId) {
+    return c.json(err('unauthorized', 'Unauthorized'), 401);
+  }
+
   const id = c.req.param('id');
+
+  const { data: existingData, error: existingError } = await db
+    .from('merchant_products')
+    .select('merchant_id')
+    .eq('id', id)
+    .single();
+
+  if (existingError || !existingData) {
+    return c.json(err('not_found', 'Product not found'), 404);
+  }
+
+  if ((existingData as { merchant_id: string | null }).merchant_id !== merchantId) {
+    return c.json(err('forbidden', 'Forbidden'), 403);
+  }
 
   const { data, error } = await db
     .from('merchant_products')
     .update({ status: 'archived', updated_at: new Date().toISOString() })
     .eq('id', id)
+    .eq('merchant_id', merchantId)
     .select('id')
     .single();
 

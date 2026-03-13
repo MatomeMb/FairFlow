@@ -103,6 +103,15 @@ if (process.env.NODE_ENV === 'test') {
   delete process.env.SHADOW_INDEX_API_KEYS;
 }
 
+if (
+  process.env.NODE_ENV !== 'test'
+  && !process.env.SHADOW_INDEX_API_KEY
+  && !process.env.SHADOW_INDEX_API_KEYS
+) {
+  console.error('[FATAL] SHADOW_INDEX_API_KEY is required. Refusing to start.');
+  process.exit(1);
+}
+
 // Paystack is lazy-loaded via getPaystack() to reduce cold start
 
 /** Paystack routing stub — ready for Peach Payments later when selectRail() chooses provider. */
@@ -205,10 +214,6 @@ app.use('*', async (c, next) => {
     }
   }
 
-  const hasKeys = process.env.SHADOW_INDEX_API_KEY || process.env.SHADOW_INDEX_API_KEYS;
-  if (!hasKeys) {
-    return next();
-  }
   const headerKey = c.req.header('x-api-key');
   const auth = c.req.header('Authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
@@ -1227,12 +1232,12 @@ const getMerchantIdentity = async (c: { req: { header: (name: string) => string 
 }> => {
   const token = extractBearerToken(c.req.header('Authorization'));
   if (!token) {
-    return { account: null, merchantIds: ['dev-merchant-001', 'default'] };
+    return { account: null, merchantIds: [] };
   }
 
   const payload = verifyJwt(token, jwtSecret);
   if (!payload || payload.typ !== 'merchant_auth') {
-    return { account: null, merchantIds: ['dev-merchant-001', 'default'] };
+    return { account: null, merchantIds: [] };
   }
 
   const subject = typeof payload.sub === 'string' ? payload.sub : null;
@@ -1242,8 +1247,8 @@ const getMerchantIdentity = async (c: { req: { header: (name: string) => string 
     (subject && candidate.id === subject) || (email && candidate.email.toLowerCase() === email)
   ) ?? null;
 
-  const merchantIds = ['dev-merchant-001', 'default'];
-  if (account?.id) merchantIds.unshift(account.id);
+  const merchantIds: string[] = [];
+  if (account?.id) merchantIds.push(account.id);
   return { account, merchantIds };
 };
 
@@ -1782,6 +1787,9 @@ app.post('/v1/merchant/products/:productId/restock', async (c) => {
 
 app.get('/v1/merchant/orders', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
   const orders = await loadOrders();
   const products = await readProducts();
   const filtered = orders
@@ -1853,11 +1861,19 @@ app.patch('/v1/merchant/orders/:id/delivery-date', async (c) => {
 });
 
 app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
   const orderId = c.req.param('orderId');
   const orders = await loadOrders();
   const order = orders.find((candidate) => candidate.id === orderId);
   if (!order) {
     return c.json(err('not_found', 'Order not found'), 404);
+  }
+  if (!order.merchant_id || !merchantIds.includes(order.merchant_id)) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
   }
 
   const now = new Date().toISOString();
@@ -1885,10 +1901,18 @@ app.patch('/v1/merchant/orders/:orderId/fulfill', async (c) => {
 const SLIP_MAX_BYTES = 5 * 1024 * 1024;
 const SLIP_ALLOWED_TYPES = ['application/pdf', 'image/jpeg', 'image/jpg', 'image/png'];
 app.post('/v1/merchant/orders/:orderId/upload-slip', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
   const orderId = c.req.param('orderId');
   const orders = await loadOrders();
   const order = orders.find((o) => o.id === orderId);
   if (!order) return c.json(err('not_found', 'Order not found'), 404);
+  if (!order.merchant_id || !merchantIds.includes(order.merchant_id)) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
 
   const body = await c.req.parseBody();
   const file = body['file'] ?? body['slip'];
@@ -1917,6 +1941,11 @@ app.post('/v1/merchant/orders/:orderId/upload-slip', async (c) => {
 
 // PATCH /v1/merchant/orders/:id/ship - Mark order as shipped (requires shipment_slip_url)
 app.patch('/v1/merchant/orders/:orderId/ship', async (c) => {
+  const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
   const orderId = c.req.param('orderId');
   const body = await c.req.json().catch(() => null) as { shipment_slip_url?: string } | null;
   const slipUrl = body?.shipment_slip_url?.trim();
@@ -1933,6 +1962,9 @@ app.patch('/v1/merchant/orders/:orderId/ship', async (c) => {
   const orders = await loadOrders();
   const order = orders.find((o) => o.id === orderId);
   if (!order) return c.json(err('not_found', 'Order not found'), 404);
+  if (!order.merchant_id || !merchantIds.includes(order.merchant_id)) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
 
   const confirmToken = crypto.randomBytes(24).toString('hex');
   const now = new Date().toISOString();
@@ -2165,20 +2197,17 @@ app.post('/v1/admin/payouts/backfill', async (c) => {
 
 app.get('/v1/merchant/account', async (c) => {
   const { account } = await getMerchantIdentity(c);
-  if (account) {
-    return c.json(sanitizeMerchantAccount(account));
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
   }
-
-  const accounts = await loadMerchantAccounts();
-  const fallback = accounts[0] ?? null;
-  if (!fallback) {
-    return c.json(err('not_found', 'Merchant account not found'), 404);
-  }
-  return c.json(sanitizeMerchantAccount(fallback));
+  return c.json(sanitizeMerchantAccount(account));
 });
 
 app.get('/v1/merchant/payouts', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
   const payouts = await loadPayoutLogs();
   const filtered = payouts.filter((item) => !item.merchant_id || merchantIds.includes(item.merchant_id));
   filtered.sort((a, b) => {
@@ -2196,8 +2225,11 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
   }
 
   const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
   const accounts = await loadMerchantAccounts();
-  const target = account ?? accounts[0];
+  const target = accounts.find((candidate) => candidate.id === account.id);
   if (!target) {
     return c.json(err('not_found', 'Merchant account not found'), 404);
   }
@@ -2241,9 +2273,11 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
 // PATCH /v1/merchant/account/bank - Update bank account details for payouts
 app.patch('/v1/merchant/account/bank', async (c) => {
   const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
   const accounts = await loadMerchantAccounts();
-  const target = account ?? accounts[0];
-  
+  const target = accounts.find((candidate) => candidate.id === account.id);
   if (!target) {
     return c.json(err('not_found', 'Merchant account not found'), 404);
   }
@@ -2470,6 +2504,9 @@ app.patch('/v1/admin/kyc/reject/:merchantId', async (c) => {
 
 app.get('/v1/merchant/notifications', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
+  if (merchantIds.length === 0) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
   const items = await loadNotifications();
   const filtered = items.filter((item) => !item.merchant_id || merchantIds.includes(item.merchant_id));
   filtered.sort((a, b) => {
@@ -2922,6 +2959,10 @@ app.get('/v1/analytics/dashboard', (c) => dashboardHandler(c, {
 
 // Sprint 4 Week 2: Retention policy — manual trigger (POST /v1/admin/retention/run)
 app.post('/v1/admin/retention/run', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
   const eventsDir = getEventsDir();
   const archiveDir = path.join(dataRoot, 'archive');
   const retentionDays = parseInt(process.env.RETENTION_DAYS ?? '90', 10) || 90;
@@ -2991,6 +3032,10 @@ app.post('/v1/admin/cron/release-escrow', async (c) => {
 
 // Sprint 4 Week 3: Cache invalidation (POST /v1/admin/cache/clear)
 app.post('/v1/admin/cache/clear', (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
   invalidateCache();
   const accept = c.req.header('Accept') ?? '';
   const isForm = c.req.header('Content-Type')?.includes('application/x-www-form-urlencoded');
