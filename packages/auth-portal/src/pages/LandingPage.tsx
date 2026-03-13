@@ -308,10 +308,24 @@ export function LandingPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Payments</p>
               <p>Powered by trusted payment infrastructure partners.</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">PAYSTACK</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">VISA</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">MASTERCARD</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">EFT</div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#00c3f7] text-[10px] font-black text-white">P</span>
+                  PAYSTACK
+                </div>
+                <div className="flex items-center justify-center rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-black italic tracking-[0.02em] text-[#1434cb]">
+                  VISA
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="relative inline-flex h-4 w-7 items-center">
+                    <span className="absolute left-0 h-4 w-4 rounded-full bg-[#eb001b]" />
+                    <span className="absolute right-0 h-4 w-4 rounded-full bg-[#f79e1b]" />
+                  </span>
+                  MASTERCARD
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-[#2f855a] text-[10px] font-black text-white">R</span>
+                  EFT
+                </div>
               </div>
               <p className="mt-2">Supported methods: card payments, EFT, and wallet-compatible checkout flows.</p>
             </div>
@@ -320,10 +334,22 @@ export function LandingPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Compliance</p>
               <p>Built with POPIA-aware data handling and audit-friendly merchant workflows.</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">POPIA</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">KYC</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">AML</div>
-                <div className="rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-center text-xs font-semibold text-[var(--ff-ink)]">PRIVACY</div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#1f7a3e] text-[10px] font-black text-[#1f7a3e]">SA</span>
+                  POPIA
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#1f7a3e] text-[10px] font-black text-white">ID</span>
+                  KYC
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#9b2c2c] text-[10px] font-black text-white">A</span>
+                  AML
+                </div>
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                  <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#2b6cb0] text-[10px] font-black text-[#2b6cb0]">P</span>
+                  PRIVACY
+                </div>
               </div>
               <p className="mt-2">KYC and payout controls are integrated for responsible marketplace operations.</p>
             </div>
