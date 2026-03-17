@@ -67,9 +67,15 @@ temp/
 .local/
 local/
 
+<<<<<<< Updated upstream
 # Reports
 reports/
 
 # Experimental / scratch directories (safe to delete)
 otw/
 .venv/
+=======
+# Generated git reporting artifacts
+reports/git/
+.env*.local
+>>>>>>> Stashed changes
