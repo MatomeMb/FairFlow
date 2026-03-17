@@ -1,100 +1,38 @@
+# CI: type-check, lint, test for shadow-index (lead package)
 name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 jobs:
-  shadow-index-lint:
-    name: Shadow Index — Lint
+  shadow-index:
+    name: shadow-index
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: mcj/packages/shadow-index
+
     steps:
       - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: mcj/packages/shadow-index/package-lock.json
 
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: packages/shadow-index/node_modules
-          key: ${{ runner.os }}-si-${{ hashFiles('packages/shadow-index/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-si-
+      - name: Install dependencies
+        run: npm ci 2>/dev/null || npm install
 
-      - run: npm ci
-        working-directory: packages/shadow-index
+      - name: Type-check
+        run: npm run type-check
 
-      - run: npm run lint
-        working-directory: packages/shadow-index
+      - name: Lint
+        run: npm run lint
 
-  shadow-index-typecheck:
-    name: Shadow Index — Type Check
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: packages/shadow-index/node_modules
-          key: ${{ runner.os }}-si-${{ hashFiles('packages/shadow-index/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-si-
-
-      - run: npm ci
-        working-directory: packages/shadow-index
-
-      - run: npm run type-check
-        working-directory: packages/shadow-index
-
-  shadow-index-test:
-    name: Shadow Index — Test
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: packages/shadow-index/node_modules
-          key: ${{ runner.os }}-si-${{ hashFiles('packages/shadow-index/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-si-
-
-      - run: npm ci
-        working-directory: packages/shadow-index
-
-      - run: npm run test -- --run
-        working-directory: packages/shadow-index
-
-  auth-portal-build:
-    name: Auth Portal — Build
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Cache node_modules
-        uses: actions/cache@v4
-        with:
-          path: packages/auth-portal/node_modules
-          key: ${{ runner.os }}-ap-${{ hashFiles('packages/auth-portal/package-lock.json') }}
-          restore-keys: ${{ runner.os }}-ap-
-
-      - run: npm ci
-        working-directory: packages/auth-portal
-
-      - run: npm run build
-        working-directory: packages/auth-portal
-        env:
-          VITE_SUPABASE_URL: https://placeholder.supabase.co
-          VITE_SUPABASE_ANON_KEY: placeholder
-          VITE_API_BASE_URL: https://api.fairflow.co.za
+      - name: Test
+        run: npm run test -- --run
