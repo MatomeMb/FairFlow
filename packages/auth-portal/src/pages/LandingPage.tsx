@@ -90,7 +90,7 @@ export function LandingPage() {
               to="/merchant/register"
               className="rounded-full bg-[var(--ff-accent)] px-5 py-2 text-sm font-semibold text-white transition hover:brightness-95"
             >
-              Become a merchant
+              Start selling
             </Link>
           </div>
 
@@ -129,7 +129,7 @@ export function LandingPage() {
                 className="rounded-lg bg-[var(--ff-accent)] px-3 py-2 text-sm font-semibold text-white"
                 onClick={() => setMobileOpen(false)}
               >
-                Become a merchant
+                Start selling
               </Link>
             </div>
           </div>
@@ -151,13 +151,11 @@ export function LandingPage() {
               className="ff-hero-2 text-4xl leading-[1.05] text-[var(--ff-ink)] sm:text-5xl lg:text-6xl"
               style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600 }}
             >
-              Keep goods in motion,
-              <br />
-              keep value in communities.
+              Getting your goods{" "}
+              <span style={{ color: "var(--ff-accent)" }}>online.</span>
             </h1>
             <p className="ff-hero-3 mt-6 max-w-xl text-base leading-7 text-[var(--ff-ink-muted)] sm:text-lg">
-              Fairflow helps merchants sell with transparent fulfillment, real-time order tracking, and trust-forward checkout.
-              Customers buy with confidence while local businesses move inventory faster.
+              Fairflow helps you to get your products online, sell them and stay connected with your customers.
             </p>
             <div className="ff-hero-4 mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -176,7 +174,10 @@ export function LandingPage() {
               </button>
             </div>
             <p className="ff-hero-5 mt-4 text-sm text-[var(--ff-ink-muted)]">
-              Already have an account? <Link to="/login" className="font-semibold text-[var(--ff-accent)] underline">Sign in</Link>
+              Already have an account?{" "}
+              <Link to="/login" className="font-semibold text-[var(--ff-accent)] underline">
+                Sign in
+              </Link>
             </p>
           </div>
 
@@ -184,22 +185,22 @@ export function LandingPage() {
             <div className="ff-hero-2 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
               <Clock3 size={18} className="mb-2 text-[var(--ff-accent)]" />
               <p className="text-sm font-semibold">Fast order flow</p>
-              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Automated check-ins and ETA updates from order to delivery.</p>
+              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Your customer places an order — you know about it straight away.</p>
             </div>
             <div className="ff-hero-3 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
               <ShieldCheck size={18} className="mb-2 text-[var(--ff-accent)]" />
-              <p className="text-sm font-semibold">Trust by default</p>
-              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Secure customer details, merchant verification, and clear status visibility.</p>
+              <p className="text-sm font-semibold">Safe and trusted</p>
+              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Customer details are secure. Payments are handled properly. No shortcuts.</p>
             </div>
             <div className="ff-hero-4 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
               <BarChart3 size={18} className="mb-2 text-[var(--ff-accent)]" />
-              <p className="text-sm font-semibold">Merchant insight</p>
-              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Track conversion and fulfillment health with practical analytics.</p>
+              <p className="text-sm font-semibold">See what is working</p>
+              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Simple numbers that show you how your business is doing — no jargon.</p>
             </div>
             <div className="ff-hero-5 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
               <HandCoins size={18} className="mb-2 text-[var(--ff-accent)]" />
-              <p className="text-sm font-semibold">Sustainable margin</p>
-              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Move stock efficiently and reduce waste across every order cycle.</p>
+              <p className="text-sm font-semibold">Keep money in your pocket</p>
+              <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Move your stock without waste. Every sale counts.</p>
             </div>
           </div>
         </section>
@@ -210,28 +211,28 @@ export function LandingPage() {
               className="text-3xl sm:text-4xl"
               style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 550 }}
             >
-              How Fairflow works
+              Three simple steps.
             </h2>
             <p className="mt-4 max-w-2xl text-[var(--ff-ink-muted)]">
-              A clean pipeline from listing to confirmed delivery, designed for merchants and buyers who value clarity.
+              From listing your product to getting paid — it all happens in one place.
             </p>
           </RevealSection>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-1">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">1. Publish</p>
-              <h3 className="text-lg font-semibold">Create product flows</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">List inventory with clear details and deliver a branded product page instantly.</p>
+              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">1. List</p>
+              <h3 className="text-lg font-semibold">List your products</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Add what you are selling. Set your price, add a photo, and you are live in minutes.</p>
             </RevealSection>
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-2">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">2. Fulfill</p>
-              <h3 className="text-lg font-semibold">Automate check-ins</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Order status and customer updates stay synchronized with minimal manual work.</p>
+              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">2. Sell</p>
+              <h3 className="text-lg font-semibold">Customers buy from you</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">They pay securely online. No cash, no chasing payments — it just comes to you.</p>
             </RevealSection>
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-3">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">3. Grow</p>
-              <h3 className="text-lg font-semibold">Improve every cycle</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Use reporting trends to tune operations and improve customer confidence.</p>
+              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">3. Connect</p>
+              <h3 className="text-lg font-semibold">Stay in touch</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Know when every order is placed and when it is delivered. Your customers always know what is happening.</p>
             </RevealSection>
           </div>
         </section>
@@ -243,20 +244,29 @@ export function LandingPage() {
                 className="text-3xl sm:text-4xl"
                 style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 550 }}
               >
-                Why teams choose Fairflow
+                Built for people who sell.
               </h2>
               <p className="mt-4 text-[var(--ff-ink-muted)]">
-                We combine practical operations tooling with a buyer experience that feels high-trust and easy to follow.
+                No complicated setup. No confusion. Just tools that work.
               </p>
               <ul className="mt-6 space-y-3 text-sm text-[var(--ff-ink-muted)]">
-                <li className="flex items-start gap-3"><ShieldCheck size={16} className="mt-0.5 text-[var(--ff-accent)]" /> Role-aware access and guardrails built for growing teams.</li>
-                <li className="flex items-start gap-3"><Store size={16} className="mt-0.5 text-[var(--ff-accent)]" /> Merchant-first portal patterns for day-to-day execution.</li>
-                <li className="flex items-start gap-3"><Leaf size={16} className="mt-0.5 text-[var(--ff-accent)]" /> Circular commerce positioning that aligns with modern buyers.</li>
+                <li className="flex items-start gap-3">
+                  <ShieldCheck size={16} className="mt-0.5 text-[var(--ff-accent)]" />
+                  Your customers always know their order is safe.
+                </li>
+                <li className="flex items-start gap-3">
+                  <Store size={16} className="mt-0.5 text-[var(--ff-accent)]" />
+                  Everything you need to run your store in one place.
+                </li>
+                <li className="flex items-start gap-3">
+                  <Leaf size={16} className="mt-0.5 text-[var(--ff-accent)]" />
+                  Sell more, waste less, keep more of what you earn.
+                </li>
               </ul>
             </RevealSection>
 
             <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[linear-gradient(135deg,rgba(216,243,220,0.65),rgba(255,255,255,0.8))] p-7" delayClass="ff-reveal-delay-2">
-              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ff-ink-muted)]">Operator note</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ff-ink-muted)]">Merchant note</p>
               <p className="mt-4 text-lg leading-8 text-[var(--ff-ink)]">
                 "The platform turned order follow-up from scattered messages into one clear timeline. That gave our team back hours each week."
               </p>
@@ -267,12 +277,12 @@ export function LandingPage() {
 
         <section id="merchants" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[var(--ff-navy)] p-8 text-[var(--ff-cream)] sm:p-10">
-            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ff-accent-light)]">Merchant spotlight</p>
+            <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ff-accent-light)]">Get started</p>
             <h2 className="mt-3 text-3xl sm:text-4xl" style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 520 }}>
-              A practical portal for sustainable growth.
+              Ready to start selling?
             </h2>
             <p className="mt-4 max-w-2xl text-sm leading-7 text-[rgba(244,241,235,0.82)] sm:text-base">
-              Run listings, monitor check-ins, and handle customer communication in one consistent workspace.
+              It takes less than 5 minutes to set up your store.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -297,10 +307,9 @@ export function LandingPage() {
           <div className="grid gap-8 text-sm text-[var(--ff-ink-muted)] md:grid-cols-3">
             <div>
               <div className="mb-3 flex items-center gap-3 text-[var(--ff-ink)]">
-                <FairflowLogo markHeight={30} showWordmark={false} style="derivative" />
-                <span className="font-semibold tracking-[0.02em]">fairflow</span>
+                <FairflowLogo markHeight={30} showWordmark variant="light" />
               </div>
-              <p>Professional commerce operations for merchants, teams, and trusted customer journeys.</p>
+              <p>Professional commerce for merchants, teams, and trusted customer journeys.</p>
               <p className="mt-3">Contact: hello@fairflow.co.za</p>
             </div>
 
@@ -357,10 +366,10 @@ export function LandingPage() {
 
           <div className="mt-8 flex flex-col gap-3 border-t border-[var(--ff-border)] pt-4 text-xs text-[var(--ff-ink-muted)] sm:flex-row sm:items-center sm:justify-between">
             <p>© {new Date().getFullYear()} Fairflow. All rights reserved.</p>
-            <p className="inline-flex items-center gap-2">
-              <ShieldCheck size={14} className="text-[var(--ff-accent)]" />
-              Powered by trusted payments and built with compliance-first operations.
-            </p>
+            <div className="flex gap-4">
+              <Link to="/privacy" className="hover:text-[var(--ff-ink)] transition">Privacy</Link>
+              <a href="mailto:hello@fairflow.co.za" className="hover:text-[var(--ff-ink)] transition">Support</a>
+            </div>
           </div>
         </div>
       </footer>
