@@ -160,7 +160,18 @@ export const MerchantPortal: React.FC = () => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
-  const hasApiAuth = Boolean(authToken || import.meta.env.VITE_API_KEY);
+
+  const resolveStoredMerchantToken = () => {
+    if (typeof window === 'undefined') return null;
+    return (
+      sessionStorage.getItem('merchantToken')
+      || sessionStorage.getItem('merchant_token')
+      || localStorage.getItem('merchantToken')
+      || localStorage.getItem('merchant_token')
+    );
+  };
+
+  const hasApiAuth = Boolean(authToken || resolveStoredMerchantToken() || import.meta.env.VITE_API_KEY);
 
   // On mount: pick up token from URL or sessionStorage
   useEffect(() => {
@@ -171,10 +182,16 @@ export const MerchantPortal: React.FC = () => {
     if (urlToken) {
       sessionStorage.setItem('merchantToken', urlToken);
       sessionStorage.setItem('merchant_token', urlToken);
+      localStorage.setItem('merchantToken', urlToken);
+      localStorage.setItem('merchant_token', urlToken);
       setAuthToken(urlToken);
       window.history.replaceState({}, '', '/dashboard/merchant');
     } else {
-      const existingToken = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
+      const existingToken = resolveStoredMerchantToken();
+      if (existingToken) {
+        sessionStorage.setItem('merchantToken', existingToken);
+        sessionStorage.setItem('merchant_token', existingToken);
+      }
       setAuthToken(existingToken);
     }
 
@@ -195,7 +212,7 @@ export const MerchantPortal: React.FC = () => {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       const fromUrl = new URLSearchParams(window.location.search).get('token');
-      const fromStorage = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
+      const fromStorage = resolveStoredMerchantToken();
       if (!fromUrl && !fromStorage && !authToken && !import.meta.env.VITE_API_KEY) {
         window.location.href = '/merchant/login';
       }
@@ -213,8 +230,9 @@ export const MerchantPortal: React.FC = () => {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
     };
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
+    const resolvedToken = authToken || resolveStoredMerchantToken();
+    if (resolvedToken) {
+      headers['Authorization'] = `Bearer ${resolvedToken}`;
     }
     if (import.meta.env.VITE_API_KEY) {
       headers['x-api-key'] = import.meta.env.VITE_API_KEY;

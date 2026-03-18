@@ -15,6 +15,8 @@ export function MerchantPortalGuard({ children }: MerchantPortalGuardProps) {
     (new URLSearchParams(window.location.search).get("token") ||
       sessionStorage.getItem("merchantToken") ||
       sessionStorage.getItem("merchant_token") ||
+      localStorage.getItem("merchantToken") ||
+      localStorage.getItem("merchant_token") ||
       import.meta.env.VITE_API_KEY);
 
   if (hasToken) {
