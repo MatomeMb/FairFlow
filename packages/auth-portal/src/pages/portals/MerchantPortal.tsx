@@ -8,11 +8,15 @@ import { EmptyState } from '../../components/shared/EmptyState';
 import CreateProductModal from '../../components/CreateProductModal';
 import { type KycSubmitPayload } from '../../components/KYCForm';
 import { Package, Bell } from 'lucide-react';
-import type { MerchantProductApi, MerchantOrder, MerchantNotification, MerchantAccount, PayoutLog } from '../../types/merchant';
+import type { MerchantOrder, MerchantNotification, MerchantAccount, PayoutLog } from '../../types/merchant';
 import { MerchantOrders } from './merchant/MerchantOrders';
 import { MerchantNotifications } from './merchant/MerchantNotifications';
 import { MerchantKYCPayouts } from './merchant/MerchantKYCPayouts';
 import { apiBase } from '../../lib/config';
+import { useMerchantAuthToken } from '../../features/merchant-portal/hooks/useMerchantAuthToken';
+import { useMerchantProducts } from '../../features/merchant-portal/hooks/useMerchantProducts';
+import { useMerchantOrders } from '../../features/merchant-portal/hooks/useMerchantOrders';
+import { useMerchantAnalytics } from '../../features/merchant-portal/hooks/useMerchantAnalytics';
 import {
   Area,
   AreaChart,
@@ -24,23 +28,6 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-
-interface Product {
-  id: string;
-  name: string;
-  category: string;
-  price: number;
-  status: 'Active' | 'Pending' | 'Inactive';
-  stock: number;
-  sales: number;
-  ethicalScore: number;
-  matterUri?: string;
-  thingUrl?: string;
-  hash?: string;
-}
-
-type ReportRowDay = { date: string; views: number; clicks: number };
-type ReportRowHash = { hash: string; views: number; clicks: number };
 
 type Tab = 'products' | 'analytics' | 'orders' | 'notifications' | 'kyc-payouts' | 'account';
 
@@ -90,21 +77,32 @@ export const MerchantPortal: React.FC = () => {
       setLogoStyle(storedStyle);
     }
   }, []);
-  const [products, setProducts] = useState<Product[]>([]);
+  const { token: authToken, merchantFetch } = useMerchantAuthToken();
+  const {
+    products,
+    isLoadingProducts,
+    loadProducts,
+    handleDeleteProduct,
+    handleRestockProduct: restockProduct,
+  } = useMerchantProducts(authToken, merchantFetch);
+  const {
+    orders,
+    isLoadingOrders,
+    loadOrders,
+    fulfillOrder,
+    uploadSlip,
+    markAsShipped,
+    fulfillingOrderId,
+    uploadingSlipOrderId,
+    updateOrder,
+  } = useMerchantOrders(authToken, merchantFetch);
+  const { analytics, isLoadingAnalytics, loadAnalytics } = useMerchantAnalytics(authToken, merchantFetch, products);
+
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const [productsLoading, setProductsLoading] = useState(false);
   const [productsError, setProductsError] = useState<string | null>(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState(false);
   const [analyticsError, setAnalyticsError] = useState<string | null>(null);
-  const [reportByDay, setReportByDay] = useState<ReportRowDay[]>([]);
-  const [reportByHash, setReportByHash] = useState<ReportRowHash[]>([]);
-  const [analyticsSummary, setAnalyticsSummary] = useState({ totalViews: 0, totalClicks: 0 });
-  const [orders, setOrders] = useState<MerchantOrder[]>([]);
-  const [ordersLoading, setOrdersLoading] = useState(false);
   const [ordersError, setOrdersError] = useState<string | null>(null);
-  const [fulfillingOrderId, setFulfillingOrderId] = useState<string | null>(null);
-  const [uploadingSlipOrderId, setUploadingSlipOrderId] = useState<string | null>(null);
   const [notifications, setNotifications] = useState<MerchantNotification[]>([]);
   const [notificationsLoading, setNotificationsLoading] = useState(false);
   const [notificationsError, setNotificationsError] = useState<string | null>(null);
@@ -145,7 +143,6 @@ export const MerchantPortal: React.FC = () => {
     branchCode: ''
   });
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
-  const [authToken, setAuthToken] = useState<string | null>(null);
 
   const tabs = [
     { id: 'products', label: 'My Products' },
@@ -162,21 +159,9 @@ export const MerchantPortal: React.FC = () => {
   };
   const hasApiAuth = Boolean(authToken || import.meta.env.VITE_API_KEY);
 
-  // On mount: pick up token from URL or sessionStorage
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get('token');
     const urlError = params.get('error');
-
-    if (urlToken) {
-      sessionStorage.setItem('merchantToken', urlToken);
-      sessionStorage.setItem('merchant_token', urlToken);
-      setAuthToken(urlToken);
-      window.history.replaceState({}, '', '/dashboard/merchant');
-    } else {
-      const existingToken = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
-      setAuthToken(existingToken);
-    }
 
     if (urlError) {
       const messages: Record<string, string> = {
@@ -209,19 +194,6 @@ export const MerchantPortal: React.FC = () => {
     }
   }, [merchantAccount?.kyc_status, products.length]);
 
-  const merchantFetch = (url: string, options: RequestInit = {}) => {
-    const headers: Record<string, string> = {
-      ...(options.headers as Record<string, string> | undefined),
-    };
-    if (authToken) {
-      headers['Authorization'] = `Bearer ${authToken}`;
-    }
-    if (import.meta.env.VITE_API_KEY) {
-      headers['x-api-key'] = import.meta.env.VITE_API_KEY;
-    }
-    return fetch(url, { ...options, headers });
-  };
-
   const apiError = async (res: Response, fallback: string): Promise<string> => {
     const text = await res.text();
     let detail = res.status === 401 ? 'Unauthorized (check token or API key)' : fallback;
@@ -234,129 +206,52 @@ export const MerchantPortal: React.FC = () => {
     return `${detail} (${res.status})`;
   };
 
-  const mapProduct = (product: MerchantProductApi): Product => {
-    const statusMap: Record<MerchantProductApi['status'], Product['status']> = {
-      published: 'Active',
-      draft: 'Pending',
-      archived: 'Inactive',
-    };
-
-    return {
-      id: product.id,
-      name: product.title,
-      category: product.category ?? 'Uncategorized',
-      price: product.price_cents / 100,
-      stock: product.stock_count,
-      status: statusMap[product.status],
-      sales: 0,
-      ethicalScore: 0,
-      matterUri: product.thing_file?.matter_uri,
-      thingUrl: product.thing_file?.thing_url,
-      hash: product.thing_file?.hash,
-    };
-  };
-
-  const fetchMerchantProducts = useCallback(async () => {
-    setProductsLoading(true);
+  const loadProductsWithError = useCallback(async () => {
     setProductsError(null);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/products`, {
-        headers: { Accept: 'application/json', 'x-merchant-id': 'dev-merchant-001' },
-      });
-      if (!res.ok) {
-        throw new Error(await apiError(res, 'Failed to load products'));
-      }
-      const data = await res.json();
-      const list = Array.isArray(data) ? data : (data.products || []);
-      setProducts(list.map(mapProduct));
+      await loadProducts();
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load products';
       setProductsError(msg);
-    } finally {
-      setProductsLoading(false);
     }
-  }, [apiBase]);
+  }, [loadProducts]);
 
-  const fetchAnalytics = useCallback(async () => {
-    const formatDate = (date: Date) => date.toISOString().slice(0, 10);
-    const to = new Date();
-    const from = new Date();
-    from.setDate(to.getDate() - 29);
-
-    setAnalyticsLoading(true);
+  const loadAnalyticsWithError = useCallback(async () => {
     setAnalyticsError(null);
     try {
-      const params = `from=${formatDate(from)}&to=${formatDate(to)}&limit=1000`;
-      const [dayRes, hashRes] = await Promise.all([
-        merchantFetch(`${apiBase}/v1/analytics/report?${params}&groupBy=day&sortBy=date`, {
-          headers: { Accept: 'application/json' },
-        }),
-        merchantFetch(`${apiBase}/v1/analytics/report?${params}&groupBy=hash&sortBy=clicks`, {
-          headers: { Accept: 'application/json' },
-        }),
-      ]);
-
-      if (!dayRes.ok || !hashRes.ok) {
-        const [dayErr, hashErr] = await Promise.all([
-          dayRes.ok ? Promise.resolve('') : apiError(dayRes, 'Failed to load analytics'),
-          hashRes.ok ? Promise.resolve('') : apiError(hashRes, 'Failed to load analytics'),
-        ]);
-        throw new Error(dayErr || hashErr || 'Failed to load analytics');
-      }
-
-      const dayData = await dayRes.json();
-      const hashData = await hashRes.json();
-
-      setReportByDay(dayData.rows || []);
-      setReportByHash(hashData.rows || []);
-      setAnalyticsSummary({
-        totalViews: dayData.summary?.totalViews ?? 0,
-        totalClicks: dayData.summary?.totalClicks ?? 0,
-      });
+      await loadAnalytics();
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load analytics';
       setAnalyticsError(msg);
-    } finally {
-      setAnalyticsLoading(false);
     }
-  }, [apiBase]);
+  }, [loadAnalytics]);
 
-  useEffect(() => {
-    if (activeTab !== 'analytics') return;
-    fetchAnalytics();
-  }, [activeTab]);
-
-  const fetchMerchantOrders = useCallback(async () => {
-    setOrdersLoading(true);
+  const loadOrdersWithError = useCallback(async () => {
     setOrdersError(null);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/orders`, {
-        headers: { Accept: 'application/json' },
-      });
-      if (!res.ok) {
-        throw new Error(await apiError(res, 'Failed to load orders'));
-      }
-      const data = await res.json();
-      setOrders(data.orders || []);
+      await loadOrders();
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load orders';
       setOrdersError(msg);
-    } finally {
-      setOrdersLoading(false);
     }
-  }, [apiBase]);
+  }, [loadOrders]);
+
+  useEffect(() => {
+    if (activeTab !== 'analytics') return;
+    void loadAnalyticsWithError();
+  }, [activeTab, loadAnalyticsWithError]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
     if (activeTab !== 'orders' && activeTab !== 'products') return;
-    fetchMerchantOrders();
-  }, [activeTab, fetchMerchantOrders, hasApiAuth]);
+    void loadOrdersWithError();
+  }, [activeTab, hasApiAuth, loadOrdersWithError]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
     if (activeTab !== 'products' && activeTab !== 'analytics') return;
-    fetchMerchantProducts();
-  }, [activeTab, fetchMerchantProducts, hasApiAuth]);
+    void loadProductsWithError();
+  }, [activeTab, hasApiAuth, loadProductsWithError]);
 
   const fetchMerchantAccount = useCallback(async () => {
     setAccountLoading(true);
@@ -526,97 +421,41 @@ export const MerchantPortal: React.FC = () => {
   }, [activeTab, markAllNotificationsRead]);
 
   const handleMarkAsFulfilled = async (orderId: string) => {
-    setFulfillingOrderId(orderId);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/orders/${orderId}/fulfill`, {
-        method: 'PATCH',
-        headers: { Accept: 'application/json' },
-      });
-      if (!res.ok) {
-        throw new Error('Failed to mark order as fulfilled');
-      }
-      const data = await res.json();
-      if (data.ok && data.order) {
-        setOrders((prev) => prev.map((order) => (order.id === orderId ? data.order : order)));
-        showToast('Order marked as fulfilled', 'success');
-      }
+      await fulfillOrder(orderId);
+      showToast('Order marked as fulfilled', 'success');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to mark order as fulfilled';
       setOrdersError(msg);
       showToast(msg, 'error');
-    } finally {
-      setFulfillingOrderId(null);
     }
   };
 
   const handleUploadSlip = async (orderId: string, file: File) => {
-    setUploadingSlipOrderId(orderId);
     try {
-      const formData = new FormData();
-      formData.append('file', file);
-      const res = await merchantFetch(`${apiBase}/v1/merchant/orders/${orderId}/upload-slip`, {
-        method: 'POST',
-        body: formData,
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.message || 'Failed to upload slip');
-      }
-      const data = await res.json();
-      if (data.slip_url) {
-        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, shipment_slip_url: data.slip_url } : o)));
-        showToast('Shipment slip uploaded', 'success');
-      }
+      const slipUrl = await uploadSlip(orderId, file);
+      if (slipUrl) showToast('Shipment slip uploaded', 'success');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to upload slip';
       showToast(msg, 'error');
-    } finally {
-      setUploadingSlipOrderId(null);
     }
   };
 
   const handleMarkAsShipped = async (orderId: string, slipUrl: string) => {
-    setFulfillingOrderId(orderId);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/orders/${orderId}/ship`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ shipment_slip_url: slipUrl }),
-      });
-      if (!res.ok) {
-        const errData = await res.json().catch(() => ({}));
-        throw new Error(errData?.message || 'Failed to mark as shipped');
-      }
-      const data = await res.json();
-      if (data.ok && data.order) {
-        setOrders((prev) => prev.map((o) => (o.id === orderId ? data.order : o)));
-        showToast('Order marked as shipped', 'success');
-      }
+      await markAsShipped(orderId, slipUrl);
+      showToast('Order marked as shipped', 'success');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to mark as shipped';
       setOrdersError(msg);
       showToast(msg, 'error');
-    } finally {
-      setFulfillingOrderId(null);
     }
   };
 
   const handleRestockProduct = useCallback(async (productId: string) => {
     setRestockingProductId(productId);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/products/${productId}/restock`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({ quantity: 10 }),
-      });
-      if (!res.ok) {
-        throw new Error('Failed to restock product');
-      }
-      const data = await res.json();
-      const nextStock = typeof data.stock_count === 'number' ? data.stock_count : null;
-      if (nextStock !== null) {
-        setProducts((prev) => prev.map((product) => (product.id === productId ? { ...product, stock: nextStock } : product)));
-      }
+      await restockProduct(productId);
       showToast('Stock increased by 10 units', 'success');
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to restock product';
@@ -624,7 +463,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setRestockingProductId(null);
     }
-  }, [apiBase]);
+  }, [restockProduct]);
 
   const handleCopyMatter = async (productId: string, value?: string) => {
     if (!value) return;
@@ -650,13 +489,7 @@ export const MerchantPortal: React.FC = () => {
 
   const handleRemoveProduct = async (id: string) => {
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/products/${id}`, { method: 'DELETE' });
-      if (!res.ok) {
-        const msg = await apiError(res, 'Failed to remove product');
-        showToast(msg, 'error');
-        return;
-      }
-      setProducts(products.filter(p => p.id !== id));
+      await handleDeleteProduct(id);
       showToast('Product removed', 'success');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Failed to remove product', 'error');
@@ -672,53 +505,7 @@ export const MerchantPortal: React.FC = () => {
       : (products.reduce((sum, p) => sum + p.ethicalScore, 0) / products.length).toFixed(1)
   }), [products]);
 
-  const analyticsSnapshot = useMemo(() => {
-    const productByHash = new Map(
-      products.filter((p) => p.hash).map((p) => [p.hash as string, p])
-    );
-
-    const engagementTrend = reportByDay.map((row) => ({
-      label: row.date,
-      views: row.views,
-      clicks: row.clicks,
-    }));
-
-    const topProductsFromEvents = reportByHash.slice(0, 6).map((row) => {
-      const product = productByHash.get(row.hash);
-      return {
-        name: product?.name ?? `${row.hash.slice(0, 8)}...`,
-        views: row.views,
-        clicks: row.clicks,
-        stock: product?.stock ?? 0,
-        category: product?.category ?? 'Uncategorized',
-      };
-    });
-
-    const fallbackProducts = products.slice(0, 6).map((product) => ({
-      name: product.name,
-      views: 0,
-      clicks: 0,
-      stock: product.stock,
-      category: product.category,
-    }));
-
-    const topProducts = topProductsFromEvents.length > 0 ? topProductsFromEvents : fallbackProducts;
-
-    const categoryEngagement = Array.from(
-      topProducts.reduce((acc, item) => {
-        const current = acc.get(item.category) ?? 0;
-        acc.set(item.category, current + item.clicks);
-        return acc;
-      }, new Map<string, number>())
-    ).map(([category, clicks]) => ({ category, clicks }));
-
-    const funnel = [
-      { stage: 'Views', count: analyticsSummary.totalViews },
-      { stage: 'Checkout Clicks', count: analyticsSummary.totalClicks },
-    ];
-
-    return { engagementTrend, categoryEngagement, topProducts, funnel };
-  }, [products, reportByDay, reportByHash, analyticsSummary.totalViews, analyticsSummary.totalClicks]);
+  const analyticsSnapshot = analytics.viewModel;
 
   const renderMyProducts = () => {
     const lowStockProducts = products.filter((product) => product.stock < 5);
@@ -734,7 +521,7 @@ export const MerchantPortal: React.FC = () => {
         {accountError && <ErrorBanner message={accountError} onDismiss={() => setAccountError(null)} />}
         {productsError && <ErrorBanner message={productsError} onDismiss={() => setProductsError(null)} />}
 
-        {(ordersLoading || accountLoading || productsLoading) && <InlineSpinner label="Loading dashboard data..." />}
+        {(isLoadingOrders || accountLoading || isLoadingProducts) && <InlineSpinner label="Loading dashboard data..." />}
 
         {merchantAccount?.kyc_status !== 'approved' && (
           <div className="rounded-xl border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-4 text-sm text-[var(--ff-warning-bold)]">
@@ -853,7 +640,7 @@ export const MerchantPortal: React.FC = () => {
           </div>
         </div>
 
-        {productsLoading ? (
+        {isLoadingProducts ? (
           <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
               <thead className="bg-[var(--ff-neutral-subtle)]">
@@ -986,12 +773,12 @@ export const MerchantPortal: React.FC = () => {
       {analyticsError && (
         <ErrorBanner message={analyticsError} onDismiss={() => setAnalyticsError(null)} />
       )}
-      {analyticsLoading && (
+      {isLoadingAnalytics && (
         <InlineSpinner label="Loading analytics..." />
       )}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <MetricCard label="Total Views" value={analyticsSummary.totalViews.toLocaleString()} color="green" />
-        <MetricCard label="Checkout Clicks" value={analyticsSummary.totalClicks.toLocaleString()} color="blue" />
+        <MetricCard label="Total Views" value={analytics.summary.totalViews.toLocaleString()} color="green" />
+        <MetricCard label="Checkout Clicks" value={analytics.summary.totalClicks.toLocaleString()} color="blue" />
         <MetricCard label="Active Products" value={stats.active} color="blue" />
         <MetricCard label="Total Inventory" value={products.reduce((sum, p) => sum + p.stock, 0)} unit="units" color="amber" />
       </div>
@@ -1137,7 +924,7 @@ export const MerchantPortal: React.FC = () => {
   const renderOrders = () => (
     <MerchantOrders
       orders={orders}
-      ordersLoading={ordersLoading}
+      ordersLoading={isLoadingOrders}
       ordersError={ordersError}
       fulfillingOrderId={fulfillingOrderId}
       uploadingSlipOrderId={uploadingSlipOrderId}
@@ -1146,9 +933,7 @@ export const MerchantPortal: React.FC = () => {
       onMarkAsFulfilled={handleMarkAsFulfilled}
       onUploadSlip={handleUploadSlip}
       onMarkAsShipped={handleMarkAsShipped}
-      onDeliveryDateSaved={(orderId, date) => {
-        setOrders((prev) => prev.map((o) => (o.id === orderId ? { ...o, estimated_delivery_date: date } : o)));
-      }}
+      onDeliveryDateSaved={(orderId, date) => updateOrder(orderId, { estimated_delivery_date: date })}
       getPayoutStatusLabel={getPayoutStatusLabel}
       apiBase={apiBase}
       authToken={authToken}
@@ -1413,7 +1198,7 @@ export const MerchantPortal: React.FC = () => {
           } else {
             showToast('Product created', 'success');
           }
-          fetchMerchantProducts();
+          void loadProductsWithError();
         }}
       />
 

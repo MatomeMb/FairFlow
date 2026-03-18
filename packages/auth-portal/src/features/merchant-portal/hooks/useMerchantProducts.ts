@@ -49,7 +49,10 @@ async function apiError(res: Response, fallback: string): Promise<string> {
   }
 }
 
-export function useMerchantProducts(merchantFetch: (url: string, options?: RequestInit) => Promise<Response>) {
+export function useMerchantProducts(
+  token: string | null,
+  merchantFetch: (url: string, options?: RequestInit) => Promise<Response>
+) {
   const [products, setProducts] = useState<MerchantPortalProduct[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
 
@@ -66,13 +69,13 @@ export function useMerchantProducts(merchantFetch: (url: string, options?: Reque
     } finally {
       setIsLoadingProducts(false);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const handleDeleteProduct = useCallback(async (productId: string) => {
     const res = await merchantFetch(`${apiBase}/v1/merchant/products/${productId}`, { method: 'DELETE' });
     if (!res.ok) throw new Error(await apiError(res, 'Failed to remove product'));
     setProducts((prev) => prev.filter((product) => product.id !== productId));
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const handleRestockProduct = useCallback(async (productId: string) => {
     const res = await merchantFetch(`${apiBase}/v1/merchant/products/${productId}/restock`, {
@@ -85,7 +88,7 @@ export function useMerchantProducts(merchantFetch: (url: string, options?: Reque
     const nextStock = typeof data.stock_count === 'number' ? data.stock_count : null;
     if (nextStock === null) return;
     setProducts((prev) => prev.map((product) => (product.id === productId ? { ...product, stock: nextStock } : product)));
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   return { products, isLoadingProducts, loadProducts, handleDeleteProduct, handleRestockProduct };
 }

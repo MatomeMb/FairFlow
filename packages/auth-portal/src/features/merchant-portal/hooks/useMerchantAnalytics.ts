@@ -28,6 +28,7 @@ async function apiError(res: Response, fallback: string): Promise<string> {
 }
 
 export function useMerchantAnalytics(
+  token: string | null,
   merchantFetch: (url: string, options?: RequestInit) => Promise<Response>,
   products: MerchantPortalProduct[]
 ) {
@@ -66,7 +67,7 @@ export function useMerchantAnalytics(
     } finally {
       setIsLoadingAnalytics(false);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const analytics = useMemo<AnalyticsState>(() => {
     const productsByHash = new Map(products.filter((p) => p.hash).map((p) => [p.hash as string, p]));

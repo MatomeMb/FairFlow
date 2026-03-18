@@ -13,7 +13,10 @@ async function apiError(res: Response, fallback: string): Promise<string> {
   }
 }
 
-export function useMerchantOrders(merchantFetch: (url: string, options?: RequestInit) => Promise<Response>) {
+export function useMerchantOrders(
+  token: string | null,
+  merchantFetch: (url: string, options?: RequestInit) => Promise<Response>
+) {
   const [orders, setOrders] = useState<MerchantOrder[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
   const [fulfillingOrderId, setFulfillingOrderId] = useState<string | null>(null);
@@ -29,7 +32,7 @@ export function useMerchantOrders(merchantFetch: (url: string, options?: Request
     } finally {
       setIsLoadingOrders(false);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const fulfillOrder = useCallback(async (orderId: string) => {
     setFulfillingOrderId(orderId);
@@ -44,7 +47,7 @@ export function useMerchantOrders(merchantFetch: (url: string, options?: Request
     } finally {
       setFulfillingOrderId(null);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const uploadSlip = useCallback(async (orderId: string, file: File) => {
     setUploadingSlipOrderId(orderId);
@@ -64,7 +67,7 @@ export function useMerchantOrders(merchantFetch: (url: string, options?: Request
     } finally {
       setUploadingSlipOrderId(null);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
   const markAsShipped = useCallback(async (orderId: string, slipUrl: string) => {
     setFulfillingOrderId(orderId);
@@ -80,7 +83,21 @@ export function useMerchantOrders(merchantFetch: (url: string, options?: Request
     } finally {
       setFulfillingOrderId(null);
     }
-  }, [merchantFetch]);
+  }, [merchantFetch, token]);
 
-  return { orders, isLoadingOrders, loadOrders, fulfillOrder, uploadSlip, markAsShipped, fulfillingOrderId, uploadingSlipOrderId };
+  const updateOrder = useCallback((orderId: string, patch: Partial<MerchantOrder>) => {
+    setOrders((prev) => prev.map((order) => (order.id === orderId ? { ...order, ...patch } : order)));
+  }, []);
+
+  return {
+    orders,
+    isLoadingOrders,
+    loadOrders,
+    fulfillOrder,
+    uploadSlip,
+    markAsShipped,
+    fulfillingOrderId,
+    uploadingSlipOrderId,
+    updateOrder,
+  };
 }
