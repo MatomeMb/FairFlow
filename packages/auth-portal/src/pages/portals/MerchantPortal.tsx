@@ -2,12 +2,10 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { TabShell } from '../../components/layout/TabShell';
 import { FairflowLogo, type LogoStyle, LOGO_STYLES } from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
-import { MetricCard } from '../../components/shared/MetricCard';
 import { Toast } from '../../components/shared/Toast';
-import { EmptyState } from '../../components/shared/EmptyState';
 import CreateProductModal from '../../components/CreateProductModal';
 import { type KycSubmitPayload } from '../../components/KYCForm';
-import { Package, Bell } from 'lucide-react';
+import { Bell } from 'lucide-react';
 import type { MerchantOrder, MerchantNotification, MerchantAccount, PayoutLog } from '../../types/merchant';
 import { MerchantOrders } from './merchant/MerchantOrders';
 import { MerchantNotifications } from './merchant/MerchantNotifications';
@@ -17,17 +15,9 @@ import { useMerchantAuthToken } from '../../features/merchant-portal/hooks/useMe
 import { useMerchantProducts } from '../../features/merchant-portal/hooks/useMerchantProducts';
 import { useMerchantOrders } from '../../features/merchant-portal/hooks/useMerchantOrders';
 import { useMerchantAnalytics } from '../../features/merchant-portal/hooks/useMerchantAnalytics';
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from 'recharts';
+import { MerchantProductsSection } from '../../features/merchant-portal/components/MerchantProductsSection';
+import { MerchantAnalyticsSection } from '../../features/merchant-portal/components/MerchantAnalyticsSection';
+import { MerchantAccountSection, type BusinessProfile } from '../../features/merchant-portal/components/MerchantAccountSection';
 
 type Tab = 'products' | 'analytics' | 'orders' | 'notifications' | 'kyc-payouts' | 'account';
 
@@ -130,7 +120,7 @@ export const MerchantPortal: React.FC = () => {
       account_type: 'cheque',
     },
   });
-  const [businessProfile, setBusinessProfile] = useState({
+  const [businessProfile, setBusinessProfile] = useState<BusinessProfile>({
     businessName: 'Ethical Threads SA',
     contactEmail: 'contact@ethicalthreads.co.za',
     phone: '+27 21 555 1234',
@@ -496,6 +486,45 @@ export const MerchantPortal: React.FC = () => {
     }
   };
 
+  const handleBusinessProfileChange = useCallback((updates: Partial<BusinessProfile>) => {
+    setBusinessProfile((prev) => ({ ...prev, ...updates }));
+  }, []);
+
+  const handleSaveBusinessProfile = useCallback(() => {
+    showToast('Changes saved', 'success');
+  }, []);
+
+  const handleUpdateBankDetails = useCallback(async () => {
+    if (!businessProfile.accountHolderName || !businessProfile.accountNumber || !businessProfile.branchCode || !businessProfile.bankName) {
+      showToast('Please fill in all bank account fields', 'error');
+      return;
+    }
+
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/account/bank`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          account_name: businessProfile.accountHolderName,
+          account_number: businessProfile.accountNumber,
+          branch_code: businessProfile.branchCode,
+          bank_name: businessProfile.bankName,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.message || 'Failed to update bank account', 'error');
+        return;
+      }
+      setMerchantAccount(data.account);
+      showToast('Bank account updated successfully', 'success');
+    } catch (error) {
+      showToast(`Error: ${error instanceof Error ? error.message : 'Failed to update'}`, 'error');
+    }
+  }, [businessProfile, merchantFetch]);
+
   const stats = useMemo(() => ({
     active: products.filter(p => p.status === 'Active').length,
     pending: products.filter(p => p.status === 'Pending').length,
@@ -506,406 +535,6 @@ export const MerchantPortal: React.FC = () => {
   }), [products]);
 
   const analyticsSnapshot = analytics.viewModel;
-
-  const renderMyProducts = () => {
-    const lowStockProducts = products.filter((product) => product.stock < 5);
-    const recentOrders = orders.slice(0, 3);
-    const onboardingKycStatus = merchantAccount?.kyc_status;
-    const shouldShowOnboardingBanner =
-      showOnboardingBanner && products.length === 0;
-
-    return (
-      <div className="space-y-6">
-        {analyticsError && <ErrorBanner message={analyticsError} onDismiss={() => setAnalyticsError(null)} />}
-        {ordersError && <ErrorBanner message={ordersError} onDismiss={() => setOrdersError(null)} />}
-        {accountError && <ErrorBanner message={accountError} onDismiss={() => setAccountError(null)} />}
-        {productsError && <ErrorBanner message={productsError} onDismiss={() => setProductsError(null)} />}
-
-        {(isLoadingOrders || accountLoading || isLoadingProducts) && <InlineSpinner label="Loading dashboard data..." />}
-
-        {merchantAccount?.kyc_status !== 'approved' && (
-          <div className="rounded-xl border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-4 text-sm text-[var(--ff-warning-bold)]">
-            <p className="font-semibold">KYC is not approved yet.</p>
-            <p className="mt-1 text-[var(--ff-warning-bold)]">Complete KYC in the KYC & Payouts tab to unlock full payout processing.</p>
-          </div>
-        )}
-
-        {shouldShowOnboardingBanner && (
-          <div className="rounded-lg border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-5">
-            <div className="flex items-start justify-between">
-              <div>
-                <h3 className="font-semibold text-[var(--ff-warning)]">Welcome — let's get you set up</h3>
-                <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">
-                  Complete these three steps to start selling.
-                </p>
-              </div>
-              <button
-                onClick={() => setShowOnboardingBanner(false)}
-                className="text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]"
-              >
-                ✕
-              </button>
-            </div>
-            <div className="mt-4 space-y-3">
-              {[
-                {
-                  done: products.length > 0,
-                  label: 'Create your first product',
-                  action: () => setShowCreateModal(true),
-                  cta: 'Create product',
-                },
-                {
-                  done: onboardingKycStatus === 'pending' || onboardingKycStatus === 'approved',
-                  label: 'Submit KYC verification',
-                  action: () => setActiveTab('kyc-payouts'),
-                  cta: 'Start KYC',
-                },
-                {
-                  done: merchantAccount?.bank_account != null,
-                  label: 'Add your bank account for payouts',
-                  action: () => setActiveTab('kyc-payouts'),
-                  cta: 'Add bank account',
-                },
-              ].map((step, i) => (
-                <div key={i} className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                      step.done ? 'bg-[var(--ff-success)] text-[var(--ff-neutral)]' : 'bg-[var(--ff-neutral-subtle)] text-[var(--ff-ink-muted)]'
-                    }`}>
-                      {step.done ? '✓' : i + 1}
-                    </span>
-                    <span className={`text-sm ${step.done ? 'text-[var(--ff-ink-muted)] line-through' : 'text-[var(--ff-ink)]'}`}>
-                      {step.label}
-                    </span>
-                  </div>
-                  {!step.done && (
-                    <button
-                      onClick={step.action}
-                      className="text-xs text-[var(--ff-warning)] hover:text-[var(--ff-warning-bold)] underline"
-                    >
-                      {step.cta} →
-                    </button>
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <MetricCard label="Active Products" value={stats.active} color="green" />
-          <MetricCard label="Pending Review" value={stats.pending} color="amber" />
-          <MetricCard label="Pending Payout" value={`R ${((merchantAccount?.pending_payout ?? 0) / 100).toFixed(2)}`} color="blue" />
-        </div>
-
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3">Recent Orders</h3>
-            {recentOrders.length === 0 ? (
-              <p className="text-sm text-[var(--ff-neutral-muted)]">No recent orders yet.</p>
-            ) : (
-              <div className="space-y-2">
-                {recentOrders.map((order) => (
-                  <div key={order.id} className="flex items-center justify-between text-sm">
-                    <span className="text-[var(--ff-neutral-bold)] truncate mr-2">{order.customer_email}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${order.fulfillment_status === 'fulfilled' ? 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' : 'bg-[var(--ff-warning-subtle)] text-[var(--ff-warning)]'}`}>
-                      {order.fulfillment_status === 'fulfilled' ? 'Fulfilled' : 'Pending'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3">Low Stock Alerts</h3>
-            {lowStockProducts.length === 0 ? (
-              <p className="text-sm text-[var(--ff-neutral-muted)]">No low stock alerts.</p>
-            ) : (
-              <div className="space-y-2">
-                {lowStockProducts.map((product) => (
-                  <div key={product.id} className="flex items-center justify-between gap-3 rounded-lg border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-3">
-                    <p className="text-sm text-[var(--ff-warning)]">{product.name} has {product.stock} unit(s) remaining</p>
-                    <button
-                      onClick={() => handleRestockProduct(product.id)}
-                      disabled={restockingProductId === product.id}
-                      className="bg-[var(--ff-warning)] hover:bg-[var(--ff-warning-bold)] disabled:bg-[var(--ff-neutral-subtle)] text-[var(--ff-ink)] px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
-                    >
-                      {restockingProductId === product.id ? 'Restocking...' : 'Restock'}
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {isLoadingProducts ? (
-          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[var(--ff-neutral-subtle)]">
-                <tr>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Product</th>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Category</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Price</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Stock</th>
-                  <th className="px-6 py-3 text-center text-[var(--ff-neutral-bold)]">Status</th>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Links</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {[0, 1, 2].map((index) => (
-                  <tr key={index} className="border-t border-[var(--ff-border)]">
-                    <td className="px-6 py-4" colSpan={7}>
-                      <div className="h-4 bg-[var(--ff-neutral-subtle)] rounded animate-pulse w-full" />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        ) : products.length === 0 ? (
-          <EmptyState icon={<Package className="w-10 h-10 text-[var(--ff-neutral-muted)]" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
-        ) : (
-          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-[var(--ff-neutral-subtle)]">
-                <tr>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Product</th>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Category</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Price</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Stock</th>
-                  <th className="px-6 py-3 text-center text-[var(--ff-neutral-bold)]">Status</th>
-                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Links</th>
-                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {products.map(p => (
-                  <tr key={p.id} className="border-t border-[var(--ff-border-light)] hover:bg-[var(--ff-neutral-subtle)]">
-                    <td className="px-6 py-4">{p.name}</td>
-                    <td className="px-6 py-4 text-[var(--ff-ink-muted)]">{p.category}</td>
-                    <td className="px-6 py-4 text-right font-mono">R {p.price.toFixed(2)}</td>
-                    <td className="px-6 py-4 text-right">{p.stock}</td>
-                    <td className="px-6 py-4 text-center">
-                      <span className={`text-xs px-2 py-1 rounded ${
-                        p.status === 'Active' ? 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' :
-                        p.status === 'Pending' ? 'bg-[var(--ff-warning-subtle)] text-[var(--ff-warning)]' :
-                        'bg-[var(--ff-error-subtle)] text-[var(--ff-error)]'
-                      }`}>
-                        {p.status}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      {p.thingUrl && p.hash && p.matterUri ? (
-                        <div className="flex flex-col gap-2 text-xs">
-                          <div className="flex items-center gap-2">
-                            <a
-                              href={p.thingUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-[var(--ff-info)] hover:text-[var(--ff-info-bold)]"
-                            >
-                              .thing URL
-                            </a>
-                          </div>
-                          <div className="text-[var(--ff-success)] font-mono break-all" title="Matter URI">
-                            {p.matterUri}
-                          </div>
-                        </div>
-                      ) : (
-                        <span className="text-[var(--ff-neutral-muted)] text-xs">Not compiled</span>
-                      )}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <div className="flex flex-wrap items-center justify-end gap-2">
-                        {p.hash ? (
-                          <>
-                            <button
-                              onClick={() => handleCopyMatter(p.id, p.matterUri)}
-                              className="min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2 text-xs text-[var(--ff-ink)] hover:brightness-95"
-                            >
-                              {copiedMatterId === p.id ? 'Copied!' : 'Copy matter://'}
-                            </button>
-                            <a
-                              href={`/product/${p.hash}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-neutral)] px-3 py-2 min-h-[44px] rounded-lg text-xs"
-                            >
-                              View Page ↗
-                            </a>
-                            <button
-                              onClick={() => handleCopyPage(p.id, p.hash)}
-                              className="min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2 text-xs text-[var(--ff-ink)] hover:brightness-95"
-                            >
-                              {copiedPageId === p.id ? 'Copied!' : 'Copy page'}
-                            </button>
-                          </>
-                        ) : (
-                          <span className="text-[var(--ff-neutral-muted)] text-xs">Pending</span>
-                        )}
-                        <button onClick={() => handleRemoveProduct(p.id)} className="text-[var(--ff-error)] hover:text-[var(--ff-error-bold)] text-xs min-h-[44px] px-2">
-                          Remove
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        )}
-
-        <button
-          onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-[var(--ff-cta)] text-[var(--ff-neutral)] rounded hover:bg-[var(--ff-cta-hover)] text-sm font-medium"
-        >
-          + Create Product
-        </button>
-      </div>
-    );
-  };
-
-  const renderAnalytics = () => (
-    <div className="space-y-6">
-      {analyticsError && (
-        <ErrorBanner message={analyticsError} onDismiss={() => setAnalyticsError(null)} />
-      )}
-      {isLoadingAnalytics && (
-        <InlineSpinner label="Loading analytics..." />
-      )}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <MetricCard label="Total Views" value={analytics.summary.totalViews.toLocaleString()} color="green" />
-        <MetricCard label="Checkout Clicks" value={analytics.summary.totalClicks.toLocaleString()} color="blue" />
-        <MetricCard label="Active Products" value={stats.active} color="blue" />
-        <MetricCard label="Total Inventory" value={products.reduce((sum, p) => sum + p.stock, 0)} unit="units" color="amber" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6 lg:col-span-2">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Engagement Trend (Last 30 Days)</h3>
-            <span className="text-xs text-[var(--ff-neutral-muted)]">Views vs Clicks</span>
-          </div>
-          <div className="h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={analyticsSnapshot.engagementTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="viewsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--ff-info)" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="var(--ff-info)" stopOpacity={0.05} />
-                  </linearGradient>
-                  <linearGradient id="clicksFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="var(--ff-success)" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="var(--ff-success)" stopOpacity={0.05} />
-                  </linearGradient>
-                </defs>
-                <CartesianGrid stroke="#1f2937" strokeDasharray="4 4" />
-                <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Area type="monotone" dataKey="views" stroke="var(--ff-info)" fill="url(#viewsFill)" strokeWidth={2} />
-                <Area type="monotone" dataKey="clicks" stroke="var(--ff-success)" fill="url(#clicksFill)" strokeWidth={2} />
-              </AreaChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-          <h3 className="font-bold mb-4">Checkout Funnel</h3>
-          <div className="space-y-4">
-            {analyticsSnapshot.funnel.map((stage) => (
-              <div key={stage.stage} className="space-y-2">
-                <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--ff-ink-muted)]">{stage.stage}</span>
-                  <span className="font-mono text-[var(--ff-ink)]">{stage.count.toLocaleString()}</span>
-                </div>
-                <div className="h-2 rounded-full bg-[var(--ff-neutral-subtle)]">
-                  <div
-                    className="h-2 rounded-full bg-[var(--ff-success)]"
-                    style={{ width: `${Math.min(100, (stage.count / analyticsSnapshot.funnel[0].count) * 100)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
-            <p className="text-xs text-[var(--ff-neutral-muted)]">Based on real view and click events.</p>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Top Products</h3>
-            <span className="text-xs text-[var(--ff-neutral-muted)]">Checkout Clicks</span>
-          </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analyticsSnapshot.topProducts} layout="vertical" margin={{ top: 10, right: 20, left: 20, bottom: 0 }}>
-                <CartesianGrid stroke="#1f2937" strokeDasharray="4 4" />
-                <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis type="category" dataKey="name" width={120} tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Bar dataKey="clicks" fill="var(--ff-info)" radius={[0, 6, 6, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Engagement by Category</h3>
-            <span className="text-xs text-[var(--ff-neutral-muted)]">Checkout Clicks</span>
-          </div>
-          <div className="h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={analyticsSnapshot.categoryEngagement} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke="#1f2937" strokeDasharray="4 4" />
-                <XAxis dataKey="category" tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
-                <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Bar dataKey="clicks" fill="var(--ff-warning)" radius={[6, 6, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-      </div>
-
-      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold">Inventory Snapshot</h3>
-          <span className="text-xs text-[var(--ff-neutral-muted)]">Stock vs. Clicks</span>
-        </div>
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="text-[var(--ff-ink-muted)]">
-              <tr className="border-b border-[var(--ff-border)]">
-                <th className="py-2 text-left">Product</th>
-                <th className="py-2 text-right">Stock</th>
-                <th className="py-2 text-right">Clicks</th>
-              </tr>
-            </thead>
-            <tbody>
-              {analyticsSnapshot.topProducts.map((item) => (
-                <tr key={item.name} className="border-b border-[var(--ff-border)] last:border-0">
-                  <td className="py-2 text-[var(--ff-ink)]">{item.name}</td>
-                  <td className="py-2 text-right text-[var(--ff-ink-muted)]">{item.stock}</td>
-                  <td className="py-2 text-right text-[var(--ff-success-bold)]">{item.clicks.toLocaleString()}</td>
-                </tr>
-              ))}
-              {analyticsSnapshot.topProducts.length === 0 && (
-                <tr>
-                  <td colSpan={3} className="py-6 text-center text-[var(--ff-neutral-muted)]">No sales data yet. Create products to start tracking.</td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
-  );
 
   const getPayoutStatusLabel = (order: MerchantOrder) => {
     if (order.payment_status === 'released') return 'Released to your account';
@@ -987,176 +616,6 @@ export const MerchantPortal: React.FC = () => {
     />
   );
 
-  const renderMyAccount = () => (
-    <div className="space-y-6">
-      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-        <h3 className="font-bold mb-6">Business Profile</h3>
-        <div className="space-y-4">
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Name</label>
-            <input
-              type="text"
-              value={businessProfile.businessName}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, businessName: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Contact Email</label>
-            <input
-              type="email"
-              value={businessProfile.contactEmail}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, contactEmail: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Phone</label>
-            <input
-              type="tel"
-              value={businessProfile.phone}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, phone: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Address</label>
-            <textarea
-              value={businessProfile.address}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, address: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)] h-20"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Certifications</label>
-            <input
-              type="text"
-              value={businessProfile.certifications}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, certifications: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Year Established</label>
-            <input
-              type="text"
-              value={businessProfile.yearEstablished}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, yearEstablished: e.target.value })}
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-        </div>
-        <button
-          onClick={() => showToast('Changes saved', 'success')}
-          className="mt-6 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] px-6 py-3 rounded-xl font-medium transition"
-        >
-          Save Changes
-        </button>
-      </div>
-      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-        <h3 className="font-bold mb-6">Bank Account Details</h3>
-        <p className="text-[var(--ff-ink-muted)] text-sm mb-4">For receiving weekly payouts to your merchant account</p>
-        <div className="space-y-4">
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Holder Name</label>
-            <input
-              type="text"
-              value={businessProfile.accountHolderName || ''}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, accountHolderName: e.target.value })}
-              placeholder="Full name on bank account"
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Bank Name</label>
-            <input
-              type="text"
-              value={businessProfile.bankName || ''}
-              onChange={(e) => setBusinessProfile({ ...businessProfile, bankName: e.target.value })}
-              placeholder="e.g., Standard Bank"
-              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-            />
-          </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Number</label>
-              <input
-                type="text"
-                value={businessProfile.accountNumber || ''}
-                onChange={(e) => setBusinessProfile({ ...businessProfile, accountNumber: e.target.value })}
-                placeholder="Account number"
-                className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-              />
-            </div>
-            <div>
-              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Branch Code</label>
-              <input
-                type="text"
-                value={businessProfile.branchCode || ''}
-                onChange={(e) => setBusinessProfile({ ...businessProfile, branchCode: e.target.value })}
-                placeholder="Branch code"
-                className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
-              />
-            </div>
-          </div>
-          {merchantAccount?.bank_account?.bank_name && (
-            <div className="bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)]/50 rounded-lg p-4 mt-4">
-              <p className="text-[var(--ff-ink-muted)] text-sm mb-2">Current Bank Details:</p>
-              <p className="text-[var(--ff-ink)] text-sm">{merchantAccount.bank_account.account_holder_name}</p>
-              <p className="text-[var(--ff-ink-muted)] text-sm">{merchantAccount.bank_account.bank_name}</p>
-              <p className="text-[var(--ff-neutral-muted)] text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
-            </div>
-          )}
-        </div>
-        <button
-          onClick={async () => {
-            if (!businessProfile.accountHolderName || !businessProfile.accountNumber || !businessProfile.branchCode || !businessProfile.bankName) {
-              showToast('Please fill in all bank account fields', 'error');
-              return;
-            }
-            try {
-              const token = localStorage.getItem('merchantToken');
-              const res = await fetch(`${apiBase}/v1/merchant/account/bank`, {
-                method: 'PATCH',
-                headers: {
-                  'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                  account_name: businessProfile.accountHolderName,
-                  account_number: businessProfile.accountNumber,
-                  branch_code: businessProfile.branchCode,
-                  bank_name: businessProfile.bankName,
-                }),
-              });
-              const data = await res.json();
-              if (!res.ok) {
-                showToast(data.message || 'Failed to update bank account', 'error');
-                return;
-              }
-              setMerchantAccount(data.account);
-              showToast('Bank account updated successfully', 'success');
-            } catch (error) {
-              showToast(`Error: ${error instanceof Error ? error.message : 'Failed to update'}`, 'error');
-            }
-          }}
-          className="mt-6 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] px-6 py-3 rounded-xl font-medium transition"
-        >
-          Update Bank Details
-        </button>
-      </div>
-      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
-        <h3 className="font-bold mb-4">Account Settings</h3>
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
-            <button className="text-[var(--ff-success)] hover:text-[var(--ff-success-bold)] text-sm">Enable</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-
   return (
     <TabShell
       title={<FairflowLogo markHeight={32} variant="light" style={logoStyle} />}
@@ -1180,12 +639,63 @@ export const MerchantPortal: React.FC = () => {
       )}
     >
       <div className="space-y-6">
-        {activeTab === 'products' && renderMyProducts()}
-        {activeTab === 'analytics' && renderAnalytics()}
+        {activeTab === 'products' && (
+          <MerchantProductsSection
+            ErrorBanner={ErrorBanner}
+            InlineSpinner={InlineSpinner}
+            products={products}
+            orders={orders}
+            merchantAccount={merchantAccount}
+            analyticsError={analyticsError}
+            ordersError={ordersError}
+            accountError={accountError}
+            productsError={productsError}
+            onDismissAnalyticsError={() => setAnalyticsError(null)}
+            onDismissOrdersError={() => setOrdersError(null)}
+            onDismissAccountError={() => setAccountError(null)}
+            onDismissProductsError={() => setProductsError(null)}
+            isLoadingOrders={isLoadingOrders}
+            accountLoading={accountLoading}
+            isLoadingProducts={isLoadingProducts}
+            showOnboardingBanner={showOnboardingBanner}
+            onDismissOnboardingBanner={() => setShowOnboardingBanner(false)}
+            onOpenCreateModal={() => setShowCreateModal(true)}
+            onGoToKycPayouts={() => setActiveTab('kyc-payouts')}
+            stats={stats}
+            restockingProductId={restockingProductId}
+            onRestockProduct={handleRestockProduct}
+            copiedMatterId={copiedMatterId}
+            copiedPageId={copiedPageId}
+            onCopyMatter={handleCopyMatter}
+            onCopyPage={handleCopyPage}
+            onRemoveProduct={handleRemoveProduct}
+          />
+        )}
+        {activeTab === 'analytics' && (
+          <MerchantAnalyticsSection
+            analyticsError={analyticsError}
+            onDismissAnalyticsError={() => setAnalyticsError(null)}
+            ErrorBanner={ErrorBanner}
+            InlineSpinner={InlineSpinner}
+            isLoadingAnalytics={isLoadingAnalytics}
+            summary={analytics.summary}
+            stats={{ active: stats.active }}
+            products={products}
+            analyticsViewModel={analyticsSnapshot}
+          />
+        )}
         {activeTab === 'orders' && renderOrders()}
         {activeTab === 'notifications' && renderNotifications()}
         {activeTab === 'kyc-payouts' && renderKycPayouts()}
-        {activeTab === 'account' && renderMyAccount()}
+        {activeTab === 'account' && (
+          <MerchantAccountSection
+            businessProfile={businessProfile}
+            merchantAccount={merchantAccount}
+            onBusinessProfileChange={handleBusinessProfileChange}
+            onSaveChanges={handleSaveBusinessProfile}
+            onUpdateBankDetails={handleUpdateBankDetails}
+          />
+        )}
       </div>
 
       <CreateProductModal

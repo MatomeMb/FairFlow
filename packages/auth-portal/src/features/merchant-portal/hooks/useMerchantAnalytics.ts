@@ -5,16 +5,20 @@ import type { MerchantPortalProduct } from './useMerchantProducts';
 type ReportRowDay = { date: string; views: number; clicks: number };
 type ReportRowHash = { hash: string; views: number; clicks: number };
 
-type AnalyticsState = {
+export type MerchantAnalyticsSummary = { totalViews: number; totalClicks: number };
+
+export type MerchantAnalyticsViewModel = {
+  engagementTrend: Array<{ label: string; views: number; clicks: number }>;
+  categoryEngagement: Array<{ category: string; clicks: number }>;
+  topProducts: Array<{ name: string; views: number; clicks: number; stock: number; category: string }>;
+  funnel: Array<{ stage: string; count: number }>;
+};
+
+export type MerchantAnalyticsState = {
   reportByDay: ReportRowDay[];
   reportByHash: ReportRowHash[];
-  summary: { totalViews: number; totalClicks: number };
-  viewModel: {
-    engagementTrend: Array<{ label: string; views: number; clicks: number }>;
-    categoryEngagement: Array<{ category: string; clicks: number }>;
-    topProducts: Array<{ name: string; views: number; clicks: number; stock: number; category: string }>;
-    funnel: Array<{ stage: string; count: number }>;
-  };
+  summary: MerchantAnalyticsSummary;
+  viewModel: MerchantAnalyticsViewModel;
 };
 
 async function apiError(res: Response, fallback: string): Promise<string> {
@@ -69,7 +73,7 @@ export function useMerchantAnalytics(
     }
   }, [merchantFetch, token]);
 
-  const analytics = useMemo<AnalyticsState>(() => {
+  const analytics = useMemo<MerchantAnalyticsState>(() => {
     const productsByHash = new Map(products.filter((p) => p.hash).map((p) => [p.hash as string, p]));
     const topProducts = (reportByHash.length ? reportByHash.slice(0, 6).map((row) => {
       const product = productsByHash.get(row.hash);
