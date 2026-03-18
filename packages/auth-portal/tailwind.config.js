@@ -14,9 +14,14 @@ export default {
           success: 'var(--ff-success)',
           'success-bold': 'var(--ff-success-bold)',
           'success-subtle': 'var(--ff-success-subtle)',
-          info: 'var(--ff-info)',
+          info: {
+            DEFAULT: 'var(--ff-info)',
+            subtle: 'var(--ff-info-subtle)',
+            bold: 'var(--ff-info-bold)',
+          },
           warning: {
             DEFAULT: 'var(--ff-warning)',
+            bold: 'var(--ff-warning-bold)',
             bg: 'var(--ff-warning-bg)',
             border: 'var(--ff-warning-border)',
           },

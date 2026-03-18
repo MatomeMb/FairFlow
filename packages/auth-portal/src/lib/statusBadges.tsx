@@ -4,8 +4,8 @@ export type StatusType = 'complete' | 'in-progress' | 'upcoming';
 
 export function SprintStatus({ status }: { status: StatusType }) {
   const config = {
-    'complete':    { icon: CheckCircle2, label: 'Complete',     className: 'text-emerald-400 bg-emerald-400/10' },
-    'in-progress': { icon: RefreshCw,   label: 'In Progress',  className: 'text-yellow-400 bg-yellow-400/10' },
+    'complete':    { icon: CheckCircle2, label: 'Complete',     className: 'text-ff-success bg-ff-success/10' },
+    'in-progress': { icon: RefreshCw,   label: 'In Progress',  className: 'text-ff-warning bg-ff-warning/10' },
     'upcoming':    { icon: Clock,       label: 'Upcoming',     className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)]' },
   };
   const { icon: Icon, label, className } = config[status];
@@ -21,9 +21,9 @@ export type StatusDotType = 'online' | 'offline' | 'degraded';
 
 export function StatusDot({ status }: { status: StatusDotType }) {
   const colors = {
-    online:   'bg-emerald-400',
-    offline:  'bg-red-500',
-    degraded: 'bg-yellow-400',
+    online:   'bg-ff-success',
+    offline:  'bg-ff-error',
+    degraded: 'bg-ff-warning',
   };
   
   const labels = {
@@ -33,9 +33,9 @@ export function StatusDot({ status }: { status: StatusDotType }) {
   };
   
   const textColors = {
-    online:   'text-emerald-400',
-    offline:  'text-red-400',
-    degraded: 'text-yellow-400',
+    online:   'text-ff-success',
+    offline:  'text-ff-error',
+    degraded: 'text-ff-warning',
   };
   
   return (
@@ -53,9 +53,9 @@ export type TalentStatusType = 'potential' | 'contacted' | 'interviewing' | 'hir
 export function TalentStatusBadge({ status }: { status: TalentStatusType }) {
   const config = {
     'potential':    { label: 'Potential',    className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border border-[var(--ff-border)]' },
-    'contacted':    { label: 'Contacted',    className: 'text-blue-300 bg-blue-500/10 border border-blue-500/20' },
-    'interviewing': { label: 'Interviewing', className: 'text-yellow-300 bg-yellow-500/10 border border-yellow-500/20' },
-    'hired':        { label: 'Hired',        className: 'text-emerald-300 bg-emerald-500/10 border border-emerald-500/20' },
+    'contacted':    { label: 'Contacted',    className: 'text-ff-info bg-ff-info/10 border border-ff-info/20' },
+    'interviewing': { label: 'Interviewing', className: 'text-ff-warning bg-ff-warning/10 border border-ff-warning/20' },
+    'hired':        { label: 'Hired',        className: 'text-ff-success bg-ff-success/10 border border-ff-success/20' },
     'rejected':     { label: 'Not Moving',   className: 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border border-[var(--ff-border)]' },
   };
   
@@ -71,9 +71,9 @@ export function TalentStatusBadge({ status }: { status: TalentStatusType }) {
 export function RoleBadge({ role }: { role: string }) {
   const styles: Record<string, string> = {
     'ceo':      'text-purple-300 bg-purple-500/10 border-purple-500/20',
-    'cto':      'text-blue-300 bg-blue-500/10 border-blue-500/20',
+    'cto':      'text-ff-info bg-ff-info/10 border-ff-info/20',
     'merchant': 'text-orange-300 bg-orange-500/10 border-orange-500/20',
-    'investor': 'text-emerald-300 bg-emerald-500/10 border-emerald-500/20',
+    'investor': 'text-ff-success bg-ff-success/10 border-ff-success/20',
     'consumer': 'text-[var(--ff-ink-muted)] bg-[var(--ff-surface)] border-[var(--ff-border)]',
   };
   

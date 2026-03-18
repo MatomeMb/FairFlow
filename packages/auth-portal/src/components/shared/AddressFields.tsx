@@ -30,9 +30,9 @@ export function AddressFields({ values, onChange, errors, prefix }: AddressField
     <>
       {ADDRESS_FIELDS.map(({ key, label, placeholder, required }) => (
         <div key={`${prefix}-${key}`}>
-          <label htmlFor={`${prefix}-${key}`} className="block text-xs text-stone-600 mb-1">
+          <label htmlFor={`${prefix}-${key}`} className="block text-xs text-ff-form-label mb-1">
             {label}
-            {required && <span className="text-red-500 ml-1">*</span>}
+            {required && <span className="text-ff-error ml-1">*</span>}
           </label>
           <input
             id={`${prefix}-${key}`}
@@ -40,9 +40,9 @@ export function AddressFields({ values, onChange, errors, prefix }: AddressField
             placeholder={placeholder}
             value={values[key]}
             onChange={(e) => onChange({ ...values, [key]: e.target.value })}
-            className="w-full px-3 py-2 bg-white border border-stone-300 rounded-lg text-stone-900 text-sm placeholder-stone-400 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            className="w-full px-3 py-2 bg-white border border-ff-border-mid rounded-lg text-ff-form-text text-sm placeholder-ff-form-placeholder focus:ring-2 focus:ring-ff-focus focus:border-transparent"
           />
-          {errors[key] && <p className="text-red-500 text-xs mt-1">{errors[key]}</p>}
+          {errors[key] && <p className="text-ff-error text-xs mt-1">{errors[key]}</p>}
         </div>
       ))}
     </>

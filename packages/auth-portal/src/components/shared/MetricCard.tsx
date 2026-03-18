@@ -8,10 +8,10 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, unit, trend, color }: MetricCardProps) {
   const colorClasses = {
-    green: "text-emerald-700",
-    red: "text-red-700",
-    blue: "text-blue-700",
-    amber: "text-amber-700"
+    green: "text-ff-success-bold",
+    red: "text-ff-error-bold",
+    blue: "text-ff-info-bold",
+    amber: "text-ff-warning-bold"
   };
 
   const trendSymbols = {
