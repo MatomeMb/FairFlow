@@ -418,7 +418,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                     onClick={() => applyTemplate(template)}
                     className={`rounded-lg border px-3 py-3 text-left transition ${
                       isActive
-                        ? 'border-emerald-500 bg-emerald-50/70'
+                        ? 'border-ff-focus bg-ff-success-subtle'
                         : 'border-[var(--ff-border)] bg-white hover:bg-[var(--ff-surface)]'
                     }`}
                   >
@@ -435,65 +435,65 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-800">Title *</label>
+            <label className="mb-1 block text-sm font-medium text-ff-form-label">Title *</label>
             <input
               type="text"
               value={form.title}
               onChange={(e) => setField('title', e.target.value)}
               maxLength={255}
-              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
               placeholder="Product title"
             />
-            {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title}</p>}
+            {errors.title && <p className="mt-1 text-xs text-ff-error">{errors.title}</p>}
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-stone-800">Description</label>
+            <label className="mb-1 block text-sm font-medium text-ff-form-label">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
               placeholder="Describe your product"
             />
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-800">Price (Rands) *</label>
+              <label className="mb-1 block text-sm font-medium text-ff-form-label">Price (Rands) *</label>
               <input
                 type="text"
                 inputMode="decimal"
                 value={form.priceRands}
                 onChange={(e) => handlePriceChange(e.target.value)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
                 placeholder="125.00"
               />
-              <p className="mt-1 text-xs text-stone-600">Price preview: {prettyPrice}</p>
-              {errors.price_cents && <p className="mt-1 text-xs text-red-400">{errors.price_cents}</p>}
+              <p className="mt-1 text-xs text-ff-form-helper">Price preview: {prettyPrice}</p>
+              {errors.price_cents && <p className="mt-1 text-xs text-ff-error">{errors.price_cents}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-800">Stock Count *</label>
+              <label className="mb-1 block text-sm font-medium text-ff-form-label">Stock Count *</label>
               <input
                 type="number"
                 min={0}
                 step={1}
                 value={form.stock_count}
                 onChange={(e) => setField('stock_count', e.target.value)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
               />
-              {errors.stock_count && <p className="mt-1 text-xs text-red-400">{errors.stock_count}</p>}
+              {errors.stock_count && <p className="mt-1 text-xs text-ff-error">{errors.stock_count}</p>}
             </div>
           </div>
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-800">Category *</label>
+              <label className="mb-1 block text-sm font-medium text-ff-form-label">Category *</label>
               <select
                 value={form.category}
                 onChange={(e) => setField('category', e.target.value as FormState['category'])}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
               >
                 <option value="">Select category</option>
                 {CATEGORY_OPTIONS.map((option) => (
@@ -502,11 +502,11 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                   </option>
                 ))}
               </select>
-              {errors.category && <p className="mt-1 text-xs text-red-400">{errors.category}</p>}
+              {errors.category && <p className="mt-1 text-xs text-ff-error">{errors.category}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-stone-800">Product Image *</label>
+              <label className="mb-1 block text-sm font-medium text-ff-form-label">Product Image *</label>
               <input
                 type="file"
                 accept="image/*"
@@ -519,9 +519,9 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                     setField('image_url', '');
                   }
                 }}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-ff-form-text placeholder:text-ff-form-placeholder outline-none transition-colors focus:border-ff-focus"
               />
-              <p className="mt-1 text-xs text-stone-600">
+              <p className="mt-1 text-xs text-ff-form-helper">
                 {isUploadingImage
                   ? `Uploading ${selectedImageName || 'image'}...`
                   : form.image_url
@@ -535,33 +535,33 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                   className="mt-2 h-24 w-24 rounded-md object-cover border border-[var(--ff-border)]"
                 />
               )}
-              {imageUploadError && <p className="mt-1 text-xs text-red-400">{imageUploadError}</p>}
-              {errors.image_url && <p className="mt-1 text-xs text-red-400">{errors.image_url}</p>}
+              {imageUploadError && <p className="mt-1 text-xs text-ff-error">{imageUploadError}</p>}
+              {errors.image_url && <p className="mt-1 text-xs text-ff-error">{errors.image_url}</p>}
             </div>
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm text-stone-800">
+            <label className="flex items-center gap-2 text-sm text-ff-form-label">
               <input
                 type="checkbox"
                 checked={form.shipping_available}
                 onChange={(e) => setField('shipping_available', e.target.checked)}
-                className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-emerald-500 focus:ring-emerald-500"
+                className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-ff-focus focus:ring-ff-focus"
               />
               Shipping available
             </label>
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-medium text-stone-800">Certifications</p>
+            <p className="mb-2 text-sm font-medium text-ff-form-label">Certifications</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {CERTIFICATION_OPTIONS.map((certification) => (
-                <label key={certification} className="flex items-center gap-2 text-sm text-stone-800">
+                <label key={certification} className="flex items-center gap-2 text-sm text-ff-form-label">
                   <input
                     type="checkbox"
                     checked={form.certifications.includes(certification)}
                     onChange={() => toggleCertification(certification)}
-                    className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-emerald-500 focus:ring-emerald-500"
+                    className="h-4 w-4 rounded border-[var(--ff-border)] bg-white text-ff-focus focus:ring-ff-focus"
                   />
                   {certification}
                 </label>
@@ -572,7 +572,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </form>
         ) : (
           <div className="overflow-y-auto flex-1 px-6 py-6 space-y-4">
-            <div className="flex items-center gap-2 text-emerald-400">
+            <div className="flex items-center gap-2 text-ff-success">
               <span className="text-lg">✓</span>
               <span className="text-sm font-semibold">Product published</span>
             </div>
@@ -586,7 +586,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 Your portable product link — share this anywhere. It works even if your website changes.
               </p>
               <div className="flex items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2">
-                <code className="flex-1 text-xs text-emerald-400 break-all">{successPayload?.matter_uri}</code>
+                <code className="flex-1 text-xs text-ff-success break-all">{successPayload?.matter_uri}</code>
                 <button
                   type="button"
                   onClick={() => handleCopy(successPayload?.matter_uri ?? '', 'matter')}
@@ -603,7 +603,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               </p>
               <p className="text-xs text-[var(--ff-ink-muted)] mb-2">Product page:</p>
               <div className="flex items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-3 py-2">
-                <code className="flex-1 text-xs text-blue-400 break-all">{productPageUrl}</code>
+                <code className="flex-1 text-xs text-ff-info break-all">{productPageUrl}</code>
                 <button
                   type="button"
                   onClick={() => handleCopy(productPageUrl, 'page')}
@@ -631,7 +631,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 type="submit"
                 form="create-product-form"
                 disabled={isSubmitting || isUploadingImage}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-ff-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ff-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isUploadingImage ? 'Uploading image...' : isSubmitting ? 'Creating product...' : 'Create Product'}
               </button>
@@ -648,14 +648,14 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <button
                 type="button"
                 onClick={handleDone}
-                className="rounded-lg bg-emerald-600 px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-emerald-500"
+                className="rounded-lg bg-ff-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-ff-primary-hover"
               >
                 Done
               </button>
             </>
           )}
         </div>
-        {submitError && <p className="px-6 pb-4 text-sm text-red-400">{submitError}</p>}
+        {submitError && <p className="px-6 pb-4 text-sm text-ff-error">{submitError}</p>}
       </div>
     </div>
   );

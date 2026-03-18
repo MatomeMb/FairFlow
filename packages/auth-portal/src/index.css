@@ -26,6 +26,20 @@
   --ff-accent-light: rgba(170,255,69,0.15);
   --ff-accent-warm: #AAFF45;
   --ff-border: rgba(255,255,255,0.07);
+  /* Semantic status */
+  --ff-error: #f87171;
+  --ff-success: #34d399;
+  --ff-success-subtle: rgba(236, 253, 245, 0.7);
+  --ff-info: #60a5fa;
+  /* Primary action */
+  --ff-primary: #059669;
+  --ff-primary-hover: #10b981;
+  --ff-focus: #10b981;
+  /* Form (light context) */
+  --ff-form-label: #292524;
+  --ff-form-text: #1c1917;
+  --ff-form-placeholder: #78716c;
+  --ff-form-helper: #57534e;
 }
 
 body {
