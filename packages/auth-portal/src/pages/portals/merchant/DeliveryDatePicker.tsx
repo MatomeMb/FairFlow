@@ -62,13 +62,13 @@ export function DeliveryDatePicker({
             value={date}
             min={new Date().toISOString().split('T')[0]}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-md border border-[var(--ff-border)] bg-white py-1.5 pl-8 pr-3 text-sm text-stone-900 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-md border border-[var(--ff-border)] bg-white py-1.5 pl-8 pr-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:ring-2 focus:ring-ff-focus"
           />
         </div>
         <button
           onClick={handleSave}
           disabled={!date || saving || !token}
-          className="px-3 py-1.5 text-sm font-medium bg-emerald-600 text-white rounded-md hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-w-[80px] justify-center"
+          className="px-3 py-1.5 text-sm font-medium bg-ff-primary text-white rounded-md hover:bg-ff-primary-hover disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-w-[80px] justify-center"
         >
           {saving ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />
@@ -81,14 +81,14 @@ export function DeliveryDatePicker({
           )}
         </button>
       </div>
-      {error && <p className="mt-1.5 text-xs text-red-400">{error}</p>}
+      {error && <p className="mt-1.5 text-xs text-ff-error">{error}</p>}
       {currentDate && !saved && (
         <p className="mt-1.5 text-xs text-[var(--ff-ink-muted)]">
           Currently set: {new Date(currentDate).toLocaleDateString('en-ZA', { dateStyle: 'medium' })}
         </p>
       )}
       {!token && (
-        <p className="mt-1.5 text-xs text-amber-400">Sign in again to set delivery dates.</p>
+        <p className="mt-1.5 text-xs text-ff-warning">Sign in again to set delivery dates.</p>
       )}
     </div>
   );

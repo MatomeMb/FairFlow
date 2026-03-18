@@ -43,7 +43,7 @@ export function MerchantKYCPayouts({
   return (
     <div className="space-y-6">
       {accountError && (
-        <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
+        <div className="bg-ff-error-bold border border-ff-error rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
           <p>{accountError}</p>
           <button
             type="button"
@@ -58,7 +58,7 @@ export function MerchantKYCPayouts({
 
       {(accountLoading || payoutsLoading) && (
         <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
-          <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="w-5 h-5 text-ff-primary animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
             <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
           </svg>
@@ -117,7 +117,7 @@ export function MerchantKYCPayouts({
 
         {payoutsLoading ? (
           <div className="rounded-xl border border-[var(--ff-border)] bg-white p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
-            <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="w-5 h-5 text-ff-primary animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
               <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
             </svg>
@@ -143,13 +143,13 @@ export function MerchantKYCPayouts({
                     <td className="py-2 text-[var(--ff-ink)]">{new Date(payout.created_at).toLocaleDateString('en-ZA')}</td>
                     <td className="py-2 text-right text-[var(--ff-ink)]">{formatCents(payout.gross_amount)}</td>
                     <td className="py-2 text-right text-[var(--ff-ink)]">{formatCents(payout.commission_amount)}</td>
-                    <td className="py-2 text-right text-emerald-700">{formatCents(payout.net_amount)}</td>
+                    <td className="py-2 text-right text-ff-primary">{formatCents(payout.net_amount)}</td>
                     <td className="py-2 text-right">
                       <span className={`text-xs px-2 py-1 rounded ${
-                        payout.status === 'completed' ? 'bg-emerald-100 text-emerald-800' :
-                        payout.status === 'processing' ? 'bg-blue-100 text-blue-800' :
-                        payout.status === 'failed' ? 'bg-red-100 text-red-800' :
-                        'bg-amber-100 text-amber-800'
+                        payout.status === 'completed' ? 'bg-ff-success-subtle text-ff-success-bold' :
+                        payout.status === 'processing' ? 'bg-ff-info-subtle text-ff-info-bold' :
+                        payout.status === 'failed' ? 'bg-ff-error-subtle text-ff-error-bold' :
+                        'bg-ff-warning-subtle text-ff-warning-bold'
                       }`}>
                         {payout.status}
                       </span>

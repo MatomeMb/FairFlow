@@ -21,11 +21,11 @@ interface MerchantOrdersProps {
 }
 
 const PAYMENT_BADGE: Record<string, { label: string; className: string }> = {
-  held: { label: 'Held', className: 'bg-amber-100 text-amber-800' },
-  shipped: { label: 'Shipped', className: 'bg-blue-100 text-blue-800' },
-  confirmed: { label: 'Confirmed', className: 'bg-emerald-100 text-emerald-800' },
-  released: { label: 'Released', className: 'bg-emerald-100 text-emerald-800' },
-  disputed: { label: 'Disputed', className: 'bg-red-100 text-red-800' },
+  held: { label: 'Held', className: 'bg-ff-warning-subtle text-ff-warning-bold' },
+  shipped: { label: 'Shipped', className: 'bg-ff-info-subtle text-ff-info-bold' },
+  confirmed: { label: 'Confirmed', className: 'bg-ff-success-subtle text-ff-success-bold' },
+  released: { label: 'Released', className: 'bg-ff-success-subtle text-ff-success-bold' },
+  disputed: { label: 'Disputed', className: 'bg-ff-error-subtle text-ff-error-bold' },
 };
 
 export function MerchantOrders({
@@ -47,7 +47,7 @@ export function MerchantOrders({
   return (
     <div className="space-y-4">
       {ordersError && (
-        <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
+        <div className="bg-ff-error-bold border border-ff-error rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
           <p>{ordersError}</p>
           <button
             type="button"
@@ -106,7 +106,7 @@ export function MerchantOrders({
                     </span>
                   )}
                   {(order.fulfillment_status === 'shipped' || order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered') ? (
-                    <span className="text-xs px-2 py-1 rounded bg-emerald-100 text-emerald-800">Shipped ✓</span>
+                    <span className="text-xs px-2 py-1 rounded bg-ff-success-subtle text-ff-success-bold">Shipped ✓</span>
                   ) : (
                     <div className="flex gap-2">
                       <label className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-3 text-xs font-medium text-[var(--ff-ink)] hover:brightness-95">
@@ -128,7 +128,7 @@ export function MerchantOrders({
                         onClick={() => order.shipment_slip_url && onMarkAsShipped(order.id, order.shipment_slip_url)}
                         disabled={!order.shipment_slip_url || fulfillingOrderId === order.id}
                         title={!order.shipment_slip_url ? 'Upload shipment slip first' : ''}
-                        className="flex min-h-[44px] items-center gap-2 rounded-lg bg-emerald-600 px-4 py-3 text-xs font-medium text-white transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-emerald-800/60"
+                        className="flex min-h-[44px] items-center gap-2 rounded-lg bg-ff-primary px-4 py-3 text-xs font-medium text-white transition hover:bg-ff-primary-hover disabled:cursor-not-allowed disabled:bg-ff-primary/60"
                       >
                         <Truck className="w-4 h-4" />
                         {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Shipped'}

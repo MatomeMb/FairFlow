@@ -22,6 +22,7 @@ export default {
           warning: {
             DEFAULT: 'var(--ff-warning)',
             bold: 'var(--ff-warning-bold)',
+            subtle: 'var(--ff-warning-subtle)',
             bg: 'var(--ff-warning-bg)',
             border: 'var(--ff-warning-border)',
           },

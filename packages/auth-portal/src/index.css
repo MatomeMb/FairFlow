@@ -39,6 +39,7 @@
   /* Warning (system caution alerts) */
   --ff-warning: #facc15;
   --ff-warning-bold: #b45309;
+  --ff-warning-subtle: #fef3c7;
   --ff-warning-bg: rgba(113, 63, 18, 0.5);
   --ff-warning-border: #854d0e;
   /* Primary action */

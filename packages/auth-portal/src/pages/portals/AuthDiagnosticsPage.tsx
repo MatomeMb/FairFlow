@@ -128,7 +128,7 @@ export function AuthDiagnosticsPage() {
           <FairflowLogo markHeight={42} variant="light" />
           <button
             onClick={() => navigate("/dashboard/admin")}
-            className="rounded-lg border border-[var(--ff-border)] px-3 py-2 text-sm text-[var(--ff-ink)] hover:bg-stone-100"
+            className="rounded-lg border border-[var(--ff-border)] px-3 py-2 text-sm text-[var(--ff-ink)] hover:bg-ff-neutral-subtle"
           >
             Back to Admin
           </button>
@@ -148,7 +148,7 @@ export function AuthDiagnosticsPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@fairflow.co.za"
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-stone-900 placeholder:text-stone-500"
+                className="w-full rounded-xl border border-ff-border-light px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder"
               />
             </div>
 
@@ -159,14 +159,14 @@ export function AuthDiagnosticsPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password to test"
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-stone-900 placeholder:text-stone-500"
+                className="w-full rounded-xl border border-ff-border-light px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder"
               />
             </div>
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-emerald-600 py-3 font-medium text-white hover:bg-emerald-500 disabled:opacity-50"
+              className="w-full rounded-xl bg-ff-primary py-3 font-medium text-white hover:bg-ff-primary-hover disabled:opacity-50"
             >
               {loading ? "Testing..." : "Run Auth Check"}
             </button>
@@ -175,7 +175,7 @@ export function AuthDiagnosticsPage() {
           {result && (
             <div
               className={`mt-6 rounded-xl border p-4 ${
-                result.ok ? "border-emerald-200 bg-emerald-50" : "border-rose-200 bg-rose-50"
+                result.ok ? "border-ff-success-subtle bg-ff-success-subtle" : "border-rose-200 bg-rose-50"
               }`}
             >
               <p className="text-sm text-[var(--ff-ink)]">

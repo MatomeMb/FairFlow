@@ -14,9 +14,9 @@ interface MerchantNotificationsProps {
 }
 
 const renderNotificationIcon = (type: MerchantNotification['type']) => {
-  if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-emerald-700" />;
-  if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-amber-700" />;
-  if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-red-700" />;
+  if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-ff-primary" />;
+  if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-ff-warning-bold" />;
+  if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-ff-error-bold" />;
   return <Bell className="w-4 h-4 text-[var(--ff-ink-muted)]" />;
 };
 
@@ -36,14 +36,14 @@ export function MerchantNotifications({
         <h3 className="font-bold">Notifications</h3>
         <button
           onClick={onMarkAllNotificationsRead}
-          className="text-xs text-emerald-700 hover:text-emerald-800"
+          className="text-xs text-ff-primary hover:text-ff-primary-hover"
         >
           Mark all as read
         </button>
       </div>
 
       {notificationsError && (
-        <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
+        <div className="bg-ff-error-bold border border-ff-error rounded-xl px-4 py-3 text-sm text-white flex items-start justify-between gap-3">
           <p>{notificationsError}</p>
           <button
             type="button"
@@ -58,7 +58,7 @@ export function MerchantNotifications({
 
       {notificationsLoading ? (
         <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
-          <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+          <svg className="w-5 h-5 text-ff-primary animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
             <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
           </svg>
@@ -73,10 +73,10 @@ export function MerchantNotifications({
               key={notification.id}
               className={`border rounded-xl p-4 ${
                 notification.type === 'high_value_order'
-                    ? 'border-red-300 bg-red-50'
+                    ? 'border-ff-error bg-ff-error-subtle'
                   : notification.read
                     ? 'bg-white/85 border-[var(--ff-border)]'
-                    : 'bg-white border-emerald-300 border-l-4 border-l-emerald-600'
+                    : 'bg-white border-ff-success border-l-4 border-l-ff-primary'
               }`}
             >
               <div className="flex items-start justify-between gap-3">
@@ -92,7 +92,7 @@ export function MerchantNotifications({
                   <button
                     onClick={() => onMarkNotificationRead(notification.id)}
                     disabled={updatingNotificationId === notification.id}
-                    className="text-xs text-emerald-700 hover:text-emerald-800 disabled:text-[var(--ff-ink-muted)] px-3 py-3 min-h-[44px] rounded-lg border border-emerald-300"
+                    className="text-xs text-ff-primary hover:text-ff-primary-hover disabled:text-[var(--ff-ink-muted)] px-3 py-3 min-h-[44px] rounded-lg border border-ff-success"
                   >
                     {updatingNotificationId === notification.id ? 'Updating...' : 'Mark as read'}
                   </button>
