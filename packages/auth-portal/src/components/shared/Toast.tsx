@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { X } from "lucide-react";
+import { Card } from "../../design-system";
 
 interface ToastProps {
   message: string;
@@ -14,13 +15,13 @@ export function Toast({ message, type, onDismiss }: ToastProps) {
   }, [onDismiss]);
 
   const colors = {
-    success: "bg-ff-success-subtle border-ff-success text-ff-success-bold",
-    error: "bg-ff-error-subtle border-ff-error text-ff-error-bold",
-    info: "bg-ff-info-subtle border-ff-info text-ff-info-bold"
+    success: "bg-emerald-50 border-emerald-300 text-emerald-800",
+    error: "bg-red-50 border-red-300 text-red-800",
+    info: "bg-blue-50 border-blue-300 text-blue-800"
   };
 
   return (
-    <div className={`fixed bottom-4 right-4 ${colors[type]} border px-4 py-3 rounded-lg shadow-lg z-50 max-w-md`}>
+    <Card variant="bordered" className={`fixed bottom-4 right-4 ${colors[type]} px-4 py-3 shadow-lg z-50 max-w-md`}>
       <div className="flex items-center justify-between gap-3">
         <span className="text-sm font-medium">{message}</span>
         <button
@@ -30,6 +31,6 @@ export function Toast({ message, type, onDismiss }: ToastProps) {
           <X className="w-4 h-4" />
         </button>
       </div>
-    </div>
+    </Card>
   );
 }

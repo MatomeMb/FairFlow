@@ -1,4 +1,5 @@
 import { RefreshCw } from "lucide-react";
+import { StatusDot } from "../../design-system";
 
 interface StatusBarProps {
   apiOnline: boolean;
@@ -13,15 +14,15 @@ export function StatusBar({ apiOnline, version, secondsSince, onRefresh, readOnl
     <div className="border-b border-[var(--ff-border)] bg-white/90 px-4 py-3 text-sm backdrop-blur-sm md:px-6 flex flex-col md:flex-row md:items-center md:justify-between gap-2">
       <div className="flex flex-wrap items-center gap-3 md:gap-6 text-[var(--ff-ink-muted)]">
         <span className="flex items-center gap-2">
-          <span className={`w-2 h-2 rounded-full ${apiOnline ? 'bg-ff-success' : 'bg-ff-error'}`} />
+          <StatusDot status={apiOnline ? 'online' : 'offline'} />
           API: {apiOnline ? 'Online' : 'Offline'}
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-ff-success" />
+          <StatusDot status="online" />
           DB: Connected
         </span>
         <span className="flex items-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-ff-success" />
+          <StatusDot status="online" />
           Auth: Active
         </span>
         <span className="text-[var(--ff-ink-muted)]">{version}</span>
@@ -36,7 +37,7 @@ export function StatusBar({ apiOnline, version, secondsSince, onRefresh, readOnl
           {onRefresh && (
             <button
               onClick={onRefresh}
-              className="inline-flex items-center gap-2 text-ff-primary hover:text-ff-primary-hover font-medium transition-colors"
+              className="inline-flex items-center gap-2 text-emerald-400 hover:text-emerald-300 font-medium transition-colors"
             >
               <RefreshCw className="w-4 h-4" />
               Refresh Now

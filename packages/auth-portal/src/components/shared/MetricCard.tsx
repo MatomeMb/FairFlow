@@ -1,3 +1,5 @@
+import { Card } from "../../design-system";
+
 interface MetricCardProps {
   label: string;
   value: string | number;
@@ -8,10 +10,10 @@ interface MetricCardProps {
 
 export function MetricCard({ label, value, unit, trend, color }: MetricCardProps) {
   const colorClasses = {
-    green: "text-ff-success-bold",
-    red: "text-ff-error-bold",
-    blue: "text-ff-info-bold",
-    amber: "text-ff-warning-bold"
+    green: "text-emerald-700",
+    red: "text-red-700",
+    blue: "text-blue-700",
+    amber: "text-amber-700"
   };
 
   const trendSymbols = {
@@ -21,7 +23,7 @@ export function MetricCard({ label, value, unit, trend, color }: MetricCardProps
   };
 
   return (
-    <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-5">
+    <Card variant="default" className="p-5">
       <div className="mb-2 text-xs font-medium uppercase tracking-widest text-[var(--ff-ink-muted)]">
         {label}
       </div>
@@ -32,6 +34,6 @@ export function MetricCard({ label, value, unit, trend, color }: MetricCardProps
         {unit && <span className="text-sm text-[var(--ff-ink-muted)]">{unit}</span>}
         {trend && <span className="text-sm text-[var(--ff-ink-muted)]">{trendSymbols[trend]}</span>}
       </div>
-    </div>
+    </Card>
   );
 }
