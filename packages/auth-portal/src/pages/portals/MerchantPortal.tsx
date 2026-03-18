@@ -45,8 +45,8 @@ type ReportRowHash = { hash: string; views: number; clicks: number };
 type Tab = 'products' | 'analytics' | 'orders' | 'notifications' | 'kyc-payouts' | 'account';
 
 const InlineSpinner: React.FC<{ label: string }> = ({ label }) => (
-  <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4 text-sm text-stone-700 flex items-center gap-3">
-    <svg className="w-5 h-5 text-emerald-400 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+  <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-4 text-sm text-[var(--ff-neutral-bold)] flex items-center gap-3">
+    <svg className="w-5 h-5 text-[var(--ff-success)] animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
       <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
       <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
     </svg>
@@ -55,7 +55,7 @@ const InlineSpinner: React.FC<{ label: string }> = ({ label }) => (
 );
 
 const ErrorBanner: React.FC<{ message: string; onDismiss: () => void }> = ({ message, onDismiss }) => (
-  <div className="bg-red-700 border border-red-500 rounded-xl px-4 py-3 text-sm text-[var(--ff-ink)] flex items-start justify-between gap-3">
+  <div className="bg-[var(--ff-error-bold)] border border-[var(--ff-error)] rounded-xl px-4 py-3 text-sm text-[var(--ff-neutral)] flex items-start justify-between gap-3">
     <p>{message}</p>
     <button
       type="button"
@@ -160,18 +160,7 @@ export const MerchantPortal: React.FC = () => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
   };
-
-  const resolveStoredMerchantToken = () => {
-    if (typeof window === 'undefined') return null;
-    return (
-      sessionStorage.getItem('merchantToken')
-      || sessionStorage.getItem('merchant_token')
-      || localStorage.getItem('merchantToken')
-      || localStorage.getItem('merchant_token')
-    );
-  };
-
-  const hasApiAuth = Boolean(authToken || resolveStoredMerchantToken() || import.meta.env.VITE_API_KEY);
+  const hasApiAuth = Boolean(authToken || import.meta.env.VITE_API_KEY);
 
   // On mount: pick up token from URL or sessionStorage
   useEffect(() => {
@@ -182,16 +171,10 @@ export const MerchantPortal: React.FC = () => {
     if (urlToken) {
       sessionStorage.setItem('merchantToken', urlToken);
       sessionStorage.setItem('merchant_token', urlToken);
-      localStorage.setItem('merchantToken', urlToken);
-      localStorage.setItem('merchant_token', urlToken);
       setAuthToken(urlToken);
       window.history.replaceState({}, '', '/dashboard/merchant');
     } else {
-      const existingToken = resolveStoredMerchantToken();
-      if (existingToken) {
-        sessionStorage.setItem('merchantToken', existingToken);
-        sessionStorage.setItem('merchant_token', existingToken);
-      }
+      const existingToken = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
       setAuthToken(existingToken);
     }
 
@@ -212,7 +195,7 @@ export const MerchantPortal: React.FC = () => {
   React.useEffect(() => {
     const timer = setTimeout(() => {
       const fromUrl = new URLSearchParams(window.location.search).get('token');
-      const fromStorage = resolveStoredMerchantToken();
+      const fromStorage = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
       if (!fromUrl && !fromStorage && !authToken && !import.meta.env.VITE_API_KEY) {
         window.location.href = '/merchant/login';
       }
@@ -230,9 +213,8 @@ export const MerchantPortal: React.FC = () => {
     const headers: Record<string, string> = {
       ...(options.headers as Record<string, string> | undefined),
     };
-    const resolvedToken = authToken || resolveStoredMerchantToken();
-    if (resolvedToken) {
-      headers['Authorization'] = `Bearer ${resolvedToken}`;
+    if (authToken) {
+      headers['Authorization'] = `Bearer ${authToken}`;
     }
     if (import.meta.env.VITE_API_KEY) {
       headers['x-api-key'] = import.meta.env.VITE_API_KEY;
@@ -755,24 +737,24 @@ export const MerchantPortal: React.FC = () => {
         {(ordersLoading || accountLoading || productsLoading) && <InlineSpinner label="Loading dashboard data..." />}
 
         {merchantAccount?.kyc_status !== 'approved' && (
-          <div className="rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-900">
+          <div className="rounded-xl border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-4 text-sm text-[var(--ff-warning-bold)]">
             <p className="font-semibold">KYC is not approved yet.</p>
-            <p className="mt-1 text-amber-800">Complete KYC in the KYC & Payouts tab to unlock full payout processing.</p>
+            <p className="mt-1 text-[var(--ff-warning-bold)]">Complete KYC in the KYC & Payouts tab to unlock full payout processing.</p>
           </div>
         )}
 
         {shouldShowOnboardingBanner && (
-          <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-5">
+          <div className="rounded-lg border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-5">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-amber-800">Welcome — let's get you set up</h3>
-                <p className="mt-1 text-sm text-stone-700">
+                <h3 className="font-semibold text-[var(--ff-warning)]">Welcome — let's get you set up</h3>
+                <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">
                   Complete these three steps to start selling.
                 </p>
               </div>
               <button
                 onClick={() => setShowOnboardingBanner(false)}
-                className="text-stone-700 hover:text-[var(--ff-ink)]"
+                className="text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]"
               >
                 ✕
               </button>
@@ -801,18 +783,18 @@ export const MerchantPortal: React.FC = () => {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                      step.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-stone-700'
+                      step.done ? 'bg-[var(--ff-success)] text-[var(--ff-neutral)]' : 'bg-[var(--ff-neutral-subtle)] text-[var(--ff-ink-muted)]'
                     }`}>
                       {step.done ? '✓' : i + 1}
                     </span>
-                    <span className={`text-sm ${step.done ? 'text-stone-700 line-through' : 'text-[var(--ff-ink)]'}`}>
+                    <span className={`text-sm ${step.done ? 'text-[var(--ff-ink-muted)] line-through' : 'text-[var(--ff-ink)]'}`}>
                       {step.label}
                     </span>
                   </div>
                   {!step.done && (
                     <button
                       onClick={step.action}
-                      className="text-xs text-amber-800 hover:text-amber-900 underline"
+                      className="text-xs text-[var(--ff-warning)] hover:text-[var(--ff-warning-bold)] underline"
                     >
                       {step.cta} →
                     </button>
@@ -830,16 +812,16 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3 text-stone-900">Recent Orders</h3>
+          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-4">
+            <h3 className="font-semibold mb-3">Recent Orders</h3>
             {recentOrders.length === 0 ? (
-              <p className="text-sm text-stone-700">No recent orders yet.</p>
+              <p className="text-sm text-[var(--ff-neutral-muted)]">No recent orders yet.</p>
             ) : (
               <div className="space-y-2">
                 {recentOrders.map((order) => (
                   <div key={order.id} className="flex items-center justify-between text-sm">
-                    <span className="text-stone-700 truncate mr-2">{order.customer_email}</span>
-                    <span className={`text-xs px-2 py-1 rounded ${order.fulfillment_status === 'fulfilled' ? 'bg-emerald-900/50 text-emerald-400' : 'bg-amber-900/50 text-amber-400'}`}>
+                    <span className="text-[var(--ff-neutral-bold)] truncate mr-2">{order.customer_email}</span>
+                    <span className={`text-xs px-2 py-1 rounded ${order.fulfillment_status === 'fulfilled' ? 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' : 'bg-[var(--ff-warning-subtle)] text-[var(--ff-warning)]'}`}>
                       {order.fulfillment_status === 'fulfilled' ? 'Fulfilled' : 'Pending'}
                     </span>
                   </div>
@@ -848,19 +830,19 @@ export const MerchantPortal: React.FC = () => {
             )}
           </div>
 
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3 text-stone-900">Low Stock Alerts</h3>
+          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-4">
+            <h3 className="font-semibold mb-3">Low Stock Alerts</h3>
             {lowStockProducts.length === 0 ? (
-              <p className="text-sm text-stone-700">No low stock alerts.</p>
+              <p className="text-sm text-[var(--ff-neutral-muted)]">No low stock alerts.</p>
             ) : (
               <div className="space-y-2">
                 {lowStockProducts.map((product) => (
-                  <div key={product.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-800/40 bg-amber-900/10 p-3">
-                    <p className="text-sm text-amber-800">{product.name} has {product.stock} unit(s) remaining</p>
+                  <div key={product.id} className="flex items-center justify-between gap-3 rounded-lg border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-3">
+                    <p className="text-sm text-[var(--ff-warning)]">{product.name} has {product.stock} unit(s) remaining</p>
                     <button
                       onClick={() => handleRestockProduct(product.id)}
                       disabled={restockingProductId === product.id}
-                      className="bg-amber-600 hover:bg-amber-700 disabled:bg-stone-200 text-[var(--ff-ink)] px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
+                      className="bg-[var(--ff-warning)] hover:bg-[var(--ff-warning-bold)] disabled:bg-[var(--ff-neutral-subtle)] text-[var(--ff-ink)] px-4 py-3 min-h-[44px] rounded-lg text-xs font-medium transition"
                     >
                       {restockingProductId === product.id ? 'Restocking...' : 'Restock'}
                     </button>
@@ -872,24 +854,24 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         {productsLoading ? (
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
+          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-100">
+              <thead className="bg-[var(--ff-neutral-subtle)]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-stone-700">Product</th>
-                  <th className="px-6 py-3 text-left text-stone-700">Category</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Price</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Stock</th>
-                  <th className="px-6 py-3 text-center text-stone-700">Status</th>
-                  <th className="px-6 py-3 text-left text-stone-700">Links</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Action</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Product</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Category</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Price</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Stock</th>
+                  <th className="px-6 py-3 text-center text-[var(--ff-neutral-bold)]">Status</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Links</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {[0, 1, 2].map((index) => (
                   <tr key={index} className="border-t border-[var(--ff-border)]">
                     <td className="px-6 py-4" colSpan={7}>
-                      <div className="h-4 bg-stone-100 rounded animate-pulse w-full" />
+                      <div className="h-4 bg-[var(--ff-neutral-subtle)] rounded animate-pulse w-full" />
                     </td>
                   </tr>
                 ))}
@@ -897,33 +879,33 @@ export const MerchantPortal: React.FC = () => {
             </table>
           </div>
         ) : products.length === 0 ? (
-          <EmptyState icon={<Package className="w-10 h-10 text-stone-500" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
+          <EmptyState icon={<Package className="w-10 h-10 text-[var(--ff-neutral-muted)]" />} title="No products yet" description="No products yet. Create your first product to begin selling." />
         ) : (
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
+          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-stone-100">
+              <thead className="bg-[var(--ff-neutral-subtle)]">
                 <tr>
-                  <th className="px-6 py-3 text-left text-stone-700">Product</th>
-                  <th className="px-6 py-3 text-left text-stone-700">Category</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Price</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Stock</th>
-                  <th className="px-6 py-3 text-center text-stone-700">Status</th>
-                  <th className="px-6 py-3 text-left text-stone-700">Links</th>
-                  <th className="px-6 py-3 text-right text-stone-700">Action</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Product</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Category</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Price</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Stock</th>
+                  <th className="px-6 py-3 text-center text-[var(--ff-neutral-bold)]">Status</th>
+                  <th className="px-6 py-3 text-left text-[var(--ff-neutral-bold)]">Links</th>
+                  <th className="px-6 py-3 text-right text-[var(--ff-neutral-bold)]">Action</th>
                 </tr>
               </thead>
               <tbody>
                 {products.map(p => (
-                  <tr key={p.id} className="border-t border-[var(--ff-border)] hover:bg-stone-200/60">
+                  <tr key={p.id} className="border-t border-[var(--ff-border-light)] hover:bg-[var(--ff-neutral-subtle)]">
                     <td className="px-6 py-4">{p.name}</td>
-                    <td className="px-6 py-4 text-stone-700">{p.category}</td>
+                    <td className="px-6 py-4 text-[var(--ff-ink-muted)]">{p.category}</td>
                     <td className="px-6 py-4 text-right font-mono">R {p.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">{p.stock}</td>
                     <td className="px-6 py-4 text-center">
                       <span className={`text-xs px-2 py-1 rounded ${
-                        p.status === 'Active' ? 'bg-emerald-900/50 text-emerald-500' :
-                        p.status === 'Pending' ? 'bg-amber-900/50 text-amber-500' :
-                        'bg-red-900/50 text-red-500'
+                        p.status === 'Active' ? 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' :
+                        p.status === 'Pending' ? 'bg-[var(--ff-warning-subtle)] text-[var(--ff-warning)]' :
+                        'bg-[var(--ff-error-subtle)] text-[var(--ff-error)]'
                       }`}>
                         {p.status}
                       </span>
@@ -936,17 +918,17 @@ export const MerchantPortal: React.FC = () => {
                               href={p.thingUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="text-blue-400 hover:text-blue-300"
+                              className="text-[var(--ff-info)] hover:text-[var(--ff-info-bold)]"
                             >
                               .thing URL
                             </a>
                           </div>
-                          <div className="text-emerald-400 font-mono break-all" title="Matter URI">
+                          <div className="text-[var(--ff-success)] font-mono break-all" title="Matter URI">
                             {p.matterUri}
                           </div>
                         </div>
                       ) : (
-                        <span className="text-stone-700 text-xs">Not compiled</span>
+                        <span className="text-[var(--ff-neutral-muted)] text-xs">Not compiled</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -963,7 +945,7 @@ export const MerchantPortal: React.FC = () => {
                               href={`/product/${p.hash}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 min-h-[44px] rounded-lg text-xs"
+                              className="bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-neutral)] px-3 py-2 min-h-[44px] rounded-lg text-xs"
                             >
                               View Page ↗
                             </a>
@@ -975,9 +957,9 @@ export const MerchantPortal: React.FC = () => {
                             </button>
                           </>
                         ) : (
-                          <span className="text-stone-700 text-xs">Pending</span>
+                          <span className="text-[var(--ff-neutral-muted)] text-xs">Pending</span>
                         )}
-                        <button onClick={() => handleRemoveProduct(p.id)} className="text-red-500 hover:text-red-400 text-xs min-h-[44px] px-2">
+                        <button onClick={() => handleRemoveProduct(p.id)} className="text-[var(--ff-error)] hover:text-[var(--ff-error-bold)] text-xs min-h-[44px] px-2">
                           Remove
                         </button>
                       </div>
@@ -991,7 +973,7 @@ export const MerchantPortal: React.FC = () => {
 
         <button
           onClick={() => setShowCreateModal(true)}
-          className="px-4 py-2 bg-emerald-600 text-white rounded hover:bg-emerald-700 text-sm font-medium"
+          className="px-4 py-2 bg-[var(--ff-cta)] text-[var(--ff-neutral)] rounded hover:bg-[var(--ff-cta-hover)] text-sm font-medium"
         >
           + Create Product
         </button>
@@ -1015,62 +997,62 @@ export const MerchantPortal: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6 lg:col-span-2">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-stone-900">Engagement Trend (Last 30 Days)</h3>
-            <span className="text-xs text-stone-700">Views vs Clicks</span>
+            <h3 className="font-bold">Engagement Trend (Last 30 Days)</h3>
+            <span className="text-xs text-[var(--ff-neutral-muted)]">Views vs Clicks</span>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={analyticsSnapshot.engagementTrend} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
                 <defs>
                   <linearGradient id="viewsFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#38bdf8" stopOpacity={0.05} />
+                    <stop offset="5%" stopColor="var(--ff-info)" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="var(--ff-info)" stopOpacity={0.05} />
                   </linearGradient>
                   <linearGradient id="clicksFill" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.4} />
-                    <stop offset="95%" stopColor="#10b981" stopOpacity={0.05} />
+                    <stop offset="5%" stopColor="var(--ff-success)" stopOpacity={0.4} />
+                    <stop offset="95%" stopColor="var(--ff-success)" stopOpacity={0.05} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid stroke="#1f2937" strokeDasharray="4 4" />
                 <XAxis dataKey="label" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Area type="monotone" dataKey="views" stroke="#38bdf8" fill="url(#viewsFill)" strokeWidth={2} />
-                <Area type="monotone" dataKey="clicks" stroke="#10b981" fill="url(#clicksFill)" strokeWidth={2} />
+                <Area type="monotone" dataKey="views" stroke="var(--ff-info)" fill="url(#viewsFill)" strokeWidth={2} />
+                <Area type="monotone" dataKey="clicks" stroke="var(--ff-success)" fill="url(#clicksFill)" strokeWidth={2} />
               </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-          <h3 className="font-bold mb-4 text-stone-900">Checkout Funnel</h3>
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
+          <h3 className="font-bold mb-4">Checkout Funnel</h3>
           <div className="space-y-4">
             {analyticsSnapshot.funnel.map((stage) => (
               <div key={stage.stage} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-stone-700">{stage.stage}</span>
+                  <span className="text-[var(--ff-ink-muted)]">{stage.stage}</span>
                   <span className="font-mono text-[var(--ff-ink)]">{stage.count.toLocaleString()}</span>
                 </div>
-                <div className="h-2 rounded-full bg-stone-100">
+                <div className="h-2 rounded-full bg-[var(--ff-neutral-subtle)]">
                   <div
-                    className="h-2 rounded-full bg-emerald-500"
+                    className="h-2 rounded-full bg-[var(--ff-success)]"
                     style={{ width: `${Math.min(100, (stage.count / analyticsSnapshot.funnel[0].count) * 100)}%` }}
                   />
                 </div>
               </div>
             ))}
-            <p className="text-xs text-stone-700">Based on real view and click events.</p>
+            <p className="text-xs text-[var(--ff-neutral-muted)]">Based on real view and click events.</p>
           </div>
         </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-stone-900">Top Products</h3>
-            <span className="text-xs text-stone-700">Checkout Clicks</span>
+            <h3 className="font-bold">Top Products</h3>
+            <span className="text-xs text-[var(--ff-neutral-muted)]">Checkout Clicks</span>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -1079,16 +1061,16 @@ export const MerchantPortal: React.FC = () => {
                 <XAxis type="number" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <YAxis type="category" dataKey="name" width={120} tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Bar dataKey="clicks" fill="#38bdf8" radius={[0, 6, 6, 0]} />
+                <Bar dataKey="clicks" fill="var(--ff-info)" radius={[0, 6, 6, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold text-stone-900">Engagement by Category</h3>
-            <span className="text-xs text-stone-700">Checkout Clicks</span>
+            <h3 className="font-bold">Engagement by Category</h3>
+            <span className="text-xs text-[var(--ff-neutral-muted)]">Checkout Clicks</span>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -1097,21 +1079,21 @@ export const MerchantPortal: React.FC = () => {
                 <XAxis dataKey="category" tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <YAxis tick={{ fill: '#94a3b8', fontSize: 12 }} />
                 <Tooltip contentStyle={{ background: '#0f172a', border: '1px solid #1f2937', color: '#e2e8f0' }} />
-                <Bar dataKey="clicks" fill="#f59e0b" radius={[6, 6, 0, 0]} />
+                <Bar dataKey="clicks" fill="var(--ff-warning)" radius={[6, 6, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
       </div>
 
-      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
+      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold text-stone-900">Inventory Snapshot</h3>
-          <span className="text-xs text-stone-700">Stock vs. Clicks</span>
+          <h3 className="font-bold">Inventory Snapshot</h3>
+          <span className="text-xs text-[var(--ff-neutral-muted)]">Stock vs. Clicks</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-stone-700">
+            <thead className="text-[var(--ff-ink-muted)]">
               <tr className="border-b border-[var(--ff-border)]">
                 <th className="py-2 text-left">Product</th>
                 <th className="py-2 text-right">Stock</th>
@@ -1122,13 +1104,13 @@ export const MerchantPortal: React.FC = () => {
               {analyticsSnapshot.topProducts.map((item) => (
                 <tr key={item.name} className="border-b border-[var(--ff-border)] last:border-0">
                   <td className="py-2 text-[var(--ff-ink)]">{item.name}</td>
-                  <td className="py-2 text-right text-stone-700">{item.stock}</td>
-                  <td className="py-2 text-right text-emerald-700">{item.clicks.toLocaleString()}</td>
+                  <td className="py-2 text-right text-[var(--ff-ink-muted)]">{item.stock}</td>
+                  <td className="py-2 text-right text-[var(--ff-success-bold)]">{item.clicks.toLocaleString()}</td>
                 </tr>
               ))}
               {analyticsSnapshot.topProducts.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="py-6 text-center text-stone-700">No sales data yet. Create products to start tracking.</td>
+                  <td colSpan={3} className="py-6 text-center text-[var(--ff-neutral-muted)]">No sales data yet. Create products to start tracking.</td>
                 </tr>
               )}
             </tbody>
@@ -1222,122 +1204,122 @@ export const MerchantPortal: React.FC = () => {
 
   const renderMyAccount = () => (
     <div className="space-y-6">
-      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-6 text-stone-900">Business Profile</h3>
+      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
+        <h3 className="font-bold mb-6">Business Profile</h3>
         <div className="space-y-4">
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Business Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Name</label>
             <input
               type="text"
               value={businessProfile.businessName}
               onChange={(e) => setBusinessProfile({ ...businessProfile, businessName: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Contact Email</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Contact Email</label>
             <input
               type="email"
               value={businessProfile.contactEmail}
               onChange={(e) => setBusinessProfile({ ...businessProfile, contactEmail: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Phone</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Phone</label>
             <input
               type="tel"
               value={businessProfile.phone}
               onChange={(e) => setBusinessProfile({ ...businessProfile, phone: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Business Address</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Address</label>
             <textarea
               value={businessProfile.address}
               onChange={(e) => setBusinessProfile({ ...businessProfile, address: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500 h-20"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)] h-20"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Certifications</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Certifications</label>
             <input
               type="text"
               value={businessProfile.certifications}
               onChange={(e) => setBusinessProfile({ ...businessProfile, certifications: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Year Established</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Year Established</label>
             <input
               type="text"
               value={businessProfile.yearEstablished}
               onChange={(e) => setBusinessProfile({ ...businessProfile, yearEstablished: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
         </div>
         <button
           onClick={() => showToast('Changes saved', 'success')}
-          className="mt-6 bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl font-medium transition"
+          className="mt-6 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] px-6 py-3 rounded-xl font-medium transition"
         >
           Save Changes
         </button>
       </div>
-      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-6 text-stone-900">Bank Account Details</h3>
-        <p className="text-stone-700 text-sm mb-4">For receiving weekly payouts to your merchant account</p>
+      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
+        <h3 className="font-bold mb-6">Bank Account Details</h3>
+        <p className="text-[var(--ff-ink-muted)] text-sm mb-4">For receiving weekly payouts to your merchant account</p>
         <div className="space-y-4">
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Account Holder Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Holder Name</label>
             <input
               type="text"
               value={businessProfile.accountHolderName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, accountHolderName: e.target.value })}
               placeholder="Full name on bank account"
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div>
-            <label className="text-stone-700 text-sm block mb-2">Bank Name</label>
+            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Bank Name</label>
             <input
               type="text"
               value={businessProfile.bankName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, bankName: e.target.value })}
               placeholder="e.g., Standard Bank"
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+              className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-stone-700 text-sm block mb-2">Account Number</label>
+              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Number</label>
               <input
                 type="text"
                 value={businessProfile.accountNumber || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, accountNumber: e.target.value })}
                 placeholder="Account number"
-                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+                className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
               />
             </div>
             <div>
-              <label className="text-stone-700 text-sm block mb-2">Branch Code</label>
+              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Branch Code</label>
               <input
                 type="text"
                 value={businessProfile.branchCode || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, branchCode: e.target.value })}
                 placeholder="Branch code"
-                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
+                className="w-full bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded-lg px-4 py-3 text-[var(--ff-form-text)]"
               />
             </div>
           </div>
           {merchantAccount?.bank_account?.bank_name && (
-            <div className="bg-stone-200/60 border border-[var(--ff-border)]/50 rounded-lg p-4 mt-4">
-              <p className="text-stone-700 text-sm mb-2">Current Bank Details:</p>
+            <div className="bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)]/50 rounded-lg p-4 mt-4">
+              <p className="text-[var(--ff-ink-muted)] text-sm mb-2">Current Bank Details:</p>
               <p className="text-[var(--ff-ink)] text-sm">{merchantAccount.bank_account.account_holder_name}</p>
-              <p className="text-stone-700 text-sm">{merchantAccount.bank_account.bank_name}</p>
-              <p className="text-stone-700 text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
+              <p className="text-[var(--ff-ink-muted)] text-sm">{merchantAccount.bank_account.bank_name}</p>
+              <p className="text-[var(--ff-neutral-muted)] text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
             </div>
           )}
         </div>
@@ -1348,10 +1330,12 @@ export const MerchantPortal: React.FC = () => {
               return;
             }
             try {
-              const res = await merchantFetch(`${apiBase}/v1/merchant/account/bank`, {
+              const token = localStorage.getItem('merchantToken');
+              const res = await fetch(`${apiBase}/v1/merchant/account/bank`, {
                 method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                   account_name: businessProfile.accountHolderName,
@@ -1371,17 +1355,17 @@ export const MerchantPortal: React.FC = () => {
               showToast(`Error: ${error instanceof Error ? error.message : 'Failed to update'}`, 'error');
             }
           }}
-          className="mt-6 bg-emerald-600 hover:bg-emerald-700 px-6 py-3 rounded-xl font-medium transition"
+          className="mt-6 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] px-6 py-3 rounded-xl font-medium transition"
         >
           Update Bank Details
         </button>
       </div>
-      <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-4 text-stone-900">Account Settings</h3>
+      <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-6">
+        <h3 className="font-bold mb-4">Account Settings</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-stone-700">Two-Factor Authentication</span>
-            <button className="text-emerald-500 hover:text-emerald-400 text-sm">Enable</button>
+            <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
+            <button className="text-[var(--ff-success)] hover:text-[var(--ff-success-bold)] text-sm">Enable</button>
           </div>
         </div>
       </div>
@@ -1403,7 +1387,7 @@ export const MerchantPortal: React.FC = () => {
         >
           <Bell className="w-4 h-4 text-[var(--ff-ink)]" />
           {unreadCount > 0 && (
-            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-red-500 text-[var(--ff-ink)] text-[10px] leading-[18px] font-semibold">
+            <span className="absolute -top-1 -right-1 min-w-[18px] h-[18px] px-1 rounded-full bg-[var(--ff-error)] text-[var(--ff-neutral)] text-[10px] leading-[18px] font-semibold">
               {unreadCount > 99 ? '99+' : unreadCount}
             </span>
           )}
@@ -1437,4 +1421,3 @@ export const MerchantPortal: React.FC = () => {
     </TabShell>
   );
 }
-
