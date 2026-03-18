@@ -164,7 +164,7 @@ export function MerchantLogin() {
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>
@@ -178,7 +178,7 @@ export function MerchantLogin() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>

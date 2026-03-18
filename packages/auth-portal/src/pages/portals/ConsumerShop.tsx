@@ -144,7 +144,7 @@ export const ConsumerShop: React.FC = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-white pl-8 pr-3 text-xs text-[var(--ff-ink)] placeholder:text-[var(--ff-ink-muted)] focus:outline-none focus:border-[var(--ff-accent)]"
+                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-white pl-8 pr-3 text-xs text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[var(--ff-accent)]"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={selectedCategory || ''}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-stone-900"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -174,7 +174,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={minScore}
                 onChange={(e) => setMinScore(parseInt(e.target.value))}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-stone-900"
               >
                 <option value="0">Any Score</option>
                 <option value="3">3+ Stars</option>

@@ -579,7 +579,7 @@ export const CEODashboard: React.FC = () => {
                   type="text"
                   value={onboardForm.businessName}
                   onChange={e => setOnboardForm({ ...onboardForm, businessName: e.target.value })}
-                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-[var(--ff-ink)] focus:outline-none focus:border-emerald-500"
+                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-emerald-500"
                   placeholder="Enter business name"
                 />
               </div>
@@ -589,7 +589,7 @@ export const CEODashboard: React.FC = () => {
                   type="email"
                   value={onboardForm.contactEmail}
                   onChange={e => setOnboardForm({ ...onboardForm, contactEmail: e.target.value })}
-                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-[var(--ff-ink)] focus:outline-none focus:border-emerald-500"
+                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-emerald-500"
                   placeholder="merchant@example.com"
                 />
               </div>
@@ -598,7 +598,7 @@ export const CEODashboard: React.FC = () => {
                 <select
                   value={onboardForm.category}
                   onChange={e => setOnboardForm({ ...onboardForm, category: e.target.value })}
-                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-[var(--ff-ink)] focus:outline-none focus:border-emerald-500"
+                  className="w-full px-4 py-2 bg-[var(--ff-bg)] border border-[var(--ff-border)] rounded-lg text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-emerald-500"
                 >
                   <option value="">Select category</option>
                   <option value="food">Food & Beverage</option>

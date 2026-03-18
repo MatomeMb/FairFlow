@@ -262,7 +262,7 @@ export function CTOAdminPanel() {
           <input
             type="text"
             placeholder="Search..."
-            className="bg-white/70 border border-[var(--ff-border)] rounded-lg px-4 py-2 text-sm text-[var(--ff-ink)] placeholder-stone-500"
+            className="bg-white/70 border border-[var(--ff-border)] rounded-lg px-4 py-2 text-sm text-stone-900 placeholder-stone-500"
           />
         </div>
 

@@ -678,7 +678,7 @@ export const AdminPortal: React.FC = () => {
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
-                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-[var(--ff-ink-muted)] focus:outline-none focus:border-blue-500"
+                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-stone-900 text-sm placeholder:text-stone-500 focus:outline-none focus:border-blue-500"
                     placeholder="Add any notes about this approval..."
                     rows={3}
                   />
@@ -689,7 +689,7 @@ export const AdminPortal: React.FC = () => {
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
-                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-[var(--ff-ink)] text-sm placeholder-[var(--ff-ink-muted)] focus:outline-none focus:border-red-500"
+                    className="w-full bg-[var(--ff-surface)] border border-[var(--ff-border)] rounded-lg px-3 py-2 text-stone-900 text-sm placeholder:text-stone-500 focus:outline-none focus:border-red-500"
                     placeholder="Explain why this KYC is being rejected..."
                     rows={3}
                   />

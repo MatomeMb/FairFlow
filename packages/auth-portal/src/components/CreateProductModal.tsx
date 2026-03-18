@@ -441,7 +441,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               value={form.title}
               onChange={(e) => setField('title', e.target.value)}
               maxLength={255}
-              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               placeholder="Product title"
             />
             {errors.title && <p className="mt-1 text-xs text-red-400">{errors.title}</p>}
@@ -453,7 +453,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
               rows={3}
-              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+              className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               placeholder="Describe your product"
             />
           </div>
@@ -466,7 +466,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 inputMode="decimal"
                 value={form.priceRands}
                 onChange={(e) => handlePriceChange(e.target.value)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
                 placeholder="125.00"
               />
               <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">Price preview: {prettyPrice}</p>
@@ -481,7 +481,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 step={1}
                 value={form.stock_count}
                 onChange={(e) => setField('stock_count', e.target.value)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               />
               {errors.stock_count && <p className="mt-1 text-xs text-red-400">{errors.stock_count}</p>}
             </div>
@@ -493,7 +493,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
               <select
                 value={form.category}
                 onChange={(e) => setField('category', e.target.value as FormState['category'])}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               >
                 <option value="">Select category</option>
                 {CATEGORY_OPTIONS.map((option) => (
@@ -519,7 +519,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                     setField('image_url', '');
                   }
                 }}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-[var(--ff-ink)] outline-none transition-colors focus:border-emerald-500"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               />
               <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">
                 {isUploadingImage

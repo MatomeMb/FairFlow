@@ -148,7 +148,7 @@ export function AuthDiagnosticsPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@fairflow.co.za"
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-stone-900 placeholder:text-stone-500"
               />
             </div>
 
@@ -159,7 +159,7 @@ export function AuthDiagnosticsPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password to test"
-                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full rounded-xl border border-stone-200 px-4 py-3 text-stone-900 placeholder:text-stone-500"
               />
             </div>
 

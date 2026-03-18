@@ -62,7 +62,7 @@ export function DeliveryDatePicker({
             value={date}
             min={new Date().toISOString().split('T')[0]}
             onChange={(e) => setDate(e.target.value)}
-            className="w-full rounded-md border border-[var(--ff-border)] bg-white py-1.5 pl-8 pr-3 text-sm text-[var(--ff-ink)] focus:outline-none focus:ring-2 focus:ring-emerald-500"
+            className="w-full rounded-md border border-[var(--ff-border)] bg-white py-1.5 pl-8 pr-3 text-sm text-stone-900 placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
           />
         </div>
         <button
