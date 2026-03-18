@@ -37,7 +37,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <div className="flex gap-3 justify-center">
               <button
                 onClick={() => this.setState({ hasError: false, error: null })}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg text-sm transition"
+                className="px-4 py-2 bg-ff-primary hover:bg-ff-primary-hover text-white rounded-lg text-sm transition"
               >
                 Try again
               </button>

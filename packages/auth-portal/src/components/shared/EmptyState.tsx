@@ -19,7 +19,7 @@ export function EmptyState({ icon, title, description, action }: EmptyStateProps
       {action && (
         <button
           onClick={action.onClick}
-          className="inline-flex items-center gap-2 h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50"
+          className="inline-flex items-center gap-2 h-9 px-4 bg-ff-primary hover:bg-ff-primary-hover text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-ff-focus/50"
         >
           {action.label}
         </button>

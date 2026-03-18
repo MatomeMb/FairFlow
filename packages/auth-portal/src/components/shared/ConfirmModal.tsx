@@ -31,10 +31,10 @@ export function ConfirmModal({ isOpen, title, message, confirmLabel, onConfirm, 
           </button>
           <button
             onClick={onConfirm}
-            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500 ${
+            className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-ff-focus ${
               danger
-                ? 'border border-red-300 bg-red-50 text-red-700 hover:bg-red-100'
-                : 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                ? 'border border-ff-error bg-ff-error-subtle text-ff-error-bold hover:bg-ff-error-subtle'
+                : 'bg-ff-primary hover:bg-ff-primary-hover text-white'
             }`}
           >
             {confirmLabel}

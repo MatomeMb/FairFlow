@@ -15,6 +15,11 @@ export default {
           'success-bold': 'var(--ff-success-bold)',
           'success-subtle': 'var(--ff-success-subtle)',
           info: 'var(--ff-info)',
+          warning: {
+            DEFAULT: 'var(--ff-warning)',
+            bg: 'var(--ff-warning-bg)',
+            border: 'var(--ff-warning-border)',
+          },
           primary: 'var(--ff-primary)',
           'primary-hover': 'var(--ff-primary-hover)',
           focus: 'var(--ff-focus)',
