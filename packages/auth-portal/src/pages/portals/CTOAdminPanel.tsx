@@ -66,7 +66,7 @@ export function CTOAdminPanel() {
           <OfflineBanner />
           <div className="p-6">
             <EmptyState
-              icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
+              icon={<AlertTriangle className="w-10 h-10 text-[var(--ff-warning)]" />}
               title="API Offline"
               description="Cannot fetch analytics. Run: cd mcj && npm run demo, then refresh this panel."
               action={{ label: "Try Again", onClick: refresh }}
@@ -97,13 +97,13 @@ export function CTOAdminPanel() {
           {/* Two Column Section */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Query Cache */}
-            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+            <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
               <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Query Cache</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
                   <span className="text-[var(--ff-ink-muted)]">Status</span>
                   <span className="flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-lg ${analytics?.cache.enabled ? 'bg-green-500' : 'bg-red-500'}`} />
+                    <span className={`w-2 h-2 rounded-lg ${analytics?.cache.enabled ? 'bg-[var(--ff-success)]' : 'bg-[var(--ff-error)]'}`} />
                     {analytics?.cache.enabled ? 'Enabled' : 'Disabled'}
                   </span>
                 </div>
@@ -131,7 +131,7 @@ export function CTOAdminPanel() {
               <button
                 onClick={onClearCache}
                 title="Cache management coming in Sprint 8"
-                className="mt-4 w-full bg-stone-200/60 cursor-not-allowed text-stone-500 text-sm font-medium px-4 py-2 rounded-lg border border-[var(--ff-border)] transition-colors"
+                className="mt-4 w-full bg-[var(--ff-neutral-subtle)] cursor-not-allowed text-[var(--ff-neutral-muted)] text-sm font-medium px-4 py-2 rounded-lg border border-[var(--ff-border-light)] transition-colors"
                 disabled
               >
                 Clear Cache (Sprint 8)
@@ -139,7 +139,7 @@ export function CTOAdminPanel() {
             </div>
 
             {/* Storage Breakdown */}
-            <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+            <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
               <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Storage Breakdown</h3>
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between">
@@ -161,13 +161,13 @@ export function CTOAdminPanel() {
               </div>
               {/* Progress Bar */}
               <div className="mt-4">
-              <div className="w-full bg-stone-100 rounded-lg h-2">
+              <div className="w-full bg-[var(--ff-neutral-subtle)] rounded-lg h-2">
                 <div
-                  className="bg-emerald-500 h-2 rounded-lg"
+                  className="bg-[var(--ff-success)] h-2 rounded-lg"
                     style={{ width: `${((analytics?.storage.totalSize || 0) / (5120 * 1024 * 1024)) * 100}%` }}
                   />
                 </div>
-                <p className="text-xs text-stone-500 mt-1">
+                <p className="text-xs text-[var(--ff-neutral-muted)] mt-1">
                   {(((analytics?.storage.totalSize || 0) / (5120 * 1024 * 1024)) * 100).toFixed(4)}% used
                 </p>
               </div>
@@ -175,7 +175,7 @@ export function CTOAdminPanel() {
           </div>
 
           {/* Query Histogram */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+          <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
             <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Query Time Histogram</h3>
             {analytics && analytics.queryHistogram.length > 0 ? (
               <ResponsiveContainer width="100%" height={250}>
@@ -189,7 +189,7 @@ export function CTOAdminPanel() {
               </ResponsiveContainer>
             ) : (
               <EmptyState
-                icon={<BarChart2 className="w-10 h-10 text-stone-500" />}
+                icon={<BarChart2 className="w-10 h-10 text-[var(--ff-neutral-muted)]" />}
                 title="No queries recorded"
                 description="System is in a clean state."
               />
@@ -262,27 +262,27 @@ export function CTOAdminPanel() {
           <input
             type="text"
             placeholder="Search..."
-            className="bg-white/70 border border-[var(--ff-border)] rounded-lg px-4 py-2 text-sm text-stone-900 placeholder-stone-500"
+            className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-lg px-4 py-2 text-sm text-[var(--ff-ink)] placeholder-[var(--ff-form-placeholder)]"
           />
         </div>
 
         {/* Stats Row */}
         <div className="flex gap-4 text-sm">
           <span className="text-[var(--ff-ink-muted)]">CEO: <span className="text-[var(--ff-ink)]">{roleCounts.ceo || 0}</span></span>
-          <span className="text-stone-500">|</span>
+          <span className="text-[var(--ff-neutral-muted)]">|</span>
           <span className="text-[var(--ff-ink-muted)]">CTO: <span className="text-[var(--ff-ink)]">{roleCounts.cto || 0}</span></span>
-          <span className="text-stone-500">|</span>
+          <span className="text-[var(--ff-neutral-muted)]">|</span>
           <span className="text-[var(--ff-ink-muted)]">Merchants: <span className="text-[var(--ff-ink)]">{roleCounts.merchant || 0}</span></span>
-          <span className="text-stone-500">|</span>
+          <span className="text-[var(--ff-neutral-muted)]">|</span>
           <span className="text-[var(--ff-ink-muted)]">Investors: <span className="text-[var(--ff-ink)]">{roleCounts.investor || 0}</span></span>
-          <span className="text-stone-500">|</span>
+          <span className="text-[var(--ff-neutral-muted)]">|</span>
           <span className="text-[var(--ff-ink-muted)]">Consumers: <span className="text-[var(--ff-ink)]">{roleCounts.consumer || 0}</span></span>
         </div>
 
         {/* Users Table */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-hidden">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-hidden">
           <table className="w-full">
-            <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
+            <thead className="bg-[var(--ff-neutral-subtle)] border-b border-[var(--ff-border-light)]">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">#</th>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">User ID</th>
@@ -291,13 +291,13 @@ export function CTOAdminPanel() {
                 <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-800">
+            <tbody className="divide-y divide-[var(--ff-border-mid)]">
               {usersLoading ? (
                 <tr>
-                  <td colSpan={5} className="px-4 py-8 text-center text-stone-500">Loading...</td>
+                  <td colSpan={5} className="px-4 py-8 text-center text-[var(--ff-neutral-muted)]">Loading...</td>
                 </tr>
               ) : users.map((user, idx) => (
-                <tr key={user.id} className="hover:bg-stone-200/60 transition-colors">
+                <tr key={user.id} className="hover:bg-[var(--ff-neutral-subtle)] transition-colors">
                   <td className="px-4 py-3 text-sm text-[var(--ff-ink-muted)]">{idx + 1}</td>
                   <td className="px-4 py-3 text-sm text-[var(--ff-ink)] font-mono">{truncateId(user.user_id)}</td>
                   <td className="px-4 py-3">
@@ -310,7 +310,7 @@ export function CTOAdminPanel() {
                     <select
                       value={user.role}
                       onChange={(e) => handleRoleChange(user.user_id, user.role, e.target.value as AppRole)}
-                      className="bg-stone-100 border border-[var(--ff-border)] rounded px-2 py-1 text-xs text-[var(--ff-ink)]"
+                      className="bg-[var(--ff-neutral-subtle)] border border-[var(--ff-border-light)] rounded px-2 py-1 text-xs text-[var(--ff-ink)]"
                     >
                       <option value="ceo">CEO</option>
                       <option value="cto">CTO</option>
@@ -320,7 +320,7 @@ export function CTOAdminPanel() {
                     </select>
                     <button
                       onClick={() => handleRemoveUser(user.id)}
-                      className="bg-red-900/50 hover:bg-red-900 text-red-400 border border-red-800 rounded px-2 py-1 text-xs transition-colors"
+                      className="bg-[var(--ff-error-subtle)] hover:bg-[var(--ff-error-bold)] text-[var(--ff-error)] border border-[var(--ff-error-bold)] rounded px-2 py-1 text-xs transition-colors"
                     >
                       Remove
                     </button>
@@ -360,7 +360,7 @@ export function CTOAdminPanel() {
     return (
       <div className="p-6 space-y-6">
         {/* API Status */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
           <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">API Status</h3>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div>
@@ -378,7 +378,7 @@ export function CTOAdminPanel() {
             <div>
               <span className="text-[var(--ff-ink-muted)]">Status:</span>
               <span className="text-[var(--ff-ink)] ml-2 flex items-center gap-2">
-                <span className={`w-2 h-2 rounded-lg ${apiOnline ? 'bg-green-500' : 'bg-red-500'}`} />
+                <span className={`w-2 h-2 rounded-lg ${apiOnline ? 'bg-[var(--ff-success)]' : 'bg-[var(--ff-error)]'}`} />
                 {apiOnline ? 'ok' : 'offline'}
               </span>
             </div>
@@ -389,14 +389,14 @@ export function CTOAdminPanel() {
           </div>
           <button
             onClick={() => checkHealth().then(setApiOnline)}
-            className="mt-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="mt-4 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-neutral)] text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
             Test Connection
           </button>
         </div>
 
         {/* Memory Monitor */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
           <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Memory Monitor</h3>
           <div className="space-y-4">
             <div>
@@ -404,8 +404,8 @@ export function CTOAdminPanel() {
                 <span className="text-[var(--ff-ink-muted)]">Heap Memory</span>
                 <span className="text-[var(--ff-ink)]">{(analytics?.system.memoryHeap || 0).toFixed(2)} MB</span>
               </div>
-              <div className="w-full bg-stone-100 rounded-lg h-2">
-                <div className="bg-blue-500 h-2 rounded-lg" style={{ width: '45%' }} />
+              <div className="w-full bg-[var(--ff-neutral-subtle)] rounded-lg h-2">
+                <div className="bg-[var(--ff-info)] h-2 rounded-lg" style={{ width: '45%' }} />
               </div>
             </div>
             <div>
@@ -413,15 +413,15 @@ export function CTOAdminPanel() {
                 <span className="text-[var(--ff-ink-muted)]">RSS Memory</span>
                 <span className="text-[var(--ff-ink)]">{(analytics?.system.memoryRss || 0).toFixed(2)} MB</span>
               </div>
-              <div className="w-full bg-stone-100 rounded-lg h-2">
-                <div className="bg-purple-500 h-2 rounded-lg" style={{ width: '60%' }} />
+              <div className="w-full bg-[var(--ff-neutral-subtle)] rounded-lg h-2">
+                <div className="bg-[var(--ff-primary)] h-2 rounded-lg" style={{ width: '60%' }} />
               </div>
             </div>
           </div>
         </div>
 
         {/* Pre-Aggregation */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
           <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Pre-Aggregation</h3>
           <div className="space-y-2 text-sm mb-4">
             <div className="flex justify-between">
@@ -443,14 +443,14 @@ export function CTOAdminPanel() {
           </div>
           <button
             onClick={onPreAggregate}
-            className="w-full bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium px-4 py-2 rounded-lg transition-colors"
+            className="w-full bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-neutral)] text-sm font-medium px-4 py-2 rounded-lg transition-colors"
           >
             Run Now
           </button>
         </div>
 
         {/* Environment Info */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
           <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Environment Info</h3>
           <div className="space-y-2 text-sm">
             <div className="flex justify-between">
@@ -468,12 +468,12 @@ export function CTOAdminPanel() {
             <div className="flex justify-between">
               <span className="text-[var(--ff-ink-muted)]">Auth Hook:</span>
               <span className="text-[var(--ff-ink)] flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-500" /> custom-access-token-hook (HTTPS)
+                <Check className="w-4 h-4 text-[var(--ff-success)]" /> custom-access-token-hook (HTTPS)
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--ff-ink-muted)]">RBAC:</span>
-              <span className="text-[var(--ff-ink)] flex items-center gap-2"><Check className="w-4 h-4 text-emerald-500" /> 5 roles · 16 permissions</span>
+              <span className="text-[var(--ff-ink)] flex items-center gap-2"><Check className="w-4 h-4 text-[var(--ff-success)]" /> 5 roles · 16 permissions</span>
             </div>
             <div className="flex justify-between">
               <span className="text-[var(--ff-ink-muted)]">JWT Claim:</span>
@@ -506,9 +506,9 @@ export function CTOAdminPanel() {
       <div className="p-6 space-y-6">
         <h2 className="text-2xl font-semibold text-[var(--ff-ink)]">RBAC Matrix — 16 permission rules across 5 roles</h2>
 
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-x-auto">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
+            <thead className="bg-[var(--ff-neutral-subtle)] border-b border-[var(--ff-border-light)]">
               <tr>
                 <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Resource</th>
                 {roles.map(role => (
@@ -518,13 +518,13 @@ export function CTOAdminPanel() {
                 ))}
               </tr>
             </thead>
-            <tbody className="divide-y divide-stone-800">
+            <tbody className="divide-y divide-[var(--ff-border-mid)]">
               {permsLoading ? (
                 <tr>
-                  <td colSpan={6} className="px-4 py-8 text-center text-stone-500">Loading permissions...</td>
+                  <td colSpan={6} className="px-4 py-8 text-center text-[var(--ff-neutral-muted)]">Loading permissions...</td>
                 </tr>
               ) : resources.map(resource => (
-                <tr key={resource} className="hover:bg-stone-200/60">
+                <tr key={resource} className="hover:bg-[var(--ff-neutral-subtle)]">
                   <td className="px-4 py-3 text-sm font-medium text-[var(--ff-ink)]">{resource}</td>
                   {roles.map(role => {
                     const perm = permissions.find(p => p.resource === resource && p.role === role);
@@ -532,17 +532,17 @@ export function CTOAdminPanel() {
                       <td key={role} className="px-4 py-3 text-center">
                         {perm ? (
                           <div className="flex justify-center gap-1" title={`select: ${perm.can_select ? 'yes' : 'no'} | insert: ${perm.can_insert ? 'yes' : 'no'} | update: ${perm.can_update ? 'yes' : 'no'} | delete: ${perm.can_delete ? 'yes' : 'no'}`}>
-                            <Circle className={`w-2 h-2 fill-current ${perm.can_select ? 'text-emerald-400' : 'text-stone-700'}`} />
-                            <Circle className={`w-2 h-2 fill-current ${perm.can_insert ? 'text-emerald-400' : 'text-stone-700'}`} />
-                            <Circle className={`w-2 h-2 fill-current ${perm.can_update ? 'text-emerald-400' : 'text-stone-700'}`} />
-                            <Circle className={`w-2 h-2 fill-current ${perm.can_delete ? 'text-emerald-400' : 'text-stone-700'}`} />
+                            <Circle className={`w-2 h-2 fill-current ${perm.can_select ? 'text-[var(--ff-success)]' : 'text-[var(--ff-neutral-muted)]'}`} />
+                            <Circle className={`w-2 h-2 fill-current ${perm.can_insert ? 'text-[var(--ff-success)]' : 'text-[var(--ff-neutral-muted)]'}`} />
+                            <Circle className={`w-2 h-2 fill-current ${perm.can_update ? 'text-[var(--ff-success)]' : 'text-[var(--ff-neutral-muted)]'}`} />
+                            <Circle className={`w-2 h-2 fill-current ${perm.can_delete ? 'text-[var(--ff-success)]' : 'text-[var(--ff-neutral-muted)]'}`} />
                           </div>
                         ) : (
                           <div className="flex justify-center gap-1">
-                            <Circle className="w-2 h-2 fill-current text-stone-700" />
-                            <Circle className="w-2 h-2 fill-current text-stone-700" />
-                            <Circle className="w-2 h-2 fill-current text-stone-700" />
-                            <Circle className="w-2 h-2 fill-current text-stone-700" />
+                            <Circle className="w-2 h-2 fill-current text-[var(--ff-neutral-muted)]" />
+                            <Circle className="w-2 h-2 fill-current text-[var(--ff-neutral-muted)]" />
+                            <Circle className="w-2 h-2 fill-current text-[var(--ff-neutral-muted)]" />
+                            <Circle className="w-2 h-2 fill-current text-[var(--ff-neutral-muted)]" />
                           </div>
                         )}
                       </td>
@@ -555,13 +555,13 @@ export function CTOAdminPanel() {
         </div>
 
         <div className="flex gap-6 text-xs text-[var(--ff-ink-muted)]">
-          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_select</span>
-          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_insert</span>
-          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_update</span>
-          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-emerald-400" /> can_delete</span>
+          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-[var(--ff-success)]" /> can_select</span>
+          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-[var(--ff-success)]" /> can_insert</span>
+          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-[var(--ff-success)]" /> can_update</span>
+          <span className="flex items-center gap-2"><Circle className="w-2 h-2 fill-current text-[var(--ff-success)]" /> can_delete</span>
         </div>
 
-        <p className="text-sm text-stone-500 italic">
+        <p className="text-sm text-[var(--ff-neutral-muted)] italic">
           Permissions enforced at PostgreSQL level via RLS. Changes require a SQL migration.
         </p>
       </div>
@@ -574,7 +574,7 @@ export function CTOAdminPanel() {
       return (
         <div className="p-6">
           <EmptyState
-            icon={<AlertTriangle className="w-10 h-10 text-yellow-400" />}
+            icon={<AlertTriangle className="w-10 h-10 text-[var(--ff-warning)]" />}
             title="API Offline"
             description="Cannot fetch logs. Run: cd mcj && npm run demo. Then refresh this panel."
             action={{ label: "Try Again", onClick: refresh }}
@@ -586,24 +586,24 @@ export function CTOAdminPanel() {
     return (
       <div className="p-6 space-y-6">
         {/* Error Summary */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl p-5">
           <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-2">Error Summary (24h)</h3>
           <div className="text-3xl font-bold tabular-nums mb-2">
             {analytics?.errors.count || 0} errors
           </div>
-          <p className={analytics?.errors.count === 0 ? "text-green-400 flex items-center gap-2" : "text-red-400 flex items-center gap-2"}>
+          <p className={analytics?.errors.count === 0 ? "text-[var(--ff-success)] flex items-center gap-2" : "text-[var(--ff-error)] flex items-center gap-2"}>
             {analytics?.errors.count === 0 ? <><Check className="w-4 h-4" /> All clear</> : <><AlertTriangle className="w-4 h-4" /> Review logs</>}
           </p>
         </div>
 
         {/* Query History */}
-        <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl overflow-hidden">
-          <div className="px-5 py-4 border-b border-[var(--ff-border)]">
+        <div className="bg-[var(--ff-neutral)]/70 border border-[var(--ff-border-light)] rounded-xl overflow-hidden">
+          <div className="px-5 py-4 border-b border-[var(--ff-border-light)]">
             <h3 className="text-xl font-semibold text-[var(--ff-ink)]">Query History</h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
-              <thead className="bg-stone-100 border-b border-[var(--ff-border)]">
+              <thead className="bg-[var(--ff-neutral-subtle)] border-b border-[var(--ff-border-light)]">
                 <tr>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Time</th>
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Duration</th>
@@ -612,10 +612,10 @@ export function CTOAdminPanel() {
                   <th className="px-4 py-3 text-left text-xs font-medium text-[var(--ff-ink-muted)] uppercase">Status</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-stone-800">
+              <tbody className="divide-y divide-[var(--ff-border-mid)]">
                 {analytics && analytics.recentQueries.length > 0 ? (
                   analytics.recentQueries.map((query, idx) => (
-                    <tr key={idx} className="hover:bg-stone-200/60">
+                    <tr key={idx} className="hover:bg-[var(--ff-neutral-subtle)]">
                       <td className="px-4 py-3 text-sm text-[var(--ff-ink)] font-mono">
                         {new Date(query.timestamp).toLocaleTimeString()}
                       </td>
@@ -627,8 +627,8 @@ export function CTOAdminPanel() {
                       <td className="px-4 py-3">
                         <span className={`inline-flex px-2 py-1 text-xs rounded-md ${
                           query.status === 'success'
-                            ? 'bg-green-900/50 text-green-400 border border-green-800'
-                            : 'bg-red-900/50 text-red-400 border border-red-800'
+                            ? 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)] border border-[var(--ff-success-bold)]'
+                            : 'bg-[var(--ff-error-subtle)] text-[var(--ff-error)] border border-[var(--ff-error-bold)]'
                         }`}>
                           {query.status}
                         </span>
@@ -639,7 +639,7 @@ export function CTOAdminPanel() {
                   <tr>
                     <td colSpan={5} className="px-4 py-8">
                       <EmptyState
-                        icon={<FileText className="w-10 h-10 text-stone-500" />}
+                        icon={<FileText className="w-10 h-10 text-[var(--ff-neutral-muted)]" />}
                         title="No query history"
                         description="Recent queries will appear here."
                       />
@@ -662,20 +662,20 @@ export function CTOAdminPanel() {
             <h2 className="text-2xl font-bold text-[var(--ff-ink)]">Talent Pipeline</h2>
             <p className="text-sm text-[var(--ff-ink-muted)] mt-1">Manage potential candidates for future hiring</p>
           </div>
-          <button className="inline-flex items-center gap-2 h-9 px-4 bg-emerald-600 hover:bg-emerald-500 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-emerald-500/50">
+          <button className="inline-flex items-center gap-2 h-9 px-4 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-neutral)] text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-[var(--ff-focus)]/50">
             Add Candidate
           </button>
         </div>
 
-        <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 overflow-hidden">
-          <div className="p-6 border-b border-[var(--ff-border)]/60">
+        <div className="bg-[var(--ff-neutral)]/70 rounded-xl border border-[var(--ff-border-light)]/60 overflow-hidden">
+          <div className="p-6 border-b border-[var(--ff-border-light)]/60">
             <p className="text-sm text-[var(--ff-ink-muted)]">
               Coming in Sprint 8: Talent database for tracking candidates, managing interviews, and building your hiring pipeline.
             </p>
           </div>
           <div className="p-12">
             <EmptyState
-              icon={<Briefcase className="w-10 h-10 text-stone-500" />}
+              icon={<Briefcase className="w-10 h-10 text-[var(--ff-neutral-muted)]" />}
               title="No candidates yet"
               description="Start building your talent pipeline by adding potential team members for future roles."
             />
@@ -683,17 +683,17 @@ export function CTOAdminPanel() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
-            <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Potential</div>
+          <div className="bg-[var(--ff-neutral)]/70 rounded-xl border border-[var(--ff-border-light)]/60 p-5">
+            <div className="text-xs font-medium tracking-widest uppercase text-[var(--ff-neutral-muted)] mb-2">Potential</div>
             <div className="text-3xl font-bold text-[var(--ff-ink)]">0</div>
           </div>
-          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
-            <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Interviewing</div>
-            <div className="text-3xl font-bold text-yellow-400">0</div>
+          <div className="bg-[var(--ff-neutral)]/70 rounded-xl border border-[var(--ff-border-light)]/60 p-5">
+            <div className="text-xs font-medium tracking-widest uppercase text-[var(--ff-neutral-muted)] mb-2">Interviewing</div>
+            <div className="text-3xl font-bold text-[var(--ff-warning)]">0</div>
           </div>
-          <div className="bg-white/70 rounded-xl border border-[var(--ff-border)]/60 p-5">
-            <div className="text-xs font-medium tracking-widest uppercase text-stone-500 mb-2">Hired</div>
-            <div className="text-3xl font-bold text-emerald-400">0</div>
+          <div className="bg-[var(--ff-neutral)]/70 rounded-xl border border-[var(--ff-border-light)]/60 p-5">
+            <div className="text-xs font-medium tracking-widest uppercase text-[var(--ff-neutral-muted)] mb-2">Hired</div>
+            <div className="text-3xl font-bold text-[var(--ff-success)]">0</div>
           </div>
         </div>
       </div>
