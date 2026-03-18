@@ -102,10 +102,10 @@ export function OrderConfirmation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-blue-600 mx-auto mb-4" />
-          <p className="text-stone-600">Loading your order...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-ff-info mx-auto mb-4" />
+          <p className="text-ff-form-helper">Loading your order...</p>
         </div>
       </div>
     );
@@ -113,15 +113,15 @@ export function OrderConfirmation() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
         <div className="text-center max-w-md mx-auto px-6">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-16 h-16 bg-ff-error-subtle rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-ff-error-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-stone-900 mb-2">Order Not Found</h1>
-          <p className="text-stone-600">
+          <h1 className="text-2xl font-bold text-ff-form-text mb-2">Order Not Found</h1>
+          <p className="text-ff-form-helper">
             {error || 'We could not find your order. Please check your email for confirmation.'}
           </p>
         </div>
@@ -134,9 +134,9 @@ export function OrderConfirmation() {
   const email = order.customer?.email ?? order.customer_email ?? '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
       {/* Header */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-white border-b border-ff-border-light">
         <div className="max-w-3xl mx-auto px-6 py-4">
           <FairflowLogo markHeight={32} />
         </div>
@@ -147,14 +147,14 @@ export function OrderConfirmation() {
         {isPending ? (
           // Processing State
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 text-center">
-            <div className="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-6">
-              <Loader2 className="w-8 h-8 text-yellow-600 animate-spin" />
+            <div className="w-16 h-16 bg-ff-warning-subtle rounded-full flex items-center justify-center mx-auto mb-6">
+              <Loader2 className="w-8 h-8 text-ff-warning-bold animate-spin" />
             </div>
-            <h2 className="text-2xl font-bold text-stone-900 mb-3">Processing Payment...</h2>
-            <p className="text-stone-600 mb-6">
+            <h2 className="text-2xl font-bold text-ff-form-text mb-3">Processing Payment...</h2>
+            <p className="text-ff-form-helper mb-6">
               We're confirming your payment. This usually takes just a few seconds.
             </p>
-            <div className="text-sm text-stone-500">
+            <div className="text-sm text-ff-form-placeholder">
               Order ID: <span className="font-mono">{order.id}</span>
             </div>
           </div>
@@ -163,52 +163,52 @@ export function OrderConfirmation() {
           <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
             {/* Success Icon */}
             <div className="text-center mb-8">
-              <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-12 h-12 text-green-600" />
+              <div className="w-20 h-20 bg-ff-success-subtle rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-12 h-12 text-ff-success-bold" />
               </div>
-              <h2 className="text-3xl font-bold text-stone-900 mb-2">Payment Successful!</h2>
-              <p className="text-stone-600">
+              <h2 className="text-3xl font-bold text-ff-form-text mb-2">Payment Successful!</h2>
+              <p className="text-ff-form-helper">
                 Thank you for your purchase. A confirmation email has been sent to{' '}
-                <span className="font-medium text-stone-900">{email}</span>.
+                <span className="font-medium text-ff-form-text">{email}</span>.
               </p>
             </div>
 
             {/* Order Details */}
-            <div className="bg-stone-50 rounded-xl p-6 mb-6">
-              <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wide mb-4">
+            <div className="bg-ff-neutral-subtle rounded-xl p-6 mb-6">
+              <h3 className="text-sm font-semibold text-ff-form-helper uppercase tracking-wide mb-4">
                 Order Summary
               </h3>
               <div className="space-y-3">
                 <div className="flex justify-between">
-                  <span className="text-stone-600">Order ID</span>
-                  <span className="font-mono text-sm text-stone-900">{order.id}</span>
+                  <span className="text-ff-form-helper">Order ID</span>
+                  <span className="font-mono text-sm text-ff-form-text">{order.id}</span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-stone-600">Product</span>
-                  <span className="font-medium text-stone-900">{productTitle || (order.product_hash ?? '').slice(0, 12) + '...'}</span>
+                  <span className="text-ff-form-helper">Product</span>
+                  <span className="font-medium text-ff-form-text">{productTitle || (order.product_hash ?? '').slice(0, 12) + '...'}</span>
                 </div>
-                <div className="flex justify-between border-t border-stone-200 pt-3">
-                  <span className="text-stone-900 font-semibold">Amount Paid</span>
-                  <span className="text-xl font-bold text-green-600">
+                <div className="flex justify-between border-t border-ff-border-light pt-3">
+                  <span className="text-ff-form-text font-semibold">Amount Paid</span>
+                  <span className="text-xl font-bold text-ff-success-bold">
                     {formatPrice(amount, order.currency)}
                   </span>
                 </div>
               </div>
             </div>
 
-            <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-6">
-              <p className="text-sm text-amber-800">
+            <div className="bg-ff-warning-subtle border border-ff-warning-border rounded-xl p-4 mb-6">
+              <p className="text-sm text-ff-warning-bold">
                 <strong>Your payment is held securely.</strong> It releases to the merchant once you confirm receipt.
               </p>
-              <p className="text-sm text-amber-700 mt-1">Expected delivery within 10 days.</p>
+              <p className="text-sm text-ff-warning mt-1">Expected delivery within 10 days.</p>
             </div>
 
             {order.billing_address && (
-              <div className="bg-stone-50 rounded-xl p-6 mb-6">
-                <h3 className="text-sm font-semibold text-stone-700 uppercase tracking-wide mb-4">
+              <div className="bg-ff-neutral-subtle rounded-xl p-6 mb-6">
+                <h3 className="text-sm font-semibold text-ff-form-helper uppercase tracking-wide mb-4">
                   Billing Address
                 </h3>
-                <div className="text-sm text-stone-600 space-y-1">
+                <div className="text-sm text-ff-form-helper space-y-1">
                   {order.billing_address.name && <p>{order.billing_address.name}</p>}
                   {order.billing_address.line1 && <p>{order.billing_address.line1}</p>}
                   {order.billing_address.line2 && <p>{order.billing_address.line2}</p>}
@@ -223,21 +223,21 @@ export function OrderConfirmation() {
             )}
 
             {/* Additional Info */}
-            <div className="border-t border-stone-200 pt-6 space-y-4">
+            <div className="border-t border-ff-border-light pt-6 space-y-4">
               <div className="flex items-start gap-3">
-                <Package className="w-5 h-5 text-stone-400 mt-0.5 flex-shrink-0" />
+                <Package className="w-5 h-5 text-ff-neutral-bold mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-stone-900 mb-1">Order Date</div>
-                  <div className="text-sm text-stone-600">
+                  <div className="font-medium text-ff-form-text mb-1">Order Date</div>
+                  <div className="text-sm text-ff-form-helper">
                     {formatDateTime(order.paid_at || order.created_at)}
                   </div>
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Mail className="w-5 h-5 text-stone-400 mt-0.5 flex-shrink-0" />
+                <Mail className="w-5 h-5 text-ff-neutral-bold mt-0.5 flex-shrink-0" />
                 <div>
-                  <div className="font-medium text-stone-900 mb-1">Email Confirmation</div>
-                  <div className="text-sm text-stone-600">
+                  <div className="font-medium text-ff-form-text mb-1">Email Confirmation</div>
+                  <div className="text-sm text-ff-form-helper">
                     Check {email} for your receipt and order details
                   </div>
                 </div>
@@ -245,8 +245,8 @@ export function OrderConfirmation() {
             </div>
 
             {/* Footer */}
-            <div className="text-center mt-8 pt-6 border-t border-stone-200">
-              <p className="text-sm text-stone-500">
+            <div className="text-center mt-8 pt-6 border-t border-ff-border-light">
+              <p className="text-sm text-ff-form-placeholder">
                 © 2026 fairflow
               </p>
             </div>
