@@ -5,18 +5,33 @@ interface RoleBadgeProps {
 }
 
 export function RoleBadge({ role }: RoleBadgeProps) {
-  const config = {
-    ceo: { color: "purple", label: "CEO" },
-    cto: { color: "blue", label: "CTO" },
-    merchant: { color: "orange", label: "Merchant" },
-    investor: { color: "green", label: "Investor" },
-    consumer: { color: "stone", label: "Consumer" }
+  const config: Record<AppRole, { label: string; className: string }> = {
+    ceo: {
+      label: "CEO",
+      className: "bg-[var(--ff-primary)]/15 text-[var(--ff-primary)] border-[var(--ff-primary)]/30",
+    },
+    cto: {
+      label: "CTO",
+      className: "bg-[var(--ff-info)]/15 text-[var(--ff-info)] border-[var(--ff-info)]/30",
+    },
+    merchant: {
+      label: "Merchant",
+      className: "bg-[var(--ff-warning)]/15 text-[var(--ff-warning)] border-[var(--ff-warning)]/30",
+    },
+    investor: {
+      label: "Investor",
+      className: "bg-[var(--ff-success)]/15 text-[var(--ff-success)] border-[var(--ff-success)]/30",
+    },
+    consumer: {
+      label: "Consumer",
+      className: "bg-[var(--ff-neutral-subtle)] text-[var(--ff-ink-muted)] border-[var(--ff-border-mid)]",
+    },
   };
 
-  const { color, label } = config[role];
+  const { label, className } = config[role];
 
   return (
-    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium bg-${color}-500/20 text-${color}-300 border border-${color}-500/30`}>
+    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-medium border ${className}`}>
       {label}
     </span>
   );
