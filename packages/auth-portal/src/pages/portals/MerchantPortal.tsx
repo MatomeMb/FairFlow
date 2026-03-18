@@ -1213,7 +1213,7 @@ export const MerchantPortal: React.FC = () => {
               type="text"
               value={businessProfile.businessName}
               onChange={(e) => setBusinessProfile({ ...businessProfile, businessName: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div>
@@ -1222,7 +1222,7 @@ export const MerchantPortal: React.FC = () => {
               type="email"
               value={businessProfile.contactEmail}
               onChange={(e) => setBusinessProfile({ ...businessProfile, contactEmail: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div>
@@ -1231,7 +1231,7 @@ export const MerchantPortal: React.FC = () => {
               type="tel"
               value={businessProfile.phone}
               onChange={(e) => setBusinessProfile({ ...businessProfile, phone: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div>
@@ -1239,7 +1239,7 @@ export const MerchantPortal: React.FC = () => {
             <textarea
               value={businessProfile.address}
               onChange={(e) => setBusinessProfile({ ...businessProfile, address: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)] h-20"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500 h-20"
             />
           </div>
           <div>
@@ -1248,7 +1248,7 @@ export const MerchantPortal: React.FC = () => {
               type="text"
               value={businessProfile.certifications}
               onChange={(e) => setBusinessProfile({ ...businessProfile, certifications: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div>
@@ -1257,7 +1257,7 @@ export const MerchantPortal: React.FC = () => {
               type="text"
               value={businessProfile.yearEstablished}
               onChange={(e) => setBusinessProfile({ ...businessProfile, yearEstablished: e.target.value })}
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
         </div>
@@ -1279,7 +1279,7 @@ export const MerchantPortal: React.FC = () => {
               value={businessProfile.accountHolderName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, accountHolderName: e.target.value })}
               placeholder="Full name on bank account"
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div>
@@ -1289,7 +1289,7 @@ export const MerchantPortal: React.FC = () => {
               value={businessProfile.bankName || ''}
               onChange={(e) => setBusinessProfile({ ...businessProfile, bankName: e.target.value })}
               placeholder="e.g., Standard Bank"
-              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+              className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
             />
           </div>
           <div className="grid grid-cols-2 gap-4">
@@ -1300,7 +1300,7 @@ export const MerchantPortal: React.FC = () => {
                 value={businessProfile.accountNumber || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, accountNumber: e.target.value })}
                 placeholder="Account number"
-                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
               />
             </div>
             <div>
@@ -1310,7 +1310,7 @@ export const MerchantPortal: React.FC = () => {
                 value={businessProfile.branchCode || ''}
                 onChange={(e) => setBusinessProfile({ ...businessProfile, branchCode: e.target.value })}
                 placeholder="Branch code"
-                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full bg-stone-100 border border-[var(--ff-border)] rounded-lg px-4 py-3 text-stone-900 placeholder:text-stone-500"
               />
             </div>
           </div>

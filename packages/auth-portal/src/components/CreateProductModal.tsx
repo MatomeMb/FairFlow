@@ -435,7 +435,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Title *</label>
+            <label className="mb-1 block text-sm font-medium text-stone-800">Title *</label>
             <input
               type="text"
               value={form.title}
@@ -448,7 +448,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Description</label>
+            <label className="mb-1 block text-sm font-medium text-stone-800">Description</label>
             <textarea
               value={form.description}
               onChange={(e) => setField('description', e.target.value)}
@@ -460,7 +460,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Price (Rands) *</label>
+              <label className="mb-1 block text-sm font-medium text-stone-800">Price (Rands) *</label>
               <input
                 type="text"
                 inputMode="decimal"
@@ -469,12 +469,12 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
                 placeholder="125.00"
               />
-              <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">Price preview: {prettyPrice}</p>
+              <p className="mt-1 text-xs text-stone-600">Price preview: {prettyPrice}</p>
               {errors.price_cents && <p className="mt-1 text-xs text-red-400">{errors.price_cents}</p>}
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Stock Count *</label>
+              <label className="mb-1 block text-sm font-medium text-stone-800">Stock Count *</label>
               <input
                 type="number"
                 min={0}
@@ -489,7 +489,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
 
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Category *</label>
+              <label className="mb-1 block text-sm font-medium text-stone-800">Category *</label>
               <select
                 value={form.category}
                 onChange={(e) => setField('category', e.target.value as FormState['category'])}
@@ -506,7 +506,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
             </div>
 
             <div>
-              <label className="mb-1 block text-sm font-medium text-[var(--ff-ink)]">Product Image *</label>
+              <label className="mb-1 block text-sm font-medium text-stone-800">Product Image *</label>
               <input
                 type="file"
                 accept="image/*"
@@ -521,7 +521,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
                 }}
                 className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-sm text-stone-900 placeholder:text-stone-500 outline-none transition-colors focus:border-emerald-500"
               />
-              <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">
+              <p className="mt-1 text-xs text-stone-600">
                 {isUploadingImage
                   ? `Uploading ${selectedImageName || 'image'}...`
                   : form.image_url
@@ -541,7 +541,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <label className="flex items-center gap-2 text-sm text-[var(--ff-ink)]">
+            <label className="flex items-center gap-2 text-sm text-stone-800">
               <input
                 type="checkbox"
                 checked={form.shipping_available}
@@ -553,10 +553,10 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
           </div>
 
           <div>
-            <p className="mb-2 text-sm font-medium text-[var(--ff-ink)]">Certifications</p>
+            <p className="mb-2 text-sm font-medium text-stone-800">Certifications</p>
             <div className="grid gap-2 sm:grid-cols-2">
               {CERTIFICATION_OPTIONS.map((certification) => (
-                <label key={certification} className="flex items-center gap-2 text-sm text-[var(--ff-ink)]">
+                <label key={certification} className="flex items-center gap-2 text-sm text-stone-800">
                   <input
                     type="checkbox"
                     checked={form.certifications.includes(certification)}
