@@ -813,7 +813,7 @@ export const MerchantPortal: React.FC = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3">Recent Orders</h3>
+            <h3 className="font-semibold mb-3 text-stone-900">Recent Orders</h3>
             {recentOrders.length === 0 ? (
               <p className="text-sm text-stone-700">No recent orders yet.</p>
             ) : (
@@ -831,7 +831,7 @@ export const MerchantPortal: React.FC = () => {
           </div>
 
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
-            <h3 className="font-semibold mb-3">Low Stock Alerts</h3>
+            <h3 className="font-semibold mb-3 text-stone-900">Low Stock Alerts</h3>
             {lowStockProducts.length === 0 ? (
               <p className="text-sm text-stone-700">No low stock alerts.</p>
             ) : (
@@ -999,7 +999,7 @@ export const MerchantPortal: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Engagement Trend (Last 30 Days)</h3>
+            <h3 className="font-bold text-stone-900">Engagement Trend (Last 30 Days)</h3>
             <span className="text-xs text-stone-700">Views vs Clicks</span>
           </div>
           <div className="h-64">
@@ -1027,7 +1027,7 @@ export const MerchantPortal: React.FC = () => {
         </div>
 
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-          <h3 className="font-bold mb-4">Checkout Funnel</h3>
+          <h3 className="font-bold mb-4 text-stone-900">Checkout Funnel</h3>
           <div className="space-y-4">
             {analyticsSnapshot.funnel.map((stage) => (
               <div key={stage.stage} className="space-y-2">
@@ -1051,7 +1051,7 @@ export const MerchantPortal: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Top Products</h3>
+            <h3 className="font-bold text-stone-900">Top Products</h3>
             <span className="text-xs text-stone-700">Checkout Clicks</span>
           </div>
           <div className="h-72">
@@ -1069,7 +1069,7 @@ export const MerchantPortal: React.FC = () => {
 
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
-            <h3 className="font-bold">Engagement by Category</h3>
+            <h3 className="font-bold text-stone-900">Engagement by Category</h3>
             <span className="text-xs text-stone-700">Checkout Clicks</span>
           </div>
           <div className="h-72">
@@ -1088,7 +1088,7 @@ export const MerchantPortal: React.FC = () => {
 
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="font-bold">Inventory Snapshot</h3>
+          <h3 className="font-bold text-stone-900">Inventory Snapshot</h3>
           <span className="text-xs text-stone-700">Stock vs. Clicks</span>
         </div>
         <div className="overflow-x-auto">
@@ -1205,7 +1205,7 @@ export const MerchantPortal: React.FC = () => {
   const renderMyAccount = () => (
     <div className="space-y-6">
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-6">Business Profile</h3>
+        <h3 className="font-bold mb-6 text-stone-900">Business Profile</h3>
         <div className="space-y-4">
           <div>
             <label className="text-stone-700 text-sm block mb-2">Business Name</label>
@@ -1269,7 +1269,7 @@ export const MerchantPortal: React.FC = () => {
         </button>
       </div>
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-6">Bank Account Details</h3>
+        <h3 className="font-bold mb-6 text-stone-900">Bank Account Details</h3>
         <p className="text-stone-700 text-sm mb-4">For receiving weekly payouts to your merchant account</p>
         <div className="space-y-4">
           <div>
@@ -1361,7 +1361,7 @@ export const MerchantPortal: React.FC = () => {
         </button>
       </div>
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
-        <h3 className="font-bold mb-4">Account Settings</h3>
+        <h3 className="font-bold mb-4 text-stone-900">Account Settings</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-stone-700">Two-Factor Authentication</span>
