@@ -44,7 +44,7 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
   return (
     <div className="min-h-screen bg-[var(--ff-bg)] text-[var(--ff-ink)]">
       {/* Header */}
-      <div className="border-b border-[var(--ff-border)] bg-white/90 backdrop-blur-sm">
+      <div className="border-b border-[rgba(170,255,69,0.15)] bg-white/90 backdrop-blur-sm">
         <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-xl font-semibold text-[var(--ff-ink)]">{title}</div>
           <div className="flex items-center gap-3">

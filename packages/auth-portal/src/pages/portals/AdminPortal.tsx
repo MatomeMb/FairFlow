@@ -578,7 +578,7 @@ export const AdminPortal: React.FC = () => {
       {/* Main Content */}
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="border-b border-[var(--ff-border)] bg-white px-4 md:px-6 py-4">
+        <div className="border-b border-[rgba(170,255,69,0.15)] bg-white px-4 md:px-6 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
