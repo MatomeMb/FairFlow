@@ -1,8 +1,3 @@
-/**
- * Optical note:
- * Crossbars are drawn slightly lighter than the main stems so the mark keeps a
- * balanced weight at small sizes. This avoids horizontal strokes appearing too heavy.
- */
 export type LogoStyle =
   | 'luxury'
   | 'geo-tech'
@@ -31,129 +26,16 @@ interface FairflowLogoProps {
   style?: LogoStyle;
 }
 
-const STYLE_LOOKUP = new Set<LogoStyle>(LOGO_STYLES.map((entry) => entry.id));
-
-function isLogoStyle(value: string | null): value is LogoStyle {
-  return value !== null && STYLE_LOOKUP.has(value as LogoStyle);
-}
-
-function LogoMark({ size, color, style }: { size: number; color: string; style: LogoStyle }) {
-  const stroke = Math.max(2.2, size * 0.08);
-  const barStroke = Math.max(1.7, stroke * 0.78);
-  const heavyStroke = stroke * 1.16;
-
-  const lineColor = color;
-  const markStyle = {
-    vectorEffect: 'non-scaling-stroke' as const,
-    fill: 'none',
-    stroke: lineColor,
-  };
-
-  return (
-    <svg
-      width={size}
-      height={size}
-      viewBox="0 0 48 48"
-      fill="none"
-      aria-hidden
-      style={{ display: 'block', flexShrink: 0 }}
-    >
-      {style === 'luxury' && (
-        <>
-          <path {...markStyle} d="M14 5 C10.5 10.5 10.5 18 14 23.5 C10.5 29 10.5 36.5 14 43" strokeWidth={heavyStroke} strokeLinecap="square" strokeLinejoin="round" />
-          <path {...markStyle} d="M30 5 C26.5 10.5 26.5 18 30 23.5 C26.5 29 26.5 36.5 30 43" strokeWidth={heavyStroke} strokeLinecap="square" strokeLinejoin="round" />
-          <line x1="8.5" y1="12" x2="18.5" y2="12" stroke={lineColor} strokeWidth={barStroke} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="24.5" y1="12" x2="34.5" y2="12" stroke={lineColor} strokeWidth={barStroke} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'geo-tech' && (
-        <>
-          <path {...markStyle} d="M14 5 C12 9.5 12 14.5 14 19.5 L14 43" strokeWidth={stroke} strokeLinecap="square" strokeLinejoin="miter" />
-          <path {...markStyle} d="M30 5 C28 9.5 28 14.5 30 19.5 L30 43" strokeWidth={stroke} strokeLinecap="square" strokeLinejoin="miter" />
-          <line x1="8.5" y1="11.5" x2="18" y2="11.5" stroke={lineColor} strokeWidth={barStroke} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="24.5" y1="11.5" x2="34" y2="11.5" stroke={lineColor} strokeWidth={barStroke} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="10" y1="24" x2="17" y2="24" stroke={lineColor} strokeWidth={barStroke * 0.92} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="26" y1="24" x2="33" y2="24" stroke={lineColor} strokeWidth={barStroke * 0.92} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'soft-premium' && (
-        <>
-          <path {...markStyle} d="M14 5 C9.5 11 9.5 18.5 13.5 24 C9.5 29.5 9.5 37 14 43" strokeWidth={stroke * 0.92} strokeLinecap="round" strokeLinejoin="round" />
-          <path {...markStyle} d="M30 5 C25.5 11 25.5 18.5 29.5 24 C25.5 29.5 25.5 37 30 43" strokeWidth={stroke * 0.92} strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="9" y1="12" x2="17" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.88} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line x1="25" y1="12" x2="33" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.88} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'executive' && (
-        <>
-          <path {...markStyle} d="M15 4.5 C12.5 10 12.5 17 15 23 C12.5 29 12.5 36 15 43.5" strokeWidth={heavyStroke * 1.08} strokeLinecap="square" strokeLinejoin="round" />
-          <path {...markStyle} d="M28.5 4.5 C26 10 26 17 28.5 23 C26 29 26 36 28.5 43.5" strokeWidth={heavyStroke * 1.08} strokeLinecap="square" strokeLinejoin="round" />
-          <line x1="9.5" y1="11.5" x2="19.5" y2="11.5" stroke={lineColor} strokeWidth={barStroke * 1.02} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="23" y1="11.5" x2="33" y2="11.5" stroke={lineColor} strokeWidth={barStroke * 1.02} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="11" y1="23.8" x2="18" y2="23.8" stroke={lineColor} strokeWidth={barStroke * 0.95} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="24.5" y1="23.8" x2="31.5" y2="23.8" stroke={lineColor} strokeWidth={barStroke * 0.95} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'precision' && (
-        <>
-          <path {...markStyle} d="M14 5 C11.5 10.5 11.5 17.5 14 23.5 C11.5 29.5 11.5 36.5 14 43" strokeWidth={stroke * 0.86} strokeLinecap="round" strokeLinejoin="round" />
-          <path {...markStyle} d="M30 5 C27.5 10.5 27.5 17.5 30 23.5 C27.5 29.5 27.5 36.5 30 43" strokeWidth={stroke * 0.86} strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="9.5" y1="12" x2="17" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.82} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-          <line x1="25.5" y1="12" x2="33" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.82} strokeLinecap="square" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'aero' && (
-        <>
-          <path {...markStyle} d="M13 5 C8.5 10.5 9 17.5 13.5 23.5 C9.5 29.5 9 36.5 14 43" strokeWidth={stroke * 0.95} strokeLinecap="round" strokeLinejoin="round" />
-          <path {...markStyle} d="M29 5 C24.5 10.5 25 17.5 29.5 23.5 C25.5 29.5 25 36.5 30 43" strokeWidth={stroke * 0.95} strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="8.5" y1="12" x2="17.5" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.9} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line x1="24.5" y1="12" x2="33.5" y2="12" stroke={lineColor} strokeWidth={barStroke * 0.9} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-
-      {style === 'bold-minimal' && (
-        <>
-          <rect x="10" y="5" width="7" height="38" rx="1.6" fill={lineColor} />
-          <rect x="26" y="5" width="7" height="38" rx="1.6" fill={lineColor} />
-          <rect x="6" y="10" width="11" height="4.4" rx="1.2" fill={lineColor} />
-          <rect x="22" y="10" width="11" height="4.4" rx="1.2" fill={lineColor} />
-          <rect x="8" y="22" width="9" height="4" rx="1.1" fill={lineColor} />
-          <rect x="24" y="22" width="9" height="4" rx="1.1" fill={lineColor} />
-        </>
-      )}
-
-      {style === 'derivative' && (
-        <>
-          <path {...markStyle} d="M17 6 C13.2 8.8 12.6 12.8 14.8 17.3 C16.9 22 16.9 28.8 14.9 34 C13.6 37.4 13.8 40 16.2 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
-          <path {...markStyle} d="M29 6 C25.2 8.8 24.6 12.8 26.8 17.3 C28.9 22 28.9 28.8 26.9 34 C25.6 37.4 25.8 40 28.2 42" strokeWidth={heavyStroke} strokeLinecap="round" strokeLinejoin="round" />
-          <line x1="9.5" y1="18.5" x2="20.8" y2="18.5" stroke={lineColor} strokeWidth={barStroke * 1.08} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-          <line x1="21.5" y1="18.5" x2="32.8" y2="18.5" stroke={lineColor} strokeWidth={barStroke * 1.08} strokeLinecap="round" vectorEffect="non-scaling-stroke" />
-        </>
-      )}
-    </svg>
-  );
-}
-
 export function FairflowLogo({
   markHeight = 56,
   showWordmark = true,
   variant = 'light',
   style = 'geo-tech',
 }: FairflowLogoProps) {
-  const urlStyle = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('logoStyle') : null;
-  const storedStyle = typeof window !== 'undefined' ? window.localStorage.getItem('fairflowLogoStyle') : null;
-  const currentStyle = isLogoStyle(urlStyle) ? urlStyle : isLogoStyle(storedStyle) ? storedStyle : style;
-
   const markColor = variant === 'dark' ? '#F5F5F0' : '#1B2330';
-  const wordColor = markColor;
+  const markBg = '#AAFF45';
   const wordSize = Math.round(markHeight * 0.38);
-  const gap = Math.max(2, Math.round(wordSize * 0.12));
-  const fontWeight = currentStyle === 'soft-premium' || currentStyle === 'aero' ? 600 : 700;
+  const fontWeight = style === 'soft-premium' || style === 'aero' ? 600 : 700;
 
   return (
     <div
@@ -161,27 +43,23 @@ export function FairflowLogo({
       style={{
         display: 'flex',
         alignItems: 'center',
-        gap,
-        color: wordColor,
+        justifyContent: 'center',
+        width: markHeight,
+        height: markHeight,
+        borderRadius: Math.max(8, Math.round(markHeight * 0.2)),
+        backgroundColor: markBg,
+        color: markColor,
         isolation: 'isolate',
+        fontFamily: "'Sora', 'Instrument Sans', system-ui, sans-serif",
+        fontWeight,
+        fontSize: wordSize,
+        letterSpacing: '-0.015em',
+        lineHeight: 1,
+        WebkitFontSmoothing: 'antialiased',
+        userSelect: 'none',
       }}
     >
-      <LogoMark size={markHeight} color={markColor} style={currentStyle} />
-      {showWordmark && (
-        <span
-          style={{
-            fontFamily: "'Sora', 'Instrument Sans', system-ui, sans-serif",
-            fontWeight,
-            fontSize: wordSize,
-            letterSpacing: '-0.015em',
-            lineHeight: 1,
-            color: wordColor,
-            WebkitFontSmoothing: 'antialiased',
-          }}
-        >
-          ff.
-        </span>
-      )}
+      {showWordmark ? 'ff.' : null}
     </div>
   );
 }
