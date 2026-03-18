@@ -852,7 +852,7 @@ export const CEODashboard: React.FC = () => {
               <label className="block text-sm font-medium text-[var(--ff-ink-muted)] mb-1">Talent Pipeline</label>
               <div className="flex items-center gap-2">
                 <span className="text-emerald-400 font-semibold">Active</span>
-                <span className="px-2 py-0.5 bg-emerald-600/30 text-white text-xs rounded-full">CTO-managed</span>
+                <span className="px-2 py-0.5 bg-emerald-100 text-emerald-900 text-xs rounded-full">CTO-managed</span>
               </div>
             </div>
             <div>
