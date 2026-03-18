@@ -4,21 +4,17 @@ import { MetricCard } from '../../../components/shared/MetricCard';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import type { MerchantOrder, MerchantAccount } from '../../../types/merchant';
 import type { MerchantPortalProduct } from '../hooks/useMerchantProducts';
-
 interface ErrorBannerProps {
   message: string;
   onDismiss: () => void;
 }
-
 interface InlineSpinnerProps {
   label: string;
 }
-
 interface MerchantProductsStats {
   active: number;
   pending: number;
 }
-
 export interface MerchantProductsSectionProps {
   ErrorBanner: ComponentType<ErrorBannerProps>;
   InlineSpinner: ComponentType<InlineSpinnerProps>;
@@ -49,7 +45,6 @@ export interface MerchantProductsSectionProps {
   onCopyPage: (productId: string, hash?: string) => void;
   onRemoveProduct: (productId: string) => void;
 }
-
 export function MerchantProductsSection({
   ErrorBanner,
   InlineSpinner,
@@ -84,16 +79,13 @@ export function MerchantProductsSection({
   const recentOrders = orders.slice(0, 3);
   const onboardingKycStatus = merchantAccount?.kyc_status;
   const shouldShowOnboardingBanner = showOnboardingBanner && products.length === 0;
-
   return (
     <div className="space-y-6">
       {analyticsError && <ErrorBanner message={analyticsError} onDismiss={onDismissAnalyticsError} />}
       {ordersError && <ErrorBanner message={ordersError} onDismiss={onDismissOrdersError} />}
       {accountError && <ErrorBanner message={accountError} onDismiss={onDismissAccountError} />}
       {productsError && <ErrorBanner message={productsError} onDismiss={onDismissProductsError} />}
-
       {(isLoadingOrders || accountLoading || isLoadingProducts) && <InlineSpinner label="Loading dashboard data..." />}
-
       {merchantAccount?.kyc_status !== 'approved' && (
         <div className="rounded-xl border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] p-4 text-sm text-[var(--ff-warning-bold)]">
           <p className="font-semibold">KYC is not approved yet.</p>
@@ -114,24 +106,9 @@ export function MerchantProductsSection({
           </div>
           <div className="mt-4 space-y-3">
             {[
-              {
-                done: products.length > 0,
-                label: 'Create your first product',
-                action: onOpenCreateModal,
-                cta: 'Create product',
-              },
-              {
-                done: onboardingKycStatus === 'pending' || onboardingKycStatus === 'approved',
-                label: 'Submit KYC verification',
-                action: onGoToKycPayouts,
-                cta: 'Start KYC',
-              },
-              {
-                done: merchantAccount?.bank_account != null,
-                label: 'Add your bank account for payouts',
-                action: onGoToKycPayouts,
-                cta: 'Add bank account',
-              },
+              { done: products.length > 0, label: 'Create your first product', action: onOpenCreateModal, cta: 'Create product' },
+              { done: onboardingKycStatus === 'pending' || onboardingKycStatus === 'approved', label: 'Submit KYC verification', action: onGoToKycPayouts, cta: 'Start KYC' },
+              { done: merchantAccount?.bank_account != null, label: 'Add your bank account for payouts', action: onGoToKycPayouts, cta: 'Add bank account' },
             ].map((step, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
@@ -154,13 +131,11 @@ export function MerchantProductsSection({
           </div>
         </div>
       )}
-
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         <MetricCard label="Active Products" value={stats.active} color="green" />
         <MetricCard label="Pending Review" value={stats.pending} color="amber" />
         <MetricCard label="Pending Payout" value={`R ${((merchantAccount?.pending_payout ?? 0) / 100).toFixed(2)}`} color="blue" />
       </div>
-
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <div className="rounded-xl border border-[var(--ff-border-light)] bg-[var(--ff-neutral)]/70 p-4">
           <h3 className="mb-3 font-semibold">Recent Orders</h3>
@@ -202,7 +177,6 @@ export function MerchantProductsSection({
           )}
         </div>
       </div>
-
       {isLoadingProducts ? (
         <div className="overflow-x-auto rounded-xl border border-[var(--ff-border-light)] bg-[var(--ff-neutral)]/70">
           <table className="w-full text-sm">
@@ -317,7 +291,6 @@ export function MerchantProductsSection({
           </table>
         </div>
       )}
-
       <button onClick={onOpenCreateModal} className="rounded bg-[var(--ff-cta)] px-4 py-2 text-sm font-medium text-[var(--ff-neutral)] hover:bg-[var(--ff-cta-hover)]">
         + Create Product
       </button>
