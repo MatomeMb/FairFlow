@@ -98,7 +98,7 @@ export function MerchantRegister() {
           <div className="mb-2">
             <FairflowLogo markHeight={48} variant="light" />
           </div>
-          <p className="mb-8 text-sm text-stone-500">Create your merchant account</p>
+          <p className="mb-8 text-sm text-stone-700">Create your merchant account</p>
 
           <a
             href={`${apiBase}/v1/auth/google`}
@@ -130,7 +130,7 @@ export function MerchantRegister() {
               <div className="w-full border-t border-stone-200" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white/80 px-2 text-stone-400">or continue with email</span>
+              <span className="bg-white/80 px-2 text-stone-600">or continue with email</span>
             </div>
           </div>
 
@@ -203,7 +203,7 @@ export function MerchantRegister() {
                 }
                 className="mt-1 cursor-pointer"
               />
-              <label htmlFor="terms" className="text-sm text-stone-500">
+              <label htmlFor="terms" className="text-sm text-stone-700">
                 I accept the terms and conditions
               </label>
             </div>
@@ -219,7 +219,7 @@ export function MerchantRegister() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-stone-500">
+          <div className="mt-6 text-center text-sm text-stone-700">
             Already have an account?{" "}
             <Link to="/merchant/login" className="text-emerald-600 hover:text-emerald-700">
               Sign in

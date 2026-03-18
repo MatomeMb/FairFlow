@@ -254,7 +254,7 @@ export const AdminPortal: React.FC = () => {
             <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ff-ink-muted)]">Platform Users</p>
+                  <p className="text-sm text-stone-700">Platform Users</p>
                   <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{users.length}</p>
                 </div>
                 <Users className="w-8 h-8 text-blue-500" />
@@ -263,7 +263,7 @@ export const AdminPortal: React.FC = () => {
             <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ff-ink-muted)]">CEOs</p>
+                  <p className="text-sm text-stone-700">CEOs</p>
                   <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.ceo}</p>
                 </div>
                 <Shield className="w-8 h-8 text-purple-500" />
@@ -272,7 +272,7 @@ export const AdminPortal: React.FC = () => {
             <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ff-ink-muted)]">CTOs</p>
+                  <p className="text-sm text-stone-700">CTOs</p>
                   <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.cto}</p>
                 </div>
                 <Zap className="w-8 h-8 text-yellow-500" />
@@ -281,7 +281,7 @@ export const AdminPortal: React.FC = () => {
             <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-[var(--ff-ink-muted)]">KYC Pending</p>
+                  <p className="text-sm text-stone-700">KYC Pending</p>
                   <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{pendingKYC.length}</p>
                 </div>
                 <Clock className="w-8 h-8 text-orange-500" />
@@ -321,7 +321,7 @@ export const AdminPortal: React.FC = () => {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-xl font-bold text-[var(--ff-ink)]">KYC Approvals</h2>
-            <p className="text-sm text-[var(--ff-ink-muted)] mt-1">{pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}</p>
+            <p className="text-sm text-stone-700 mt-1">{pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}</p>
           </div>
           <button
             onClick={fetchPendingKYC}
@@ -340,28 +340,28 @@ export const AdminPortal: React.FC = () => {
                   <div className="flex items-center gap-3">
                     <div>
                       <h3 className="font-semibold text-[var(--ff-ink)]">{kyc.businessName}</h3>
-                      <p className="text-sm text-[var(--ff-ink-muted)]">{kyc.email}</p>
+                      <p className="text-sm text-stone-700">{kyc.email}</p>
                     </div>
                   </div>
                   <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                     <div>
-                      <p className="text-[var(--ff-ink-muted)]">ID Number</p>
+                      <p className="text-stone-700">ID Number</p>
                       <p className="text-[var(--ff-ink)] font-mono">{kyc.kycData?.id_number || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-[var(--ff-ink-muted)]">DOB</p>
+                      <p className="text-stone-700">DOB</p>
                       <p className="text-[var(--ff-ink)]">{kyc.kycData?.date_of_birth || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-[var(--ff-ink-muted)]">Bank</p>
+                      <p className="text-stone-700">Bank</p>
                       <p className="text-[var(--ff-ink)]">{kyc.bankAccount?.bank_name || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="text-[var(--ff-ink-muted)]">Account</p>
+                      <p className="text-stone-700">Account</p>
                       <p className="text-[var(--ff-ink)] font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
                     </div>
                   </div>
-                  <p className="text-xs text-[var(--ff-ink-muted)] mt-3">
+                  <p className="text-xs text-stone-700 mt-3">
                     Submitted: {new Date(kyc.submittedAt).toLocaleDateString()} at {new Date(kyc.submittedAt).toLocaleTimeString()}
                   </p>
                 </div>
@@ -407,7 +407,7 @@ export const AdminPortal: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="font-semibold text-[var(--ff-ink)]">{merchant.id}</p>
-                  <p className="text-sm text-[var(--ff-ink-muted)]">{merchant.role}</p>
+                  <p className="text-sm text-stone-700">{merchant.role}</p>
                 </div>
                 <RoleBadge role={merchant.role} />
               </div>
@@ -434,7 +434,7 @@ export const AdminPortal: React.FC = () => {
             <div key={user.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4 flex items-center justify-between">
               <div>
                 <p className="font-semibold text-[var(--ff-ink)]">{user.id}</p>
-                <p className="text-sm text-[var(--ff-ink-muted)]">{user.user_id}</p>
+                <p className="text-sm text-stone-700">{user.user_id}</p>
               </div>
               <RoleBadge role={user.role} />
             </div>
@@ -474,7 +474,7 @@ export const AdminPortal: React.FC = () => {
       <div className="p-6 space-y-6">
         <h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2>
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
-          <p className="text-sm text-[var(--ff-ink-muted)]">System features coming soon</p>
+          <p className="text-sm text-stone-700">System features coming soon</p>
         </div>
       </div>
     );
@@ -485,7 +485,7 @@ export const AdminPortal: React.FC = () => {
       <div className="p-6 space-y-6">
         <h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2>
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5">
-          <p className="text-sm text-[var(--ff-ink-muted)]">Financial reporting coming soon</p>
+          <p className="text-sm text-stone-700">Financial reporting coming soon</p>
         </div>
       </div>
     );
@@ -540,7 +540,7 @@ export const AdminPortal: React.FC = () => {
         <div className="p-4 border-b border-[var(--ff-border)] flex-shrink-0 overflow-hidden">
           <div className="flex items-center justify-between">
             <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="light" />
-            {sidebarOpen && <span className="text-xs font-bold text-[var(--ff-ink-muted)]">ADMIN</span>}
+            {sidebarOpen && <span className="text-xs font-bold text-stone-700">ADMIN</span>}
           </div>
         </div>
 
@@ -555,7 +555,7 @@ export const AdminPortal: React.FC = () => {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeSection === item.id
                     ? 'bg-[var(--ff-accent-light)] text-[var(--ff-ink)] border border-[var(--ff-border)]'
-                    : 'text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]'
+                    : 'text-stone-700 hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -568,7 +568,7 @@ export const AdminPortal: React.FC = () => {
         <div className="border-t border-[var(--ff-border)] p-4">
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="w-full flex items-center justify-center px-4 py-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] transition"
+            className="w-full flex items-center justify-center px-4 py-2 text-stone-700 hover:text-[var(--ff-ink)] transition"
           >
             {sidebarOpen ? '←' : '→'}
           </button>
@@ -582,7 +582,7 @@ export const AdminPortal: React.FC = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
-                className="md:hidden p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg"
+                className="md:hidden p-2 text-stone-700 hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg"
                 onClick={() => setSidebarOpen(!sidebarOpen)}
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" /></svg>
@@ -599,7 +599,7 @@ export const AdminPortal: React.FC = () => {
                 >
                   <Zap className="w-4 h-4 text-yellow-500" />
                   <span className="text-xs font-bold uppercase tracking-wider">{logoStyle.replace('-', ' ')}</span>
-                  <ChevronDown className={`w-3 h-3 text-[var(--ff-ink-muted)] transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
+                  <ChevronDown className={`w-3 h-3 text-stone-700 transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
                 </button>
 
                 {logoMenuOpen && (
@@ -610,7 +610,7 @@ export const AdminPortal: React.FC = () => {
                     />
                     <div className="absolute right-0 mt-2 w-56 bg-white/70 border border-[var(--ff-border)] rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                       <div className="px-3 py-2 border-b border-[var(--ff-border)] mb-1">
-                        <span className="text-[10px] font-black text-[var(--ff-ink-muted)] uppercase tracking-[0.2em]">Select Brand Identity</span>
+                        <span className="text-[10px] font-black text-stone-700 uppercase tracking-[0.2em]">Select Brand Identity</span>
                       </div>
                       {LOGO_STYLES.map((styleOption) => (
                         <button
@@ -626,7 +626,7 @@ export const AdminPortal: React.FC = () => {
                           className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-all ${
                             logoStyle === styleOption.id 
                               ? 'bg-blue-600/10 text-blue-400 font-bold' 
-                                : 'text-[var(--ff-ink-muted)] hover:bg-[var(--ff-surface)] hover:text-[var(--ff-ink)]'
+                                : 'text-stone-700 hover:bg-[var(--ff-surface)] hover:text-[var(--ff-ink)]'
                           }`}
                         >
                           <span className="capitalize">{styleOption.label}</span>
@@ -637,7 +637,7 @@ export const AdminPortal: React.FC = () => {
                   </>
                 )}
               </div>
-              <button className="p-2 text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg">
+              <button className="p-2 text-stone-700 hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)] rounded-lg">
                 <Bell className="w-5 h-5" />
               </button>
             </div>
@@ -668,13 +668,13 @@ export const AdminPortal: React.FC = () => {
             
             <div className="space-y-4">
               <div>
-                <p className="text-sm text-[var(--ff-ink-muted)]">Merchant</p>
+                <p className="text-sm text-stone-700">Merchant</p>
                 <p className="text-[var(--ff-ink)] font-semibold">{selectedKYC.businessName}</p>
               </div>
 
               {kycAction === 'approve' ? (
                 <div>
-                  <label className="block text-sm text-[var(--ff-ink-muted)] mb-2">Approval Notes (Optional)</label>
+                  <label className="block text-sm text-stone-700 mb-2">Approval Notes (Optional)</label>
                   <textarea
                     value={approvalNotes}
                     onChange={(e) => setApprovalNotes(e.target.value)}
@@ -685,7 +685,7 @@ export const AdminPortal: React.FC = () => {
                 </div>
               ) : (
                 <div>
-                  <label className="block text-sm text-[var(--ff-ink-muted)] mb-2">Rejection Reason *</label>
+                  <label className="block text-sm text-stone-700 mb-2">Rejection Reason *</label>
                   <textarea
                     value={rejectionReason}
                     onChange={(e) => setRejectionReason(e.target.value)}
@@ -736,3 +736,4 @@ export const AdminPortal: React.FC = () => {
     </div>
   );
 };
+

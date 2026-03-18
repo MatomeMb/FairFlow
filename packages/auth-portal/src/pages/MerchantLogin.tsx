@@ -118,7 +118,7 @@ export function MerchantLogin() {
         <div className="mb-2">
           <FairflowLogo markHeight={48} variant="light" />
         </div>
-        <p className="mb-8 text-sm text-[var(--ff-ink-muted)]">Sign in to your merchant account</p>
+        <p className="mb-8 text-sm text-stone-700">Sign in to your merchant account</p>
 
         <a
           href={`${apiBase}/v1/auth/google`}
@@ -150,7 +150,7 @@ export function MerchantLogin() {
             <div className="w-full border-t border-[var(--ff-border)]" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2 text-[var(--ff-ink-muted)]">or continue with email</span>
+            <span className="bg-white px-2 text-stone-600">or continue with email</span>
           </div>
         </div>
 
@@ -183,7 +183,7 @@ export function MerchantLogin() {
             />
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-red-600 text-sm">{error}</p>}
 
           <button
             type="submit"
@@ -199,7 +199,7 @@ export function MerchantLogin() {
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
-              className="text-xs text-[var(--ff-ink-muted)] underline hover:text-[var(--ff-ink)]"
+              className="text-xs text-stone-700 underline hover:text-stone-900"
             >
               Forgot your password?
             </button>
@@ -208,7 +208,7 @@ export function MerchantLogin() {
 
         {showForgotPassword && (
           <form onSubmit={handleForgotPassword} className="mt-4 space-y-3 rounded-lg border border-[var(--ff-border)] bg-white p-4">
-            <p className="text-xs text-[var(--ff-ink-muted)]">
+            <p className="text-xs text-stone-700">
               Enter your email to generate a reset token (MVP manual relay flow).
             </p>
             <input
@@ -219,7 +219,7 @@ export function MerchantLogin() {
               className="w-full rounded-lg border border-[var(--ff-border)] bg-[var(--ff-bg)] px-3 py-2 text-sm text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
-            {resetError && <p className="text-xs text-red-400">{resetError}</p>}
+            {resetError && <p className="text-xs text-red-600">{resetError}</p>}
             {resetMessage && <p className="text-xs text-emerald-700">{resetMessage}</p>}
             <div className="flex gap-2">
               <button
@@ -240,7 +240,7 @@ export function MerchantLogin() {
           </form>
         )}
 
-        <div className="mt-6 text-center text-sm text-[var(--ff-ink-muted)]">
+        <div className="mt-6 text-center text-sm text-stone-700">
           Don't have an account?{" "}
           <Link to="/merchant/register" className="text-emerald-400 hover:text-emerald-300">
             Create one

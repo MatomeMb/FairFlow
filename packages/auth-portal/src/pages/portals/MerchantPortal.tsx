@@ -747,14 +747,14 @@ export const MerchantPortal: React.FC = () => {
           <div className="rounded-lg border border-amber-500/30 bg-amber-500/10 p-5">
             <div className="flex items-start justify-between">
               <div>
-                <h3 className="font-semibold text-amber-400">Welcome — let's get you set up</h3>
-                <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">
+                <h3 className="font-semibold text-amber-800">Welcome — let's get you set up</h3>
+                <p className="mt-1 text-sm text-stone-700">
                   Complete these three steps to start selling.
                 </p>
               </div>
               <button
                 onClick={() => setShowOnboardingBanner(false)}
-                className="text-[var(--ff-ink-muted)] hover:text-[var(--ff-ink)]"
+                className="text-stone-700 hover:text-[var(--ff-ink)]"
               >
                 ✕
               </button>
@@ -783,18 +783,18 @@ export const MerchantPortal: React.FC = () => {
                 <div key={i} className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
-                      step.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-[var(--ff-ink-muted)]'
+                      step.done ? 'bg-emerald-500 text-white' : 'bg-stone-200 text-stone-700'
                     }`}>
                       {step.done ? '✓' : i + 1}
                     </span>
-                    <span className={`text-sm ${step.done ? 'text-[var(--ff-ink-muted)] line-through' : 'text-[var(--ff-ink)]'}`}>
+                    <span className={`text-sm ${step.done ? 'text-stone-700 line-through' : 'text-[var(--ff-ink)]'}`}>
                       {step.label}
                     </span>
                   </div>
                   {!step.done && (
                     <button
                       onClick={step.action}
-                      className="text-xs text-amber-400 hover:text-amber-300 underline"
+                      className="text-xs text-amber-800 hover:text-amber-900 underline"
                     >
                       {step.cta} →
                     </button>
@@ -815,7 +815,7 @@ export const MerchantPortal: React.FC = () => {
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
             <h3 className="font-semibold mb-3">Recent Orders</h3>
             {recentOrders.length === 0 ? (
-              <p className="text-sm text-stone-500">No recent orders yet.</p>
+              <p className="text-sm text-stone-700">No recent orders yet.</p>
             ) : (
               <div className="space-y-2">
                 {recentOrders.map((order) => (
@@ -833,12 +833,12 @@ export const MerchantPortal: React.FC = () => {
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
             <h3 className="font-semibold mb-3">Low Stock Alerts</h3>
             {lowStockProducts.length === 0 ? (
-              <p className="text-sm text-stone-500">No low stock alerts.</p>
+              <p className="text-sm text-stone-700">No low stock alerts.</p>
             ) : (
               <div className="space-y-2">
                 {lowStockProducts.map((product) => (
                   <div key={product.id} className="flex items-center justify-between gap-3 rounded-lg border border-amber-800/40 bg-amber-900/10 p-3">
-                    <p className="text-sm text-amber-300">{product.name} has {product.stock} unit(s) remaining</p>
+                    <p className="text-sm text-amber-800">{product.name} has {product.stock} unit(s) remaining</p>
                     <button
                       onClick={() => handleRestockProduct(product.id)}
                       disabled={restockingProductId === product.id}
@@ -898,7 +898,7 @@ export const MerchantPortal: React.FC = () => {
                 {products.map(p => (
                   <tr key={p.id} className="border-t border-[var(--ff-border)] hover:bg-stone-200/60">
                     <td className="px-6 py-4">{p.name}</td>
-                    <td className="px-6 py-4 text-[var(--ff-ink-muted)]">{p.category}</td>
+                    <td className="px-6 py-4 text-stone-700">{p.category}</td>
                     <td className="px-6 py-4 text-right font-mono">R {p.price.toFixed(2)}</td>
                     <td className="px-6 py-4 text-right">{p.stock}</td>
                     <td className="px-6 py-4 text-center">
@@ -928,7 +928,7 @@ export const MerchantPortal: React.FC = () => {
                           </div>
                         </div>
                       ) : (
-                        <span className="text-stone-500 text-xs">Not compiled</span>
+                        <span className="text-stone-700 text-xs">Not compiled</span>
                       )}
                     </td>
                     <td className="px-6 py-4 text-right">
@@ -957,7 +957,7 @@ export const MerchantPortal: React.FC = () => {
                             </button>
                           </>
                         ) : (
-                          <span className="text-stone-500 text-xs">Pending</span>
+                          <span className="text-stone-700 text-xs">Pending</span>
                         )}
                         <button onClick={() => handleRemoveProduct(p.id)} className="text-red-500 hover:text-red-400 text-xs min-h-[44px] px-2">
                           Remove
@@ -1000,7 +1000,7 @@ export const MerchantPortal: React.FC = () => {
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6 lg:col-span-2">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Engagement Trend (Last 30 Days)</h3>
-            <span className="text-xs text-stone-500">Views vs Clicks</span>
+            <span className="text-xs text-stone-700">Views vs Clicks</span>
           </div>
           <div className="h-64">
             <ResponsiveContainer width="100%" height="100%">
@@ -1032,7 +1032,7 @@ export const MerchantPortal: React.FC = () => {
             {analyticsSnapshot.funnel.map((stage) => (
               <div key={stage.stage} className="space-y-2">
                 <div className="flex items-center justify-between text-sm">
-                  <span className="text-[var(--ff-ink-muted)]">{stage.stage}</span>
+                  <span className="text-stone-700">{stage.stage}</span>
                   <span className="font-mono text-[var(--ff-ink)]">{stage.count.toLocaleString()}</span>
                 </div>
                 <div className="h-2 rounded-full bg-stone-100">
@@ -1043,7 +1043,7 @@ export const MerchantPortal: React.FC = () => {
                 </div>
               </div>
             ))}
-            <p className="text-xs text-stone-500">Based on real view and click events.</p>
+            <p className="text-xs text-stone-700">Based on real view and click events.</p>
           </div>
         </div>
       </div>
@@ -1052,7 +1052,7 @@ export const MerchantPortal: React.FC = () => {
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Top Products</h3>
-            <span className="text-xs text-stone-500">Checkout Clicks</span>
+            <span className="text-xs text-stone-700">Checkout Clicks</span>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -1070,7 +1070,7 @@ export const MerchantPortal: React.FC = () => {
         <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-bold">Engagement by Category</h3>
-            <span className="text-xs text-stone-500">Checkout Clicks</span>
+            <span className="text-xs text-stone-700">Checkout Clicks</span>
           </div>
           <div className="h-72">
             <ResponsiveContainer width="100%" height="100%">
@@ -1089,11 +1089,11 @@ export const MerchantPortal: React.FC = () => {
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-bold">Inventory Snapshot</h3>
-          <span className="text-xs text-stone-500">Stock vs. Clicks</span>
+          <span className="text-xs text-stone-700">Stock vs. Clicks</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="text-[var(--ff-ink-muted)]">
+            <thead className="text-stone-700">
               <tr className="border-b border-[var(--ff-border)]">
                 <th className="py-2 text-left">Product</th>
                 <th className="py-2 text-right">Stock</th>
@@ -1104,13 +1104,13 @@ export const MerchantPortal: React.FC = () => {
               {analyticsSnapshot.topProducts.map((item) => (
                 <tr key={item.name} className="border-b border-[var(--ff-border)] last:border-0">
                   <td className="py-2 text-[var(--ff-ink)]">{item.name}</td>
-                  <td className="py-2 text-right text-[var(--ff-ink-muted)]">{item.stock}</td>
+                  <td className="py-2 text-right text-stone-700">{item.stock}</td>
                   <td className="py-2 text-right text-emerald-700">{item.clicks.toLocaleString()}</td>
                 </tr>
               ))}
               {analyticsSnapshot.topProducts.length === 0 && (
                 <tr>
-                  <td colSpan={3} className="py-6 text-center text-stone-500">No sales data yet. Create products to start tracking.</td>
+                  <td colSpan={3} className="py-6 text-center text-stone-700">No sales data yet. Create products to start tracking.</td>
                 </tr>
               )}
             </tbody>
@@ -1208,7 +1208,7 @@ export const MerchantPortal: React.FC = () => {
         <h3 className="font-bold mb-6">Business Profile</h3>
         <div className="space-y-4">
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Name</label>
+            <label className="text-stone-700 text-sm block mb-2">Business Name</label>
             <input
               type="text"
               value={businessProfile.businessName}
@@ -1217,7 +1217,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Contact Email</label>
+            <label className="text-stone-700 text-sm block mb-2">Contact Email</label>
             <input
               type="email"
               value={businessProfile.contactEmail}
@@ -1226,7 +1226,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Phone</label>
+            <label className="text-stone-700 text-sm block mb-2">Phone</label>
             <input
               type="tel"
               value={businessProfile.phone}
@@ -1235,7 +1235,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Business Address</label>
+            <label className="text-stone-700 text-sm block mb-2">Business Address</label>
             <textarea
               value={businessProfile.address}
               onChange={(e) => setBusinessProfile({ ...businessProfile, address: e.target.value })}
@@ -1243,7 +1243,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Certifications</label>
+            <label className="text-stone-700 text-sm block mb-2">Certifications</label>
             <input
               type="text"
               value={businessProfile.certifications}
@@ -1252,7 +1252,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Year Established</label>
+            <label className="text-stone-700 text-sm block mb-2">Year Established</label>
             <input
               type="text"
               value={businessProfile.yearEstablished}
@@ -1270,10 +1270,10 @@ export const MerchantPortal: React.FC = () => {
       </div>
       <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-6">
         <h3 className="font-bold mb-6">Bank Account Details</h3>
-        <p className="text-[var(--ff-ink-muted)] text-sm mb-4">For receiving weekly payouts to your merchant account</p>
+        <p className="text-stone-700 text-sm mb-4">For receiving weekly payouts to your merchant account</p>
         <div className="space-y-4">
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Holder Name</label>
+            <label className="text-stone-700 text-sm block mb-2">Account Holder Name</label>
             <input
               type="text"
               value={businessProfile.accountHolderName || ''}
@@ -1283,7 +1283,7 @@ export const MerchantPortal: React.FC = () => {
             />
           </div>
           <div>
-            <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Bank Name</label>
+            <label className="text-stone-700 text-sm block mb-2">Bank Name</label>
             <input
               type="text"
               value={businessProfile.bankName || ''}
@@ -1294,7 +1294,7 @@ export const MerchantPortal: React.FC = () => {
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Account Number</label>
+              <label className="text-stone-700 text-sm block mb-2">Account Number</label>
               <input
                 type="text"
                 value={businessProfile.accountNumber || ''}
@@ -1304,7 +1304,7 @@ export const MerchantPortal: React.FC = () => {
               />
             </div>
             <div>
-              <label className="text-[var(--ff-ink-muted)] text-sm block mb-2">Branch Code</label>
+              <label className="text-stone-700 text-sm block mb-2">Branch Code</label>
               <input
                 type="text"
                 value={businessProfile.branchCode || ''}
@@ -1316,10 +1316,10 @@ export const MerchantPortal: React.FC = () => {
           </div>
           {merchantAccount?.bank_account?.bank_name && (
             <div className="bg-stone-200/60 border border-[var(--ff-border)]/50 rounded-lg p-4 mt-4">
-              <p className="text-[var(--ff-ink-muted)] text-sm mb-2">Current Bank Details:</p>
+              <p className="text-stone-700 text-sm mb-2">Current Bank Details:</p>
               <p className="text-[var(--ff-ink)] text-sm">{merchantAccount.bank_account.account_holder_name}</p>
-              <p className="text-[var(--ff-ink-muted)] text-sm">{merchantAccount.bank_account.bank_name}</p>
-              <p className="text-stone-500 text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
+              <p className="text-stone-700 text-sm">{merchantAccount.bank_account.bank_name}</p>
+              <p className="text-stone-700 text-sm">Account: ...{merchantAccount.bank_account.account_number?.slice(-4)}</p>
             </div>
           )}
         </div>
@@ -1364,7 +1364,7 @@ export const MerchantPortal: React.FC = () => {
         <h3 className="font-bold mb-4">Account Settings</h3>
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
+            <span className="text-stone-700">Two-Factor Authentication</span>
             <button className="text-emerald-500 hover:text-emerald-400 text-sm">Enable</button>
           </div>
         </div>
@@ -1421,3 +1421,4 @@ export const MerchantPortal: React.FC = () => {
     </TabShell>
   );
 }
+
