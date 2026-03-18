@@ -1330,12 +1330,10 @@ export const MerchantPortal: React.FC = () => {
               return;
             }
             try {
-              const token = localStorage.getItem('merchantToken');
-              const res = await fetch(`${apiBase}/v1/merchant/account/bank`, {
+              const res = await merchantFetch(`${apiBase}/v1/merchant/account/bank`, {
                 method: 'PATCH',
                 headers: {
                   'Content-Type': 'application/json',
-                  'Authorization': `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                   account_name: businessProfile.accountHolderName,
