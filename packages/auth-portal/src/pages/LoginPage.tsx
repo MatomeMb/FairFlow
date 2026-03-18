@@ -100,7 +100,7 @@ export function LoginPage() {
           <div className="mb-2">
             <FairflowLogo markHeight={48} variant="light" />
           </div>
-          <p className="mb-8 text-sm text-stone-700">Sign in to your portal</p>
+          <p className="mb-8 text-sm text-ff-form-helper">Sign in to your portal</p>
 
           {/* Email/Password */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
@@ -111,9 +111,9 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                className="w-full rounded-xl border border-ff-border-light bg-white text-ff-form-text placeholder:text-ff-form-placeholder px-4 py-3 focus:outline-none focus:border-ff-focus disabled:opacity-50"
               />
-              <p className="mt-2 text-xs text-stone-700">Use full email format, e.g. name@fairflow.co.za</p>
+              <p className="mt-2 text-xs text-ff-form-helper">Use full email format, e.g. name@fairflow.co.za</p>
             </div>
             <input
               type="password"
@@ -121,15 +121,15 @@ export function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+              className="w-full rounded-xl border border-ff-border-light bg-white text-ff-form-text placeholder:text-ff-form-placeholder px-4 py-3 focus:outline-none focus:border-ff-focus disabled:opacity-50"
             />
-            {error && <p className="text-red-600 text-sm">{error}</p>}
-            {resetError && <p className="text-red-600 text-sm">{resetError}</p>}
-            {resetMessage && <p className="text-emerald-700 text-sm">{resetMessage}</p>}
+            {error && <p className="text-ff-error-bold text-sm">{error}</p>}
+            {resetError && <p className="text-ff-error-bold text-sm">{resetError}</p>}
+            {resetMessage && <p className="text-ff-success-bold text-sm">{resetMessage}</p>}
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-emerald-600 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:opacity-50"
+              className="w-full rounded-xl bg-ff-primary py-3 font-medium text-white transition hover:bg-ff-primary-hover disabled:opacity-50"
             >
               {isLoading ? "Signing in..." : "Sign in"}
             </button>
@@ -140,27 +140,27 @@ export function LoginPage() {
               type="button"
               onClick={() => setShowForgotPassword((prev) => !prev)}
               disabled={isLoading}
-              className="text-emerald-600 hover:text-emerald-500 underline disabled:opacity-50"
+              className="text-ff-primary hover:text-ff-primary-hover underline disabled:opacity-50"
             >
               {showForgotPassword ? "Hide password reset" : "Forgot password?"}
             </button>
           </div>
 
           {showForgotPassword && (
-            <form onSubmit={handleForgotPassword} className="mt-3 rounded-xl border border-stone-200 bg-white/70 p-3">
+            <form onSubmit={handleForgotPassword} className="mt-3 rounded-xl border border-ff-border-light bg-white/70 p-3">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-sm font-medium text-emerald-800 hover:bg-emerald-100 disabled:opacity-50"
+                className="w-full rounded-lg border border-ff-success bg-ff-success-subtle py-2 text-sm font-medium text-ff-success-bold hover:bg-ff-success-subtle disabled:opacity-50"
               >
                 {isLoading ? "Sending..." : "Send reset link to entered email"}
               </button>
             </form>
           )}
 
-          <div className="mt-4 text-center text-sm text-stone-700">
+          <div className="mt-4 text-center text-sm text-ff-form-helper">
             Are you a merchant?{' '}
-            <a href="/merchant/login" className="text-emerald-600 hover:text-emerald-500 underline">
+            <a href="/merchant/login" className="text-ff-primary hover:text-ff-primary-hover underline">
               Sign in here
             </a>
           </div>

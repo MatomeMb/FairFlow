@@ -118,7 +118,7 @@ export function MerchantLogin() {
         <div className="mb-2">
           <FairflowLogo markHeight={48} variant="light" />
         </div>
-        <p className="mb-8 text-sm text-stone-700">Sign in to your merchant account</p>
+        <p className="mb-8 text-sm text-ff-form-helper">Sign in to your merchant account</p>
 
         <a
           href={`${apiBase}/v1/auth/google`}
@@ -150,7 +150,7 @@ export function MerchantLogin() {
             <div className="w-full border-t border-[var(--ff-border)]" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2 text-stone-600">or continue with email</span>
+            <span className="bg-white px-2 text-ff-form-helper">or continue with email</span>
           </div>
         </div>
 
@@ -164,7 +164,7 @@ export function MerchantLogin() {
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>
@@ -178,17 +178,17 @@ export function MerchantLogin() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-stone-900 placeholder:text-stone-500 focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>
 
-          {error && <p className="text-red-600 text-sm">{error}</p>}
+          {error && <p className="text-ff-error-bold text-sm">{error}</p>}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-emerald-600 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:bg-emerald-800/60"
+            className="w-full rounded-xl bg-ff-primary py-3 font-medium text-white transition hover:bg-ff-primary-hover disabled:bg-ff-primary/60"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
@@ -199,7 +199,7 @@ export function MerchantLogin() {
             <button
               type="button"
               onClick={() => setShowForgotPassword(true)}
-              className="text-xs text-stone-700 underline hover:text-stone-900"
+              className="text-xs text-ff-form-helper underline hover:text-ff-form-text"
             >
               Forgot your password?
             </button>
@@ -208,7 +208,7 @@ export function MerchantLogin() {
 
         {showForgotPassword && (
           <form onSubmit={handleForgotPassword} className="mt-4 space-y-3 rounded-lg border border-[var(--ff-border)] bg-white p-4">
-            <p className="text-xs text-stone-700">
+            <p className="text-xs text-ff-form-helper">
               Enter your email to generate a reset token (MVP manual relay flow).
             </p>
             <input
@@ -219,8 +219,8 @@ export function MerchantLogin() {
               className="w-full rounded-lg border border-[var(--ff-border)] bg-[var(--ff-bg)] px-3 py-2 text-sm text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
-            {resetError && <p className="text-xs text-red-600">{resetError}</p>}
-            {resetMessage && <p className="text-xs text-emerald-700">{resetMessage}</p>}
+            {resetError && <p className="text-xs text-ff-error-bold">{resetError}</p>}
+            {resetMessage && <p className="text-xs text-ff-success-bold">{resetMessage}</p>}
             <div className="flex gap-2">
               <button
                 type="button"
@@ -232,7 +232,7 @@ export function MerchantLogin() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs text-white hover:bg-emerald-500 disabled:bg-emerald-800/60"
+                className="flex-1 rounded-lg bg-ff-primary px-3 py-2 text-xs text-white hover:bg-ff-primary-hover disabled:bg-ff-primary/60"
               >
                 Send reset link
               </button>
@@ -240,9 +240,9 @@ export function MerchantLogin() {
           </form>
         )}
 
-        <div className="mt-6 text-center text-sm text-stone-700">
+        <div className="mt-6 text-center text-sm text-ff-form-helper">
           Don't have an account?{" "}
-          <Link to="/merchant/register" className="text-emerald-400 hover:text-emerald-300">
+          <Link to="/merchant/register" className="text-ff-primary hover:text-ff-primary-hover">
             Create one
           </Link>
         </div>
