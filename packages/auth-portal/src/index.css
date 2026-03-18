@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=Sora:wght@600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Fraunces:wght@700;900&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -12,19 +12,20 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  --ff-navy: #1b2330;
-  --ff-cream: #f4f1eb;
-  --ff-navy-60: rgba(27, 35, 48, 0.6);
-  --ff-navy-40: rgba(27, 35, 48, 0.4);
-  --ff-navy-10: rgba(27, 35, 48, 0.08);
-  --ff-bg: #fafaf8;
-  --ff-surface: #f2f0ec;
-  --ff-ink: #1a1a18;
-  --ff-ink-muted: #6b6b65;
-  --ff-accent: #2d6a4f;
-  --ff-accent-light: #d8f3dc;
-  --ff-accent-warm: #b7791f;
-  --ff-border: #e4e2dc;
+  --ff-navy: #0D1B2A;
+  --ff-navy-light: #1A2D42;
+  --ff-cream: #FFFFFF;
+  --ff-navy-60: rgba(13,27,42,0.6);
+  --ff-navy-40: rgba(13,27,42,0.4);
+  --ff-navy-10: rgba(13,27,42,0.08);
+  --ff-bg: #0D1B2A;
+  --ff-surface: #1A2D42;
+  --ff-ink: #FFFFFF;
+  --ff-ink-muted: #8A99AA;
+  --ff-accent: #AAFF45;
+  --ff-accent-light: rgba(170,255,69,0.15);
+  --ff-accent-warm: #AAFF45;
+  --ff-border: rgba(255,255,255,0.07);
 }
 
 body {
