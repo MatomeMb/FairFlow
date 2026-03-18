@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { adminSecret, apiBase } from '../../../lib/config';
+import { apiBase } from '../../../lib/config';
 
 export interface KYCSubmission {
   id: string;
@@ -14,7 +14,7 @@ export interface KYCSubmission {
 type ActionType = 'approve' | 'reject';
 type ToastType = 'success' | 'error' | 'info';
 
-export function useAdminKYCQueue(onToast?: (message: string, type: ToastType) => void) {
+export function useAdminKYCQueue(token: string, onToast?: (message: string, type: ToastType) => void) {
   const [pendingKYC, setPendingKYC] = useState<KYCSubmission[]>([]);
   const [loadingKYC, setLoadingKYC] = useState(false);
   const [selectedKYC, setSelectedKYC] = useState<KYCSubmission | null>(null);
@@ -25,7 +25,7 @@ export function useAdminKYCQueue(onToast?: (message: string, type: ToastType) =>
   const loadKYCQueue = async () => {
     setLoadingKYC(true);
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, { headers: { Authorization: `Bearer ${adminSecret}` } });
+      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, { headers: { Authorization: `Bearer ${token}` } });
       const data = await response.json();
       if (data.ok && data.pending) setPendingKYC(data.pending);
     } catch {
@@ -55,7 +55,7 @@ export function useAdminKYCQueue(onToast?: (message: string, type: ToastType) =>
     try {
       const response = await fetch(`${apiBase}/v1/admin/kyc/${path}/${selectedKYC.id}`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${adminSecret}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const data = await response.json();
