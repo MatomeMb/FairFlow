@@ -8,23 +8,25 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { FairflowLogo } from "../components/FairflowLogo";
 import { useReveal } from "../hooks/useReveal";
 
 function RevealSection({
   children,
   className = "",
   delayClass = "",
+  style,
 }: {
   children: React.ReactNode;
   className?: string;
   delayClass?: string;
+  style?: React.CSSProperties;
 }) {
   const { ref, isVisible } = useReveal<HTMLDivElement>(0.18);
   return (
     <div
       ref={ref}
       className={`ff-reveal ${isVisible ? "is-visible" : ""} ${delayClass} ${className}`.trim()}
+      style={style}
     >
       {children}
     </div>
