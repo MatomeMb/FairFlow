@@ -151,29 +151,29 @@ export const InvestorMode: React.FC = () => {
           {/* Headline Card */}
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-4">
             <div className="space-y-2">
-              <h3 className="text-4xl font-bold text-emerald-400">fairflow</h3>
-              <p className="text-2xl text-stone-700 italic">For humans today, AI agents tomorrow</p>
+              <h3 className="text-4xl font-bold text-ff-primary">fairflow</h3>
+              <p className="text-2xl text-ff-form-helper italic">For humans today, AI agents tomorrow</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 text-lg">
               <div>
-                <span className="text-stone-500">Category:</span>
+                <span className="text-ff-form-placeholder">Category:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Ethical Shopping / AI-Assisted Commerce</span>
               </div>
               <div>
-                <span className="text-stone-500">Stage:</span>
+                <span className="text-ff-form-placeholder">Stage:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Pre-Revenue (MVP Launch Imminent)</span>
               </div>
               <div>
-                <span className="text-stone-500">Revenue Model:</span>
+                <span className="text-ff-form-placeholder">Revenue Model:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
-                <span className="text-stone-500">Market:</span>
+                <span className="text-ff-form-placeholder">Market:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">South Africa → Global</span>
               </div>
               <div className="col-span-2">
-                <span className="text-stone-500">Technology:</span>
+                <span className="text-ff-form-placeholder">Technology:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Chrome Extension + Web Platform + AI Agent</span>
               </div>
             </div>
@@ -223,14 +223,14 @@ export const InvestorMode: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-[var(--ff-bg)]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Component</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Notes</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Component</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Notes</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--ff-border)]">
                   {infrastructureComponents.map((item, index) => (
-                    <tr key={index} className="hover:bg-stone-200/60 transition-colors">
+                    <tr key={index} className="hover:bg-ff-neutral-muted/60 transition-colors">
                       <td className="px-6 py-4 text-[var(--ff-ink)] font-medium">{item.component}</td>
                       <td className="px-6 py-4">
                         <SprintStatus status={item.status} />
@@ -248,20 +248,20 @@ export const InvestorMode: React.FC = () => {
             <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Storage & Scale</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Current Storage</div>
-                <div className="text-2xl font-bold text-emerald-400">~200 MB</div>
+                <div className="text-sm text-ff-form-placeholder mb-1">Current Storage</div>
+                <div className="text-2xl font-bold text-ff-primary">~200 MB</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Quota Available</div>
-                <div className="text-2xl font-bold text-emerald-400">5,120 MB</div>
+                <div className="text-sm text-ff-form-placeholder mb-1">Quota Available</div>
+                <div className="text-2xl font-bold text-ff-primary">5,120 MB</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Error Rate (24h)</div>
-                <div className="text-2xl font-bold text-emerald-400">0.0%</div>
+                <div className="text-sm text-ff-form-placeholder mb-1">Error Rate (24h)</div>
+                <div className="text-2xl font-bold text-ff-primary">0.0%</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">System Memory</div>
-                <div className="text-2xl font-bold text-emerald-400">Healthy</div>
+                <div className="text-sm text-ff-form-placeholder mb-1">System Memory</div>
+                <div className="text-2xl font-bold text-ff-primary">Healthy</div>
               </div>
             </div>
           </div>
@@ -289,12 +289,12 @@ export const InvestorMode: React.FC = () => {
                   <div className="flex-grow pb-8">
                     <div className="flex items-baseline gap-4 mb-2">
                       <h3 className="text-xl font-semibold text-[var(--ff-ink)]">{item.title}</h3>
-                      <span className="text-sm text-stone-500">{item.timeline}</span>
+                      <span className="text-sm text-ff-form-placeholder">{item.timeline}</span>
                     </div>
                     <ul className="space-y-1 text-[var(--ff-ink-muted)]">
                       {item.details.map((detail, detailIndex) => (
                         <li key={detailIndex} className="flex items-start gap-2">
-                          <span className="text-emerald-500 mt-1">•</span>
+                          <span className="text-ff-primary mt-1">•</span>
                           <span>{detail}</span>
                         </li>
                       ))}
@@ -316,31 +316,31 @@ export const InvestorMode: React.FC = () => {
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-lg">
               <div>
-                <span className="text-stone-500">Revenue Model:</span>
+                <span className="text-ff-form-placeholder">Revenue Model:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
-                <span className="text-stone-500">Break-Even:</span>
-                <span className="ml-3 text-emerald-400 font-bold">R{breakEvenRevenue}/month</span>
+                <span className="text-ff-form-placeholder">Break-Even:</span>
+                <span className="ml-3 text-ff-primary font-bold">R{breakEvenRevenue}/month</span>
               </div>
               <div>
-                <span className="text-stone-500">Primary Gateway:</span>
+                <span className="text-ff-form-placeholder">Primary Gateway:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">PayFast 3.5% + R2</span>
               </div>
               <div>
-                <span className="text-stone-500">Current Burn:</span>
+                <span className="text-ff-form-placeholder">Current Burn:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">R{currentBurn.toLocaleString()}/month</span>
               </div>
               <div>
-                <span className="text-stone-500">Secondary Gateway:</span>
+                <span className="text-ff-form-placeholder">Secondary Gateway:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Stripe 2.9% + R5.50</span>
               </div>
               <div>
-                <span className="text-stone-500">Cash to Revenue:</span>
-                <span className="ml-3 text-emerald-400 font-bold">1 sprint</span>
+                <span className="text-ff-form-placeholder">Cash to Revenue:</span>
+                <span className="ml-3 text-ff-primary font-bold">1 sprint</span>
               </div>
               <div>
-                <span className="text-stone-500">Alternative Revenue:</span>
+                <span className="text-ff-form-placeholder">Alternative Revenue:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Subscriptions (under evaluation)</span>
               </div>
             </div>
@@ -355,14 +355,14 @@ export const InvestorMode: React.FC = () => {
               <table className="w-full">
                 <thead className="bg-[var(--ff-bg)]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Service</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Monthly Cost</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Tier / Details</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Service</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Monthly Cost</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-ff-form-helper">Tier / Details</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--ff-border)]">
                   {costStructure.map((item, index) => (
-                    <tr key={index} className="hover:bg-stone-200/60 transition-colors">
+                    <tr key={index} className="hover:bg-ff-neutral-muted/60 transition-colors">
                       <td className="px-6 py-4 text-[var(--ff-ink)] font-medium">{item.service}</td>
                       <td className="px-6 py-4 text-[var(--ff-ink)]">{item.cost}</td>
                       <td className="px-6 py-4 text-[var(--ff-ink-muted)]">{item.tier}</td>
@@ -370,7 +370,7 @@ export const InvestorMode: React.FC = () => {
                   ))}
                   <tr className="bg-[var(--ff-bg)] font-bold">
                     <td className="px-6 py-4 text-[var(--ff-ink)]">Total Infrastructure</td>
-                    <td className="px-6 py-4 text-emerald-400">R{totalMonthlyCost}</td>
+                    <td className="px-6 py-4 text-ff-primary">R{totalMonthlyCost}</td>
                     <td className="px-6 py-4 text-[var(--ff-ink-muted)]">Operational baseline</td>
                   </tr>
                 </tbody>
@@ -389,11 +389,11 @@ export const InvestorMode: React.FC = () => {
                 <div className="flex-grow">
                   <div className="flex items-baseline gap-4 mb-2">
                     <h3 className="text-2xl font-bold text-[var(--ff-ink)]">Matome Mbowene</h3>
-                    <span className="px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-sm font-semibold">
+                    <span className="px-3 py-1 bg-ff-primary/20 text-ff-primary rounded-full text-sm font-semibold">
                       CTO
                     </span>
                   </div>
-                  <p className="text-lg text-stone-700 mb-2">Architect of the platform</p>
+                  <p className="text-lg text-ff-form-helper mb-2">Architect of the platform</p>
                   <p className="text-[var(--ff-ink-muted)]">
                     Full-stack TypeScript · Supabase · AI integration
                   </p>
@@ -406,11 +406,11 @@ export const InvestorMode: React.FC = () => {
                 <div className="flex-grow">
                   <div className="flex items-baseline gap-4 mb-2">
                     <h3 className="text-2xl font-bold text-[var(--ff-ink)]">Sobuhle Nyambali</h3>
-                    <span className="px-3 py-1 bg-emerald-900/30 text-emerald-400 rounded-full text-sm font-semibold">
+                    <span className="px-3 py-1 bg-ff-primary/20 text-ff-primary rounded-full text-sm font-semibold">
                       CEO
                     </span>
                   </div>
-                  <p className="text-lg text-stone-700 mb-2">Business strategy & merchant relationships</p>
+                  <p className="text-lg text-ff-form-helper mb-2">Business strategy & merchant relationships</p>
                   <p className="text-[var(--ff-ink-muted)]">
                     Product vision · Investor relations · Market expansion
                   </p>
@@ -429,19 +429,19 @@ export const InvestorMode: React.FC = () => {
               <div>
                 <h3 className="text-[var(--ff-ink-muted)] mb-2">For investor inquiries:</h3>
                 <div className="space-y-1 ml-4">
-                  <div className="text-stone-700">
+                  <div className="text-ff-form-helper">
                     <a 
                       href="mailto:hello@fairflow.co.za" 
-                      className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="text-ff-primary hover:text-ff-primary-hover transition-colors"
                     >
                       hello@fairflow.co.za
                     </a>
-                    <span className="ml-3 text-sm text-stone-500">(Sprint 7)</span>
+                    <span className="ml-3 text-sm text-ff-form-placeholder">(Sprint 7)</span>
                   </div>
                   <div>
                     <a 
                       href="mailto:matome@fairflow.co.za" 
-                      className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="text-ff-primary hover:text-ff-primary-hover transition-colors"
                     >
                       matome@fairflow.co.za
                     </a>
@@ -449,7 +449,7 @@ export const InvestorMode: React.FC = () => {
                   <div>
                     <a 
                       href="mailto:sobuhle@fairflow.co.za" 
-                      className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                      className="text-ff-primary hover:text-ff-primary-hover transition-colors"
                     >
                       sobuhle@fairflow.co.za
                     </a>
@@ -464,11 +464,11 @@ export const InvestorMode: React.FC = () => {
                     href="https://fairflow.co.za" 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="text-emerald-400 hover:text-emerald-300 transition-colors"
+                    className="text-ff-primary hover:text-ff-primary-hover transition-colors"
                   >
                     fairflow.co.za
                   </a>
-                  <span className="ml-3 text-sm text-stone-500">(Sprint 7)</span>
+                  <span className="ml-3 text-sm text-ff-form-placeholder">(Sprint 7)</span>
                 </div>
               </div>
 
@@ -476,7 +476,7 @@ export const InvestorMode: React.FC = () => {
                 <p className="text-[var(--ff-ink-muted)]">
                   This dashboard is updated in real time from live infrastructure.
                 </p>
-                <p className="text-stone-500 text-sm mt-1">
+                <p className="text-ff-form-placeholder text-sm mt-1">
                   Last system check: {lastRefreshed?.toLocaleString() ?? 'Loading...'}
                 </p>
               </div>
@@ -486,7 +486,7 @@ export const InvestorMode: React.FC = () => {
 
         {/* Footer */}
         <div className="text-center pt-8 pb-4">
-          <p className="text-stone-500 flex items-center justify-center gap-2">
+          <p className="text-ff-form-placeholder flex items-center justify-center gap-2">
             <Lock className="w-4 h-4" />
             <span>Investor view — read only. Data refreshed automatically.</span>
           </p>
