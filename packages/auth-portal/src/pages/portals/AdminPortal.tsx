@@ -14,6 +14,7 @@ import { useAdminKYCQueue } from '../../features/admin-portal/hooks/useAdminKYCQ
 import { AdminOverviewSection } from '../../features/admin-portal/components/AdminOverviewSection';
 import { AdminKYCSection } from '../../features/admin-portal/components/AdminKYCSection';
 import { AdminMerchantsSection } from '../../features/admin-portal/components/AdminMerchantsSection';
+import { AdminPayoutsSection } from '../../features/admin-portal/components/AdminPayoutsSection';
 import { BarChart2, Activity, Users, Store, DollarSign, Settings2, AlertTriangle, FileCheck, LogOut, Bell } from 'lucide-react';
 
 type ToastState = { message: string; type: 'success' | 'error' | 'info' } | null;
@@ -175,6 +176,8 @@ export const AdminPortal: React.FC = () => {
         return renderSystem();
       case 'financials':
         return renderFinancials();
+      case 'payouts':
+        return <AdminPayoutsSection />;
       case 'settings':
         return renderSettings();
       default:

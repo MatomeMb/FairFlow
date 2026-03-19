@@ -2085,6 +2085,42 @@ app.get('/v1/slips/:filename', async (c) => {
   }
 });
 
+// GET /v1/admin/payouts - List pending payouts for admin release
+app.get('/v1/admin/payouts', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const [payoutLogs, merchants] = await Promise.all([loadPayoutLogs(), loadMerchantAccounts()]);
+  
+  // Filter to pending payouts and enrich with merchant names
+  const pending = payoutLogs
+    .filter((log) => log.status === 'pending')
+    .map((log) => {
+      const merchant = merchants.find((m) => m.id === log.merchant_id);
+      return {
+        id: log.id,
+        payout_log_id: log.id,
+        merchant_id: log.merchant_id,
+        merchant_name: merchant?.business_name || 'Unknown Merchant',
+        net_amount: log.net_amount ?? 0,
+        gross_amount: log.gross_amount ?? 0,
+        commission_amount: log.commission_amount ?? 0,
+        currency: log.currency ?? 'ZAR',
+        status: log.status,
+        created_at: log.created_at,
+        orders_count: Array.isArray(log.orders_included) ? log.orders_included.length : 0,
+      };
+    })
+    .sort((a, b) => {
+      const aTime = typeof a.created_at === 'string' ? new Date(a.created_at).getTime() : 0;
+      const bTime = typeof b.created_at === 'string' ? new Date(b.created_at).getTime() : 0;
+      return aTime - bTime; // Oldest first
+    });
+
+  return c.json({ ok: true, payouts: pending, count: pending.length });
+});
+
 app.post('/v1/admin/payouts/release', async (c) => {
   if (!validateAdminAuth(c.req.header('authorization'))) {
     return c.json({ ok: false, error: 'Forbidden' }, 403);

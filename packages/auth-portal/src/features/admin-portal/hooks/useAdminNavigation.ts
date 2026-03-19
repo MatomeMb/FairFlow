@@ -6,6 +6,7 @@ export type AdminSection =
   | 'users-roles'
   | 'merchants'
   | 'financials'
+  | 'payouts'
   | 'platform-health'
   | 'system'
   | 'settings';
@@ -23,6 +24,7 @@ const NAVIGATION: AdminNavigationItem[] = [
   { id: 'users-roles', label: 'Users & Roles', icon: 'Users' },
   { id: 'platform-health', label: 'Platform Health', icon: 'Activity' },
   { id: 'financials', label: 'Financials', icon: 'DollarSign' },
+  { id: 'payouts', label: 'Payouts', icon: 'DollarSign' },
   { id: 'system', label: 'System', icon: 'Zap' },
   { id: 'settings', label: 'Settings', icon: 'Settings2' },
 ];
