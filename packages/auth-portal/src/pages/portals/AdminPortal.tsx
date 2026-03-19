@@ -213,7 +213,7 @@ export const AdminPortal: React.FC = () => {
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition ${
                   activeSection === item.id
                     ? 'bg-[var(--ff-accent-light)] text-[var(--ff-ink)] border border-[var(--ff-border)]'
-                    : 'text-stone-700 hover:text-[var(--ff-ink)] hover:bg-[var(--ff-surface)]'
+                    : 'text-[#8A99AA] hover:text-white hover:bg-[var(--ff-surface)]'
                 }`}
               >
                 <Icon className="w-5 h-5 flex-shrink-0" />
@@ -226,7 +226,7 @@ export const AdminPortal: React.FC = () => {
         <div className="border-t border-[var(--ff-border)] p-4">
           <button
             onClick={toggleSidebar}
-            className="w-full flex items-center justify-center px-4 py-2 text-stone-700 hover:text-[var(--ff-ink)] transition"
+            className="w-full flex items-center justify-center px-4 py-2 text-[#8A99AA] hover:text-white transition"
           >
             {sidebarOpen ? '←' : '→'}
           </button>
