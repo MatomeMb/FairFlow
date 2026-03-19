@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import type { AnalyticsDashboard } from "../types/analytics";
 import { apiBase, apiKey } from "../lib/config";
+import { useVisibilityAwareInterval } from "./useVisibilityAwareInterval";
 
 const buildHeaders = (includeAccept = false): Record<string, string> => {
   const headers: Record<string, string> = {};
@@ -52,10 +53,13 @@ export function useAnalytics(refreshInterval = 30000) {
 
   useEffect(() => {
     fetchData();
-    const dataInterval = setInterval(fetchData, refreshInterval);
     const tickInterval = setInterval(() => setSecondsSince(s => s + 1), 1000);
-    return () => { clearInterval(dataInterval); clearInterval(tickInterval); };
-  }, [fetchData, refreshInterval]);
+    return () => {
+      clearInterval(tickInterval);
+    };
+  }, [fetchData]);
+
+  useVisibilityAwareInterval(fetchData, refreshInterval);
 
   return { data, error, loading, lastRefreshed, secondsSince, refresh: fetchData, checkHealth };
 }

@@ -18,6 +18,7 @@ import { useMerchantAnalytics } from '../../features/merchant-portal/hooks/useMe
 import { MerchantProductsSection } from '../../features/merchant-portal/components/MerchantProductsSection';
 import { MerchantAnalyticsSection } from '../../features/merchant-portal/components/MerchantAnalyticsSection';
 import { MerchantAccountSection, type BusinessProfile } from '../../features/merchant-portal/components/MerchantAccountSection';
+import { useVisibilityAwareInterval } from '../../hooks/useVisibilityAwareInterval';
 
 type Tab = 'products' | 'analytics' | 'orders' | 'notifications' | 'kyc-payouts' | 'account';
 
@@ -352,9 +353,15 @@ export const MerchantPortal: React.FC = () => {
   useEffect(() => {
     if (!hasApiAuth) return;
     fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 15000);
-    return () => clearInterval(intervalId);
   }, [fetchNotifications, hasApiAuth]);
+
+  useVisibilityAwareInterval(
+    () => {
+      if (!hasApiAuth) return;
+      void fetchNotifications();
+    },
+    hasApiAuth ? 15000 : null
+  );
 
   const markNotificationRead = useCallback(async (id: string) => {
     setUpdatingNotificationId(id);
