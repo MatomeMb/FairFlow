@@ -122,7 +122,7 @@ export function MerchantLogin() {
 
         <a
           href={`${apiBase}/v1/auth/google`}
-          className="mb-4 flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-sm font-medium text-[var(--ff-ink)] transition hover:bg-[var(--ff-surface)]"
+          className="mb-4 flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#0D1B2A] px-4 py-3 text-sm font-medium text-white transition hover:bg-[#152238]"
         >
           <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
             <path
