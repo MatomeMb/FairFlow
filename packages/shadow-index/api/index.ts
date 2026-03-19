@@ -124,6 +124,7 @@ const app = new Hono();
 // Allow only configured origins (production domains + localhost for dev)
 const prodOrigins = [
   'https://fairflow.co.za',
+  'https://www.fairflow.co.za',
   'https://portal.fairflow.co.za',
   'https://api.fairflow.co.za',
 ];
