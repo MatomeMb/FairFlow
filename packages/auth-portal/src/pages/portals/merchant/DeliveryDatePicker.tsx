@@ -68,7 +68,7 @@ export function DeliveryDatePicker({
         <button
           onClick={handleSave}
           disabled={!date || saving || !token}
-          className="px-3 py-1.5 text-sm font-medium bg-[var(--ff-cta)] text-white rounded-md hover:bg-[var(--ff-cta-hover)] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-w-[80px] justify-center"
+          className="px-3 py-1.5 text-sm font-medium bg-[#AAFF45] text-[#0D1B2A] rounded-md hover:bg-[#95E830] disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 min-w-[80px] justify-center"
         >
           {saving ? (
             <Loader2 className="w-3.5 h-3.5 animate-spin" />

@@ -302,7 +302,7 @@ export const AdminPortal: React.FC = () => {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={resetKYCAction}
-                className="flex-1 px-4 py-2 bg-[var(--ff-surface)] hover:brightness-95 text-[var(--ff-ink)] rounded-lg transition"
+                className="flex-1 px-4 py-2 bg-[#1A2D42] border border-[rgba(255,255,255,0.10)] hover:border-[rgba(255,255,255,0.20)] text-white rounded-lg transition"
               >
                 Cancel
               </button>

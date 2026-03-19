@@ -58,7 +58,7 @@ export function MerchantAccountSection({
             <input type="text" value={businessProfile.yearEstablished} onChange={(event) => onBusinessProfileChange({ yearEstablished: event.target.value })} className="w-full rounded-lg border border-[var(--ff-border-light)] bg-[var(--ff-neutral-subtle)] px-4 py-3 text-[var(--ff-form-text)]" />
           </div>
         </div>
-        <button onClick={onSaveChanges} className="mt-6 rounded-xl bg-[var(--ff-cta)] px-6 py-3 font-medium transition hover:bg-[var(--ff-cta-hover)]">
+        <button onClick={onSaveChanges} className="mt-6 rounded-xl bg-[#AAFF45] px-6 py-3 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">
           Save Changes
         </button>
       </div>
