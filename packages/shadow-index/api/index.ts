@@ -121,8 +121,18 @@ export function selectRail(): 'paystack' {
 
 const app = new Hono();
 
-// Allow extension/page on different origin (e.g. localhost:5177) to call API
-app.use('*', cors());
+// Allow only configured origins (production domains + localhost for dev)
+app.use('*', cors({
+  origin: [
+    'https://fairflow.co.za',
+    'https://portal.fairflow.co.za',
+    'https://api.fairflow.co.za',
+    'http://localhost:3000',
+    'http://localhost:5178',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:5178'
+  ]
+}));
 
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
