@@ -278,9 +278,10 @@ export async function sendKycStatusEmail(details: KycStatusDetails): Promise<voi
 
   const bodyHtml = details.approved
     ? `
-      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">Account verified</h1>
+      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">Account verified ✓</h1>
       <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${details.merchantBusinessName}</p>
-      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">Your KYC verification is approved. You can now receive payouts from sales made through Fairflow.</p>`
+      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">Congratulations! Your KYC verification is approved. Your account is now fully verified and you can start selling on Fairflow.</p>
+      <p style="margin:0 0 24px;font-size:15px;color:#18181b;"><strong>Payouts Unlocked:</strong> All earnings from your sales will be automatically transferred to your bank account on a weekly basis.</p>`
     : `
       <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">KYC verification update</h1>
       <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${details.merchantBusinessName}</p>
