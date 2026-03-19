@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "lint": "eslint \"src/**/*.{ts,tsx}\" --max-warnings=0",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "keywords": [
     "auth",
@@ -35,6 +39,13 @@
     "vite": "^7.3.1"
   },
   "devDependencies": {
-    "tailwindcss": "^3.4.19"
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@typescript-eslint/parser": "^8.29.1",
+    "@vitest/coverage-v8": "^4.1.0",
+    "eslint": "^9.23.0",
+    "jsdom": "^27.0.1",
+    "tailwindcss": "^3.4.19",
+    "vitest": "^4.1.0"
   }
 }
