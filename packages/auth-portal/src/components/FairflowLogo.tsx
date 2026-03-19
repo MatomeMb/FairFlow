@@ -179,9 +179,11 @@ export function FairflowLogo({
             WebkitFontSmoothing: 'antialiased',
           }}
         >
-          ff.
+          <span>fair</span>
+          <span>flow</span>
         </span>
       )}
     </div>
   );
 }
+          ff.
