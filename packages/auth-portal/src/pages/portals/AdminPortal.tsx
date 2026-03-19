@@ -26,7 +26,6 @@ const NAVIGATION_ICON_MAP: Record<string, NavIcon> = {
   Users,
   Activity,
   DollarSign,
-  Zap,
   Settings2,
 };
 
