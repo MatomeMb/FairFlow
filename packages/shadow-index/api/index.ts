@@ -1505,6 +1505,39 @@ app.post('/v1/auth/merchant/login', async (c) => {
   });
 });
 
+app.post('/v1/auth/merchant/refresh', async (c) => {
+  const authHeader = c.req.header('Authorization');
+  const token = extractBearerToken(authHeader);
+  if (!token) {
+    return c.json(err('unauthorized', 'Missing Bearer token'), 401);
+  }
+
+  const payload = verifyJwt(token, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return c.json(err('unauthorized', 'Invalid or expired token'), 401);
+  }
+
+  const subject = typeof payload.sub === 'string' ? payload.sub : null;
+  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
+  if (!subject && !email) {
+    return c.json(err('unauthorized', 'Token payload is missing subject'), 401);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) =>
+    subject ? candidate.id === subject : candidate.email.toLowerCase() === email
+  );
+  if (!account) {
+    return c.json(err('unauthorized', 'Account not found for token'), 401);
+  }
+
+  const newToken = issueMerchantToken(account);
+  return c.json({
+    token: newToken,
+    account: sanitizeMerchantAccount(account),
+  });
+});
+
 app.get('/v1/auth/merchant/me', async (c) => {
   const token = extractBearerToken(c.req.header('Authorization'));
   if (!token) {
