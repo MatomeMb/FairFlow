@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { FairflowLogo, LOGO_STYLES } from '../../components/FairflowLogo';
+import { FairflowLogo } from '../../components/FairflowLogo';
 import { useAuth } from '../../context/AuthContext';
 import { useAnalytics } from '../../hooks/useAnalytics';
 import { useSupabaseUsers } from '../../hooks/useSupabaseUsers';
@@ -14,7 +14,7 @@ import { useAdminKYCQueue } from '../../features/admin-portal/hooks/useAdminKYCQ
 import { AdminOverviewSection } from '../../features/admin-portal/components/AdminOverviewSection';
 import { AdminKYCSection } from '../../features/admin-portal/components/AdminKYCSection';
 import { AdminMerchantsSection } from '../../features/admin-portal/components/AdminMerchantsSection';
-import { BarChart2, Activity, Users, Store, DollarSign, Settings2, AlertTriangle, Check, FileCheck, LogOut, ChevronDown, Bell, Zap } from 'lucide-react';
+import { BarChart2, Activity, Users, Store, DollarSign, Settings2, AlertTriangle, FileCheck, LogOut, Bell } from 'lucide-react';
 
 type ToastState = { message: string; type: 'success' | 'error' | 'info' } | null;
 type NavIcon = React.ComponentType<{ className?: string }>;
@@ -41,13 +41,8 @@ export const AdminPortal: React.FC = () => {
   const { navigation, activeSection, setActiveSection } = useAdminNavigation();
   const {
     sidebarOpen,
-    logoStyle,
-    logoMenuOpen,
-    setLogoMenuOpen,
     toggleSidebar,
     closeSidebar,
-    toggleLogoMenu,
-    applyLogoStyle,
   } = useAdminShellState();
   const {
     pendingKYC,
@@ -197,7 +192,7 @@ export const AdminPortal: React.FC = () => {
       <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-[#1A2D42] border-r border-[rgba(255,255,255,0.07)] transition-all duration-300 flex flex-col`}>
         <div className="p-4 border-b border-[rgba(255,255,255,0.07)] flex-shrink-0 overflow-hidden">
           <div className="flex items-center justify-between">
-            <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="light" />
+            <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style="geo-tech" variant="light" />
             {sidebarOpen && <span className="text-xs font-bold text-white">ADMIN</span>}
           </div>
         </div>
@@ -248,41 +243,6 @@ export const AdminPortal: React.FC = () => {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <div className="relative">
-                <button 
-                  onClick={toggleLogoMenu}
-                  className="flex items-center gap-2 bg-[var(--ff-surface)] hover:brightness-95 text-[var(--ff-ink)] rounded-lg px-3 py-1.5 transition-colors border border-[var(--ff-border)]"
-                >
-                  <Zap className="w-4 h-4 text-[var(--ff-warning)]" />
-                  <span className="text-xs font-bold uppercase tracking-wider">{logoStyle.replace('-', ' ')}</span>
-                  <ChevronDown className={`w-3 h-3 text-[#8A99AA] transition-transform ${logoMenuOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {logoMenuOpen && (
-                  <>
-                    <div className="fixed inset-0 z-10" onClick={() => setLogoMenuOpen(false)} />
-                    <div className="absolute right-0 mt-2 w-56 bg-[#1A2D42] border border-[var(--ff-border)] rounded-xl shadow-2xl z-20 py-2 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
-                      <div className="px-3 py-2 border-b border-[var(--ff-border)] mb-1">
-                        <span className="text-[10px] font-black text-white uppercase tracking-[0.2em]">Select Brand Identity</span>
-                      </div>
-                      {LOGO_STYLES.map((styleOption) => (
-                        <button
-                          key={styleOption.id}
-                          onClick={() => applyLogoStyle(styleOption.id)}
-                          className={`w-full flex items-center justify-between px-4 py-2 text-sm transition-all ${
-                            logoStyle === styleOption.id
-                              ? 'bg-[var(--ff-info-subtle)] text-[var(--ff-info)] font-bold'
-                              : 'text-[#8A99AA] hover:bg-[var(--ff-surface)] hover:text-white'
-                          }`}
-                        >
-                          <span className="capitalize">{styleOption.label}</span>
-                          {logoStyle === styleOption.id && <Check className="w-4 h-4" />}
-                        </button>
-                      ))}
-                    </div>
-                  </>
-                )}
-              </div>
               <button className="p-2 text-[#8A99AA] hover:text-white hover:bg-[var(--ff-surface)] rounded-lg">
                 <Bell className="w-5 h-5" />
               </button>
