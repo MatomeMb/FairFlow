@@ -94,7 +94,7 @@ export function MerchantRegister() {
       />
 
       <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-10">
-        <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/70 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.10)] backdrop-blur-xl animate-[ff-fade-up_0.4s_ease-out_both]">
+        <div className="w-full max-w-md rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1A2D42] p-8 shadow-[0_8px_40px_rgba(0,0,0,0.10)] backdrop-blur-xl animate-[ff-fade-up_0.4s_ease-out_both]">
           <div className="mb-2">
             <FairflowLogo markHeight={48} variant="light" />
           </div>

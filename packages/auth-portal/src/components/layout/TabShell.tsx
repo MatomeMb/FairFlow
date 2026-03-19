@@ -44,7 +44,7 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
   return (
     <div className="min-h-screen bg-[var(--ff-bg)] text-[var(--ff-ink)]">
       {/* Header */}
-      <div className="border-b border-[rgba(170,255,69,0.15)] bg-white/90 backdrop-blur-sm">
+      <div className="border-b border-[var(--ff-border)] bg-[#1A2D42] backdrop-blur-sm">
         <div className="px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
           <div className="text-xl font-semibold text-[var(--ff-ink)]">{title}</div>
           <div className="flex items-center gap-3">
@@ -61,13 +61,13 @@ export function TabShell({ title, tabs, activeTab, onTabChange, onLogout, header
         {/* Tabs */}
         <div className="relative border-t border-[var(--ff-border)]">
           <div
-            className={`pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-gradient-to-r from-white/95 to-transparent transition-opacity sm:hidden ${
+            className={`pointer-events-none absolute bottom-0 left-0 top-0 z-10 w-8 bg-gradient-to-r from-[#1A2D42]/95 to-transparent transition-opacity sm:hidden ${
               showLeftCue ? 'opacity-100' : 'opacity-0'
             }`}
             aria-hidden="true"
           />
           <div
-            className={`pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-gradient-to-l from-white/95 to-transparent transition-opacity sm:hidden ${
+            className={`pointer-events-none absolute bottom-0 right-0 top-0 z-10 w-8 bg-gradient-to-l from-[#1A2D42]/95 to-transparent transition-opacity sm:hidden ${
               showRightCue ? 'opacity-100' : 'opacity-0'
             }`}
             aria-hidden="true"

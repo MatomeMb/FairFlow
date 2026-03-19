@@ -114,7 +114,7 @@ export function MerchantLogin() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[linear-gradient(180deg,var(--ff-bg),var(--ff-surface))] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-white/60 bg-white/75 p-8 shadow-[0_8px_40px_rgba(0,0,0,0.10)] backdrop-blur-xl">
+      <div className="w-full max-w-md rounded-2xl border border-[rgba(255,255,255,0.07)] bg-[#1A2D42] p-8 shadow-[0_8px_40px_rgba(0,0,0,0.10)] backdrop-blur-xl">
         <div className="mb-2">
           <FairflowLogo markHeight={48} variant="light" />
         </div>
