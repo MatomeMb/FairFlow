@@ -1,4 +1,4 @@
-import type { ComponentType } from 'react';
+import { memo, useMemo, type ComponentType } from 'react';
 import { Package } from 'lucide-react';
 import { MetricCard } from '../../../components/shared/MetricCard';
 import { EmptyState } from '../../../components/shared/EmptyState';
@@ -45,7 +45,7 @@ export interface MerchantProductsSectionProps {
   onCopyPage: (productId: string, hash?: string) => void;
   onRemoveProduct: (productId: string) => void;
 }
-export function MerchantProductsSection({
+export const MerchantProductsSection = memo(function MerchantProductsSection({
   ErrorBanner,
   InlineSpinner,
   products,
@@ -75,10 +75,18 @@ export function MerchantProductsSection({
   onCopyPage,
   onRemoveProduct,
 }: MerchantProductsSectionProps) {
-  const lowStockProducts = products.filter((product) => product.stock < 5);
-  const recentOrders = orders.slice(0, 3);
+  const lowStockProducts = useMemo(() => products.filter((product) => product.stock < 5), [products]);
+  const recentOrders = useMemo(() => orders.slice(0, 3), [orders]);
   const onboardingKycStatus = merchantAccount?.kyc_status;
   const shouldShowOnboardingBanner = showOnboardingBanner && products.length === 0;
+  const onboardingSteps = useMemo(
+    () => [
+      { done: products.length > 0, label: 'Create your first product', action: onOpenCreateModal, cta: 'Create product' },
+      { done: onboardingKycStatus === 'pending' || onboardingKycStatus === 'approved', label: 'Submit KYC verification', action: onGoToKycPayouts, cta: 'Start KYC' },
+      { done: merchantAccount?.bank_account != null, label: 'Add your bank account for payouts', action: onGoToKycPayouts, cta: 'Add bank account' },
+    ],
+    [merchantAccount?.bank_account, onGoToKycPayouts, onOpenCreateModal, onboardingKycStatus, products.length]
+  );
   return (
     <div className="space-y-6">
       {analyticsError && <ErrorBanner message={analyticsError} onDismiss={onDismissAnalyticsError} />}
@@ -105,11 +113,7 @@ export function MerchantProductsSection({
             </button>
           </div>
           <div className="mt-4 space-y-3">
-            {[
-              { done: products.length > 0, label: 'Create your first product', action: onOpenCreateModal, cta: 'Create product' },
-              { done: onboardingKycStatus === 'pending' || onboardingKycStatus === 'approved', label: 'Submit KYC verification', action: onGoToKycPayouts, cta: 'Start KYC' },
-              { done: merchantAccount?.bank_account != null, label: 'Add your bank account for payouts', action: onGoToKycPayouts, cta: 'Add bank account' },
-            ].map((step, index) => (
+            {onboardingSteps.map((step, index) => (
               <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <span className={`flex h-6 w-6 items-center justify-center rounded-full text-xs font-bold ${
@@ -296,4 +300,4 @@ export function MerchantProductsSection({
       </button>
     </div>
   );
-}
+});

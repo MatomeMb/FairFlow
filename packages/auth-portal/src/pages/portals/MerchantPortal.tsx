@@ -134,19 +134,19 @@ export const MerchantPortal: React.FC = () => {
   });
   const [showOnboardingBanner, setShowOnboardingBanner] = useState(true);
 
-  const tabs = [
+  const tabs = useMemo(() => [
     { id: 'products', label: 'My Products' },
     { id: 'analytics', label: 'Analytics' },
     { id: 'orders', label: 'Orders' },
     { id: 'notifications', label: 'Notifications' },
     { id: 'kyc-payouts', label: 'KYC & Payouts' },
     { id: 'account', label: 'My Account' }
-  ];
+  ], []);
 
-  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+  const showToast = useCallback((message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);
-  };
+  }, []);
   const hasApiAuth = Boolean(authToken || import.meta.env.VITE_API_KEY);
 
   useEffect(() => {
@@ -272,7 +272,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setAccountLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, merchantFetch]);
 
   const fetchPayoutLogs = useCallback(async () => {
     setPayoutsLoading(true);
@@ -291,7 +291,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setPayoutsLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, merchantFetch, showToast]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
@@ -347,7 +347,7 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setNotificationsLoading(false);
     }
-  }, [apiBase]);
+  }, [apiBase, merchantFetch]);
 
   useEffect(() => {
     if (!hasApiAuth) return;
@@ -374,16 +374,11 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setUpdatingNotificationId(null);
     }
-  }, [apiBase]);
+  }, [apiBase, merchantFetch, showToast]);
 
   const markAllNotificationsRead = useCallback(async () => {
     try {
-      // Capture current unread IDs without making notifications a dependency
-      let unreadIds: string[] = [];
-      setNotifications((prev) => {
-        unreadIds = prev.filter((n) => !n.read).map((n) => n.id);
-        return prev; // Don't modify state, just read it
-      });
+      const unreadIds = notifications.filter((n) => !n.read).map((n) => n.id);
       if (unreadIds.length === 0) return;
       
       await Promise.all(
@@ -400,7 +395,7 @@ export const MerchantPortal: React.FC = () => {
       setNotificationsError(msg);
       showToast(msg, 'error');
     }
-  }, [apiBase]);
+  }, [apiBase, merchantFetch, notifications, showToast]);
 
   useEffect(() => {
     if (activeTab !== 'notifications') return;
@@ -421,7 +416,7 @@ export const MerchantPortal: React.FC = () => {
     }
   };
 
-  const handleUploadSlip = async (orderId: string, file: File) => {
+  const handleUploadSlip = useCallback(async (orderId: string, file: File) => {
     try {
       const slipUrl = await uploadSlip(orderId, file);
       if (slipUrl) showToast('Shipment slip uploaded', 'success');
@@ -429,9 +424,9 @@ export const MerchantPortal: React.FC = () => {
       const msg = e instanceof Error ? e.message : 'Failed to upload slip';
       showToast(msg, 'error');
     }
-  };
+  }, [showToast, uploadSlip]);
 
-  const handleMarkAsShipped = async (orderId: string, slipUrl: string) => {
+  const handleMarkAsShipped = useCallback(async (orderId: string, slipUrl: string) => {
     try {
       await markAsShipped(orderId, slipUrl);
       showToast('Order marked as shipped', 'success');
@@ -440,7 +435,7 @@ export const MerchantPortal: React.FC = () => {
       setOrdersError(msg);
       showToast(msg, 'error');
     }
-  };
+  }, [markAsShipped, showToast]);
 
   const handleRestockProduct = useCallback(async (productId: string) => {
     setRestockingProductId(productId);
@@ -453,9 +448,9 @@ export const MerchantPortal: React.FC = () => {
     } finally {
       setRestockingProductId(null);
     }
-  }, [restockProduct]);
+  }, [restockProduct, showToast]);
 
-  const handleCopyMatter = async (productId: string, value?: string) => {
+  const handleCopyMatter = useCallback(async (productId: string, value?: string) => {
     if (!value) return;
     try {
       await navigator.clipboard.writeText(value);
@@ -464,9 +459,9 @@ export const MerchantPortal: React.FC = () => {
     } catch {
       showToast('Failed to copy matter link', 'error');
     }
-  };
+  }, [showToast]);
 
-  const handleCopyPage = async (productId: string, hash?: string) => {
+  const handleCopyPage = useCallback(async (productId: string, hash?: string) => {
     if (!hash) return;
     try {
       await navigator.clipboard.writeText(`${window.location.origin}/product/${hash}`);
@@ -475,16 +470,16 @@ export const MerchantPortal: React.FC = () => {
     } catch {
       showToast('Failed to copy product page', 'error');
     }
-  };
+  }, [showToast]);
 
-  const handleRemoveProduct = async (id: string) => {
+  const handleRemoveProduct = useCallback(async (id: string) => {
     try {
       await handleDeleteProduct(id);
       showToast('Product removed', 'success');
     } catch (e) {
       showToast(e instanceof Error ? e.message : 'Failed to remove product', 'error');
     }
-  };
+  }, [handleDeleteProduct, showToast]);
 
   const handleBusinessProfileChange = useCallback((updates: Partial<BusinessProfile>) => {
     setBusinessProfile((prev) => ({ ...prev, ...updates }));
@@ -523,7 +518,7 @@ export const MerchantPortal: React.FC = () => {
     } catch (error) {
       showToast(`Error: ${error instanceof Error ? error.message : 'Failed to update'}`, 'error');
     }
-  }, [businessProfile, merchantFetch]);
+  }, [apiBase, businessProfile, merchantFetch, showToast]);
 
   const stats = useMemo(() => ({
     active: products.filter(p => p.status === 'Active').length,
@@ -550,6 +545,56 @@ export const MerchantPortal: React.FC = () => {
 
   const commissionRate = merchantAccount?.commission_rate ?? 0.03;
 
+  const handleDismissOrdersError = useCallback(() => {
+    setOrdersError(null);
+  }, []);
+
+  const handleDismissNotificationsError = useCallback(() => {
+    setNotificationsError(null);
+  }, []);
+
+  const handleDismissAnalyticsError = useCallback(() => {
+    setAnalyticsError(null);
+  }, []);
+
+  const handleDismissAccountError = useCallback(() => {
+    setAccountError(null);
+  }, []);
+
+  const handleDismissProductsError = useCallback(() => {
+    setProductsError(null);
+  }, []);
+
+  const handleDismissOnboardingBanner = useCallback(() => {
+    setShowOnboardingBanner(false);
+  }, []);
+
+  const handleOpenCreateModal = useCallback(() => {
+    setShowCreateModal(true);
+  }, []);
+
+  const handleGoToKycPayouts = useCallback(() => {
+    setActiveTab('kyc-payouts');
+  }, []);
+
+  const handleOpenNotificationsTab = useCallback(() => {
+    setActiveTab('notifications');
+  }, []);
+
+  const handleCloseCreateModal = useCallback(() => {
+    setShowCreateModal(false);
+  }, []);
+
+  const handleCreatedProduct = useCallback((product?: { thing_file?: { matter_uri?: string } }) => {
+    setShowCreateModal(false);
+    if (product?.thing_file?.matter_uri) {
+      showToast('Product created with matter:// URI', 'success');
+    } else {
+      showToast('Product created', 'success');
+    }
+    void loadProductsWithError();
+  }, [loadProductsWithError, showToast]);
+
   const renderOrders = () => (
     <MerchantOrders
       orders={orders}
@@ -558,7 +603,7 @@ export const MerchantPortal: React.FC = () => {
       fulfillingOrderId={fulfillingOrderId}
       uploadingSlipOrderId={uploadingSlipOrderId}
       commissionRate={commissionRate}
-      onDismissOrdersError={() => setOrdersError(null)}
+      onDismissOrdersError={handleDismissOrdersError}
       onMarkAsFulfilled={handleMarkAsFulfilled}
       onUploadSlip={handleUploadSlip}
       onMarkAsShipped={handleMarkAsShipped}
@@ -591,7 +636,7 @@ export const MerchantPortal: React.FC = () => {
       notificationsLoading={notificationsLoading}
       notificationsError={notificationsError}
       updatingNotificationId={updatingNotificationId}
-      onDismissNotificationsError={() => setNotificationsError(null)}
+      onDismissNotificationsError={handleDismissNotificationsError}
       onMarkAllNotificationsRead={markAllNotificationsRead}
       onMarkNotificationRead={markNotificationRead}
       formatRelativeTime={formatRelativeTime}
@@ -625,7 +670,7 @@ export const MerchantPortal: React.FC = () => {
       onLogout={signOut}
       headerActions={(
         <button
-          onClick={() => setActiveTab('notifications')}
+          onClick={handleOpenNotificationsTab}
           className="relative rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] p-2 transition-colors hover:brightness-95"
           aria-label="Open notifications"
         >
@@ -650,17 +695,17 @@ export const MerchantPortal: React.FC = () => {
             ordersError={ordersError}
             accountError={accountError}
             productsError={productsError}
-            onDismissAnalyticsError={() => setAnalyticsError(null)}
-            onDismissOrdersError={() => setOrdersError(null)}
-            onDismissAccountError={() => setAccountError(null)}
-            onDismissProductsError={() => setProductsError(null)}
+            onDismissAnalyticsError={handleDismissAnalyticsError}
+            onDismissOrdersError={handleDismissOrdersError}
+            onDismissAccountError={handleDismissAccountError}
+            onDismissProductsError={handleDismissProductsError}
             isLoadingOrders={isLoadingOrders}
             accountLoading={accountLoading}
             isLoadingProducts={isLoadingProducts}
             showOnboardingBanner={showOnboardingBanner}
-            onDismissOnboardingBanner={() => setShowOnboardingBanner(false)}
-            onOpenCreateModal={() => setShowCreateModal(true)}
-            onGoToKycPayouts={() => setActiveTab('kyc-payouts')}
+            onDismissOnboardingBanner={handleDismissOnboardingBanner}
+            onOpenCreateModal={handleOpenCreateModal}
+            onGoToKycPayouts={handleGoToKycPayouts}
             stats={stats}
             restockingProductId={restockingProductId}
             onRestockProduct={handleRestockProduct}
@@ -674,7 +719,7 @@ export const MerchantPortal: React.FC = () => {
         {activeTab === 'analytics' && (
           <MerchantAnalyticsSection
             analyticsError={analyticsError}
-            onDismissAnalyticsError={() => setAnalyticsError(null)}
+            onDismissAnalyticsError={handleDismissAnalyticsError}
             ErrorBanner={ErrorBanner}
             InlineSpinner={InlineSpinner}
             isLoadingAnalytics={isLoadingAnalytics}
@@ -700,16 +745,8 @@ export const MerchantPortal: React.FC = () => {
 
       <CreateProductModal
         isOpen={showCreateModal}
-        onClose={() => setShowCreateModal(false)}
-        onCreated={(product) => {
-          setShowCreateModal(false);
-          if (product?.thing_file?.matter_uri) {
-            showToast('Product created with matter:// URI', 'success');
-          } else {
-            showToast('Product created', 'success');
-          }
-          void loadProductsWithError();
-        }}
+        onClose={handleCloseCreateModal}
+        onCreated={handleCreatedProduct}
       />
 
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}
