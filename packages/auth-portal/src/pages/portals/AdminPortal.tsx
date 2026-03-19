@@ -7,7 +7,7 @@ import { MetricCard } from '../../components/shared/MetricCard';
 import { RoleBadge } from '../../components/shared/RoleBadge';
 import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
-import { adminSecret } from '../../lib/config';
+import { adminSecret, isUsingDefaultAdminSecret } from '../../lib/config';
 import { useAdminNavigation } from '../../features/admin-portal/hooks/useAdminNavigation';
 import { useAdminShellState } from '../../features/admin-portal/hooks/useAdminShellState';
 import { useAdminKYCQueue } from '../../features/admin-portal/hooks/useAdminKYCQueue';
@@ -32,7 +32,6 @@ const NAVIGATION_ICON_MAP: Record<string, NavIcon> = {
 export const AdminPortal: React.FC = () => {
   const { signOut } = useAuth();
   const hasConfiguredAdminSecret = Boolean(import.meta.env.VITE_ADMIN_SECRET);
-  const isUsingDefaultAdminSecret = adminSecret === 'mor-admin-secret-local';
   const showAdminSecretWarning = !hasConfiguredAdminSecret || isUsingDefaultAdminSecret;
   const [toast, setToast] = useState<ToastState>(null);
   const [apiOnline, setApiOnline] = useState(true);
