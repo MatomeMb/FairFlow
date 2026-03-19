@@ -295,7 +295,7 @@ export const MerchantProductsSection = memo(function MerchantProductsSection({
           </table>
         </div>
       )}
-      <button onClick={onOpenCreateModal} className="rounded bg-[var(--ff-cta)] px-4 py-2 text-sm font-medium text-[var(--ff-neutral)] hover:bg-[var(--ff-cta-hover)]">
+      <button onClick={onOpenCreateModal} className="rounded-full bg-[#AAFF45] px-6 py-3 text-sm font-bold text-[#0D1B2A] hover:bg-[#95E830] transition-colors">
         + Create Product
       </button>
     </div>
