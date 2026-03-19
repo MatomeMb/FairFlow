@@ -15,7 +15,8 @@ Last updated: 2026-03-19
 | G - CEODashboard | Complete | `c82fb25` | `CEODashboard` reduced from 974 to 209 lines |
 | H - Cross-cutting fixes | Complete | `1c7f15b` | Token storage consolidation and dynamic class hardening |
 | I - Performance and QA pass | Complete | `N/A (read-only audit)` | Rerender, polling, refresh, and test-gap findings captured |
-| J - Cleanup and enforcement | Complete | `TBD (this commit)` | Tracker finalized and temporary refactor artifacts cleaned |
+| J - Cleanup and enforcement | Complete | `d0d7c07` | Tracker finalized and temporary refactor artifacts cleaned |
+| K - Performance hardening and test coverage | Complete | `0ade88f`, `aa265a5`, `fdca8d7` | Callback stabilization, visibility-aware polling, and critical-path hook/token tests |
 
 ## Notes
 
