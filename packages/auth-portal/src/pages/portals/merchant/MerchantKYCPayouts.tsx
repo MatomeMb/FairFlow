@@ -57,7 +57,7 @@ export function MerchantKYCPayouts({
       )}
 
       {(accountLoading || payoutsLoading) && (
-        <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
+        <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-4 text-sm text-white flex items-center gap-3">
           <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
             <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
             <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
@@ -66,7 +66,7 @@ export function MerchantKYCPayouts({
         </div>
       )}
 
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-6 space-y-4">
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-6 space-y-4">
         <KYCForm
           kycStatus={merchantAccount?.kyc_status || 'not_started'}
           initialBusinessName={merchantAccount?.business_name || kycForm.business_name}
@@ -77,8 +77,8 @@ export function MerchantKYCPayouts({
         />
       </div>
 
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-6 space-y-4">
-        <h3 className="font-bold">KYC & Payouts</h3>
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-6 space-y-4">
+        <h3 className="font-bold text-white">KYC & Payouts</h3>
         <p className="text-sm text-[var(--ff-ink-muted)]">Platform commission: {(commissionRate * 100).toFixed(1)}% per order</p>
 
         {merchantAccount?.bank_account && (
@@ -116,7 +116,7 @@ export function MerchantKYCPayouts({
         </div>
 
         {payoutsLoading ? (
-          <div className="rounded-xl border border-[var(--ff-border)] bg-white p-4 text-sm text-[var(--ff-ink)] flex items-center gap-3">
+          <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-4 text-sm text-white flex items-center gap-3">
             <svg className="w-5 h-5 text-emerald-700 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <circle cx="12" cy="12" r="10" stroke="currentColor" strokeOpacity="0.2" strokeWidth="4" />
               <path d="M22 12a10 10 0 0 0-10-10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />

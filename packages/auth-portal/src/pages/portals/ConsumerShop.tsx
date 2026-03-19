@@ -152,7 +152,7 @@ export const ConsumerShop: React.FC = () => {
       </div>
 
       {/* Search and filters */}
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-6">
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-6">
         <div className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -206,7 +206,7 @@ export const ConsumerShop: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map(product => (
-            <div key={product.id} className="group overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-[var(--ff-cta)]/50">
+            <div key={product.id} className="group overflow-hidden rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] transition hover:border-[var(--ff-cta)]/50">
               <div className="flex h-32 items-center justify-center bg-gradient-to-br from-emerald-100 to-[var(--ff-surface)] transition group-hover:scale-110">
                 {getProductIcon()}
               </div>
@@ -260,7 +260,7 @@ export const ConsumerShop: React.FC = () => {
       )}
 
       {/* How It Works */}
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-8">
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-8">
         <h3 className="text-2xl font-bold mb-8 text-center">How It Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
@@ -300,7 +300,7 @@ export const ConsumerShop: React.FC = () => {
             <p className="text-[var(--ff-ink-muted)]">Your wishlist ({wishlistProducts.length} items)</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {wishlistProducts.map(product => (
-                <div key={product.id} className="overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-emerald-500/50">
+                <div key={product.id} className="overflow-hidden rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] transition hover:border-emerald-500/50">
                   <div className="flex h-32 items-center justify-center bg-gradient-to-br from-emerald-100 to-[var(--ff-surface)]">
                     {getProductIcon()}
                   </div>

@@ -7,10 +7,10 @@ export function UnauthorizedPage() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--ff-bg)] px-4">
-      <div className="w-full max-w-md rounded-2xl border border-[var(--ff-border)] bg-white/85 p-8 text-center shadow-[0_8px_40px_rgba(0,0,0,0.08)]">
+      <div className="w-full max-w-md rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-8 text-center shadow-[0_8px_40px_rgba(0,0,0,0.08)]">
         <div className="text-6xl mb-4">🚫</div>
-        <h1 className="mb-2 text-2xl font-bold text-[var(--ff-ink)]">Access Denied</h1>
-        <p className="mb-6 text-[var(--ff-ink-muted)]">
+        <h1 className="mb-2 text-2xl font-bold text-white">Access Denied</h1>
+        <p className="mb-6 text-[#8A99AA]">
           You don't have permission to access this area.
         </p>
         {role && (
