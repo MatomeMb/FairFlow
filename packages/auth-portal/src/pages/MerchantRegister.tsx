@@ -151,7 +151,7 @@ export function MerchantRegister() {
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Email
               </label>
               <input
@@ -159,12 +159,12 @@ export function MerchantRegister() {
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Password (min 8 characters)
               </label>
               <input
@@ -174,12 +174,12 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Confirm Password
               </label>
               <input
@@ -189,7 +189,7 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, confirm_password: e.target.value })
                 }
-                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -203,7 +203,7 @@ export function MerchantRegister() {
                 }
                 className="mt-1 cursor-pointer"
               />
-              <label htmlFor="terms" className="text-sm text-stone-500">
+              <label htmlFor="terms" className="text-sm text-[#8A99AA]">
                 I accept the terms and conditions
               </label>
             </div>
@@ -219,9 +219,9 @@ export function MerchantRegister() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-stone-500">
+          <div className="mt-6 text-center text-sm text-[#8A99AA]">
             Already have an account?{" "}
-            <Link to="/merchant/login" className="text-emerald-600 hover:text-emerald-700">
+            <Link to="/merchant/login" className="text-[var(--ff-cta)] hover:text-[var(--ff-cta-hover)]">
               Sign in
             </Link>
           </div>
