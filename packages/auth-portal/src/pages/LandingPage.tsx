@@ -331,7 +331,7 @@ export function LandingPage() {
                   </span>
                   MASTERCARD
                 </div>
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-white">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-md bg-[#2f855a] text-[10px] font-black text-white">R</span>
                   EFT
                 </div>
