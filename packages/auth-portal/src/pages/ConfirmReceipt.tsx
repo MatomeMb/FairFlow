@@ -32,8 +32,8 @@ export function ConfirmReceipt() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
-      <div className="bg-white border-b border-ff-border-light">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="bg-white border-b border-stone-200">
         <div className="max-w-2xl mx-auto px-6 py-4">
           <FairflowLogo markHeight={32} />
         </div>
@@ -43,32 +43,32 @@ export function ConfirmReceipt() {
         <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
           {success ? (
             <>
-              <div className="w-20 h-20 bg-ff-success-subtle rounded-full flex items-center justify-center mx-auto mb-4">
-                <CheckCircle2 className="w-12 h-12 text-ff-success-bold" />
+              <div className="w-20 h-20 bg-[var(--ff-success-subtle)] rounded-full flex items-center justify-center mx-auto mb-4">
+                <CheckCircle2 className="w-12 h-12 text-[var(--ff-success)]" />
               </div>
-              <h2 className="text-2xl font-bold text-ff-form-text mb-2">Thank you!</h2>
-              <p className="text-ff-form-helper">
+              <h2 className="text-2xl font-bold text-stone-900 mb-2">Thank you!</h2>
+              <p className="text-stone-600">
                 Payment has been released to the merchant.
               </p>
             </>
           ) : (
             <>
-              <div className="w-16 h-16 bg-ff-info-subtle rounded-full flex items-center justify-center mx-auto mb-6">
-                <Package className="w-8 h-8 text-ff-info" />
+              <div className="w-16 h-16 bg-[var(--ff-info-subtle)] rounded-full flex items-center justify-center mx-auto mb-6">
+                <Package className="w-8 h-8 text-[var(--ff-info)]" />
               </div>
-              <h2 className="text-2xl font-bold text-ff-form-text mb-2">Confirm received</h2>
-              <p className="text-ff-form-helper mb-6">
+              <h2 className="text-2xl font-bold text-stone-900 mb-2">Confirm received</h2>
+              <p className="text-stone-600 mb-6">
                 Have you received your order? Click below to confirm and release payment to the merchant.
               </p>
               {error && (
-                <div className="mb-4 p-3 bg-ff-error-subtle border border-ff-error rounded-lg text-ff-error-bold text-sm">
+                <div className="mb-4 p-3 bg-[var(--ff-error-subtle)] border border-[var(--ff-error)] rounded-lg text-[var(--ff-error-bold)] text-sm">
                   {error}
                 </div>
               )}
               <button
                 onClick={handleConfirm}
                 disabled={loading}
-                className="w-full bg-ff-primary text-white font-semibold py-4 px-6 rounded-lg hover:bg-ff-primary-hover active:bg-ff-primary disabled:bg-ff-neutral-muted disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-[var(--ff-cta)] text-white font-semibold py-4 px-6 rounded-lg hover:bg-[var(--ff-cta-hover)] active:bg-[var(--ff-cta-active)] disabled:bg-[var(--ff-neutral-muted)] disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

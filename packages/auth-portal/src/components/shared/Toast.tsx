@@ -15,9 +15,9 @@ export function Toast({ message, type, onDismiss }: ToastProps) {
   }, [onDismiss]);
 
   const colors = {
-    success: "bg-emerald-50 border-emerald-300 text-emerald-800",
-    error: "bg-red-50 border-red-300 text-red-800",
-    info: "bg-blue-50 border-blue-300 text-blue-800"
+    success: "bg-[var(--ff-success-subtle)] border-[var(--ff-success)] text-[var(--ff-success-bold)]",
+    error: "bg-[var(--ff-error-subtle)] border-[var(--ff-error)] text-[var(--ff-error-bold)]",
+    info: "bg-[var(--ff-info-subtle)] border-[var(--ff-info)] text-[var(--ff-info-bold)]"
   };
 
   return (

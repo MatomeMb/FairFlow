@@ -196,10 +196,10 @@ export function ProductPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
         <div className="text-center">
-          <Loader2 className="w-12 h-12 animate-spin text-ff-cta mx-auto mb-4" />
-          <p className="text-ff-form-helper">Loading product...</p>
+          <Loader2 className="w-12 h-12 animate-spin text-[var(--ff-info)] mx-auto mb-4" />
+          <p className="text-stone-600">Loading product...</p>
         </div>
       </div>
     );
@@ -207,15 +207,15 @@ export function ProductPage() {
 
   if (error || !thing) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
         <div className="text-center max-w-md mx-auto px-6">
-          <div className="w-16 h-16 bg-ff-error-subtle rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-ff-error-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <div className="w-16 h-16 bg-[var(--ff-error-subtle)] rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-[var(--ff-error)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-ff-form-text mb-2">Product Not Found</h1>
-          <p className="text-ff-form-helper">
+          <h1 className="text-2xl font-bold text-stone-900 mb-2">Product Not Found</h1>
+          <p className="text-stone-600">
             {error || 'This product is no longer available or the link may be invalid.'}
           </p>
         </div>
@@ -227,13 +227,13 @@ export function ProductPage() {
   const isOutOfStock = (thing?.metadata?.stock_count ?? 1) <= 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-ff-page-bg to-ff-page-bg-to">
+    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
       {/* Header */}
-      <div className="bg-white border-b border-ff-border-light">
+      <div className="bg-white border-b border-stone-200">
         <div className="max-w-5xl mx-auto px-6 py-4">
           <div className="flex items-center justify-between">
             <FairflowLogo markHeight={32} />
-            <span className="text-xs text-ff-form-placeholder font-mono">matter://{hash?.slice(0, 12)}...</span>
+            <span className="text-xs text-stone-500 font-mono">matter://{hash?.slice(0, 12)}...</span>
           </div>
         </div>
       </div>
@@ -243,7 +243,7 @@ export function ProductPage() {
         <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 md:gap-12 p-8 md:p-12">
             {/* Product Image */}
-            <div className="aspect-square bg-ff-neutral-subtle rounded-xl overflow-hidden flex items-center justify-center">
+            <div className="aspect-square bg-[var(--ff-surface)] rounded-xl overflow-hidden flex items-center justify-center">
               {thing.product.image_url && !imageError ? (
                 <img
                   src={thing.product.image_url}
@@ -253,12 +253,12 @@ export function ProductPage() {
                 />
               ) : (
                 <div className="text-center p-8">
-                  <div className="w-16 h-16 bg-ff-neutral rounded-full flex items-center justify-center mx-auto mb-3">
-                    <svg className="w-8 h-8 text-ff-neutral-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div className="w-16 h-16 bg-[var(--ff-border)] rounded-full flex items-center justify-center mx-auto mb-3">
+                    <svg className="w-8 h-8 text-stone-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                   </div>
-                  <p className="text-sm text-ff-form-placeholder">Product Image</p>
+                  <p className="text-sm text-stone-500">Product Image</p>
                 </div>
               )}
             </div>
@@ -267,10 +267,10 @@ export function ProductPage() {
             <div className="flex flex-col">
               {/* Title & Price */}
               <div className="mb-6">
-                <h2 className="text-3xl font-bold text-ff-form-text mb-3">
+                <h2 className="text-3xl font-bold text-stone-900 mb-3">
                   {thing.product.title}
                 </h2>
-                <div className="text-4xl font-bold text-ff-cta">
+                <div className="text-4xl font-bold text-[var(--ff-info)]">
                   {formatPrice(thing.product.price, thing.product.currency)}
                 </div>
               </div>
@@ -278,21 +278,21 @@ export function ProductPage() {
               {/* Description */}
               {thing.product.description && (
                 <div className="mb-8">
-                  <p className="text-ff-form-helper leading-relaxed">
+                  <p className="text-stone-600 leading-relaxed">
                     {thing.product.description}
                   </p>
                 </div>
               )}
 
               {showAddressForm && (
-                <div className="flex items-center gap-2 mb-4 text-sm text-ff-form-placeholder">
+                <div className="flex items-center gap-2 mb-4 text-sm text-stone-500">
                   <span className="flex items-center gap-1">
-                    <span className="w-5 h-5 rounded-full bg-[var(--ff-info)] bg-opacity-20 text-ff-cta text-xs flex items-center justify-center font-semibold">✓</span>
+                    <span className="w-5 h-5 rounded-full bg-[var(--ff-info-subtle)] text-[var(--ff-info)] text-xs flex items-center justify-center font-semibold">✓</span>
                     Contact
                   </span>
-                  <span className="flex-1 h-px bg-ff-neutral" />
+                  <span className="flex-1 h-px bg-[var(--ff-border)]" />
                   <span className="flex items-center gap-1">
-                    <span className="w-5 h-5 rounded-full bg-ff-cta text-white text-xs flex items-center justify-center font-semibold">2</span>
+                    <span className="w-5 h-5 rounded-full bg-[var(--ff-info)] text-white text-xs flex items-center justify-center font-semibold">2</span>
                     Delivery
                   </span>
                 </div>
@@ -305,7 +305,7 @@ export function ProductPage() {
                 }}
               >
                 <div className="mb-6">
-                  <label htmlFor="email" className="block text-sm font-medium text-ff-form-label mb-2">
+                  <label htmlFor="email" className="block text-sm font-medium text-stone-700 mb-2">
                     Email Address
                   </label>
                   <input
@@ -317,15 +317,15 @@ export function ProductPage() {
                       if (emailError) setEmailError('');
                     }}
                     placeholder="you@example.com"
-                    className="w-full px-4 py-3 border border-ff-border-mid rounded-lg focus:ring-2 focus:ring-ff-cta focus:border-transparent text-ff-form-text placeholder-ff-form-placeholder"
+                    className="w-full px-4 py-3 border border-stone-300 rounded-lg focus:ring-2 focus:ring-[var(--ff-focus)] focus:border-transparent text-stone-900 placeholder-stone-400"
                     disabled={checkoutLoading}
                   />
-                  {emailError && <p className="text-ff-error text-xs mt-1">{emailError}</p>}
+                  {emailError && <p className="text-[var(--ff-error)] text-xs mt-1">{emailError}</p>}
                 </div>
 
                 {showAddressForm && (
-                  <div className="mt-4 space-y-3 border border-ff-border-mid rounded-lg p-4 bg-ff-neutral-subtle mb-6">
-                    <h3 className="text-sm font-semibold text-ff-form-label">Delivery Address</h3>
+                  <div className="mt-4 space-y-3 border border-stone-300 rounded-lg p-4 bg-[var(--ff-surface)] mb-6">
+                    <h3 className="text-sm font-semibold text-stone-700">Delivery Address</h3>
 
                     <AddressFields
                       values={deliveryAddress}
@@ -334,10 +334,10 @@ export function ProductPage() {
                       prefix="delivery"
                     />
 
-                    <div className="pt-3 border-t border-ff-border-mid mt-3">
+                    <div className="pt-3 border-t border-stone-300 mt-3">
                       <div className="flex items-center justify-between">
-                        <h3 className="text-sm font-semibold text-ff-form-label">Billing Address</h3>
-                        <label className="text-xs text-ff-form-helper flex items-center gap-2">
+                        <h3 className="text-sm font-semibold text-stone-700">Billing Address</h3>
+                        <label className="text-xs text-stone-600 flex items-center gap-2">
                           <input
                             type="checkbox"
                             checked={billingSameAsDelivery}
@@ -367,7 +367,7 @@ export function ProductPage() {
                 <button
                   type="submit"
                   disabled={!emailValid || checkoutLoading || isOutOfStock}
-                  className="w-full bg-ff-cta text-white font-semibold py-4 px-6 rounded-lg hover:bg-ff-cta-hover active:bg-ff-cta-active disabled:bg-ff-neutral disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 text-lg"
+                  className="w-full bg-[var(--ff-info)] text-white font-semibold py-4 px-6 rounded-lg hover:bg-[var(--ff-info-bold)] active:brightness-90 disabled:bg-[var(--ff-neutral-muted)] disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-3 text-lg"
                 >
                   {checkoutLoading ? (
                     <>
@@ -389,16 +389,16 @@ export function ProductPage() {
               </form>
 
               {/* Trust Signals */}
-              <div className="mt-6 pt-6 border-t border-ff-border-light">
-                <div className="flex items-center gap-4 text-sm text-ff-form-helper">
+              <div className="mt-6 pt-6 border-t border-stone-200">
+                <div className="flex items-center gap-4 text-sm text-stone-600">
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-ff-success-bold" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-[var(--ff-success)]" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                     </svg>
                     Secure checkout
                   </div>
                   <div className="flex items-center gap-2">
-                    <svg className="w-5 h-5 text-ff-cta" fill="currentColor" viewBox="0 0 20 20">
+                    <svg className="w-5 h-5 text-[var(--ff-info)]" fill="currentColor" viewBox="0 0 20 20">
                       <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884z" />
                       <path d="M18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z" />
                     </svg>
@@ -412,7 +412,7 @@ export function ProductPage() {
 
         {/* Powered By */}
         <div className="text-center mt-8">
-          <p className="text-sm text-ff-form-placeholder">
+          <p className="text-sm text-stone-500">
             Powered by <span className="font-semibold">fairflow</span> — Distributed Commerce
           </p>
         </div>

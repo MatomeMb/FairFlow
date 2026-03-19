@@ -42,13 +42,13 @@ const BANK_OPTIONS = [
 
 const statusBadge = (status: KycStatus) => {
   if (status === 'approved') {
-    return <span className="inline-flex text-xs px-2 py-1 rounded bg-ff-success-subtle text-ff-success-bold">Approved</span>;
+    return <span className="inline-flex text-xs px-2 py-1 rounded bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]">Approved</span>;
   }
   if (status === 'pending') {
-    return <span className="inline-flex text-xs px-2 py-1 rounded bg-ff-warning-subtle text-ff-warning-bold">Pending Review</span>;
+    return <span className="inline-flex text-xs px-2 py-1 rounded bg-amber-100 text-amber-800">Pending Review</span>;
   }
   if (status === 'rejected') {
-    return <span className="inline-flex text-xs px-2 py-1 rounded bg-ff-error-subtle text-ff-error-bold">Rejected</span>;
+    return <span className="inline-flex text-xs px-2 py-1 rounded bg-[var(--ff-error-subtle)] text-[var(--ff-error-bold)]">Rejected</span>;
   }
   return <span className="inline-flex text-xs px-2 py-1 rounded bg-[var(--ff-surface)] text-[var(--ff-ink)]">Not Started</span>;
 };
@@ -116,7 +116,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
       </div>
 
       {error && (
-        <div className="rounded-md border border-ff-error/30 bg-ff-error/10 px-3 py-2 text-sm text-ff-error">{error}</div>
+        <div className="rounded-md border border-[var(--ff-error-subtle)] bg-[var(--ff-error-subtle)] px-3 py-2 text-sm text-[var(--ff-error-bold)]">{error}</div>
       )}
 
       <div>
@@ -128,7 +128,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
           value={form.business_name}
           disabled={disabled}
           onChange={(e) => setForm((prev) => ({ ...prev, business_name: e.target.value }))}
-          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
         />
       </div>
 
@@ -141,7 +141,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
           value={form.id_number}
           disabled={disabled}
           onChange={(e) => setForm((prev) => ({ ...prev, id_number: e.target.value }))}
-          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
         />
       </div>
 
@@ -153,7 +153,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
           value={form.date_of_birth}
           disabled={disabled}
           onChange={(e) => setForm((prev) => ({ ...prev, date_of_birth: e.target.value }))}
-          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
         />
       </div>
 
@@ -166,7 +166,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
           value={form.residential_address}
           disabled={disabled}
           onChange={(e) => setForm((prev) => ({ ...prev, residential_address: e.target.value }))}
-          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
         />
       </div>
 
@@ -179,7 +179,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
           value={form.phone}
           disabled={disabled}
           onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
-          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+          className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
         />
       </div>
 
@@ -198,7 +198,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
               ...prev,
               bank_account: { ...prev.bank_account, account_holder_name: e.target.value },
             }))}
-            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
           />
         </div>
 
@@ -212,7 +212,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
               ...prev,
               bank_account: { ...prev.bank_account, bank_name: e.target.value },
             }))}
-            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
           >
             {BANK_OPTIONS.map((bank) => (
               <option key={bank} value={bank}>{bank}</option>
@@ -232,7 +232,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
               ...prev,
               bank_account: { ...prev.bank_account, account_number: e.target.value.replace(/\D/g, '').slice(0, 11) },
             }))}
-            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
           />
         </div>
 
@@ -248,7 +248,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
               ...prev,
               bank_account: { ...prev.bank_account, branch_code: e.target.value.replace(/\D/g, '').slice(0, 6) },
             }))}
-            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
           />
         </div>
 
@@ -262,7 +262,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
               ...prev,
               bank_account: { ...prev.bank_account, account_type: e.target.value as SABankAccountForm['account_type'] },
             }))}
-            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-ff-form-text placeholder:text-ff-form-placeholder disabled:opacity-60"
+            className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-3 text-sm text-[var(--ff-ink)] disabled:opacity-60"
           >
             <option value="cheque">Cheque/Current</option>
             <option value="savings">Savings</option>
@@ -275,7 +275,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
         <button
           type="submit"
           disabled={submitting}
-          className="bg-ff-primary hover:bg-ff-primary-hover disabled:bg-ff-primary/60 px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-white"
+          className="bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-active)] disabled:bg-[var(--ff-cta-active)]/60 px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-white"
         >
           {buttonLabel}
         </button>

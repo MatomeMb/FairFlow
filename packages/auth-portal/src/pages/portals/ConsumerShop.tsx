@@ -89,7 +89,7 @@ export const ConsumerShop: React.FC = () => {
   }, [products]);
 
   const getProductIcon = () => (
-    <Package className="w-10 h-10 text-ff-primary" />
+    <Package className="w-10 h-10 text-emerald-400" />
   );
 
   const filteredProducts = useMemo(() => {
@@ -124,7 +124,7 @@ export const ConsumerShop: React.FC = () => {
     return Array.from({ length: 5 }).map((_, i) => (
       <Star
         key={i}
-        className={`w-3.5 h-3.5 ${i < score ? 'text-ff-primary fill-current' : 'text-[var(--ff-ink-muted)]'}`}
+        className={`w-3.5 h-3.5 ${i < score ? 'text-emerald-500 fill-current' : 'text-stone-700'}`}
       />
     ));
   };
@@ -144,7 +144,7 @@ export const ConsumerShop: React.FC = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-white pl-8 pr-3 text-xs text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-[var(--ff-accent)]"
+                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-white pl-8 pr-3 text-xs text-[var(--ff-ink)] placeholder:text-[var(--ff-ink-muted)] focus:outline-none focus:border-[var(--ff-accent)]"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={selectedCategory || ''}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-ff-form-text"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -174,7 +174,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={minScore}
                 onChange={(e) => setMinScore(parseInt(e.target.value))}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-ff-form-text"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
               >
                 <option value="0">Any Score</option>
                 <option value="3">3+ Stars</option>
@@ -206,20 +206,20 @@ export const ConsumerShop: React.FC = () => {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProducts.map(product => (
-            <div key={product.id} className="group overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-ff-primary/50">
-              <div className="flex h-32 items-center justify-center bg-gradient-to-br from-ff-success-subtle to-[var(--ff-surface)] transition group-hover:scale-110">
+            <div key={product.id} className="group overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-[var(--ff-cta)]/50">
+              <div className="flex h-32 items-center justify-center bg-gradient-to-br from-emerald-100 to-[var(--ff-surface)] transition group-hover:scale-110">
                 {getProductIcon()}
               </div>
               
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <h3 className="font-bold group-hover:text-ff-primary transition">{product.name}</h3>
+                    <h3 className="font-bold group-hover:text-emerald-400 transition">{product.name}</h3>
                     <p className="mt-1 font-mono text-xs text-[var(--ff-ink-muted)]">{product.merchant}</p>
                   </div>
                   <button
                     onClick={() => toggleWishlist(product.id)}
-                    className={`transition ${wishlist.includes(product.id) ? 'text-ff-error' : 'text-[var(--ff-ink-muted)] hover:text-ff-error'}`}
+                      className={`transition ${wishlist.includes(product.id) ? 'text-[var(--ff-error)]' : 'text-[var(--ff-ink-muted)] hover:text-[var(--ff-error)]'}`}
                   >
                     <Heart className={`w-5 h-5 ${wishlist.includes(product.id) ? 'fill-current' : ''}`} />
                   </button>
@@ -228,7 +228,7 @@ export const ConsumerShop: React.FC = () => {
                 <div className="space-y-2">
                   <div className="flex flex-wrap gap-1">
                     {product.badges.map(badge => (
-                      <span key={badge} className="rounded bg-ff-success-subtle px-2 py-1 text-xs text-ff-success-bold">
+                      <span key={badge} className="rounded bg-[var(--ff-success-subtle)] px-2 py-1 text-xs text-[var(--ff-success-bold)]">
                         {badge}
                       </span>
                     ))}
@@ -236,7 +236,7 @@ export const ConsumerShop: React.FC = () => {
                   
                   <div>
                     <p className="mb-1 text-xs text-[var(--ff-ink-muted)]">Ethical Score</p>
-                    <div className="text-ff-primary text-sm flex gap-0.5">{renderEthicalScore(product.ethicalScore)}</div>
+                    <div className="text-[var(--ff-cta)] text-sm flex gap-0.5">{renderEthicalScore(product.ethicalScore)}</div>
                   </div>
                 </div>
 
@@ -244,14 +244,14 @@ export const ConsumerShop: React.FC = () => {
                   <span className="text-lg font-bold text-[var(--ff-ink)]">R {product.price.toFixed(2)}</span>
                   <button
                     onClick={() => handleBuyClick(product)}
-                    className="flex items-center gap-1 rounded-lg bg-ff-primary px-3 py-2 text-xs font-medium text-white transition hover:bg-ff-primary-hover focus:ring-2 focus:ring-ff-focus/50"
+                    className="flex items-center gap-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs font-medium text-white transition hover:bg-[var(--ff-cta-hover)] focus:ring-2 focus:ring-[var(--ff-focus)]/50"
                   >
                     <ShoppingCart className="w-3 h-3" /> Buy
                   </button>
                 </div>
 
                 {!product.inStock && (
-                  <div className="text-center text-ff-error text-xs font-medium pt-2">Out of Stock</div>
+                  <div className="text-center text-[var(--ff-error)] text-xs font-medium pt-2">Out of Stock</div>
                 )}
               </div>
             </div>
@@ -264,22 +264,22 @@ export const ConsumerShop: React.FC = () => {
         <h3 className="text-2xl font-bold mb-8 text-center">How It Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
-            <Search className="w-8 h-8 mx-auto mb-3 text-ff-primary" />
+            <Search className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
             <h4 className="font-bold mb-2">Discover</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Browse our curated selection of ethical products from trusted merchants</p>
           </div>
           <div className="text-center">
-            <CheckCircle2 className="w-8 h-8 mx-auto mb-3 text-ff-primary" />
+            <CheckCircle2 className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
             <h4 className="font-bold mb-2">Verify</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Check ethical scores and certifications for transparency</p>
           </div>
           <div className="text-center">
-            <ShoppingCart className="w-8 h-8 mx-auto mb-3 text-ff-primary" />
+            <ShoppingCart className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
             <h4 className="font-bold mb-2">Purchase</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Buy directly with secure Paystack checkout</p>
           </div>
           <div className="text-center">
-            <Heart className="w-8 h-8 mx-auto mb-3 text-ff-primary fill-current" />
+            <Heart className="w-8 h-8 mx-auto mb-3 text-emerald-500 fill-current" />
             <h4 className="font-bold mb-2">Impact</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Support merchants changing the world, one ethical choice at a time</p>
           </div>
@@ -300,8 +300,8 @@ export const ConsumerShop: React.FC = () => {
             <p className="text-[var(--ff-ink-muted)]">Your wishlist ({wishlistProducts.length} items)</p>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {wishlistProducts.map(product => (
-                <div key={product.id} className="overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-ff-primary/50">
-                  <div className="flex h-32 items-center justify-center bg-gradient-to-br from-ff-success-subtle to-[var(--ff-surface)]">
+                <div key={product.id} className="overflow-hidden rounded-xl border border-[var(--ff-border)] bg-white/85 transition hover:border-emerald-500/50">
+                  <div className="flex h-32 items-center justify-center bg-gradient-to-br from-emerald-100 to-[var(--ff-surface)]">
                     {getProductIcon()}
                   </div>
                   <div className="p-4">
@@ -311,7 +311,7 @@ export const ConsumerShop: React.FC = () => {
                       <span className="font-bold font-mono">R {product.price.toFixed(2)}</span>
                       <button
                         onClick={() => toggleWishlist(product.id)}
-                        className="text-ff-error hover:text-ff-error-bold transition focus:ring-2 focus:ring-ff-focus/50 rounded-lg"
+                        className="text-red-500 hover:text-red-600 transition focus:ring-2 focus:ring-emerald-500/50 rounded-lg"
                       >
                         <Heart className="w-5 h-5 fill-current" />
                       </button>
@@ -341,7 +341,7 @@ export const ConsumerShop: React.FC = () => {
           </div>
           <div className="flex justify-between border-t border-[var(--ff-border)] pt-3">
             <span className="text-[var(--ff-ink-muted)]">Role</span>
-            <span className="capitalize text-ff-primary">{user?.role}</span>
+            <span className="capitalize text-teal-500">{user?.role}</span>
           </div>
         </div>
       </div>
@@ -362,7 +362,7 @@ export const ConsumerShop: React.FC = () => {
 
       <button
         onClick={signOut}
-        className="w-full bg-ff-error/20 hover:bg-ff-error/30 border border-ff-error-bold text-ff-error px-6 py-3 rounded-lg font-medium transition"
+        className="w-full bg-[var(--ff-error-subtle)] hover:brightness-95 border border-[var(--ff-error)] text-[var(--ff-error)] px-6 py-3 rounded-lg font-medium transition"
       >
         Sign Out
       </button>

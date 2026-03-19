@@ -15,13 +15,13 @@ export function UnauthorizedPage() {
         </p>
         {role && (
           <p className="mb-8 text-sm text-[var(--ff-ink-muted)]">
-            Current role: <span className="text-ff-primary font-mono">{role}</span>
+            Current role: <span className="text-[var(--ff-cta)] font-mono">{role}</span>
           </p>
         )}
         <div className="flex gap-3">
           <button
             onClick={() => navigate("/")}
-            className="flex-1 bg-ff-primary hover:bg-ff-primary-hover text-white font-medium py-3 rounded-xl transition"
+            className="flex-1 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-white font-medium py-3 rounded-xl transition"
           >
             Go to Dashboard
           </button>

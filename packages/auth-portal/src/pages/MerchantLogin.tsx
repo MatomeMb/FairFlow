@@ -183,12 +183,12 @@ export function MerchantLogin() {
             />
           </div>
 
-          {error && <p className="text-red-400 text-sm">{error}</p>}
+          {error && <p className="text-[var(--ff-error)] text-sm">{error}</p>}
 
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-emerald-600 py-3 font-medium text-white transition hover:bg-emerald-500 disabled:bg-emerald-800/60"
+            className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-white transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
@@ -232,7 +232,7 @@ export function MerchantLogin() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 rounded-lg bg-emerald-600 px-3 py-2 text-xs text-white hover:bg-emerald-500 disabled:bg-emerald-800/60"
+                className="flex-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs text-white hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
               >
                 Send reset link
               </button>
@@ -242,7 +242,7 @@ export function MerchantLogin() {
 
         <div className="mt-6 text-center text-sm text-[var(--ff-ink-muted)]">
           Don't have an account?{" "}
-          <Link to="/merchant/register" className="text-emerald-400 hover:text-emerald-300">
+          <Link to="/merchant/register" className="text-[var(--ff-cta)] hover:text-[var(--ff-cta-hover)]">
             Create one
           </Link>
         </div>

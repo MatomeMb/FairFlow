@@ -98,11 +98,11 @@ export function MerchantRegister() {
           <div className="mb-2">
             <FairflowLogo markHeight={48} variant="light" />
           </div>
-          <p className="mb-8 text-sm text-ff-form-helper">Create your merchant account</p>
+          <p className="mb-8 text-sm text-stone-500">Create your merchant account</p>
 
           <a
             href={`${apiBase}/v1/auth/google`}
-            className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-ff-border-light bg-white px-4 py-3 text-sm font-medium text-ff-form-text shadow-sm transition-shadow hover:bg-ff-neutral-subtle hover:shadow-md"
+            className="flex min-h-[44px] w-full items-center justify-center gap-3 rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-sm font-medium text-[var(--ff-ink)] shadow-sm transition-shadow hover:bg-[var(--ff-surface)] hover:shadow-md"
           >
             <svg viewBox="0 0 24 24" className="h-5 w-5" aria-hidden="true">
               <path
@@ -127,16 +127,16 @@ export function MerchantRegister() {
 
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-ff-border-light" />
+              <div className="w-full border-t border-stone-200" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white/80 px-2 text-ff-form-helper">or continue with email</span>
+              <span className="bg-white/80 px-2 text-stone-400">or continue with email</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-ff-form-helper">
+              <label className="mb-2 block text-sm font-medium text-stone-700">
                 Business Name
               </label>
               <input
@@ -146,12 +146,12 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, business_name: e.target.value })
                 }
-                className="w-full rounded-xl border border-ff-border-light bg-white/80 px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-ff-focus focus:ring-2 focus:ring-ff-focus/20"
+                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-ff-form-helper">
+              <label className="mb-2 block text-sm font-medium text-stone-700">
                 Email
               </label>
               <input
@@ -159,12 +159,12 @@ export function MerchantRegister() {
                 placeholder="your@email.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full rounded-xl border border-ff-border-light bg-white/80 px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-ff-focus focus:ring-2 focus:ring-ff-focus/20"
+                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-ff-form-helper">
+              <label className="mb-2 block text-sm font-medium text-stone-700">
                 Password (min 8 characters)
               </label>
               <input
@@ -174,12 +174,12 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, password: e.target.value })
                 }
-                className="w-full rounded-xl border border-ff-border-light bg-white/80 px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-ff-focus focus:ring-2 focus:ring-ff-focus/20"
+                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
             <div>
-              <label className="mb-2 block text-sm font-medium text-ff-form-helper">
+              <label className="mb-2 block text-sm font-medium text-stone-700">
                 Confirm Password
               </label>
               <input
@@ -189,7 +189,7 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, confirm_password: e.target.value })
                 }
-                className="w-full rounded-xl border border-ff-border-light bg-white/80 px-4 py-3 text-ff-form-text placeholder:text-ff-form-placeholder focus:outline-none focus:border-ff-focus focus:ring-2 focus:ring-ff-focus/20"
+                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 
@@ -203,25 +203,25 @@ export function MerchantRegister() {
                 }
                 className="mt-1 cursor-pointer"
               />
-              <label htmlFor="terms" className="text-sm text-ff-form-helper">
+              <label htmlFor="terms" className="text-sm text-stone-500">
                 I accept the terms and conditions
               </label>
             </div>
 
-            {error && <p className="text-ff-error-bold text-sm">{error}</p>}
+            {error && <p className="text-red-600 text-sm">{error}</p>}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-ff-primary py-3 font-medium text-white transition hover:bg-ff-primary-hover disabled:bg-ff-neutral-muted"
+              className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-white transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-neutral-muted)]"
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-ff-form-helper">
+          <div className="mt-6 text-center text-sm text-stone-500">
             Already have an account?{" "}
-            <Link to="/merchant/login" className="text-ff-primary hover:text-ff-primary-hover">
+            <Link to="/merchant/login" className="text-emerald-600 hover:text-emerald-700">
               Sign in
             </Link>
           </div>
