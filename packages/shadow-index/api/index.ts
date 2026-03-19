@@ -122,17 +122,19 @@ export function selectRail(): 'paystack' {
 const app = new Hono();
 
 // Allow only configured origins (production domains + localhost for dev)
-app.use('*', cors({
-  origin: [
-    'https://fairflow.co.za',
-    'https://portal.fairflow.co.za',
-    'https://api.fairflow.co.za',
-    'http://localhost:3000',
-    'http://localhost:5178',
-    'http://127.0.0.1:3000',
-    'http://127.0.0.1:5178'
-  ]
-}));
+const prodOrigins = [
+  'https://fairflow.co.za',
+  'https://portal.fairflow.co.za',
+  'https://api.fairflow.co.za',
+];
+const devOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5178',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5178',
+];
+const allowedOrigins = process.env.NODE_ENV === 'production' ? prodOrigins : [...prodOrigins, ...devOrigins];
+app.use('*', cors({ origin: allowedOrigins }));
 
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
@@ -414,9 +416,10 @@ type MerchantAccount = {
 };
 
 const slipsDir = path.join(dataRoot, 'slips');
-const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? 'http://localhost:5178';
-const publicApiBase = process.env.PUBLIC_API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? 'dev-jwt-secret-change-me';
+const isProduction = process.env.NODE_ENV === 'production';
+const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? (isProduction ? (() => { throw new Error('AUTH_PORTAL_BASE_URL must be set in production'); })() : 'http://localhost:5178');
+const publicApiBase = process.env.PUBLIC_API_BASE_URL || (isProduction ? (() => { throw new Error('PUBLIC_API_BASE_URL must be set in production'); })() : `http://localhost:${process.env.PORT || 3000}`);
+const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? (isProduction ? (() => { throw new Error('JWT_SECRET or SHADOW_INDEX_API_KEY must be set in production'); })() : 'dev-jwt-secret-change-me');
 
 const registerSchema = z.object({
   business_name: z.string().trim().min(1, 'Business name is required'),
