@@ -60,9 +60,9 @@ export function LandingPage() {
         color: "var(--ff-ink)",
       }}
     >
-      <header className="sticky top-0 z-[120] border-b border-[var(--ff-border)] bg-[rgba(250,250,248,0.93)] backdrop-blur-[2px]">
+      <header className="sticky top-0 z-[120] border-b border-[var(--ff-border)] bg-[rgba(13,27,42,0.92)] backdrop-blur-[2px]">
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-3 sm:px-6 lg:px-8">
-          <Link to="/" className="shrink-0 rounded-xl border border-[var(--ff-border)] bg-white/70 px-2.5 py-1.5" aria-label="Fairflow home">
+          <Link to="/" className="shrink-0 rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] px-2.5 py-1.5" aria-label="Fairflow home">
             <FairflowLogo markHeight={38} showWordmark variant="light" />
           </Link>
 
@@ -143,7 +143,7 @@ export function LandingPage() {
           </div>
 
           <div>
-            <p className="ff-hero-1 mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--ff-border)] bg-white/80 px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ff-ink-muted)]">
+            <p className="ff-hero-1 mb-4 inline-flex items-center gap-2 rounded-full border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-1 text-xs font-semibold uppercase tracking-[0.16em] text-[var(--ff-ink-muted)]">
               <Leaf size={14} className="text-[var(--ff-accent)]" />
               Circular commerce platform
             </p>
@@ -168,7 +168,7 @@ export function LandingPage() {
               <button
                 type="button"
                 onClick={() => scrollToSection("how")}
-                className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--ff-border)] bg-white/70 px-6 py-3 text-sm font-semibold text-[var(--ff-ink)] transition hover:bg-[var(--ff-surface)]"
+                className="inline-flex items-center justify-center gap-2 rounded-full border border-[var(--ff-border)] bg-[#1A2D42] px-6 py-3 text-sm font-semibold text-[var(--ff-ink)] transition hover:bg-[var(--ff-surface)]"
               >
                 See how it works
               </button>
@@ -182,22 +182,22 @@ export function LandingPage() {
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div className="ff-hero-2 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
+            <div className="ff-hero-2 rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-5">
               <Clock3 size={18} className="mb-2 text-[var(--ff-accent)]" />
               <p className="text-sm font-semibold">Fast order flow</p>
               <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Your customer places an order — you know about it straight away.</p>
             </div>
-            <div className="ff-hero-3 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
+            <div className="ff-hero-3 rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-5">
               <ShieldCheck size={18} className="mb-2 text-[var(--ff-accent)]" />
               <p className="text-sm font-semibold">Safe and trusted</p>
               <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Customer details are secure. Payments are handled properly. No shortcuts.</p>
             </div>
-            <div className="ff-hero-4 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
+            <div className="ff-hero-4 rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-5">
               <BarChart3 size={18} className="mb-2 text-[var(--ff-accent)]" />
               <p className="text-sm font-semibold">See what is working</p>
               <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Simple numbers that show you how your business is doing — no jargon.</p>
             </div>
-            <div className="ff-hero-5 rounded-2xl border border-[var(--ff-border)] bg-white/75 p-5">
+            <div className="ff-hero-5 rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-5">
               <HandCoins size={18} className="mb-2 text-[var(--ff-accent)]" />
               <p className="text-sm font-semibold">Keep money in your pocket</p>
               <p className="mt-1 text-sm text-[var(--ff-ink-muted)]">Move your stock without waste. Every sale counts.</p>
@@ -219,17 +219,17 @@ export function LandingPage() {
           </RevealSection>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
-            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-1">
+            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-1">
               <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">1. List</p>
               <h3 className="text-lg font-semibold">List your products</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Add what you are selling. Set your price, add a photo, and you are live in minutes.</p>
             </RevealSection>
-            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-2">
+            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-2">
               <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">2. Sell</p>
               <h3 className="text-lg font-semibold">Customers buy from you</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">They pay securely online. No cash, no chasing payments — it just comes to you.</p>
             </RevealSection>
-            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-white/70 p-6" delayClass="ff-reveal-delay-3">
+            <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-3">
               <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">3. Connect</p>
               <h3 className="text-lg font-semibold">Stay in touch</h3>
               <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Know when every order is placed and when it is delivered. Your customers always know what is happening.</p>
@@ -237,7 +237,7 @@ export function LandingPage() {
           </div>
         </section>
 
-        <section id="why" className="border-y border-[var(--ff-border)] bg-white/50">
+        <section id="why" className="border-y border-[rgba(255,255,255,0.07)]">
           <div className="mx-auto grid w-full max-w-6xl gap-10 px-4 py-16 sm:px-6 lg:grid-cols-2 lg:px-8">
             <RevealSection>
               <h2
@@ -265,7 +265,7 @@ export function LandingPage() {
               </ul>
             </RevealSection>
 
-            <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[linear-gradient(135deg,rgba(216,243,220,0.65),rgba(255,255,255,0.8))] p-7" delayClass="ff-reveal-delay-2">
+            <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[rgba(170,255,69,0.08)] border border-[rgba(170,255,69,0.25)] p-7" delayClass="ff-reveal-delay-2">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ff-ink-muted)]">Merchant note</p>
               <p className="mt-4 text-lg leading-8 text-[var(--ff-ink)]">
                 "The platform turned order follow-up from scattered messages into one clear timeline. That gave our team back hours each week."
@@ -302,7 +302,7 @@ export function LandingPage() {
         </section>
       </main>
 
-      <footer id="contact" className="border-t border-[var(--ff-border)] bg-[rgba(250,250,248,0.92)]">
+      <footer id="contact" className="border-t border-[var(--ff-border)] bg-[#0D1B2A]">
         <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
           <div className="grid gap-8 text-sm text-[var(--ff-ink-muted)] md:grid-cols-3">
             <div>
@@ -317,14 +317,14 @@ export function LandingPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Payments</p>
               <p>Powered by trusted payment infrastructure partners.</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#00c3f7] text-[10px] font-black text-white">P</span>
                   PAYSTACK
                 </div>
-                <div className="flex items-center justify-center rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-black italic tracking-[0.02em] text-[#1434cb]">
+                <div className="flex items-center justify-center rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-black italic tracking-[0.02em] text-[#1434cb]">
                   VISA
                 </div>
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="relative inline-flex h-4 w-7 items-center">
                     <span className="absolute left-0 h-4 w-4 rounded-full bg-[#eb001b]" />
                     <span className="absolute right-0 h-4 w-4 rounded-full bg-[#f79e1b]" />
@@ -343,19 +343,19 @@ export function LandingPage() {
               <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink)]">Compliance</p>
               <p>Built with POPIA-aware data handling and audit-friendly merchant workflows.</p>
               <div className="mt-3 grid grid-cols-2 gap-2">
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#1f7a3e] text-[10px] font-black text-[#1f7a3e]">SA</span>
                   POPIA
                 </div>
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#1f7a3e] text-[10px] font-black text-white">ID</span>
                   KYC
                 </div>
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full bg-[#9b2c2c] text-[10px] font-black text-white">A</span>
                   AML
                 </div>
-                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
+                <div className="flex items-center justify-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[#1A2D42] px-3 py-2 text-xs font-semibold text-[var(--ff-ink)]">
                   <span className="inline-flex h-5 w-5 items-center justify-center rounded-full border border-[#2b6cb0] text-[10px] font-black text-[#2b6cb0]">P</span>
                   PRIVACY
                 </div>
