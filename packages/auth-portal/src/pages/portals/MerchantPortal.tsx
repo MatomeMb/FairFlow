@@ -492,9 +492,35 @@ export const MerchantPortal: React.FC = () => {
     setBusinessProfile((prev) => ({ ...prev, ...updates }));
   }, []);
 
-  const handleSaveBusinessProfile = useCallback(() => {
-    showToast('Changes saved', 'success');
-  }, []);
+  const handleSaveBusinessProfile = useCallback(async () => {
+    if (!businessProfile.businessName || !businessProfile.contactEmail || !businessProfile.phone) {
+      showToast('Please fill in business name, email, and phone', 'error');
+      return;
+    }
+
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/account`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          business_name: businessProfile.businessName,
+          phone: businessProfile.phone,
+          address: businessProfile.address,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        showToast(data.message || 'Failed to save business profile', 'error');
+        return;
+      }
+      setMerchantAccount(data.account);
+      showToast('Business profile updated successfully', 'success');
+    } catch (error) {
+      showToast(`Error: ${error instanceof Error ? error.message : 'Failed to save'}`, 'error');
+    }
+  }, [apiBase, businessProfile, merchantFetch, showToast]);
 
   const handleUpdateBankDetails = useCallback(async () => {
     if (!businessProfile.accountHolderName || !businessProfile.accountNumber || !businessProfile.branchCode || !businessProfile.bankName) {

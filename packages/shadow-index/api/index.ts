@@ -2322,6 +2322,55 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
   return c.json({ ok: true, account: sanitizeMerchantAccount(target) });
 });
 
+// PATCH /v1/merchant/account - Update merchant profile (business name, contact info)
+app.patch('/v1/merchant/account', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+  const accounts = await loadMerchantAccounts();
+  const target = accounts.find((candidate) => candidate.id === account.id);
+  if (!target) {
+    return c.json(err('not_found', 'Merchant account not found'), 404);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const payload = body as {
+    business_name?: string;
+    phone?: string;
+    address?: string;
+  };
+
+  // Update account fields
+  if (payload.business_name !== undefined) {
+    target.business_name = payload.business_name;
+  }
+  if (payload.phone !== undefined || payload.address !== undefined) {
+    target.kyc_data = target.kyc_data || { id_number: '', date_of_birth: '' };
+    if (payload.phone !== undefined) {
+      target.kyc_data.phone = payload.phone;
+    }
+    if (payload.address !== undefined) {
+      target.kyc_data.address = payload.address;
+    }
+  }
+  target.updated_at = new Date().toISOString();
+
+  await saveMerchantAccounts(accounts);
+  
+  logger.info('Merchant account profile updated', { merchant_id: target.id, business_name: target.business_name });
+  
+  return c.json({ 
+    ok: true, 
+    message: 'Account profile updated successfully',
+    account: sanitizeMerchantAccount(target) 
+  });
+});
+
 // PATCH /v1/merchant/account/bank - Update bank account details for payouts
 app.patch('/v1/merchant/account/bank', async (c) => {
   const { account } = await getMerchantIdentity(c);
