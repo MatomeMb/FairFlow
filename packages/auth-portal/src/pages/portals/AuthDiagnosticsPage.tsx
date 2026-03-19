@@ -124,7 +124,7 @@ export function AuthDiagnosticsPage() {
   return (
     <div className="min-h-screen bg-[var(--ff-bg)] px-4 py-8">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-6 flex items-center justify-between rounded-2xl border border-[var(--ff-border)] bg-white/80 p-4">
+        <div className="mb-6 flex items-center justify-between rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-4">
           <FairflowLogo markHeight={42} variant="light" />
           <button
             onClick={() => navigate("/dashboard/admin")}
@@ -134,7 +134,7 @@ export function AuthDiagnosticsPage() {
           </button>
         </div>
 
-        <div className="rounded-2xl border border-[var(--ff-border)] bg-white/80 p-6 shadow-sm">
+        <div className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6 shadow-sm">
           <h1 className="text-2xl font-semibold text-[var(--ff-ink)]">Auth Diagnostics</h1>
           <p className="mt-2 text-sm text-[var(--ff-ink-muted)]">
             Restricted tool for CTO/admin debugging. This tests Supabase password auth directly without changing your current portal session.
@@ -148,7 +148,7 @@ export function AuthDiagnosticsPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="name@fairflow.co.za"
-                className="w-full rounded-xl border border-[var(--ff-border)] px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#0D1B2A] px-4 py-3 text-white"
               />
             </div>
 
@@ -159,7 +159,7 @@ export function AuthDiagnosticsPage() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Enter password to test"
-                className="w-full rounded-xl border border-[var(--ff-border)] px-4 py-3 text-[var(--ff-ink)]"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#0D1B2A] px-4 py-3 text-white"
               />
             </div>
 

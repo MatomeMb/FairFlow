@@ -127,16 +127,16 @@ export function MerchantRegister() {
 
           <div className="relative my-4">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-stone-200" />
+              <div className="w-full border-t border-[rgba(255,255,255,0.07)]" />
             </div>
             <div className="relative flex justify-center text-xs">
-              <span className="bg-white/80 px-2 text-stone-400">or continue with email</span>
+              <span className="bg-[#1A2D42] px-2 text-[#8A99AA]">or continue with email</span>
             </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="mb-2 block text-sm font-medium text-stone-700">
+              <label className="mb-2 block text-sm font-medium text-white">
                 Business Name
               </label>
               <input
@@ -146,7 +146,7 @@ export function MerchantRegister() {
                 onChange={(e) =>
                   setFormData({ ...formData, business_name: e.target.value })
                 }
-                className="w-full rounded-xl border border-stone-200 bg-white/80 px-4 py-3 text-stone-900 placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20"
               />
             </div>
 

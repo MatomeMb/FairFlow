@@ -111,7 +111,7 @@ export function LoginPage() {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 disabled={isLoading}
-                className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+                className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] text-white placeholder:text-[#8A99AA] px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
               />
               <p className="mt-2 text-xs text-stone-500">Use full email format, e.g. name@fairflow.co.za</p>
             </div>
@@ -121,7 +121,7 @@ export function LoginPage() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               disabled={isLoading}
-              className="w-full rounded-xl border border-stone-200 bg-white text-stone-900 placeholder:text-stone-400 px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
+              className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] text-white placeholder:text-[#8A99AA] px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
             />
             {error && <p className="text-[var(--ff-error)] text-sm">{error}</p>}
             {resetError && <p className="text-red-600 text-sm">{resetError}</p>}
@@ -147,7 +147,7 @@ export function LoginPage() {
           </div>
 
           {showForgotPassword && (
-            <form onSubmit={handleForgotPassword} className="mt-3 rounded-xl border border-stone-200 bg-white/70 p-3">
+            <form onSubmit={handleForgotPassword} className="mt-3 rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] p-3">
               <button
                 type="submit"
                 disabled={isLoading}

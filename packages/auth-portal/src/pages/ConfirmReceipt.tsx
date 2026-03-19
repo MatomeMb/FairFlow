@@ -32,22 +32,22 @@ export function ConfirmReceipt() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
-      <div className="bg-white border-b border-stone-200">
+    <div className="min-h-screen bg-[#0D1B2A]">
+      <div className="bg-[#1A2D42] border-b border-[rgba(255,255,255,0.07)]">
         <div className="max-w-2xl mx-auto px-6 py-4">
           <FairflowLogo markHeight={32} />
         </div>
       </div>
 
       <div className="max-w-md mx-auto px-6 py-16">
-        <div className="bg-white rounded-2xl shadow-lg p-8 text-center">
+        <div className="bg-[#1A2D42] rounded-2xl shadow-lg p-8 text-center">
           {success ? (
             <>
               <div className="w-20 h-20 bg-[var(--ff-success-subtle)] rounded-full flex items-center justify-center mx-auto mb-4">
                 <CheckCircle2 className="w-12 h-12 text-[var(--ff-success)]" />
               </div>
-              <h2 className="text-2xl font-bold text-stone-900 mb-2">Thank you!</h2>
-              <p className="text-stone-600">
+              <h2 className="text-2xl font-bold text-white mb-2">Thank you!</h2>
+              <p className="text-[#8A99AA]">
                 Payment has been released to the merchant.
               </p>
             </>
@@ -56,8 +56,8 @@ export function ConfirmReceipt() {
               <div className="w-16 h-16 bg-[var(--ff-info-subtle)] rounded-full flex items-center justify-center mx-auto mb-6">
                 <Package className="w-8 h-8 text-[var(--ff-info)]" />
               </div>
-              <h2 className="text-2xl font-bold text-stone-900 mb-2">Confirm received</h2>
-              <p className="text-stone-600 mb-6">
+              <h2 className="text-2xl font-bold text-white mb-2">Confirm received</h2>
+              <p className="text-[#8A99AA] mb-6">
                 Have you received your order? Click below to confirm and release payment to the merchant.
               </p>
               {error && (

@@ -102,10 +102,10 @@ export function OrderConfirmation() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen flex items-center justify-center bg-[#0D1B2A]">
         <div className="text-center">
           <Loader2 className="w-12 h-12 animate-spin text-[var(--ff-info)] mx-auto mb-4" />
-          <p className="text-stone-600">Loading your order...</p>
+          <p className="text-[#8A99AA]">Loading your order...</p>
         </div>
       </div>
     );
@@ -113,15 +113,15 @@ export function OrderConfirmation() {
 
   if (error || !order) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-stone-50 to-stone-100">
+      <div className="min-h-screen flex items-center justify-center bg-[#0D1B2A]">
         <div className="text-center max-w-md mx-auto px-6">
           <div className="w-16 h-16 bg-[var(--ff-error-subtle)] rounded-full flex items-center justify-center mx-auto mb-4">
             <svg className="w-8 h-8 text-[var(--ff-error)]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-stone-900 mb-2">Order Not Found</h1>
-          <p className="text-stone-600">
+          <h1 className="text-2xl font-bold text-white mb-2">Order Not Found</h1>
+          <p className="text-[#8A99AA]">
             {error || 'We could not find your order. Please check your email for confirmation.'}
           </p>
         </div>
@@ -134,9 +134,9 @@ export function OrderConfirmation() {
   const email = order.customer?.email ?? order.customer_email ?? '';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-stone-50 to-stone-100">
+    <div className="min-h-screen bg-[#0D1B2A]">
       {/* Header */}
-      <div className="bg-white border-b border-stone-200">
+      <div className="bg-[#1A2D42] border-b border-[rgba(255,255,255,0.07)]">
         <div className="max-w-3xl mx-auto px-6 py-4">
           <FairflowLogo markHeight={32} />
         </div>
@@ -146,7 +146,7 @@ export function OrderConfirmation() {
       <div className="max-w-2xl mx-auto px-6 py-12">
         {isPending ? (
           // Processing State
-          <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12 text-center">
+          <div className="bg-[#1A2D42] rounded-2xl shadow-lg p-8 md:p-12 text-center">
             <div className="w-16 h-16 bg-[var(--ff-warning-subtle)] rounded-full flex items-center justify-center mx-auto mb-6">
               <Loader2 className="w-8 h-8 text-[var(--ff-warning)] animate-spin" />
             </div>

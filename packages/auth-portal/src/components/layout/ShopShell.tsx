@@ -17,7 +17,7 @@ export const ShopShell: React.FC<ShopShellProps> = ({ tabs, activeTab, onTabChan
   return (
     <div className="min-h-screen bg-[var(--ff-bg)] text-[var(--ff-ink)]">
       {/* Header */}
-      <div className="border-b border-[var(--ff-border)] bg-white/90 backdrop-blur-sm">
+      <div className="border-b border-[var(--ff-border)] bg-[#1A2D42] backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <FairflowLogo markHeight={36} variant="light" />
           <p className="text-[var(--ff-ink-muted)] text-sm">Ethical Shopping Platform</p>
@@ -25,7 +25,7 @@ export const ShopShell: React.FC<ShopShellProps> = ({ tabs, activeTab, onTabChan
       </div>
 
       {/* Tabs Navigation */}
-      <div className="border-b border-[var(--ff-border)] bg-white/70">
+      <div className="border-b border-[var(--ff-border)] bg-[#1A2D42]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="flex gap-8">
             {tabs.map(tab => (

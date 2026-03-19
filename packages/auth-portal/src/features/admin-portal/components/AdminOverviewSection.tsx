@@ -67,37 +67,37 @@ export function AdminOverviewSection({
           <MetricCard label="Errors (24h)" value={errorsCount} color={errorsCount === 0 ? 'green' : 'red'} />
         </div>
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-stone-700">Platform Users</p>
+                <p className="text-sm text-white">Platform Users</p>
                 <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{usersCount}</p>
               </div>
               <Users className="w-8 h-8 text-blue-500" />
             </div>
           </div>
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-stone-700">CEOs</p>
+                <p className="text-sm text-white">CEOs</p>
                 <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.ceo}</p>
               </div>
               <Shield className="w-8 h-8 text-purple-500" />
             </div>
           </div>
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-stone-700">CTOs</p>
+                <p className="text-sm text-white">CTOs</p>
                 <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{roleStats.cto}</p>
               </div>
               <Zap className="w-8 h-8 text-yellow-500" />
             </div>
           </div>
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-4">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-stone-700">KYC Pending</p>
+                <p className="text-sm text-white">KYC Pending</p>
                 <p className="text-2xl font-bold text-[var(--ff-ink)] mt-1">{pendingKYCCount}</p>
               </div>
               <Clock className="w-8 h-8 text-orange-500" />

@@ -127,10 +127,10 @@ export const AdminPortal: React.FC = () => {
       </div>
       <div className="space-y-4">
         {users.slice(0, 10).map(user => (
-          <div key={user.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-4 flex items-center justify-between">
+          <div key={user.id} className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-4 flex items-center justify-between">
             <div>
               <p className="font-semibold text-[var(--ff-ink)]">{user.id}</p>
-              <p className="text-sm text-stone-700">{user.user_id}</p>
+              <p className="text-sm text-white">{user.user_id}</p>
             </div>
             <RoleBadge role={user.role} />
           </div>
@@ -153,9 +153,9 @@ export const AdminPortal: React.FC = () => {
     );
   };
 
-  const renderSystem = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2><div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5"><p className="text-sm text-stone-700">System features coming soon</p></div></div>;
+  const renderSystem = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2><div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5"><p className="text-sm text-white">System features coming soon</p></div></div>;
 
-  const renderFinancials = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2><div className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5"><p className="text-sm text-stone-700">Financial reporting coming soon</p></div></div>;
+  const renderFinancials = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2><div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5"><p className="text-sm text-white">Financial reporting coming soon</p></div></div>;
 
   const renderSettings = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">Settings</h2><button onClick={signOut} className="flex items-center gap-2 px-6 py-3 bg-[var(--ff-error)] hover:bg-[var(--ff-error-bold)] text-[var(--ff-neutral)] rounded-lg transition"><LogOut className="w-4 h-4" />Sign Out</button></div>;
 
@@ -194,8 +194,8 @@ export const AdminPortal: React.FC = () => {
       {sidebarOpen && (
         <div className="fixed inset-0 bg-[rgba(27,35,48,0.24)] z-30 md:hidden" onClick={closeSidebar} />
       )}
-      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-white border-r border-[var(--ff-border)] transition-all duration-300 flex flex-col`}>
-        <div className="p-4 border-b border-[var(--ff-border)] flex-shrink-0 overflow-hidden">
+      <div className={`${sidebarOpen ? 'w-64 translate-x-0' : 'w-20 -translate-x-full md:translate-x-0'} fixed inset-y-0 left-0 z-40 md:static bg-[#1A2D42] border-r border-[rgba(255,255,255,0.07)] transition-all duration-300 flex flex-col`}>
+        <div className="p-4 border-b border-[rgba(255,255,255,0.07)] flex-shrink-0 overflow-hidden">
           <div className="flex items-center justify-between">
             <FairflowLogo markHeight={sidebarOpen ? 32 : 28} showWordmark={sidebarOpen} style={logoStyle} variant="light" />
             {sidebarOpen && <span className="text-xs font-bold text-stone-700">ADMIN</span>}

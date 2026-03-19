@@ -33,7 +33,7 @@ export function AdminKYCSection({ loadingKYC, pendingKYC, onRefresh, onOpenKYCAc
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-xl font-bold text-[var(--ff-ink)]">KYC Approvals</h2>
-          <p className="text-sm text-stone-700 mt-1">
+          <p className="text-sm text-white mt-1">
             {pendingKYC.length} pending submission{pendingKYC.length !== 1 ? 's' : ''}
           </p>
         </div>
@@ -45,34 +45,34 @@ export function AdminKYCSection({ loadingKYC, pendingKYC, onRefresh, onOpenKYCAc
 
       <div className="space-y-4">
         {pendingKYC.map((kyc) => (
-          <div key={kyc.id} className="bg-white/70 border border-[var(--ff-border)] rounded-xl p-5 hover:border-[var(--ff-border)] transition">
+          <div key={kyc.id} className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5 hover:border-[rgba(255,255,255,0.10)] transition">
             <div className="flex items-start justify-between">
               <div className="flex-1">
                 <div className="flex items-center gap-3">
                   <div>
                     <h3 className="font-semibold text-[var(--ff-ink)]">{kyc.businessName}</h3>
-                    <p className="text-sm text-stone-700">{kyc.email}</p>
+                    <p className="text-sm text-white">{kyc.email}</p>
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                   <div>
-                    <p className="text-stone-700">ID Number</p>
+                    <p className="text-white">ID Number</p>
                     <p className="text-[var(--ff-ink)] font-mono">{kyc.kycData?.id_number || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-stone-700">DOB</p>
+                    <p className="text-white">DOB</p>
                     <p className="text-[var(--ff-ink)]">{kyc.kycData?.date_of_birth || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-stone-700">Bank</p>
+                    <p className="text-white">Bank</p>
                     <p className="text-[var(--ff-ink)]">{kyc.bankAccount?.bank_name || 'N/A'}</p>
                   </div>
                   <div>
-                    <p className="text-stone-700">Account</p>
+                    <p className="text-white">Account</p>
                     <p className="text-[var(--ff-ink)] font-mono">****{kyc.bankAccount?.account_number?.slice(-4) || 'N/A'}</p>
                   </div>
                 </div>
-                <p className="text-xs text-stone-700 mt-3">
+                <p className="text-xs text-white mt-3">
                   Submitted: {new Date(kyc.submittedAt).toLocaleDateString()} at {new Date(kyc.submittedAt).toLocaleTimeString()}
                 </p>
               </div>

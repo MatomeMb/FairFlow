@@ -149,19 +149,19 @@ export const InvestorMode: React.FC = () => {
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Executive Summary</h2>
           
           {/* Headline Card */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-4">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg p-8 space-y-4">
             <div className="space-y-2">
               <h3 className="text-4xl font-bold text-[var(--ff-cta)]">fairflow</h3>
-              <p className="text-2xl text-stone-700 italic">For humans today, AI agents tomorrow</p>
+              <p className="text-2xl text-white italic">For humans today, AI agents tomorrow</p>
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4 text-lg">
               <div>
-                <span className="text-stone-500">Category:</span>
+                <span className="text-[#8A99AA]">Category:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Ethical Shopping / AI-Assisted Commerce</span>
               </div>
               <div>
-                <span className="text-stone-500">Stage:</span>
+                <span className="text-[#8A99AA]">Stage:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Pre-Revenue (MVP Launch Imminent)</span>
               </div>
               <div>
@@ -169,11 +169,11 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
-                <span className="text-stone-500">Market:</span>
+                <span className="text-[#8A99AA]">Market:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">South Africa → Global</span>
               </div>
               <div className="col-span-2">
-                <span className="text-stone-500">Technology:</span>
+                <span className="text-[#8A99AA]">Technology:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Chrome Extension + Web Platform + AI Agent</span>
               </div>
             </div>
@@ -210,22 +210,22 @@ export const InvestorMode: React.FC = () => {
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Platform Status</h2>
           
           {/* StatusBar in read-only mode */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-6">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg p-6">
             <StatusBar apiOnline={true} version="v0.6.0" readOnly />
           </div>
 
           {/* Infrastructure Status Table */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-[var(--ff-border)]">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg overflow-hidden">
+            <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
               <h3 className="text-xl font-semibold text-[var(--ff-ink)]">Infrastructure Components</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-[var(--ff-bg)]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Component</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Status</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Notes</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Component</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Status</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Notes</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--ff-border)]">
@@ -244,23 +244,23 @@ export const InvestorMode: React.FC = () => {
           </div>
 
           {/* Storage & Scale Panel */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-6">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg p-6">
             <h3 className="text-xl font-semibold text-[var(--ff-ink)] mb-4">Storage & Scale</h3>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Current Storage</div>
+                <div className="text-sm text-[#8A99AA] mb-1">Current Storage</div>
                 <div className="text-2xl font-bold text-emerald-400">~200 MB</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Quota Available</div>
+                <div className="text-sm text-[#8A99AA] mb-1">Quota Available</div>
                 <div className="text-2xl font-bold text-emerald-400">5,120 MB</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">Error Rate (24h)</div>
+                <div className="text-sm text-[#8A99AA] mb-1">Error Rate (24h)</div>
                 <div className="text-2xl font-bold text-emerald-400">0.0%</div>
               </div>
               <div className="bg-[var(--ff-bg)] rounded-lg p-4">
-                <div className="text-sm text-stone-500 mb-1">System Memory</div>
+                <div className="text-sm text-[#8A99AA] mb-1">System Memory</div>
                 <div className="text-2xl font-bold text-emerald-400">Healthy</div>
               </div>
             </div>
@@ -271,7 +271,7 @@ export const InvestorMode: React.FC = () => {
         <section className="space-y-6">
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Product Roadmap</h2>
           
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg p-8">
             <div className="space-y-8">
               {roadmap.map((item, index) => (
                 <div key={index} className="flex gap-6">
@@ -281,7 +281,7 @@ export const InvestorMode: React.FC = () => {
                       <SprintStatus status={item.status} />
                     </div>
                     {index < roadmap.length - 1 && (
-                      <div className="w-0.5 h-16 bg-[var(--ff-border)] mx-auto mt-2"></div>
+                      <div className="w-0.5 h-16 bg-[rgba(255,255,255,0.07)] mx-auto mt-2"></div>
                     )}
                   </div>
                   
@@ -289,7 +289,7 @@ export const InvestorMode: React.FC = () => {
                   <div className="flex-grow pb-8">
                     <div className="flex items-baseline gap-4 mb-2">
                       <h3 className="text-xl font-semibold text-[var(--ff-ink)]">{item.title}</h3>
-                      <span className="text-sm text-stone-500">{item.timeline}</span>
+                      <span className="text-sm text-[#8A99AA]">{item.timeline}</span>
                     </div>
                     <ul className="space-y-1 text-[var(--ff-ink-muted)]">
                       {item.details.map((detail, detailIndex) => (
@@ -311,12 +311,12 @@ export const InvestorMode: React.FC = () => {
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Financial Overview</h2>
           
           {/* Unit Economics Panel */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg p-8 space-y-6">
             <h3 className="text-xl font-semibold text-[var(--ff-ink)]">Unit Economics</h3>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-lg">
               <div>
-                <span className="text-stone-500">Revenue Model:</span>
+                <span className="text-[#8A99AA]">Revenue Model:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
@@ -324,7 +324,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-cta)] font-bold">R{breakEvenRevenue}/month</span>
               </div>
               <div>
-                <span className="text-stone-500">Primary Gateway:</span>
+                <span className="text-[#8A99AA]">Primary Gateway:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">PayFast 3.5% + R2</span>
               </div>
               <div>
@@ -332,7 +332,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">R{currentBurn.toLocaleString()}/month</span>
               </div>
               <div>
-                <span className="text-stone-500">Secondary Gateway:</span>
+                <span className="text-[#8A99AA]">Secondary Gateway:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Stripe 2.9% + R5.50</span>
               </div>
               <div>
@@ -340,24 +340,24 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-cta)] font-bold">1 sprint</span>
               </div>
               <div>
-                <span className="text-stone-500">Alternative Revenue:</span>
+                <span className="text-[#8A99AA]">Alternative Revenue:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Subscriptions (under evaluation)</span>
               </div>
             </div>
           </div>
 
           {/* Cost Structure Table */}
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg overflow-hidden">
-            <div className="p-6 border-b border-[var(--ff-border)]">
+          <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-lg overflow-hidden">
+            <div className="p-6 border-b border-[rgba(255,255,255,0.07)]">
               <h3 className="text-xl font-semibold text-[var(--ff-ink)]">Cost Structure</h3>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-[var(--ff-bg)]">
                   <tr>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Service</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Monthly Cost</th>
-                    <th className="px-6 py-4 text-left text-sm font-semibold text-stone-700">Tier / Details</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Service</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Monthly Cost</th>
+                    <th className="px-6 py-4 text-left text-sm font-semibold text-white">Tier / Details</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-[var(--ff-border)]">
@@ -369,7 +369,7 @@ export const InvestorMode: React.FC = () => {
                     </tr>
                   ))}
                   <tr className="bg-[var(--ff-bg)] font-bold">
-                    <td className="px-6 py-4 text-[var(--ff-ink)]">Total Infrastructure</td>
+                    <td className="px-6 py-4 text-white">Total Infrastructure</td>
                     <td className="px-6 py-4 text-[var(--ff-cta)]">R{totalMonthlyCost}</td>
                     <td className="px-6 py-4 text-[var(--ff-ink-muted)]">Operational baseline</td>
                   </tr>
@@ -393,14 +393,14 @@ export const InvestorMode: React.FC = () => {
                       CTO
                     </span>
                   </div>
-                  <p className="text-lg text-stone-700 mb-2">Architect of the platform</p>
+                  <p className="text-lg text-white mb-2">Architect of the platform</p>
                   <p className="text-[var(--ff-ink-muted)]">
                     Full-stack TypeScript · Supabase · AI integration
                   </p>
                 </div>
               </div>
 
-              <div className="h-px bg-[var(--ff-border)]"></div>
+              <div className="h-px bg-[rgba(255,255,255,0.07)]"></div>
 
               <div className="flex items-start gap-6">
                 <div className="flex-grow">
@@ -410,7 +410,7 @@ export const InvestorMode: React.FC = () => {
                       CEO
                     </span>
                   </div>
-                  <p className="text-lg text-stone-700 mb-2">Business strategy & merchant relationships</p>
+                  <p className="text-lg text-white mb-2">Business strategy & merchant relationships</p>
                   <p className="text-[var(--ff-ink-muted)]">
                     Product vision · Investor relations · Market expansion
                   </p>
@@ -427,7 +427,7 @@ export const InvestorMode: React.FC = () => {
           <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
             <div className="space-y-4 text-lg">
               <div>
-                <h3 className="text-[var(--ff-ink-muted)] mb-2">For investor inquiries:</h3>
+                <h3 className="text-white mb-2">For investor inquiries:</h3>
                 <div className="space-y-1 ml-4">
                   <div className="text-stone-700">
                     <a 
@@ -436,7 +436,7 @@ export const InvestorMode: React.FC = () => {
                     >
                       hello@fairflow.co.za
                     </a>
-                    <span className="ml-3 text-sm text-stone-500">(Sprint 7)</span>
+                    <span className="ml-3 text-sm text-[#8A99AA]">(Sprint 7)</span>
                   </div>
                   <div>
                     <a 
@@ -458,7 +458,7 @@ export const InvestorMode: React.FC = () => {
               </div>
 
               <div>
-                <h3 className="text-[var(--ff-ink-muted)] mb-2">Platform:</h3>
+                <h3 className="text-white mb-2">Platform:</h3>
                 <div className="ml-4">
                   <a 
                     href="https://fairflow.co.za" 
@@ -468,15 +468,15 @@ export const InvestorMode: React.FC = () => {
                   >
                     fairflow.co.za
                   </a>
-                  <span className="ml-3 text-sm text-stone-500">(Sprint 7)</span>
+                  <span className="ml-3 text-sm text-[#8A99AA]">(Sprint 7)</span>
                 </div>
               </div>
 
-              <div className="pt-4 border-t border-[var(--ff-border)]">
+              <div className="pt-4 border-t border-[rgba(255,255,255,0.07)]">
                 <p className="text-[var(--ff-ink-muted)]">
                   This dashboard is updated in real time from live infrastructure.
                 </p>
-                <p className="text-stone-500 text-sm mt-1">
+                <p className="text-[#8A99AA] text-sm mt-1">
                   Last system check: {lastRefreshed?.toLocaleString() ?? 'Loading...'}
                 </p>
               </div>
@@ -486,7 +486,7 @@ export const InvestorMode: React.FC = () => {
 
         {/* Footer */}
         <div className="text-center pt-8 pb-4">
-          <p className="text-stone-500 flex items-center justify-center gap-2">
+          <p className="text-[#8A99AA] flex items-center justify-center gap-2">
             <Lock className="w-4 h-4" />
             <span>Investor view — read only. Data refreshed automatically.</span>
           </p>

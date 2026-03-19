@@ -147,16 +147,16 @@ export function MerchantLogin() {
 
         <div className="relative my-4">
           <div className="absolute inset-0 flex items-center">
-            <div className="w-full border-t border-[var(--ff-border)]" />
+            <div className="w-full border-t border-[rgba(255,255,255,0.07)]" />
           </div>
           <div className="relative flex justify-center text-xs">
-            <span className="bg-white px-2 text-[var(--ff-ink-muted)]">or continue with email</span>
+            <span className="bg-[#1A2D42] px-2 text-[#8A99AA]">or continue with email</span>
           </div>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-[var(--ff-ink)] mb-2">
+            <label className="block text-sm font-medium text-white mb-2">
               Email
             </label>
             <input
@@ -164,13 +164,13 @@ export function MerchantLogin() {
               placeholder="your@email.com"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-[var(--ff-ink)] mb-2">
+            <label className="block text-sm font-medium text-white mb-2">
               Password
             </label>
             <input
@@ -178,7 +178,7 @@ export function MerchantLogin() {
               placeholder="••••••••"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded-xl border border-[var(--ff-border)] bg-white px-4 py-3 text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] px-4 py-3 text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
           </div>
@@ -207,8 +207,8 @@ export function MerchantLogin() {
         )}
 
         {showForgotPassword && (
-          <form onSubmit={handleForgotPassword} className="mt-4 space-y-3 rounded-lg border border-[var(--ff-border)] bg-white p-4">
-            <p className="text-xs text-[var(--ff-ink-muted)]">
+          <form onSubmit={handleForgotPassword} className="mt-4 space-y-3 rounded-lg border border-[rgba(255,255,255,0.07)] bg-[#1A2D42] p-4">
+            <p className="text-xs text-[#8A99AA]">
               Enter your email to generate a reset token (MVP manual relay flow).
             </p>
             <input
@@ -216,7 +216,7 @@ export function MerchantLogin() {
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
               placeholder="your@email.com"
-              className="w-full rounded-lg border border-[var(--ff-border)] bg-[var(--ff-bg)] px-3 py-2 text-sm text-[var(--ff-ink)] focus:outline-none focus:border-[var(--ff-accent)]"
+              className="w-full rounded-lg border border-[rgba(255,255,255,0.10)] bg-[#0D1B2A] px-3 py-2 text-sm text-white placeholder:text-[#8A99AA] focus:outline-none focus:border-[var(--ff-accent)]"
               disabled={isLoading}
             />
             {resetError && <p className="text-xs text-red-400">{resetError}</p>}
