@@ -94,7 +94,7 @@ export function MerchantAccountSection({
             </div>
           )}
         </div>
-        <button onClick={() => void onUpdateBankDetails()} className="mt-6 rounded-xl bg-[var(--ff-cta)] px-6 py-3 font-medium transition hover:bg-[var(--ff-cta-hover)]">
+        <button onClick={() => void onUpdateBankDetails()} className="mt-6 rounded-xl bg-[#AAFF45] px-6 py-3 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">
           Update Bank Details
         </button>
       </div>
@@ -104,7 +104,7 @@ export function MerchantAccountSection({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
-            <button className="text-sm text-[var(--ff-success)] hover:text-[var(--ff-success-bold)]">Enable</button>
+            <button className="text-sm rounded-xl bg-[#AAFF45] px-6 py-2 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">Enable</button>
           </div>
         </div>
       </div>
