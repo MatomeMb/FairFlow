@@ -100,7 +100,7 @@ export function LoginPage() {
           <div className="mb-2">
             <FairflowLogo markHeight={48} variant="light" />
           </div>
-          <p className="mb-8 text-sm text-stone-500">Sign in to your portal</p>
+          <p className="mb-8 text-sm text-[#8A99AA]">Sign in to your portal</p>
 
           {/* Email/Password */}
           <form onSubmit={handleEmailLogin} className="space-y-4">
@@ -113,7 +113,7 @@ export function LoginPage() {
                 disabled={isLoading}
                 className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] text-white placeholder:text-[#8A99AA] px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
               />
-              <p className="mt-2 text-xs text-stone-500">Use full email format, e.g. name@fairflow.co.za</p>
+              <p className="mt-2 text-xs text-[#8A99AA]">Use full email format, e.g. name@fairflow.co.za</p>
             </div>
             <input
               type="password"
@@ -158,7 +158,7 @@ export function LoginPage() {
             </form>
           )}
 
-          <div className="mt-4 text-center text-sm text-stone-500">
+          <div className="mt-4 text-center text-sm text-[#8A99AA]">
             Are you a merchant?{' '}
             <a href="/merchant/login" className="text-[var(--ff-cta)] hover:text-[var(--ff-cta-hover)] underline">
               Sign in here

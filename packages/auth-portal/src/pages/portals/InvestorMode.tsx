@@ -165,7 +165,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">Pre-Revenue (MVP Launch Imminent)</span>
               </div>
               <div>
-                <span className="text-stone-500">Revenue Model:</span>
+                <span className="text-[#8A99AA]">Revenue Model:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
@@ -320,7 +320,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">Commission on ethical purchases</span>
               </div>
               <div>
-                <span className="text-stone-500">Break-Even:</span>
+                <span className="text-[#8A99AA]">Break-Even:</span>
                 <span className="ml-3 text-[var(--ff-cta)] font-bold">R{breakEvenRevenue}/month</span>
               </div>
               <div>
@@ -328,7 +328,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">PayFast 3.5% + R2</span>
               </div>
               <div>
-                <span className="text-stone-500">Current Burn:</span>
+                <span className="text-[#8A99AA]">Current Burn:</span>
                 <span className="ml-3 text-[var(--ff-ink)]">R{currentBurn.toLocaleString()}/month</span>
               </div>
               <div>
@@ -336,7 +336,7 @@ export const InvestorMode: React.FC = () => {
                 <span className="ml-3 text-[var(--ff-ink)]">Stripe 2.9% + R5.50</span>
               </div>
               <div>
-                <span className="text-stone-500">Cash to Revenue:</span>
+                <span className="text-[#8A99AA]">Cash to Revenue:</span>
                 <span className="ml-3 text-[var(--ff-cta)] font-bold">1 sprint</span>
               </div>
               <div>
@@ -383,7 +383,7 @@ export const InvestorMode: React.FC = () => {
         <section className="space-y-6">
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Team</h2>
           
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
+          <div className="bg-[#1A2D42] border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
             <div className="space-y-4">
               <div className="flex items-start gap-6">
                 <div className="flex-grow">
@@ -424,12 +424,12 @@ export const InvestorMode: React.FC = () => {
         <section className="space-y-6">
           <h2 className="text-3xl font-bold text-[var(--ff-ink)]">Contact</h2>
           
-          <div className="bg-white/70 border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
+          <div className="bg-[#1A2D42] border border-[var(--ff-border)] rounded-lg p-8 space-y-6">
             <div className="space-y-4 text-lg">
               <div>
                 <h3 className="text-white mb-2">For investor inquiries:</h3>
                 <div className="space-y-1 ml-4">
-                  <div className="text-stone-700">
+                  <div className="text-white">
                     <a 
                       href="mailto:hello@fairflow.co.za" 
                       className="text-emerald-400 hover:text-emerald-300 transition-colors"

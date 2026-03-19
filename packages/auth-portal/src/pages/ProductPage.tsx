@@ -412,7 +412,7 @@ export function ProductPage() {
 
         {/* Powered By */}
         <div className="text-center mt-8">
-          <p className="text-sm text-stone-500">
+          <p className="text-sm text-[#8A99AA]">
             Powered by <span className="font-semibold">fairflow</span> — Distributed Commerce
           </p>
         </div>
