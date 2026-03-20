@@ -3363,6 +3363,240 @@ app.post('/checkout/create-session', async (c) => {
   }
 });
 
+type PaystackChargeSuccessInput = {
+  reference: string;
+  metadata?: unknown;
+  customer?: { email?: string };
+  currency?: string;
+};
+
+/** Idempotent: persist order from Paystack charge (webhook or transaction verify). */
+async function ensureOrderFromPaystackChargePayload(
+  data: PaystackChargeSuccessInput,
+): Promise<MerchantOrder | null> {
+  const reference = typeof data.reference === 'string' ? data.reference.trim() : '';
+  if (!reference) return null;
+
+  const orders = await loadOrders();
+  const existing = orders.find(
+    (o) => o.paystack_reference === reference || o.session_id === reference || o.id === reference,
+  );
+  if (existing) {
+    return existing;
+  }
+
+  let meta: Record<string, string> = {};
+  const rawMeta = data.metadata;
+  if (typeof rawMeta === 'string') {
+    try {
+      meta = JSON.parse(rawMeta) as Record<string, string>;
+    } catch {
+      // ignore
+    }
+  } else if (rawMeta && typeof rawMeta === 'object') {
+    meta = rawMeta as Record<string, string>;
+  }
+
+  const productId = meta.product_id;
+  const productHash = meta.product_hash;
+  const merchantId = meta.merchant_id;
+  const merchantPriceCents = parseInt(meta.merchant_price_cents ?? '0', 10);
+  const consumerPriceCents = parseInt(meta.consumer_price_cents ?? '0', 10);
+  const platformRevenueCents =
+    parseInt(meta.platform_revenue_cents ?? '0', 10) || (consumerPriceCents - merchantPriceCents);
+
+  let deliveryAddress: DeliveryAddress = {};
+  try {
+    const da = meta.delivery_address;
+    if (typeof da === 'string') deliveryAddress = JSON.parse(da) as DeliveryAddress;
+  } catch {
+    // ignore
+  }
+
+  let billingAddress: Record<string, unknown> | null = null;
+  try {
+    const ba = meta.billing_address;
+    if (typeof ba === 'string') billingAddress = JSON.parse(ba) as Record<string, unknown>;
+  } catch {
+    // ignore
+  }
+
+  const customerEmail = data.customer?.email ?? '';
+
+  const now = new Date().toISOString();
+  const orderId = crypto.randomUUID();
+  const orderCurrency = (data.currency ?? 'ZAR').toUpperCase().slice(0, 3);
+  const order: MerchantOrder = {
+    id: orderId,
+    paystack_reference: reference,
+    session_id: reference,
+    product_id: productId,
+    product_hash: productHash,
+    merchant_id: merchantId,
+    merchant_price_cents: merchantPriceCents,
+    consumer_price_cents: consumerPriceCents,
+    platform_revenue_cents: platformRevenueCents,
+    amount: consumerPriceCents,
+    currency: orderCurrency,
+    customer: {
+      email: customerEmail,
+      delivery_address: deliveryAddress,
+      billing_address: billingAddress,
+    },
+    customer_email: customerEmail,
+    delivery_address: deliveryAddress,
+    billing_address: billingAddress,
+    status: 'paid',
+    payment_status: 'held',
+    fulfillment_status: 'pending',
+    held_at: now,
+    rail_used: 'paystack',
+    created_at: now,
+    updated_at: now,
+  };
+
+  const products = await readProducts();
+  const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
+  if (product) {
+    const stockBefore = product.stock_count ?? 0;
+    const stockAfter = Math.max(0, stockBefore - 1);
+    product.stock_count = stockAfter;
+    product.updated_at = now;
+    await writeProducts(products);
+
+    if (product.merchant_id && product.id) {
+      await db.from('inventory_logs').insert({
+        product_id: product.id,
+        merchant_id: product.merchant_id,
+        transaction_type: 'order',
+        quantity_change: -1,
+        stock_before: stockBefore,
+        stock_after: stockAfter,
+        reference_id: orderId,
+      });
+
+      if (stockAfter < 5) {
+        const notifs = await loadNotifications();
+        notifs.push({
+          id: crypto.randomUUID(),
+          merchant_id: product.merchant_id,
+          type: 'low_stock',
+          title: `Low stock: ${product.title}`,
+          message: `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`,
+          read: false,
+          created_at: now,
+        });
+        await saveNotifications(notifs);
+
+        const merchantAccounts = await loadMerchantAccounts();
+        const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
+        if (merchant?.email) {
+          sendLowStockWarning({
+            merchantEmail: merchant.email,
+            merchantBusinessName: merchant.business_name,
+            productTitle: product.title,
+            stockCount: stockAfter,
+          }).catch((error) => console.error('[Stock] Low stock email error:', error));
+        }
+      }
+    }
+  }
+
+  const ordersBeforeInsert = await loadOrders();
+  const raced = ordersBeforeInsert.find(
+    (o) => o.paystack_reference === reference || o.session_id === reference,
+  );
+  if (raced) {
+    return raced;
+  }
+
+  const allOrders = await loadOrders();
+  allOrders.push(order);
+  await saveOrders(allOrders);
+
+  const merchantAccounts = await loadMerchantAccounts();
+  const merchant = merchantAccounts.find(
+    (account) => account.id === (merchantId || product?.merchant_id || ''),
+  );
+  const merchantBusinessName = merchant?.business_name ?? 'Fairflow Merchant';
+
+  if (merchant?.email) {
+    sendMerchantOrderNotification(merchant.email, {
+      orderId: order.id,
+      productTitle: product?.title ?? 'Product',
+      amountCents: consumerPriceCents,
+      customerEmail,
+      deliveryAddress: order.customer?.delivery_address ?? null,
+      merchantBusinessName,
+    }).catch((error) => console.error('[Webhook] Merchant email error:', error));
+  }
+
+  if (customerEmail) {
+    sendCustomerOrderConfirmation({
+      orderId: order.id,
+      productTitle: product?.title ?? 'Product',
+      amountCents: consumerPriceCents,
+      customerEmail,
+      deliveryAddress: order.customer?.delivery_address ?? null,
+      estimatedDeliveryDate: order.estimated_delivery_date ?? null,
+      merchantBusinessName,
+    }).catch((error) => console.error('[Webhook] Customer email error:', error));
+  }
+
+  const notifs = await loadNotifications();
+  notifs.push({
+    id: crypto.randomUUID(),
+    merchant_id: merchantId,
+    type: 'order',
+    title: 'New order received',
+    message: `Order #${orderId.slice(0, 8)} for ${consumerPriceCents / 100} ${orderCurrency}. Delivery: ${deliveryAddress.name ?? ''} - ${deliveryAddress.line1 ?? ''}`,
+    read: false,
+    created_at: now,
+  });
+  await saveNotifications(notifs);
+
+  logger.info('Order created from Paystack charge', {
+    orderId,
+    reference,
+    merchant_id: merchantId,
+    consumer_price_cents: consumerPriceCents,
+  });
+
+  return order;
+}
+
+/** When the user hits /order/confirmation before the webhook runs, verify with Paystack and create the row. */
+async function tryReconcileOrderWithPaystackVerify(lookup: string): Promise<MerchantOrder | null> {
+  if (!process.env.PAYSTACK_SECRET_KEY?.trim()) return null;
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(lookup)) {
+    return null;
+  }
+
+  try {
+    const paystack = await getPaystack();
+    const res = await paystack.transaction.verify({ reference: lookup });
+    if (res.status !== true) return null;
+    const d = res.data as Record<string, unknown> | undefined;
+    if (!d || String(d.status) !== 'success') return null;
+
+    const reference = typeof d.reference === 'string' && d.reference.trim() ? d.reference : lookup;
+    const currency = typeof d.currency === 'string' ? d.currency : undefined;
+
+    return await ensureOrderFromPaystackChargePayload({
+      reference,
+      metadata: d.metadata,
+      customer: d.customer as { email?: string } | undefined,
+      currency,
+    });
+  } catch (error) {
+    logger.warn('Paystack verify reconcile failed', {
+      lookup,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
+
 // POST /webhooks/paystack - Paystack webhook (charge.success, transfer.success, transfer.failed)
 app.post('/webhooks/paystack', async (c) => {
   const signature = c.req.header('x-paystack-signature');
@@ -3394,184 +3628,23 @@ app.post('/webhooks/paystack', async (c) => {
 
   try {
     if (event.event === 'charge.success') {
-      const data = event.data as { reference?: string; metadata?: Record<string, string>; customer?: { email?: string } } | undefined;
+      const data = event.data as { reference?: string; metadata?: unknown; customer?: { email?: string } } | undefined;
       if (!data?.reference) {
         logger.warn('Paystack charge.success missing reference', { event });
         return c.json({ ok: true }, 200);
       }
-
-      let meta: Record<string, string> = {};
-      const rawMeta = data.metadata;
-      if (typeof rawMeta === 'string') {
-        try {
-          meta = JSON.parse(rawMeta) as Record<string, string>;
-        } catch {
-          // ignore
-        }
-      } else if (rawMeta && typeof rawMeta === 'object') {
-        meta = rawMeta as Record<string, string>;
-      }
-      const productId = meta.product_id;
-      const productHash = meta.product_hash;
-      const merchantId = meta.merchant_id;
-      const merchantPriceCents = parseInt(meta.merchant_price_cents ?? '0', 10);
-      const consumerPriceCents = parseInt(meta.consumer_price_cents ?? '0', 10);
-      const platformRevenueCents = parseInt(meta.platform_revenue_cents ?? '0', 10) || (consumerPriceCents - merchantPriceCents);
-
-      let deliveryAddress: DeliveryAddress = {};
       try {
-        const da = meta.delivery_address;
-        if (typeof da === 'string') deliveryAddress = JSON.parse(da) as DeliveryAddress;
-      } catch {
-        // ignore
+        await ensureOrderFromPaystackChargePayload({
+          reference: data.reference,
+          metadata: data.metadata,
+          customer: data.customer,
+        });
+      } catch (error) {
+        logger.error('Paystack charge.success order persistence failed', {
+          reference: data.reference,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
-
-      let billingAddress: Record<string, unknown> | null = null;
-      try {
-        const ba = meta.billing_address;
-        if (typeof ba === 'string') billingAddress = JSON.parse(ba) as Record<string, unknown>;
-      } catch {
-        // ignore
-      }
-
-      const customerEmail = data.customer?.email ?? '';
-
-      const orders = await loadOrders();
-      const existing = orders.find((o) => o.paystack_reference === data.reference || o.id === data.reference);
-      if (existing) {
-        logger.info('Paystack charge.success order already exists', { reference: data.reference });
-        return c.json({ ok: true }, 200);
-      }
-
-      const now = new Date().toISOString();
-      const orderId = crypto.randomUUID();
-      const order: MerchantOrder = {
-        id: orderId,
-        paystack_reference: data.reference,
-        session_id: data.reference,
-        product_id: productId,
-        product_hash: productHash,
-        merchant_id: merchantId,
-        merchant_price_cents: merchantPriceCents,
-        consumer_price_cents: consumerPriceCents,
-        platform_revenue_cents: platformRevenueCents,
-        amount: consumerPriceCents,
-        currency: 'ZAR',
-        customer: {
-          email: customerEmail,
-          delivery_address: deliveryAddress,
-          billing_address: billingAddress,
-        },
-        customer_email: customerEmail,
-        delivery_address: deliveryAddress,
-        billing_address: billingAddress,
-        status: 'paid',
-        payment_status: 'held',
-        fulfillment_status: 'pending',
-        held_at: now,
-        rail_used: 'paystack',
-        created_at: now,
-        updated_at: now,
-      };
-
-      const products = await readProducts();
-      const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
-      if (product) {
-        const stockBefore = product.stock_count ?? 0;
-        const stockAfter = Math.max(0, stockBefore - 1);
-        product.stock_count = stockAfter;
-        product.updated_at = now;
-        await writeProducts(products);
-
-        if (product.merchant_id && product.id) {
-          await db.from('inventory_logs').insert({
-            product_id: product.id,
-            merchant_id: product.merchant_id,
-            transaction_type: 'order',
-            quantity_change: -1,
-            stock_before: stockBefore,
-            stock_after: stockAfter,
-            reference_id: orderId,
-          });
-
-          if (stockAfter < 5) {
-            const notifs = await loadNotifications();
-            notifs.push({
-              id: crypto.randomUUID(),
-              merchant_id: product.merchant_id,
-              type: 'low_stock',
-              title: `Low stock: ${product.title}`,
-              message: `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`,
-              read: false,
-              created_at: now,
-            });
-            await saveNotifications(notifs);
-
-            const merchantAccounts = await loadMerchantAccounts();
-            const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
-            if (merchant?.email) {
-              sendLowStockWarning({
-                merchantEmail: merchant.email,
-                merchantBusinessName: merchant.business_name,
-                productTitle: product.title,
-                stockCount: stockAfter,
-              }).catch((error) => console.error('[Stock] Low stock email error:', error));
-            }
-          }
-        }
-      }
-
-      const allOrders = await loadOrders();
-      allOrders.push(order);
-      await saveOrders(allOrders);
-
-      const merchantAccounts = await loadMerchantAccounts();
-      const merchant = merchantAccounts.find(
-        (account) => account.id === (merchantId || product?.merchant_id || ''),
-      );
-      const merchantBusinessName = merchant?.business_name ?? 'Fairflow Merchant';
-
-      if (merchant?.email) {
-        sendMerchantOrderNotification(merchant.email, {
-          orderId: order.id,
-          productTitle: product?.title ?? 'Product',
-          amountCents: consumerPriceCents,
-          customerEmail,
-          deliveryAddress: order.customer?.delivery_address ?? null,
-          merchantBusinessName,
-        }).catch((error) => console.error('[Webhook] Merchant email error:', error));
-      }
-
-      if (customerEmail) {
-        sendCustomerOrderConfirmation({
-          orderId: order.id,
-          productTitle: product?.title ?? 'Product',
-          amountCents: consumerPriceCents,
-          customerEmail,
-          deliveryAddress: order.customer?.delivery_address ?? null,
-          estimatedDeliveryDate: order.estimated_delivery_date ?? null,
-          merchantBusinessName,
-        }).catch((error) => console.error('[Webhook] Customer email error:', error));
-      }
-
-      const notifs = await loadNotifications();
-      notifs.push({
-        id: crypto.randomUUID(),
-        merchant_id: merchantId,
-        type: 'order',
-        title: 'New order received',
-        message: `Order #${orderId.slice(0, 8)} for ${consumerPriceCents / 100} ZAR. Delivery: ${deliveryAddress.name ?? ''} - ${deliveryAddress.line1 ?? ''}`,
-        read: false,
-        created_at: now,
-      });
-      await saveNotifications(notifs);
-
-      logger.info('Order created from Paystack charge.success', {
-        orderId,
-        reference: data.reference,
-        merchant_id: merchantId,
-        consumer_price_cents: consumerPriceCents,
-      });
     } else if (event.event === 'transfer.success' || event.event === 'transfer.failed') {
       const data = event.data as { reference?: string; status?: string } | undefined;
       if (data?.reference) {
@@ -3703,8 +3776,18 @@ app.get('/orders/:idOrReference', async (c) => {
       return c.json(err('invalid_request', 'Missing order ID or reference'), 400);
     }
 
-    const orders = await loadOrders();
-    const order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+    let orders = await loadOrders();
+    let order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+
+    if (!order) {
+      const reconciled = await tryReconcileOrderWithPaystackVerify(lookup);
+      if (reconciled) {
+        order = reconciled;
+      } else {
+        orders = await loadOrders();
+        order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+      }
+    }
 
     if (!order) {
       return c.json(err('not_found', `Order not found: ${lookup}`), 404);

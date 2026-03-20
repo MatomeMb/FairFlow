@@ -42,7 +42,10 @@ const formatDateTime = (isoString: string): string => {
 
 export function OrderConfirmation() {
   const [searchParams] = useSearchParams();
-  const sessionId = searchParams.get('reference') || searchParams.get('session_id');
+  const sessionId =
+    searchParams.get('reference')
+    || searchParams.get('trxref')
+    || searchParams.get('session_id');
   
   const [order, setOrder] = useState<Order | null>(null);
   const [productTitle, setProductTitle] = useState<string>('');
