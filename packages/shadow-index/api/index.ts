@@ -3288,8 +3288,11 @@ app.post('/checkout/create-session', async (c) => {
       return c.json(err('invalid_request', 'Missing product_hash or product_id'), 400);
     }
 
-    const products = await readProducts();
-    const product = products.find((p: MerchantProduct) => p.thing_file?.hash === hash || p.id === hash);
+    let product: MerchantProduct | null = await findMerchantProductByThingHash(hash);
+    if (!product) {
+      const products = await readProducts();
+      product = products.find((p: MerchantProduct) => p.id === hash && p.status !== 'archived') ?? null;
+    }
 
     if (!product) {
       return c.json(err('product_not_found', `Product not found: ${hash}`), 404);
@@ -3320,11 +3323,19 @@ app.post('/checkout/create-session', async (c) => {
     const paystack = await getPaystack();
     const init = await paystack.transaction.initialize({
       email: customer_email,
-      amount: consumerPriceCents, // Paystack expects amount in subunit (ZAR cents)
+      amount: consumerPriceCents, // ZAR: smallest unit is cents (per Paystack)
       currency: (product.currency || 'ZAR').toUpperCase().slice(0, 3),
       callback_url: callbackUrl,
-      metadata,
+      metadata: JSON.stringify(metadata),
     });
+
+    if (init.status === false) {
+      logger.warn('Paystack initialize rejected', { message: init.message, init });
+      return c.json(
+        err('checkout_failed', init.message || 'Payment provider rejected the transaction'),
+        400,
+      );
+    }
 
     const data = init.data as { authorization_url?: string; reference?: string } | undefined;
     if (!data?.authorization_url) {

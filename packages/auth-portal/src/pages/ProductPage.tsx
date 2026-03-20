@@ -96,14 +96,19 @@ export function ProductPage() {
     }
 
     fetch(`${apiBase}/thing/${hash}.json`)
-      .then((res) => {
+      .then(async (res) => {
+        const data = await res.json().catch(() => null) as { message?: string } | null;
         if (!res.ok) {
-          throw new Error('Product not found');
+          const msg =
+            data && typeof data.message === 'string' && data.message.trim()
+              ? data.message
+              : 'Product not found';
+          throw new Error(msg);
         }
-        return res.json();
+        return data;
       })
       .then((data) => {
-        setThing(data);
+        setThing(data as ThingFile);
         setLoading(false);
         if (hash) {
           sendAnalyticsEvent({
@@ -115,7 +120,7 @@ export function ProductPage() {
         }
       })
       .catch((err) => {
-        setError(err.message || 'Failed to load product');
+        setError(err instanceof Error ? err.message : 'Failed to load product');
         setLoading(false);
       });
   }, [hash]);
@@ -181,13 +186,34 @@ export function ProductPage() {
         }),
       });
 
+      const data = (await response.json().catch(() => ({}))) as {
+        message?: string;
+        authorization_url?: string;
+        url?: string;
+      };
+
       if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+        setError(
+          data.message?.trim()
+            ? data.message
+            : `Checkout failed (${response.status}). Please try again.`,
+        );
+        setCheckoutLoading(false);
+        return;
       }
 
-      const data = await response.json();
-      const url = data.authorization_url || data.url;
-      if (url) window.location.href = url;
+      const payUrl = data.authorization_url || data.url;
+      if (payUrl) {
+        window.location.href = payUrl;
+        return;
+      }
+
+      setError(
+        data.message?.trim()
+          ? data.message
+          : 'No payment link returned. If this persists, contact support.',
+      );
+      setCheckoutLoading(false);
     } catch {
       setError('Failed to start checkout. Please try again.');
       setCheckoutLoading(false);

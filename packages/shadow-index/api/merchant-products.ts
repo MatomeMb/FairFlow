@@ -115,6 +115,29 @@ const resolveMerchantId = async (c: {
   return null;
 };
 
+const normalizeThingFile = (raw: unknown): MerchantProduct['thing_file'] | undefined => {
+  if (raw == null) return undefined;
+  if (typeof raw === 'string') {
+    try {
+      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      if (parsed && typeof parsed.hash === 'string') {
+        return {
+          hash: parsed.hash,
+          matter_uri: typeof parsed.matter_uri === 'string' ? parsed.matter_uri : undefined,
+          thing_url: typeof parsed.thing_url === 'string' ? parsed.thing_url : undefined,
+        };
+      }
+    } catch {
+      return undefined;
+    }
+    return undefined;
+  }
+  if (typeof raw === 'object' && raw !== null && typeof (raw as { hash?: unknown }).hash === 'string') {
+    return raw as MerchantProduct['thing_file'];
+  }
+  return undefined;
+};
+
 const rowToProduct = (row: MerchantProductRow): MerchantProduct => ({
   id: row.id,
   merchant_id: row.merchant_id ?? undefined,
@@ -127,7 +150,7 @@ const rowToProduct = (row: MerchantProductRow): MerchantProduct => ({
   image_url: row.image_url ?? undefined,
   shipping_available: row.shipping_available,
   certifications: Array.isArray(row.certifications) ? row.certifications : [],
-  thing_file: (row.thing_file as MerchantProduct['thing_file']) ?? undefined,
+  thing_file: normalizeThingFile(row.thing_file),
   status: row.status,
   created_at: row.created_at,
   updated_at: row.updated_at,
