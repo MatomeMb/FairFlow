@@ -3496,6 +3496,7 @@ async function ensureOrderFromPaystackChargePayload(
             merchantBusinessName: merchant.business_name,
             productTitle: product.title,
             stockCount: stockAfter,
+            productImageUrl: product.image_url,
           }).catch((error) => console.error('[Stock] Low stock email error:', error));
         }
       }
@@ -3528,6 +3529,9 @@ async function ensureOrderFromPaystackChargePayload(
       customerEmail,
       deliveryAddress: order.customer?.delivery_address ?? null,
       merchantBusinessName,
+      productImageUrl: product?.image_url,
+      currency: order.currency,
+      paystackReference: order.paystack_reference,
     }).catch((error) => console.error('[Webhook] Merchant email error:', error));
   }
 
@@ -3540,6 +3544,9 @@ async function ensureOrderFromPaystackChargePayload(
       deliveryAddress: order.customer?.delivery_address ?? null,
       estimatedDeliveryDate: order.estimated_delivery_date ?? null,
       merchantBusinessName,
+      productImageUrl: product?.image_url,
+      currency: order.currency,
+      paystackReference: order.paystack_reference,
     }).catch((error) => console.error('[Webhook] Customer email error:', error));
   }
 
