@@ -1,5 +1,4 @@
 import { apiBase } from '../../../lib/config';
-import { getMerchantToken } from '../../../lib/merchantTokenStorage';
 import type { FormState, SuccessPayload } from '../types/productCreation';
 import type { MerchantProductApi } from '../../../types/merchant';
 
@@ -58,10 +57,11 @@ export async function submitProductForm(form: FormState): Promise<SubmitProductR
   } catch {
     return { success: false, error: 'Network error while creating product' };
   }
+}
 
+export async function uploadProductImage(file: File, token?: string | null): Promise<UploadImageResult> {
   try {
     const headers: { [key: string]: string } = { 'x-merchant-id': 'dev-merchant-001' };
-    const token = getMerchantToken();
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
     }

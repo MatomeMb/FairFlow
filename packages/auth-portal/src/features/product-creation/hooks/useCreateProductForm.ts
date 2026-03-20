@@ -9,9 +9,10 @@ interface UseCreateProductFormParams {
   isOpen: boolean;
   onCreated: (product: MerchantProductApi) => void;
   onClose: () => void;
+  token?: string | null;
 }
 
-export function useCreateProductForm({ isOpen, onCreated, onClose }: UseCreateProductFormParams) {
+export function useCreateProductForm({ isOpen, onCreated, onClose, token }: UseCreateProductFormParams) {
   const [form, setForm] = useState<FormState>(INITIAL_STATE);
   const [errors, setErrors] = useState<FormErrors>({});
   const [submitError, setSubmitError] = useState('');
@@ -106,7 +107,12 @@ export function useCreateProductForm({ isOpen, onCreated, onClose }: UseCreatePr
     setIsUploadingImage(true);
     setField('image_url', '');
     setErrors((prev) => ({ ...prev, image_url: undefined }));
-    const result = await uploadProductImage(file);
+    if (!token) {
+      setImageUploadError('Authentication token missing. Please refresh and try again.');
+      setIsUploadingImage(false);
+      return;
+    }
+    const result = await uploadProductImage(file, token);
     if (result.success && result.image_url) {
       setField('image_url', result.image_url);
     } else {
