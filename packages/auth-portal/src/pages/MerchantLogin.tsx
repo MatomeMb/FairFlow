@@ -21,7 +21,7 @@ export function MerchantLogin() {
 
     if (urlToken) {
       sessionStorage.setItem("merchantToken", urlToken);
-      sessionStorage.setItem("merchant_token", urlToken);
+      // sessionStorage.setItem("merchant_token", urlToken); // removed, wrong key
       window.history.replaceState({}, "", "/dashboard/merchant");
       navigate("/dashboard/merchant");
       return;
