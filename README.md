@@ -1,60 +1,66 @@
 # fairflow
 
-> Professional commerce operations for merchants, teams, and trusted customer journeys.
+> Commerce infrastructure for South African merchants, with merchant operations, public checkout, and portable product links.
 
-## What is fairflow?
+## Overview
 
-Fairflow is a commerce platform that helps South African merchants get their products online, sell them, and stay connected with their customers. It provides a merchant portal, consumer checkout, admin operations, and a browser extension for portable product discovery.
+fairflow is a monorepo for the merchant portal, public product and checkout experience, admin operations, and the supporting API. The current beta scope includes:
 
-## Project Structure
+- Merchant onboarding, product management, orders, notifications, KYC, and payouts
+- Public product pages and Paystack checkout
+- Admin KYC review, payout release, and platform health monitoring
+- `matter://` identifiers and compiled `.thing` artifacts for portable product distribution
 
-This is a monorepo. All active code lives in the `mcj/` directory.
+## Repository layout
 
-```
+The top-level workspace contains the active packages used in this worktree. The `mcj/` directory mirrors the broader project layout used in other workflows and historical references.
+
+```text
 .
-├── mcj/                        ← Main project (start here)
-│   ├── packages/
-│   │   ├── auth-portal/        ← React frontend (merchant portal, admin, consumer shop)
-│   │   ├── shadow-index/       ← Node.js API (Hono framework)
-│   │   ├── matter-core/        ← Rust compiler (.thing files, matter:// URIs)
-│   │   └── lens-extension/     ← Chrome browser extension
-│   ├── docs/                   ← Project documentation
-│   └── README.md               ← Detailed setup guide (see GETTING-STARTED.md)
-├── packages/                   ← Mirrored worktree (same code, different branch)
-└── docs/                       ← Top-level documentation index
+├── packages/
+│   ├── auth-portal/        React + TypeScript frontend
+│   ├── shadow-index/       Hono + Node.js API
+│   ├── matter-core/        Rust compiler for `.thing` artifacts
+│   └── lens-extension/     Browser extension
+├── docs/                   Project documentation and manuals
+├── demo/                   Static demo assets
+└── mcj/                    Mirrored project structure
 ```
 
-## Quick Start
+## Quick start
 
 ```bash
-cd mcj
+cd packages/shadow-index
 npm install
-cp .env.example .env
-# Fill in environment variables — see docs/API_KEYS_GUIDE.md
 
-npm run dev
+cd ../auth-portal
+npm install
 ```
 
-**Frontend:** http://localhost:5178  
-**API:** http://localhost:3000
+Set the required environment variables before running the applications:
+
+- API configuration: `docs/API_KEYS_GUIDE.md`
+- Local setup: `docs/GETTING-STARTED.md`
+- Deployment expectations: `docs/DEPLOYMENT.md`
+
+Default local ports:
+
+- Frontend: `http://localhost:5178`
+- API: `http://localhost:3000`
 
 ## Documentation
 
-- [Getting Started Guide](./docs/GETTING-STARTED.md)
-- [Technical Architecture](./docs/02-TECHNICAL-ARCHITECTURE.md)
-- [API Reference](./packages/shadow-index/README.md)
-- [Deployment Guide](./docs/DEPLOYMENT.md)
-- [Security & Hardening](./docs/20-SECURITY-HARDENING.md)
-- [All Documentation](./docs/README.md)
+- [Documentation index](./docs/README.md)
+- [Getting started](./docs/GETTING-STARTED.md)
+- [Analytics](./docs/ANALYTICS.md)
+- [Technical architecture](./docs/02-TECHNICAL-ARCHITECTURE.md)
+- [Deployment guide](./docs/DEPLOYMENT.md)
+- [Internal docs](./docs/internal/README.md) (charter, demo scripts)
+- [Beta launch readiness report](./docs/BETA-LAUNCH-READINESS-REPORT.md)
+- [Merchant manual](./docs/manuals/fairflow_merchant_manual.pdf)
+- [Beta tester manual](./docs/manuals/fairflow_beta_manual_v2.pdf)
 
-## Team
-
-| Role | Name |
-|------|------|
-| CEO | Sobuhle Nyambali |
-| CTO | Matome Mboweni |
-
-## Live Site
+## Live site
 
 [fairflow.co.za](https://fairflow.co.za)
 

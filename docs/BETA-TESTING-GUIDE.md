@@ -164,10 +164,10 @@ curl -H "Authorization: Bearer mor-admin-secret-local" http://localhost:3000/v1/
 
 | Step | Action |
 |------|--------|
-| 1 | Add beta users to `BETA-USER-LIST.md` |
-| 2 | Invite via `BETA-OUTREACH-TEMPLATE.md` |
-| 3 | Onboard via `BETA-USER-ONBOARDING.md` |
-| 4 | Track feedback via `BETA-FEEDBACK-TEMPLATE.md` |
+| 1 | Maintain a **private** beta roster (do not commit names, emails, or credentials in-repo) |
+| 2 | Invite testers with your team’s standard outreach process |
+| 3 | Onboard via [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) |
+| 4 | Track feedback in your issue tracker or spreadsheet (outside git if it contains PII) |
 
 ---
 

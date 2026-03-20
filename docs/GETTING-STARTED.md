@@ -12,19 +12,16 @@
 
 ```bash
 git clone https://github.com/MatomeMb/.Things-That-Matter.git
-cd .Things-That-Matter/mcj
-npm install
+cd .Things-That-Matter
+cd packages/shadow-index && npm install
+cd ../auth-portal && npm install
 ```
+
+**CI note:** GitHub Actions uses a nested `mcj/packages/...` layout in some workflows; treat it as the same packages with a different path prefix.
 
 ## Environment Setup
 
-The project uses environment variables for configuration. Create a `.env` file in the `mcj/` directory:
-
-```bash
-cp .env.example .env
-```
-
-Then fill in the required values. See [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) for detailed instructions on obtaining each key.
+Configure `.env` per package — see [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) (typically `packages/shadow-index/.env` and `packages/auth-portal/.env` from each package’s `.env.example`).
 
 ### Required Variables
 
@@ -50,13 +47,13 @@ Start the development servers in two terminal windows:
 
 ```bash
 # Terminal 1: Start API server (http://localhost:3000)
-cd mcj/packages/shadow-index
+cd packages/shadow-index
 npm run dev
 ```
 
 ```bash
 # Terminal 2: Start Frontend (http://localhost:5178)
-cd mcj/packages/auth-portal
+cd packages/auth-portal
 npm run dev
 ```
 
@@ -75,19 +72,19 @@ Both servers support hot reload. Changes will reflect immediately.
 
 ```bash
 # Auth Portal tests
-cd mcj/packages/auth-portal
+cd packages/auth-portal
 npm run test                # Run once
 npm run test:watch         # Watch mode
 npm run test:coverage      # With coverage report
 
 # Shadow Index tests
-cd mcj/packages/shadow-index
+cd packages/shadow-index
 npm run test
 npm run test:watch
 npm test:coverage
 
 # Matter Core tests (if working on compiler)
-cd mcj/packages/matter-core
+cd packages/matter-core
 cargo test
 ```
 
@@ -95,26 +92,26 @@ cargo test
 
 ```bash
 # Auth Portal (outputs to dist/)
-cd mcj/packages/auth-portal
+cd packages/auth-portal
 npm run build
 
 # Shadow Index (outputs to dist/)
-cd mcj/packages/shadow-index
+cd packages/shadow-index
 npm run build
 
 # Matter Core (outputs compiled binary)
-cd mcj/packages/matter-core
+cd packages/matter-core
 cargo build --release
 
 # Lens Extension (packaged for Chrome Web Store)
-cd mcj/packages/lens-extension
+cd packages/lens-extension
 npm run build
 ```
 
 ## Project Structure
 
 ```
-mcj/
+.
 ├── packages/
 │   ├── auth-portal/           — Frontend application
 │   │   ├── src/
@@ -152,16 +149,17 @@ mcj/
 │       │   └── popup.tsx      — Extension popup UI
 │       └── package.json
 │
-├── docs/                      — Documentation
-│   ├── 01-PROJECT-CHARTER.md
+├── docs/                      — Documentation (this directory)
 │   ├── 02-TECHNICAL-ARCHITECTURE.md
 │   ├── API_KEYS_GUIDE.md
 │   ├── DEPLOYMENT.md
 │   └── ... (see docs/README.md for full index)
 │
+├── demo/                      — Static demo assets
 ├── scripts/                   — Utility scripts
-├── .env.example              — Environment variable template
-└── package.json              — Root package.json
+├── mcj/                       — Optional mirror / CI checkout (same package layout)
+├── README.md
+└── package.json               — Root scripts (e2e, demo helpers)
 ```
 
 ## Deployment
@@ -175,22 +173,18 @@ The platform is deployed to Vercel:
 
 ## Common Commands
 
+Run these **inside** `packages/auth-portal` or `packages/shadow-index` (each package has its own `package.json`):
+
 ```bash
-# Type checking
-npm run type-check          # Check TypeScript types
-npm run lint                # Run ESLint
+# Type checking & lint (example: auth-portal)
+npm run type-check
+npm run lint
+npm run format
 
-# Code formatting
-npm run format              # Format with Prettier
-
-# Running full test suite
+# Tests
 npm test -- --run
-
-# Watch test changes
-npm test:watch
-
-# Coverage report
-npm test:coverage
+npm run test:watch
+npm run test:coverage
 ```
 
 ## Troubleshooting
@@ -200,7 +194,7 @@ npm test:coverage
 - Or specify a different port: `PORT=3001 npm run dev`
 
 **Environment variables not loading?**
-- Ensure `.env` file exists in the mcj directory
+- Ensure `.env` exists in `packages/shadow-index` and/or `packages/auth-portal` as described in [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md)
 - Restart dev servers after updating `.env`
 - Check for typos in variable names
 
@@ -216,9 +210,8 @@ npm test:coverage
 
 1. **Explore the docs:** Read [02-TECHNICAL-ARCHITECTURE.md](./02-TECHNICAL-ARCHITECTURE.md) to understand the system design
 2. **Set up keys:** Follow [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) to get your development keys
-3. **Read the charter:** [01-PROJECT-CHARTER.md](./01-PROJECT-CHARTER.md) explains the project vision and goals
-4. **Check the API:** See [packages/shadow-index/README.md](../packages/shadow-index/README.md) for API documentation
-5. **View deployment:** [DEPLOYMENT.md](./DEPLOYMENT.md) for staging/production procedures
+3. **Check the API:** See [packages/shadow-index/README.md](../packages/shadow-index/README.md) for API documentation
+4. **View deployment:** [DEPLOYMENT.md](./DEPLOYMENT.md) for staging/production procedures
 
 ## Getting Help
 

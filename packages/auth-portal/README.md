@@ -1,4 +1,4 @@
-﻿# @thingsthatmatter/auth-portal
+# @thingsthatmatter/auth-portal
 
 > Role-based authentication portal for fairflow. Merchant onboarding, admin operations, consumer checkout, and analytics.
 
@@ -50,7 +50,7 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 - **CEODashboard** — Strategic metrics and business intelligence
 - **CTOAdminPanel** — Technical health and deployment monitoring
 - **ConsumerShop** — Product catalog with search and checkout
-- **InvestorMode** — Financial projections and business overview
+- **InvestorMode** — Investor-facing KPIs and business overview
 - **ProductPage** — Product detail page (public, supports checkout)
 - **OrderConfirmation** — Order receipt and status
 - **LandingPage** — Public landing page
@@ -94,7 +94,7 @@ src/
 │       ├── CEODashboard.tsx         — CEO metrics
 │       ├── CTOAdminPanel.tsx        — CTO technical dashboard
 │       ├── ConsumerShop.tsx         — Consumer product catalog
-│       ├── InvestorMode.tsx         — Investor financial view
+│       ├── InvestorMode.tsx         — Investor KPI view
 │       ├── MerchantPortal.tsx       — Merchant dashboard
 │       └── merchant/                — Merchant features
 │           └── (merchant-specific components)

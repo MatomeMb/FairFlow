@@ -30,7 +30,7 @@ A role-based dashboard built with React, Vite, and Tailwind CSS. Supabase handle
 - **CEO Portal** — revenue dashboards, platform metrics, strategic reporting
 - **CTO Portal** — system health, deployment status, technical analytics
 - **Merchant Portal** — product management, upload artifacts, view sales
-- **Investor Portal** — growth metrics, financial projections
+- **Investor Portal** — growth metrics, investor-facing KPIs
 - **Consumer Portal** — purchase history, artifact verification
 
 ### lens-extension (Chrome Extension)

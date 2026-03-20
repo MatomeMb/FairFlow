@@ -2,6 +2,8 @@
 
 This directory contains the canonical written documentation for engineering, deployment, beta operations, and release readiness.
 
+**Internal** (charter, demo scripts): [internal/README.md](./internal/README.md).
+
 ## Start Here
 
 | Document | Purpose |
@@ -18,14 +20,11 @@ This directory contains the canonical written documentation for engineering, dep
 | [BETA-LAUNCH-READINESS-REPORT.md](./BETA-LAUNCH-READINESS-REPORT.md) | Single summary: beta readiness, config matrix, final manual gate |
 | [BETA-TESTING-GUIDE.md](./BETA-TESTING-GUIDE.md) | End-to-end beta verification flow for merchant and admin journeys |
 | [BETA-USER-ONBOARDING.md](./BETA-USER-ONBOARDING.md) | Beta tester onboarding process |
-| [BETA-USER-LIST.md](./BETA-USER-LIST.md) | Beta roster and ownership tracking |
-| [DEMO-VIDEO-SCRIPT.md](./DEMO-VIDEO-SCRIPT.md) | Demo and walkthrough script for product reviews |
 
 ## Product, Architecture, and Standards
 
 | Document | Purpose |
 |----------|---------|
-| [01-PROJECT-CHARTER.md](./01-PROJECT-CHARTER.md) | Vision, scope, and program goals |
 | [02-TECHNICAL-ARCHITECTURE.md](./02-TECHNICAL-ARCHITECTURE.md) | System architecture and integration boundaries |
 | [03-PRODUCT-REQUIREMENTS-DOCUMENT.md](./03-PRODUCT-REQUIREMENTS-DOCUMENT.md) | Product requirements and operating assumptions |
 | [DEVELOPMENT-STANDARDS.md](./DEVELOPMENT-STANDARDS.md) | Engineering conventions and code quality expectations |
@@ -33,24 +32,38 @@ This directory contains the canonical written documentation for engineering, dep
 | [20-SECURITY-HARDENING.md](./20-SECURITY-HARDENING.md) | Security posture and hardening guidance |
 | [22-TESTING-STANDARDS-AND-COVERAGE.md](./22-TESTING-STANDARDS-AND-COVERAGE.md) | Test expectations and coverage guidance |
 
-## Manuals and Audit History
+## Analytics
+
+| Document | Purpose |
+|----------|---------|
+| [ANALYTICS.md](./ANALYTICS.md) | Hub: events, flow, storage, links to deep specs |
+| [ANALYTICS-OVERVIEW.md](./ANALYTICS-OVERVIEW.md) | Pipeline overview, APIs, dashboards |
+| [ANALYTICS-EVENT-SCHEMA.md](./ANALYTICS-EVENT-SCHEMA.md) | Event schema and validation detail |
+
+## Manuals
 
 | Document | Purpose |
 |----------|---------|
 | [manuals/fairflow_merchant_manual.pdf](./manuals/fairflow_merchant_manual.pdf) | Merchant manual (PDF, v1.1) |
 | [manuals/fairflow_beta_manual_v2.pdf](./manuals/fairflow_beta_manual_v2.pdf) | Beta tester manual (PDF, v1.1) |
 | [manuals/BETA_MERCHANT_MANUAL_ERRATA.md](./manuals/BETA_MERCHANT_MANUAL_ERRATA.md) | Optional Markdown supplement for engineers (PDFs remain canonical) |
-| [manuals/ENGINEERING-REVIEW.md](./manuals/ENGINEERING-REVIEW.md) | Historical PDF audit; see file header for March 2026 closure note |
 
 ## Reference
 
 | Document | Purpose |
 |----------|---------|
 | [05-RISK-ASSESSMENT.md](./05-RISK-ASSESSMENT.md) | Program and delivery risks |
-| [06-BUDGET-FINANCIAL-PROJECTIONS.md](./06-BUDGET-FINANCIAL-PROJECTIONS.md) | Budgeting and financial model |
 | [07-SYSTEM-DIAGRAMS.md](./07-SYSTEM-DIAGRAMS.md) | Supporting system diagrams |
 | [17-MVP-13-ACCEPTANCE-AND-SCHEMA.md](./17-MVP-13-ACCEPTANCE-AND-SCHEMA.md) | IndexedDB schema and acceptance notes |
 | [19-PERFORMANCE-AND-OBSERVABILITY.md](./19-PERFORMANCE-AND-OBSERVABILITY.md) | Performance and observability guidance |
 | [21-PRE-COMMIT-HOOKS-SETUP.md](./21-PRE-COMMIT-HOOKS-SETUP.md) | Local hook setup |
 | [SECURITY-VERIFICATION-REPORT.md](./SECURITY-VERIFICATION-REPORT.md) | Security verification evidence |
 | [VERCEL-UPTIME-RUNBOOK.md](./VERCEL-UPTIME-RUNBOOK.md) | Runtime incident handling for hosted environments |
+| [INSTALL-LENS.md](./INSTALL-LENS.md) | Local install and dev workflow for the Lens extension |
+| [CHROME-WEB-STORE-CHECKLIST.md](./CHROME-WEB-STORE-CHECKLIST.md) | Chrome Web Store submission and release checklist |
+
+## Maintaining this folder
+
+- Prefer **one** canonical doc per topic; link instead of copying.
+- New top-level `.md` files should be listed in this README (or nested under `internal/` with a clear purpose).
+- Run `node scripts/validate-system-config.mjs` from the repo root to sanity-check core doc paths.

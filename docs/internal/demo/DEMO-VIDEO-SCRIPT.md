@@ -47,7 +47,7 @@
 2. Fill form: business "Demo Store", email demo@test.com, password SecurePass123
 3. Submit, show redirect to /dashboard/merchant
 4. Click KYC & Payouts tab
-5. Fill KYC form: ID, DOB, address, phone, bank account (ABSA, account 9–11 digits, branch 6 digits)
+5. Fill KYC form: ID, DOB, address, phone, bank account (ABSA, account 9ΓÇô11 digits, branch 6 digits)
 6. Submit KYC — status shows "Pending Review"
 
 ---

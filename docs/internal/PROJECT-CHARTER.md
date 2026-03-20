@@ -68,8 +68,8 @@ Build and launch the fairflow Commerce Compiler and distribution network targeti
 
 ## 7. Timeline
 
-- **Duration:** 8 sprints (January–May 2026)
-- **Sprint 0–2:** Complete
+- **Duration:** 8 sprints (JanuaryΓÇôMay 2026)
+- **Sprint 0ΓÇô2:** Complete
 - **Sprint 3:** In progress (Analytics MVP-14)
 - **Sprint 4+:** Beta readiness
 
@@ -91,19 +91,6 @@ Build and launch the fairflow Commerce Compiler and distribution network targeti
 | Platform dependency (Chrome extension approval) | Follow Chrome Web Store policies; maintain fallback distribution options |
 | Payment processing compliance (PCI) | Use Stripe for PCI-compliant payment handling |
 | Data privacy (POPIA for SA merchants) | Implement POPIA-compliant data handling; document data flows and consent |
-
----
-
-## 10. Budget
-
-**Phase:** Self-funded
-
-**Infrastructure costs:**
-
-- Supabase: Free tier
-- Cloudflare R2: Free tier
-- Vercel: Hobby tier
-- Stripe: 2.9% + R5 per transaction
 
 ---
 

@@ -221,9 +221,10 @@ class SystemValidator {
 
     const docs = [
       { path: 'README.md', desc: 'Project README' },
-      { path: 'docs/00-DOCUMENT-INDEX.md', desc: 'Documentation index' },
+      { path: 'docs/README.md', desc: 'Documentation index' },
+      { path: 'docs/ANALYTICS.md', desc: 'Analytics doc hub' },
       { path: 'docs/02-TECHNICAL-ARCHITECTURE.md', desc: 'Technical architecture' },
-      { path: 'docs/11-DEPLOYMENT-RUNBOOK.md', desc: 'Deployment guide' }
+      { path: 'docs/DEPLOYMENT.md', desc: 'Deployment guide' }
     ];
 
     for (const { path: p, desc } of docs) {
