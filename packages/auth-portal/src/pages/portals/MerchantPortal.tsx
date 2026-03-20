@@ -47,7 +47,7 @@ const ErrorBanner: React.FC<{ message: string; onDismiss: () => void }> = ({ mes
 );
 
 export const MerchantPortal: React.FC = () => {
-  const { signOut } = useAuth();
+  const { signOut: supabaseSignOut } = useAuth();
 
   const [activeTab, setActiveTab] = useState<Tab>('products');
   const [logoStyle, setLogoStyle] = useState<LogoStyle>('geo-tech');
@@ -68,7 +68,12 @@ export const MerchantPortal: React.FC = () => {
       setLogoStyle(storedStyle);
     }
   }, []);
-  const { token: authToken, merchantFetch } = useMerchantAuthToken();
+  const { token: authToken, merchantFetch, signOut: clearMerchantSession } = useMerchantAuthToken();
+
+  const handleLogout = useCallback(async () => {
+    clearMerchantSession();
+    await supabaseSignOut();
+  }, [clearMerchantSession, supabaseSignOut]);
   const {
     products,
     isLoadingProducts,
@@ -700,7 +705,7 @@ export const MerchantPortal: React.FC = () => {
       tabs={tabs}
       activeTab={activeTab as string}
       onTabChange={(tab) => setActiveTab(tab as Tab)}
-      onLogout={signOut}
+      onLogout={handleLogout}
       headerActions={(
         <button
           onClick={handleOpenNotificationsTab}

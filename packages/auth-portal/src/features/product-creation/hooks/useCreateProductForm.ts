@@ -108,14 +108,7 @@ export function useCreateProductForm({ isOpen, onCreated, onClose, token }: UseC
     setIsUploadingImage(true);
     setField('image_url', '');
     setErrors((prev) => ({ ...prev, image_url: undefined }));
-    const resolvedToken = token ?? getMerchantToken();
-    console.log('[upload-debug] token received:', resolvedToken);
-    if (!resolvedToken) {
-      setImageUploadError('Session expired. Please refresh and try again.');
-      setIsUploadingImage(false);
-      return;
-    }
-    const result = await uploadProductImage(file, resolvedToken);
+    const result = await uploadProductImage(file, token ?? getMerchantToken());
     if (result.success && result.image_url) {
       setField('image_url', result.image_url);
     } else {
@@ -135,7 +128,7 @@ export function useCreateProductForm({ isOpen, onCreated, onClose, token }: UseC
     setErrors(validationErrors);
     if (Object.keys(validationErrors).length > 0) return;
     setIsSubmitting(true);
-    const result = await submitProductForm(form);
+    const result = await submitProductForm(form, token ?? getMerchantToken());
     if (!result.success) {
       setSubmitError(result.error ?? 'Failed to create product');
       setIsSubmitting(false);

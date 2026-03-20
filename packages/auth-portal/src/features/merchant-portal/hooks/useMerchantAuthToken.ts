@@ -4,8 +4,7 @@ import {
   setMerchantToken,
   clearMerchantToken,
 } from '../../../lib/merchantTokenStorage';
-
-const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+import { apiBase } from '../../../lib/config';
 const REFRESH_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
 
 function getTokenExpiry(token: string): number | null {
@@ -33,7 +32,7 @@ export function useMerchantAuthToken() {
     if (isRefreshing.current) return;
     isRefreshing.current = true;
     try {
-      const res = await fetch(`${API_BASE}/v1/auth/merchant/refresh`, {
+      const res = await fetch(`${apiBase}/v1/auth/merchant/refresh`, {
         method: 'POST',
         headers: { Authorization: `Bearer ${currentToken}` },
       });

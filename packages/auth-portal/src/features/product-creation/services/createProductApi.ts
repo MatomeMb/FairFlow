@@ -1,4 +1,5 @@
 import { apiBase } from '../../../lib/config';
+import { getMerchantToken } from '../../../lib/merchantTokenStorage';
 import type { FormState, SuccessPayload } from '../types/productCreation';
 import type { MerchantProductApi } from '../../../types/merchant';
 
@@ -15,14 +16,17 @@ export type UploadImageResult = {
   error?: string;
 };
 
-export async function submitProductForm(form: FormState): Promise<SubmitProductResult> {
+export async function submitProductForm(
+  form: FormState,
+  authToken?: string | null,
+): Promise<SubmitProductResult> {
   try {
+    const bearer = authToken ?? getMerchantToken();
     const response = await fetch(`${apiBase}/v1/merchant/products`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'x-merchant-id': 'dev-merchant-001',
-        // 'x-api-key': apiKey,
+        ...(bearer ? { Authorization: `Bearer ${bearer}` } : {}),
       },
       body: JSON.stringify({
         title: form.title.trim(),
@@ -61,10 +65,13 @@ export async function submitProductForm(form: FormState): Promise<SubmitProductR
 
 export async function uploadProductImage(file: File, token?: string | null): Promise<UploadImageResult> {
   try {
-    const headers: { [key: string]: string } = { 'x-merchant-id': 'dev-merchant-001' };
-    if (token) {
-      headers['Authorization'] = `Bearer ${token}`;
+    const bearer = token ?? getMerchantToken();
+    if (!bearer) {
+      return { success: false, error: 'Session expired. Please sign in again.' };
     }
+    const headers: Record<string, string> = {
+      Authorization: `Bearer ${bearer}`,
+    };
 
     const payload = new FormData();
     payload.append('image', file);

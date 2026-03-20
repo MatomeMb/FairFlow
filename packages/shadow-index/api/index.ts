@@ -135,7 +135,14 @@ const devOrigins = [
   'http://127.0.0.1:5178',
 ];
 const allowedOrigins = process.env.NODE_ENV === 'production' ? prodOrigins : [...prodOrigins, ...devOrigins];
-app.use('*', cors({ origin: allowedOrigins }));
+app.use(
+  '*',
+  cors({
+    origin: allowedOrigins,
+    allowHeaders: ['Content-Type', 'Authorization', 'x-merchant-id', 'x-api-key', 'x-auth-portal-base-url'],
+    allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
+  }),
+);
 
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
@@ -145,7 +152,8 @@ app.use('*', async (c, next) => {
     || requestPath === '/v1/auth/merchant/register'
     || requestPath === '/v1/auth/merchant/login'
     || requestPath === '/v1/auth/merchant/forgot-password'
-    || requestPath === '/v1/auth/merchant/me';
+    || requestPath === '/v1/auth/merchant/me'
+    || requestPath === '/v1/auth/merchant/refresh';
   if (isPublicAuthRoute) {
     return next();
   }
