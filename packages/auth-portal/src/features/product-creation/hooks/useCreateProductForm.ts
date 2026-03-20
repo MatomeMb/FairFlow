@@ -4,6 +4,7 @@ import type { MerchantProductApi } from '../../../types/merchant';
 import { INITIAL_STATE } from '../config/productTemplates';
 import { validateProductForm } from '../validation/createProductValidation';
 import { submitProductForm, uploadProductImage } from '../services/createProductApi';
+import { getMerchantToken } from '../../../lib/merchantTokenStorage';
 
 interface UseCreateProductFormParams {
   isOpen: boolean;
@@ -107,13 +108,14 @@ export function useCreateProductForm({ isOpen, onCreated, onClose, token }: UseC
     setIsUploadingImage(true);
     setField('image_url', '');
     setErrors((prev) => ({ ...prev, image_url: undefined }));
-    console.log('[upload-debug] token received:', token);
-    if (!token) {
-      setImageUploadError('Authentication token missing. Please refresh and try again.');
+    const resolvedToken = token ?? getMerchantToken();
+    console.log('[upload-debug] token received:', resolvedToken);
+    if (!resolvedToken) {
+      setImageUploadError('Session expired. Please refresh and try again.');
       setIsUploadingImage(false);
       return;
     }
-    const result = await uploadProductImage(file, token);
+    const result = await uploadProductImage(file, resolvedToken);
     if (result.success && result.image_url) {
       setField('image_url', result.image_url);
     } else {

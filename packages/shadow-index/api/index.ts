@@ -2401,12 +2401,14 @@ app.patch('/v1/merchant/account', async (c) => {
     target.business_name = payload.business_name;
   }
   if (payload.phone !== undefined || payload.address !== undefined) {
-    target.kyc_data = target.kyc_data || { id_number: '', date_of_birth: '' };
+    if (!target.kyc_data) {
+      target.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
+    }
     if (payload.phone !== undefined) {
-      target.kyc_data.phone = payload.phone;
+      if (target.kyc_data) target.kyc_data.phone = payload.phone;
     }
     if (payload.address !== undefined) {
-      target.kyc_data.address = payload.address;
+      if (target.kyc_data) target.kyc_data.address = payload.address;
     }
   }
   target.updated_at = new Date().toISOString();
