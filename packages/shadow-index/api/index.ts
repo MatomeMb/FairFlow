@@ -147,14 +147,8 @@ app.use(
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
   const requestPath = c.req.path;
-  const isPublicAuthRoute = requestPath === '/v1/auth/google'
-    || requestPath === '/v1/auth/google/callback'
-    || requestPath === '/v1/auth/merchant/register'
-    || requestPath === '/v1/auth/merchant/login'
-    || requestPath === '/v1/auth/merchant/forgot-password'
-    || requestPath === '/v1/auth/merchant/me'
-    || requestPath === '/v1/auth/merchant/refresh';
-  if (isPublicAuthRoute) {
+  // All /v1/auth/* routes validate their own credentials (OAuth, merchant JWT, etc.)
+  if (requestPath.startsWith('/v1/auth/')) {
     return next();
   }
 
