@@ -18,8 +18,9 @@ function setTokenInStorage(storage: Storage, token: string): void {
   }
 }
 
-export function useMerchantAuthToken() {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() =>
+    getTokenFromStorage(sessionStorage) ?? getTokenFromStorage(localStorage)
+  );
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Attempt to refresh the token silently
