@@ -37,6 +37,8 @@ import {
   writeProducts,
   getConsumerPriceCents,
   getMerchantPriceCents,
+  findMerchantProductByThingHash,
+  buildThingJsonFromMerchantProduct,
   type MerchantProduct,
 } from './merchant-products.js';
 import {
@@ -2748,22 +2750,44 @@ app.get('/thing/:hash', async (c) => {
   if (hash.endsWith('.json')) {
     hash = hash.slice(0, -5);
   }
-  const thingPath = path.join(thingsDir, `${hash}.json`);
+  const jsonPath = path.join(thingsDir, `${hash}.json`);
   try {
-    const content = await fs.readFile(thingPath, 'utf8');
+    const content = await fs.readFile(jsonPath, 'utf8');
     const thing = JSON.parse(content);
     c.header('Content-Type', 'application/json');
     return c.json(thing);
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') {
-      return c.json(err('not_found', `Thing file not found for hash: ${hash}`, { hash }), 404);
+    if (nodeError.code !== 'ENOENT') {
+      return c.json(
+        err('internal_error', 'Failed to load thing file', { hash, error: nodeError.message }),
+        500,
+      );
     }
-    return c.json(
-      err('internal_error', 'Failed to load thing file', { hash, error: nodeError.message }),
-      500
-    );
   }
+
+  // Legacy compile path writes {hash}.thing (not .json)
+  const thingPath = path.join(thingsDir, `${hash}.thing`);
+  try {
+    const content = await fs.readFile(thingPath, 'utf8');
+    const parsed = JSON.parse(content) as Record<string, unknown>;
+    if (parsed && typeof parsed === 'object' && 'product' in parsed && 'commerce' in parsed) {
+      c.header('Content-Type', 'application/json');
+      return c.json(parsed);
+    }
+  } catch {
+    // continue to Supabase fallback
+  }
+
+  // Merchant dashboard creates hashes in Supabase only — no local file on Vercel
+  const merchantProduct = await findMerchantProductByThingHash(hash);
+  if (merchantProduct) {
+    const body = buildThingJsonFromMerchantProduct(merchantProduct, hash);
+    c.header('Content-Type', 'application/json');
+    return c.json(body);
+  }
+
+  return c.json(err('not_found', `Thing file not found for hash: ${hash}`, { hash }), 404);
 });
 
 // Batch compilation endpoint (Sprint 4 — MVP-11)

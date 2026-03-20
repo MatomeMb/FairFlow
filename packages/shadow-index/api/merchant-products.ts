@@ -165,6 +165,59 @@ export async function readProducts(): Promise<MerchantProduct[]> {
   return rows.map(rowToProduct);
 }
 
+/**
+ * Resolve a merchant row by deterministic thing hash (same hash shown as matter:// and /product/:hash).
+ * Used when no local things/{hash}.json exists (Supabase-only merchant flow, serverless disk).
+ */
+export async function findMerchantProductByThingHash(thingHash: string): Promise<MerchantProduct | null> {
+  try {
+    const products = await readProducts();
+    return (
+      products.find(
+        (p) => p.thing_file?.hash === thingHash && p.status !== 'archived',
+      ) ?? null
+    );
+  } catch {
+    return null;
+  }
+}
+
+/** Shape expected by auth-portal ProductPage (GET /thing/:hash.json). */
+export function buildThingJsonFromMerchantProduct(
+  product: MerchantProduct,
+  thingHash: string,
+): Record<string, unknown> {
+  const baseUrl =
+    process.env.PUBLIC_API_BASE_URL?.replace(/\/$/, '')
+    || `http://localhost:${Number(process.env.PORT) || 3000}`;
+  const matterUri = `matter://${thingHash}`;
+  const thingUrl = `${baseUrl}/thing/${thingHash}`;
+  return {
+    product: {
+      id: product.id,
+      title: product.title,
+      description: product.description,
+      price: product.price_cents,
+      currency: product.currency,
+      image_url: product.image_url,
+      category: product.category,
+    },
+    commerce: {
+      merchant_id: product.merchant_id ?? '',
+      payment_gateway: 'paystack',
+      supported_currencies: [product.currency || 'ZAR'],
+      shipping_available: product.shipping_available ?? false,
+    },
+    metadata: {
+      schema_version: '1.0',
+      created_at: product.created_at ?? new Date().toISOString(),
+      matter_uri: matterUri,
+      thing_url: thingUrl,
+      stock_count: product.stock_count ?? 0,
+    },
+  };
+}
+
 /** Async write of merchant products list via id-based upsert. */
 export async function writeProducts(products: MerchantProduct[]): Promise<void> {
   if (products.length === 0) {
