@@ -1734,6 +1734,17 @@ const imageExtensionByMime: Record<string, string> = {
 };
 
 app.post('/v1/merchant/uploads/image', async (c) => {
+  // Merchant JWT validation (same as other merchant routes)
+  const auth = c.req.header('Authorization');
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!bearer) {
+    return c.json(err('unauthorized', 'Authentication required'), 401);
+  }
+  const payload = verifyJwt(bearer, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return c.json(err('unauthorized', 'Invalid merchant token'), 401);
+  }
+
   const parsedBody = await c.req.parseBody().catch(() => null);
   if (!parsedBody || typeof parsedBody !== 'object') {
     return c.json(err('invalid_upload', 'Expected multipart form data'), 400);
