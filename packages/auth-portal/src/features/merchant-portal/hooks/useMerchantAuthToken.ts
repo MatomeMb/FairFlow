@@ -1,128 +1,82 @@
-import { useCallback, useEffect, useState } from 'react';
-import { shouldRefreshToken, setMerchantToken, clearMerchantToken } from '../../../lib/merchantTokenStorage';
-import { apiBase } from '../../../lib/config';
+import { useState, useEffect, useRef, useCallback } from 'react';
+import {
+  getMerchantToken,
+  setMerchantToken,
+  clearMerchantToken,
+} from '../../../lib/merchantTokenStorage';
 
-const TOKEN_KEYS = ['merchantToken', 'merchant_token'] as const;
+const API_BASE = import.meta.env.VITE_API_BASE_URL ?? 'http://localhost:3000';
+const REFRESH_THRESHOLD_MS = 24 * 60 * 60 * 1000; // 24 hours
 
-function getTokenFromStorage(storage: Storage): string | null {
-  for (const key of TOKEN_KEYS) {
-    const value = storage.getItem(key);
-    if (value) return value;
+function getTokenExpiry(token: string): number | null {
+  try {
+    const payload = JSON.parse(atob(token.split('.')[1]));
+    return typeof payload.exp === 'number' ? payload.exp * 1000 : null;
+  } catch {
+    return null;
   }
-  return null;
 }
 
-function setTokenInStorage(storage: Storage, token: string): void {
-  for (const key of TOKEN_KEYS) {
-    storage.setItem(key, token);
-  }
+function shouldRefresh(token: string): boolean {
+  const expiry = getTokenExpiry(token);
+  if (!expiry) return false;
+  return expiry - Date.now() < REFRESH_THRESHOLD_MS && expiry > Date.now();
 }
 
+export function useMerchantAuthToken() {
   const [token, setToken] = useState<string | null>(() =>
-    getTokenFromStorage(sessionStorage) ?? getTokenFromStorage(localStorage)
+    getMerchantToken()
   );
-  const [isRefreshing, setIsRefreshing] = useState(false);
+  const isRefreshing = useRef(false);
 
-  // Attempt to refresh the token silently
   const refreshToken = useCallback(async (currentToken: string) => {
-    if (isRefreshing) return; // Prevent multiple concurrent refresh attempts
-    setIsRefreshing(true);
-
+    if (isRefreshing.current) return;
+    isRefreshing.current = true;
     try {
-      const response = await fetch(`${apiBase}/v1/auth/merchant/refresh`, {
+      const res = await fetch(`${API_BASE}/v1/auth/merchant/refresh`, {
         method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${currentToken}`,
-          'Content-Type': 'application/json',
-        },
+        headers: { Authorization: `Bearer ${currentToken}` },
       });
-
-      if (!response.ok) {
-        // Refresh failed—likely expired or invalid. Clear token and redirect to login.
+      if (res.ok) {
+        const data = await res.json();
+        if (data?.token) {
+          setMerchantToken(data.token);
+          setToken(data.token);
+        }
+      } else {
         clearMerchantToken();
         setToken(null);
-        window.location.href = '/login?session=expired';
-        return;
       }
-
-      const data = await response.json();
-      if (data.token) {
-        setMerchantToken(data.token);
-        setTokenInStorage(sessionStorage, data.token);
-        setTokenInStorage(localStorage, data.token);
-        setToken(data.token);
-      }
-    } catch (error) {
-      console.error('Token refresh failed:', error);
-      // On network error, don't clear the token—rely on it being invalid when it actually expires
+    } catch {
+      // network error — keep existing token
     } finally {
-      setIsRefreshing(false);
+      isRefreshing.current = false;
     }
-  }, [isRefreshing]);
+  }, []);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const urlToken = params.get('token');
-
-    if (urlToken) {
-      setTokenInStorage(sessionStorage, urlToken);
-      setTokenInStorage(localStorage, urlToken);
-      setToken(urlToken);
-      window.history.replaceState({}, '', '/dashboard/merchant');
-      return;
+    if (!token) return;
+    if (shouldRefresh(token)) {
+      void refreshToken(token);
     }
-
-    const sessionToken = getTokenFromStorage(sessionStorage);
-    if (sessionToken) {
-      setToken(sessionToken);
-      // Check if refresh is needed
-      if (shouldRefreshToken(sessionToken)) {
-        refreshToken(sessionToken);
-      }
-      return;
-    }
-
-    const localToken = getTokenFromStorage(localStorage);
-    if (localToken) {
-      setTokenInStorage(sessionStorage, localToken);
-      setToken(localToken);
-      // Check if refresh is needed
-      if (shouldRefreshToken(localToken)) {
-        refreshToken(localToken);
-      }
-      return;
-    }
-
-    setToken(null);
-  }, [refreshToken]);
+  }, [token, refreshToken]);
 
   const merchantFetch = useCallback(
     async (url: string, options: RequestInit = {}): Promise<Response> => {
-      if (!token) {
-        return fetch(url, options); // No token, proceed without auth
+      const currentToken = token ?? getMerchantToken();
+      const headers = new Headers(options.headers);
+      if (currentToken) {
+        headers.set('Authorization', `Bearer ${currentToken}`);
       }
-
-      // Check if token needs refreshing before making the request
-      if (shouldRefreshToken(token)) {
-        await refreshToken(token);
-      }
-
-      const headers: Record<string, string> = {
-        ...(options.headers as Record<string, string> | undefined),
-      };
-
-      if (token) {
-        headers.Authorization = `Bearer ${token}`;
-      }
-
-      if (import.meta.env.VITE_API_KEY) {
-        headers['x-api-key'] = import.meta.env.VITE_API_KEY;
-      }
-
       return fetch(url, { ...options, headers });
     },
-    [token, refreshToken]
+    [token]
   );
 
-  return { token, merchantFetch };
+  const signOut = useCallback(() => {
+    clearMerchantToken();
+    setToken(null);
+  }, []);
+
+  return { token, merchantFetch, signOut };
 }
