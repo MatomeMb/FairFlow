@@ -21,6 +21,12 @@ function setTokenInStorage(storage: Storage, token: string): void {
   const [token, setToken] = useState<string | null>(() =>
     getTokenFromStorage(sessionStorage) ?? getTokenFromStorage(localStorage)
   );
+  // Temporary debug log to find storage keys and token value
+  useEffect(() => {
+    console.log('[auth-token-debug] sessionStorage keys:', Object.keys(sessionStorage));
+    console.log('[auth-token-debug] localStorage keys:', Object.keys(localStorage));
+    console.log('[auth-token-debug] resolved token:', token);
+  }, [token]);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   // Attempt to refresh the token silently
