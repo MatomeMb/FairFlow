@@ -32,6 +32,8 @@ export interface DeliveryAddress {
 
 export interface MerchantOrder {
   id: string;
+  /** Payment lifecycle from checkout (e.g. paid, pending, failed). */
+  status?: string;
   session_id?: string;
   paystack_reference?: string;
   product_hash?: string;

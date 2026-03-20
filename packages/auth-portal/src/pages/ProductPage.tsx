@@ -28,6 +28,8 @@ interface ThingFile {
     matter_uri: string;
     thing_url: string;
     stock_count?: number;
+    /** Set when merchant archived the listing; page stays viewable without checkout. */
+    fairflow_listing?: string;
   };
 }
 
@@ -144,6 +146,11 @@ export function ProductPage() {
   const handleBuyNow = async () => {
     setEmailError('');
 
+    if (!thing) return;
+    if (thing.metadata?.fairflow_listing === 'archived') return;
+    const sc = thing.metadata?.stock_count;
+    if (typeof sc === 'number' && sc <= 0) return;
+
     if (!isValidEmail(email)) {
       setEmailError('Please enter a valid email address');
       return;
@@ -250,7 +257,9 @@ export function ProductPage() {
   }
 
   const emailValid = isValidEmail(email);
-  const isOutOfStock = (thing?.metadata?.stock_count ?? 1) <= 0;
+  const stockCount = thing.metadata?.stock_count;
+  const isOutOfStock = typeof stockCount === 'number' && stockCount <= 0;
+  const listingArchived = thing.metadata?.fairflow_listing === 'archived';
 
   return (
     <div className="min-h-screen bg-[#0D1B2A]">
@@ -310,26 +319,41 @@ export function ProductPage() {
                 </div>
               )}
 
-              {showAddressForm && (
-                <div className="flex items-center gap-2 mb-4 text-sm text-[#8A99AA]">
-                  <span className="flex items-center gap-1">
-                    <span className="w-5 h-5 rounded-full bg-[var(--ff-info-subtle)] text-[var(--ff-info)] text-xs flex items-center justify-center font-semibold">✓</span>
-                    Contact
-                  </span>
-                  <span className="flex-1 h-px bg-[var(--ff-border)]" />
-                  <span className="flex items-center gap-1">
-                    <span className="w-5 h-5 rounded-full bg-[var(--ff-info)] text-white text-xs flex items-center justify-center font-semibold">2</span>
-                    Delivery
-                  </span>
+              {listingArchived && (
+                <div
+                  className="mb-8 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-3 text-sm text-[var(--ff-ink-muted)]"
+                  role="status"
+                >
+                  This product is no longer available for purchase. The listing has been archived by the
+                  merchant.
                 </div>
               )}
 
+              {!listingArchived && isOutOfStock && (
+                <p className="mb-6 text-sm font-medium text-amber-200">Out of stock — check back later.</p>
+              )}
+
+              {listingArchived ? null : (
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleBuyNow();
                 }}
               >
+                {showAddressForm && (
+                  <div className="flex items-center gap-2 mb-4 text-sm text-[#8A99AA]">
+                    <span className="flex items-center gap-1">
+                      <span className="w-5 h-5 rounded-full bg-[var(--ff-info-subtle)] text-[var(--ff-info)] text-xs flex items-center justify-center font-semibold">✓</span>
+                      Contact
+                    </span>
+                    <span className="flex-1 h-px bg-[var(--ff-border)]" />
+                    <span className="flex items-center gap-1">
+                      <span className="w-5 h-5 rounded-full bg-[var(--ff-info)] text-white text-xs flex items-center justify-center font-semibold">2</span>
+                      Delivery
+                    </span>
+                  </div>
+                )}
+
                 <div className="mb-6">
                   <label htmlFor="email" className="block text-sm font-medium text-white mb-2">
                     Email Address
@@ -413,6 +437,7 @@ export function ProductPage() {
                   )}
                 </button>
               </form>
+              )}
 
               {/* Trust Signals */}
               <div className="mt-6 pt-6 border-t border-[rgba(255,255,255,0.07)]">

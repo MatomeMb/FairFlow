@@ -365,7 +365,7 @@ export const MerchantPortal: React.FC = () => {
       if (!hasApiAuth) return;
       void fetchNotifications();
     },
-    hasApiAuth ? 15000 : null
+    hasApiAuth ? 30_000 : null
   );
 
   const markNotificationRead = useCallback(async (id: string) => {
@@ -408,14 +408,6 @@ export const MerchantPortal: React.FC = () => {
       showToast(msg, 'error');
     }
   }, [apiBase, merchantFetch, notifications, showToast]);
-
-  useEffect(() => {
-    if (activeTab !== 'notifications') return;
-    const timeoutId = window.setTimeout(() => {
-      markAllNotificationsRead();
-    }, 2000);
-    return () => window.clearTimeout(timeoutId);
-  }, [activeTab, markAllNotificationsRead]);
 
   const handleMarkAsFulfilled = async (orderId: string) => {
     try {

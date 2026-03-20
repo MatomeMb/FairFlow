@@ -160,6 +160,12 @@ export function MerchantKYCPayouts({
             </table>
           </div>
         )}
+
+        <p className="text-sm text-[var(--ff-ink-muted)] mt-4 max-w-xl leading-relaxed">
+          fairflow charges a <strong className="text-[var(--ff-ink)]">{(commissionRate * 100).toFixed(1)}% platform fee</strong> on
+          each sale. Payout amounts in the table above are <strong className="text-[var(--ff-ink)]">net of this fee</strong> (gross minus
+          commission).
+        </p>
       </div>
     </div>
   );

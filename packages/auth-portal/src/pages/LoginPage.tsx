@@ -1,5 +1,5 @@
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect, useMemo } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { FairflowLogo } from "../components/FairflowLogo";
 import { supabase } from "../lib/supabase";
@@ -12,9 +12,31 @@ const ROLE_HOME: Record<string, string> = {
   consumer: "/shop",
 };
 
+/** Safe in-app path only; role-checked for admin vs merchant. */
+function postLoginPath(role: string, redirectParam: string | null): string {
+  const home = ROLE_HOME[role] ?? "/shop";
+  if (!redirectParam || !redirectParam.startsWith("/") || redirectParam.startsWith("//")) {
+    return home;
+  }
+  const path = redirectParam.split("?")[0] ?? redirectParam;
+  if (path.startsWith("/dashboard/admin") || path.startsWith("/dashboard/ceo") || path.startsWith("/dashboard/cto")) {
+    if (role === "ceo" || role === "cto") return path;
+    return home;
+  }
+  if (path.startsWith("/dashboard/merchant")) {
+    if (role === "merchant") return path;
+    return home;
+  }
+  if (path === "/dashboard") return home;
+  if (path.startsWith("/dashboard")) return home;
+  return home;
+}
+
 export function LoginPage() {
   const { signInWithEmail, role } = useAuth();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const redirectParam = useMemo(() => searchParams.get("redirect"), [searchParams]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,16 +49,16 @@ export function LoginPage() {
   // After login, wait for the auth state to propagate the role, then navigate.
   useEffect(() => {
     if (loginSuccess && role) {
-      navigate(ROLE_HOME[role] ?? "/shop", { replace: true });
+      navigate(postLoginPath(role, redirectParam), { replace: true });
     }
-  }, [loginSuccess, role, navigate]);
+  }, [loginSuccess, role, navigate, redirectParam]);
 
   // If already logged in, redirect immediately.
   useEffect(() => {
     if (role) {
-      navigate(ROLE_HOME[role] ?? "/shop", { replace: true });
+      navigate(postLoginPath(role, redirectParam), { replace: true });
     }
-  }, [role, navigate]);
+  }, [role, navigate, redirectParam]);
 
   const handleEmailLogin = async (e: React.FormEvent) => {
     e.preventDefault();

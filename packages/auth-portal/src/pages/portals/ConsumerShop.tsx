@@ -4,6 +4,7 @@ import { ShopShell } from '../../components/layout/ShopShell';
 import { useAuth } from '../../context/AuthContext';
 import { EmptyState } from '../../components/shared/EmptyState';
 import { Toast } from '../../components/shared/Toast';
+import { apiBase } from '../../lib/config';
 import { CheckCircle2, Heart, Package, Search, ShoppingCart, Star, X } from 'lucide-react';
 
 interface Product {
@@ -47,8 +48,6 @@ export const ConsumerShop: React.FC = () => {
   const [minScore, setMinScore] = useState(0);
   const [products, setProducts] = useState<Product[]>([]);
   const [toast, setToast] = useState<{ message: string; type: 'success' | 'error' | 'info' } | null>(null);
-  const apiBase = import.meta.env.VITE_API_BASE_URL || (import.meta.env.DEV ? 'http://localhost:3000' : '');
-
   const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3000);

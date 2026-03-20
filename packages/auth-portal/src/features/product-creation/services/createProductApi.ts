@@ -21,6 +21,10 @@ export async function submitProductForm(
   authToken?: string | null,
 ): Promise<SubmitProductResult> {
   try {
+    const pc = form.price_cents;
+    if (typeof pc !== 'number' || !Number.isInteger(pc) || pc < 1) {
+      return { success: false, error: 'Enter a valid price in Rands (e.g. 150 for R150.00).' };
+    }
     const bearer = authToken ?? getMerchantToken();
     const response = await fetch(`${apiBase}/v1/merchant/products`, {
       method: 'POST',

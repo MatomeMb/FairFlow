@@ -205,6 +205,16 @@ export async function findMerchantProductByThingHash(thingHash: string): Promise
   }
 }
 
+/** Includes archived rows — for public thing JSON and checkout guards. */
+export async function findMerchantProductByThingHashAnyStatus(thingHash: string): Promise<MerchantProduct | null> {
+  try {
+    const products = await readProducts();
+    return products.find((p) => p.thing_file?.hash === thingHash) ?? null;
+  } catch {
+    return null;
+  }
+}
+
 /** Shape expected by auth-portal ProductPage (GET /thing/:hash.json). */
 export function buildThingJsonFromMerchantProduct(
   product: MerchantProduct,
@@ -264,7 +274,7 @@ export function getConsumerPriceCents(product: MerchantProduct): number {
 
 /** Merchant net amount after platform commission is deducted. */
 export function getMerchantPriceCents(product: MerchantProduct): number {
-  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.06');
+  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.03');
   return Math.round(product.price_cents * (1 - commissionRate));
 }
 
@@ -339,8 +349,17 @@ merchantProductsRouter.post('/', async (c) => {
   const title = typeof (body as Record<string, unknown>).title === 'string'
     ? ((body as Record<string, unknown>).title as string).trim()
     : '';
-  const priceRaw = (body as Record<string, unknown>).price_cents ?? (body as Record<string, unknown>).price;
-  const priceCents = typeof priceRaw === 'number' ? Math.max(0, Math.floor(priceRaw)) : 0;
+  const priceCentsRaw = (body as Record<string, unknown>).price_cents;
+  if (typeof priceCentsRaw !== 'number' || !Number.isInteger(priceCentsRaw) || priceCentsRaw < 1) {
+    return c.json(
+      err(
+        'invalid_product',
+        'price_cents must be a positive integer (amount in cents, e.g. 15000 for R150.00)',
+      ),
+      400,
+    );
+  }
+  const priceCents = priceCentsRaw;
   const currency = typeof (body as Record<string, unknown>).currency === 'string'
     ? ((body as Record<string, unknown>).currency as string).toUpperCase().slice(0, 3)
     : 'ZAR';
@@ -501,7 +520,12 @@ merchantProductsRouter.patch('/:id', async (c) => {
   const product = rowToProduct(existingData as MerchantProductRow);
   const updates = body as Record<string, unknown>;
   if (typeof updates.title === 'string') product.title = updates.title.trim();
-  if (typeof updates.price_cents === 'number') product.price_cents = Math.max(0, Math.floor(updates.price_cents));
+  if (typeof updates.price_cents === 'number') {
+    if (!Number.isInteger(updates.price_cents) || updates.price_cents < 1) {
+      return c.json(err('invalid_product', 'price_cents must be a positive integer (cents)'), 400);
+    }
+    product.price_cents = updates.price_cents;
+  }
   if (typeof updates.currency === 'string') product.currency = updates.currency.toUpperCase().slice(0, 3);
   if (updates.status === 'draft' || updates.status === 'published') product.status = updates.status;
   if (typeof updates.stock_count === 'number') product.stock_count = Math.max(0, Math.floor(updates.stock_count));
@@ -580,5 +604,5 @@ merchantProductsRouter.delete('/:id', async (c) => {
     return c.json(err('not_found', 'Product not found'), 404);
   }
 
-  return c.json({ ok: true }, 200);
+  return c.json({ ok: true, archived: true }, 200);
 });

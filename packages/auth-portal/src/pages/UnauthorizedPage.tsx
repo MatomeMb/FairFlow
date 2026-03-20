@@ -1,9 +1,18 @@
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
+const ROLE_HOME: Record<string, string> = {
+  ceo: "/dashboard/admin",
+  cto: "/dashboard/admin",
+  merchant: "/dashboard/merchant",
+  investor: "/dashboard/investor",
+  consumer: "/shop",
+};
+
 export function UnauthorizedPage() {
   const navigate = useNavigate();
   const { role, signOut } = useAuth();
+  const homeForRole = role ? (ROLE_HOME[role] ?? "/") : "/";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[var(--ff-bg)] px-4">
@@ -20,12 +29,14 @@ export function UnauthorizedPage() {
         )}
         <div className="flex gap-3">
           <button
-            onClick={() => navigate("/")}
+            type="button"
+            onClick={() => navigate(homeForRole)}
             className="flex-1 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] text-[var(--ff-on-accent)] font-medium py-3 rounded-xl transition"
           >
-            Go to Dashboard
+            {role ? "Go to your portal" : "Home"}
           </button>
           <button
+            type="button"
             onClick={signOut}
             className="flex-1 rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] py-3 font-medium text-[var(--ff-ink)] transition hover:brightness-95"
           >

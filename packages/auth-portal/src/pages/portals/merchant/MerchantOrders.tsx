@@ -20,7 +20,34 @@ interface MerchantOrdersProps {
   authToken: string | null;
 }
 
-const PAYMENT_BADGE: Record<string, { label: string; className: string }> = {
+/** Checkout / charge outcome */
+function checkoutPaymentBadge(order: MerchantOrder): { label: string; className: string } {
+  const s = order.status?.toLowerCase();
+  if (s === 'failed' || s === 'refunded') {
+    return { label: 'Failed', className: 'bg-[var(--ff-error-subtle)] text-[var(--ff-error)]' };
+  }
+  if (s === 'paid') {
+    return { label: 'Paid', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]' };
+  }
+  return { label: 'Pending', className: 'bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/35' };
+}
+
+function fulfillmentStateBadge(order: MerchantOrder): { label: string; className: string } {
+  const f = order.fulfillment_status;
+  if (f === 'fulfilled' || f === 'delivered') {
+    return { label: 'Fulfilled', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' };
+  }
+  if (f === 'shipped') {
+    return { label: 'Shipped', className: 'bg-[var(--ff-info-subtle)] text-[var(--ff-info)]' };
+  }
+  return {
+    label: 'Pending',
+    className: 'bg-sky-500/20 text-sky-100 ring-1 ring-sky-400/30',
+  };
+}
+
+/** MoR / escrow state (distinct from checkout paid) */
+const PAYOUT_STATUS_BADGE: Record<string, { label: string; className: string }> = {
   held: { label: 'Held', className: 'bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/35' },
   shipped: { label: 'Shipped', className: 'bg-[var(--ff-info-subtle)] text-[var(--ff-info)]' },
   confirmed: { label: 'Confirmed', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' },
@@ -36,7 +63,7 @@ export function MerchantOrders({
   uploadingSlipOrderId,
   commissionRate: _commissionRate,
   onDismissOrdersError,
-  onMarkAsFulfilled: _onMarkAsFulfilled,
+  onMarkAsFulfilled,
   onUploadSlip,
   onMarkAsShipped,
   onDeliveryDateSaved,
@@ -99,42 +126,115 @@ export function MerchantOrders({
                   <p className="text-sm text-[var(--ff-ink-muted)]">Ordered: {new Date(order.created_at).toLocaleString('en-ZA', { dateStyle: 'medium', timeStyle: 'short' })}</p>
                 </div>
 
-                <div className="flex items-center gap-2">
-                  {order.payment_status && PAYMENT_BADGE[order.payment_status] && (
-                    <span className={`text-xs px-2 py-1 rounded ${PAYMENT_BADGE[order.payment_status].className}`}>
-                      {PAYMENT_BADGE[order.payment_status].label}
-                    </span>
-                  )}
-                  {(order.fulfillment_status === 'shipped' || order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered') ? (
-                    <span className="text-xs px-2 py-1 rounded bg-[var(--ff-success-subtle)] text-[var(--ff-success)]">Shipped ✓</span>
-                  ) : (
-                    <div className="flex gap-2">
-                      <label className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-3 text-xs font-medium text-[var(--ff-ink)] hover:brightness-95">
-                        <Upload className="w-4 h-4" />
-                        {order.shipment_slip_url ? 'Slip uploaded' : 'Upload slip'}
-                        <input
-                          type="file"
-                          accept=".pdf,.jpg,.jpeg,.png"
-                          className="hidden"
-                          disabled={uploadingSlipOrderId === order.id}
-                          onChange={(e) => {
-                            const f = e.target.files?.[0];
-                            if (f) onUploadSlip(order.id, f);
-                            e.target.value = '';
-                          }}
-                        />
-                      </label>
-                      <button
-                        onClick={() => order.shipment_slip_url && onMarkAsShipped(order.id, order.shipment_slip_url)}
-                        disabled={!order.shipment_slip_url || fulfillingOrderId === order.id}
-                        title={!order.shipment_slip_url ? 'Upload shipment slip first' : ''}
-                        className="flex min-h-[44px] items-center gap-2 rounded-lg bg-[var(--ff-cta)] px-4 py-3 text-xs font-semibold text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-[var(--ff-ink-muted)] disabled:ring-1 disabled:ring-white/15"
+                <div className="flex flex-col items-end gap-2">
+                  <div className="flex flex-wrap justify-end gap-2">
+                    {(() => {
+                      const pb = checkoutPaymentBadge(order);
+                      return (
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${pb.className}`} title="Checkout charge">
+                          Payment: {pb.label}
+                        </span>
+                      );
+                    })()}
+                    {(() => {
+                      const fb = fulfillmentStateBadge(order);
+                      return (
+                        <span className={`text-xs px-2 py-1 rounded font-medium ${fb.className}`} title="Delivery / fulfilment">
+                          Fulfilment: {fb.label}
+                        </span>
+                      );
+                    })()}
+                    {order.payment_status && PAYOUT_STATUS_BADGE[order.payment_status] && (
+                      <span
+                        className={`text-xs px-2 py-1 rounded ${PAYOUT_STATUS_BADGE[order.payment_status].className}`}
+                        title="Payout / escrow"
                       >
-                        <Truck className="w-4 h-4" />
-                        {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Shipped'}
-                      </button>
-                    </div>
-                  )}
+                        Payout: {PAYOUT_STATUS_BADGE[order.payment_status].label}
+                      </span>
+                    )}
+                  </div>
+
+                  {(() => {
+                    const paymentFailed =
+                      order.status === 'failed' || order.status === 'refunded';
+                    const checkoutPaid =
+                      order.status === 'paid' || order.payment_status === 'held';
+                    const fulfillmentPending =
+                      order.fulfillment_status === 'pending' || !order.fulfillment_status;
+                    const shippedOrDone =
+                      order.fulfillment_status === 'shipped' ||
+                      order.fulfillment_status === 'fulfilled' ||
+                      order.fulfillment_status === 'delivered';
+                    const showFulfilmentActions =
+                      checkoutPaid && !paymentFailed && fulfillmentPending && !shippedOrDone;
+
+                    if (paymentFailed) {
+                      return (
+                        <p className="text-xs text-[var(--ff-error)] max-w-xs text-right">
+                          Payment did not complete — no fulfilment actions.
+                        </p>
+                      );
+                    }
+
+                    if (shippedOrDone) {
+                      return (
+                        <span className="text-xs text-[var(--ff-success)]">
+                          {order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered'
+                            ? 'Order marked fulfilled'
+                            : 'Shipped — awaiting customer confirmation'}
+                        </span>
+                      );
+                    }
+
+                    if (!showFulfilmentActions) {
+                      return (
+                        <span className="text-xs text-[var(--ff-ink-muted)]">
+                          Awaiting successful payment before you can fulfil.
+                        </span>
+                      );
+                    }
+
+                    return (
+                      <div className="flex flex-col items-end gap-2">
+                        {/* Proof-of-delivery: upload slip, then Mark as Shipped (MoR / payout flow). */}
+                        <div className="flex flex-wrap justify-end gap-2">
+                          <label className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-3 text-xs font-medium text-[var(--ff-ink)] hover:brightness-95">
+                            <Upload className="w-4 h-4" />
+                            {order.shipment_slip_url ? 'Slip uploaded' : 'Upload slip'}
+                            <input
+                              type="file"
+                              accept=".pdf,.jpg,.jpeg,.png"
+                              className="hidden"
+                              disabled={uploadingSlipOrderId === order.id}
+                              onChange={(e) => {
+                                const f = e.target.files?.[0];
+                                if (f) onUploadSlip(order.id, f);
+                                e.target.value = '';
+                              }}
+                            />
+                          </label>
+                          <button
+                            type="button"
+                            onClick={() => order.shipment_slip_url && onMarkAsShipped(order.id, order.shipment_slip_url)}
+                            disabled={!order.shipment_slip_url || fulfillingOrderId === order.id}
+                            title={!order.shipment_slip_url ? 'Upload shipment slip first' : ''}
+                            className="flex min-h-[44px] items-center gap-2 rounded-lg bg-[var(--ff-cta)] px-4 py-3 text-xs font-semibold text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-[var(--ff-ink-muted)] disabled:ring-1 disabled:ring-white/15"
+                          >
+                            <Truck className="w-4 h-4" />
+                            {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Shipped'}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => onMarkAsFulfilled(order.id)}
+                            disabled={fulfillingOrderId === order.id}
+                            className="flex min-h-[44px] items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-white/5 px-4 py-3 text-xs font-semibold text-[var(--ff-ink)] transition hover:bg-white/10 disabled:opacity-50"
+                          >
+                            {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Fulfilled'}
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })()}
                 </div>
               </div>
 

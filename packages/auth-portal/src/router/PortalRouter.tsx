@@ -39,7 +39,7 @@ function AuthRedirect() {
       </div>
     );
   }
-  if (!role) return <Navigate to="/login" replace />;
+  if (!role) return <Navigate to={`/login?redirect=${encodeURIComponent("/dashboard")}`} replace />;
   return <Navigate to={ROLE_HOME[role] ?? "/shop"} replace />;
 }
 

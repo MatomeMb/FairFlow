@@ -83,6 +83,9 @@ export function MerchantNotifications({
                 <div className="flex items-start gap-3 min-w-0">
                   <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
                   <div className="min-w-0">
+                    <p className="text-[10px] uppercase tracking-wide text-[var(--ff-ink-muted)]">
+                      {(notification.type ?? 'notice').replace(/_/g, ' ')}
+                    </p>
                     <p className={`text-sm ${notification.read ? 'text-[var(--ff-ink)]' : 'text-[var(--ff-ink)] font-semibold'}`}>{notification.title}</p>
                     <p className="text-xs text-[var(--ff-ink-muted)] mt-1">{notification.message}</p>
                     <p className="text-xs text-[var(--ff-ink-muted)] mt-2">{formatRelativeTime(notification.created_at)}</p>

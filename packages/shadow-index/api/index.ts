@@ -38,6 +38,7 @@ import {
   getConsumerPriceCents,
   getMerchantPriceCents,
   findMerchantProductByThingHash,
+  findMerchantProductByThingHashAnyStatus,
   buildThingJsonFromMerchantProduct,
   type MerchantProduct,
 } from './merchant-products.js';
@@ -901,7 +902,7 @@ async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
   }
 
   const grossAmount = typeof order.amount === 'number' ? order.amount : 0;
-  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.06');
+  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.03');
   const commissionAmount = Math.round(grossAmount * commissionRate);
   const netAmount = grossAmount - commissionAmount;
 
@@ -2743,6 +2744,20 @@ app.get('/gist/:hash', async (c) => {
   });
 });
 
+/** If this hash is an archived merchant row, mark JSON so the storefront hides checkout. */
+async function mergeArchivedListingFlag(thing: unknown, thingHash: string): Promise<unknown> {
+  const mp = await findMerchantProductByThingHashAnyStatus(thingHash);
+  if (mp?.status !== 'archived') return thing;
+  if (!thing || typeof thing !== 'object') return thing;
+  const obj = { ...(thing as Record<string, unknown>) };
+  const meta = obj.metadata;
+  obj.metadata =
+    meta && typeof meta === 'object'
+      ? { ...(meta as Record<string, unknown>), fairflow_listing: 'archived' }
+      : { fairflow_listing: 'archived' };
+  return obj;
+}
+
 // Get full thing file (product detail) by hash
 app.get('/thing/:hash', async (c) => {
   let hash = c.req.param('hash');
@@ -2754,8 +2769,9 @@ app.get('/thing/:hash', async (c) => {
   try {
     const content = await fs.readFile(jsonPath, 'utf8');
     const thing = JSON.parse(content);
+    const merged = await mergeArchivedListingFlag(thing, hash);
     c.header('Content-Type', 'application/json');
-    return c.json(thing);
+    return c.json(merged);
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
     if (nodeError.code !== 'ENOENT') {
@@ -2772,17 +2788,22 @@ app.get('/thing/:hash', async (c) => {
     const content = await fs.readFile(thingPath, 'utf8');
     const parsed = JSON.parse(content) as Record<string, unknown>;
     if (parsed && typeof parsed === 'object' && 'product' in parsed && 'commerce' in parsed) {
+      const merged = (await mergeArchivedListingFlag(parsed, hash)) as Record<string, unknown>;
       c.header('Content-Type', 'application/json');
-      return c.json(parsed);
+      return c.json(merged);
     }
   } catch {
     // continue to Supabase fallback
   }
 
   // Merchant dashboard creates hashes in Supabase only — no local file on Vercel
-  const merchantProduct = await findMerchantProductByThingHash(hash);
-  if (merchantProduct) {
-    const body = buildThingJsonFromMerchantProduct(merchantProduct, hash);
+  const mpAny = await findMerchantProductByThingHashAnyStatus(hash);
+  if (mpAny) {
+    const body = buildThingJsonFromMerchantProduct(mpAny, hash);
+    if (mpAny.status === 'archived') {
+      const meta = (body.metadata ?? {}) as Record<string, unknown>;
+      body.metadata = { ...meta, fairflow_listing: 'archived' };
+    }
     c.header('Content-Type', 'application/json');
     return c.json(body);
   }
@@ -3288,6 +3309,11 @@ app.post('/checkout/create-session', async (c) => {
       return c.json(err('invalid_request', 'Missing product_hash or product_id'), 400);
     }
 
+    const rowAny = await findMerchantProductByThingHashAnyStatus(hash);
+    if (rowAny?.status === 'archived') {
+      return c.json(err('product_archived', 'This product is no longer available for purchase'), 409);
+    }
+
     let product: MerchantProduct | null = await findMerchantProductByThingHash(hash);
     if (!product) {
       const products = await readProducts();
@@ -3299,7 +3325,7 @@ app.post('/checkout/create-session', async (c) => {
     }
 
     if ((product.stock_count ?? 0) <= 0) {
-      return c.json(err('out_of_stock', 'This product is out of stock'), 400);
+      return c.json(err('out_of_stock', 'This product is out of stock'), 409);
     }
 
     const consumerPriceCents = getConsumerPriceCents(product);
@@ -3457,48 +3483,79 @@ async function ensureOrderFromPaystackChargePayload(
 
   const products = await readProducts();
   const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
-  if (product) {
-    const stockBefore = product.stock_count ?? 0;
-    const stockAfter = Math.max(0, stockBefore - 1);
+  let stockAfter: number | null = null;
+  let stockBefore = 0;
+
+  if (product?.id && product.merchant_id) {
+    stockBefore = product.stock_count ?? 0;
+    if (stockBefore > 0) {
+      const { data: updatedRow, error: stockErr } = await db
+        .from('merchant_products')
+        .update({ stock_count: stockBefore - 1, updated_at: now })
+        .eq('id', product.id)
+        .eq('merchant_id', product.merchant_id)
+        .eq('stock_count', stockBefore)
+        .select('stock_count')
+        .maybeSingle();
+
+      if (
+        !stockErr &&
+        updatedRow &&
+        typeof (updatedRow as { stock_count?: number }).stock_count === 'number'
+      ) {
+        stockAfter = (updatedRow as { stock_count: number }).stock_count;
+        product.stock_count = stockAfter;
+        product.updated_at = now;
+        await writeProducts(products);
+      }
+    }
+  } else if (product) {
+    stockBefore = product.stock_count ?? 0;
+    stockAfter = Math.max(0, stockBefore - 1);
     product.stock_count = stockAfter;
     product.updated_at = now;
     await writeProducts(products);
+  }
 
-    if (product.merchant_id && product.id) {
-      await db.from('inventory_logs').insert({
-        product_id: product.id,
+  if (product?.merchant_id && product.id && stockAfter !== null) {
+    await db.from('inventory_logs').insert({
+      product_id: product.id,
+      merchant_id: product.merchant_id,
+      transaction_type: 'order',
+      quantity_change: -1,
+      stock_before: stockBefore,
+      stock_after: stockAfter,
+      reference_id: orderId,
+    });
+
+    if (stockAfter < 5) {
+      const notifs = await loadNotifications();
+      const lowTitle = stockAfter === 0 ? `Sold out: ${product.title}` : `Low stock: ${product.title}`;
+      const lowMsg =
+        stockAfter === 0
+          ? `${product.title} is now out of stock.`
+          : `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`;
+      notifs.push({
+        id: crypto.randomUUID(),
         merchant_id: product.merchant_id,
-        transaction_type: 'order',
-        quantity_change: -1,
-        stock_before: stockBefore,
-        stock_after: stockAfter,
-        reference_id: orderId,
+        type: 'low_stock',
+        title: lowTitle,
+        message: lowMsg,
+        read: false,
+        created_at: now,
       });
+      await saveNotifications(notifs);
 
-      if (stockAfter < 5) {
-        const notifs = await loadNotifications();
-        notifs.push({
-          id: crypto.randomUUID(),
-          merchant_id: product.merchant_id,
-          type: 'low_stock',
-          title: `Low stock: ${product.title}`,
-          message: `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`,
-          read: false,
-          created_at: now,
-        });
-        await saveNotifications(notifs);
-
-        const merchantAccounts = await loadMerchantAccounts();
-        const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
-        if (merchant?.email) {
-          sendLowStockWarning({
-            merchantEmail: merchant.email,
-            merchantBusinessName: merchant.business_name,
-            productTitle: product.title,
-            stockCount: stockAfter,
-            productImageUrl: product.image_url,
-          }).catch((error) => console.error('[Stock] Low stock email error:', error));
-        }
+      const merchantAccounts = await loadMerchantAccounts();
+      const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
+      if (merchant?.email) {
+        sendLowStockWarning({
+          merchantEmail: merchant.email,
+          merchantBusinessName: merchant.business_name,
+          productTitle: product.title,
+          stockCount: stockAfter,
+          productImageUrl: product.image_url,
+        }).catch((error) => logger.warn('Low stock email failed', { error: String(error) }));
       }
     }
   }
@@ -3551,12 +3608,13 @@ async function ensureOrderFromPaystackChargePayload(
   }
 
   const notifs = await loadNotifications();
+  const productTitle = product?.title ?? 'Product';
   notifs.push({
     id: crypto.randomUUID(),
-    merchant_id: merchantId,
-    type: 'order',
-    title: 'New order received',
-    message: `Order #${orderId.slice(0, 8)} for ${consumerPriceCents / 100} ${orderCurrency}. Delivery: ${deliveryAddress.name ?? ''} - ${deliveryAddress.line1 ?? ''}`,
+    merchant_id: merchantId || product?.merchant_id || '',
+    type: 'order_received',
+    title: `New order: ${productTitle}`,
+    message: `Customer ${customerEmail || '—'} · ${productTitle} · ${orderCurrency} ${(consumerPriceCents / 100).toFixed(2)}`,
     read: false,
     created_at: now,
   });
