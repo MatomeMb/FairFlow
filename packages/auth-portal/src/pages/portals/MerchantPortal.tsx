@@ -780,6 +780,7 @@ export const MerchantPortal: React.FC = () => {
         isOpen={showCreateModal}
         onClose={handleCloseCreateModal}
         onCreated={handleCreatedProduct}
+        token={authToken}
       />
 
       {toast && <Toast message={toast.message} type={toast.type} onDismiss={() => setToast(null)} />}

@@ -2,7 +2,7 @@ import type { CreateProductModalProps, FormState } from '../features/product-cre
 import { PRODUCT_TEMPLATES, CATEGORY_OPTIONS, CERTIFICATION_OPTIONS } from '../features/product-creation/config/productTemplates';
 import { useCreateProductForm } from '../features/product-creation/hooks/useCreateProductForm';
 
-export default function CreateProductModal({ isOpen, onClose, onCreated }: CreateProductModalProps) {
+export default function CreateProductModal({ isOpen, onClose, onCreated, token }: CreateProductModalProps & { token?: string | null }) {
   const {
     form, errors, submitError, isSubmitting, isUploadingImage,
     imageUploadError, selectedImageName, step, successPayload,
@@ -11,7 +11,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated }: Creat
     handleImageFileUpload, handleSubmit, handleCopy,
     handleCreateAnother, handleDone,
     clearImageSelection, clearTemplateSelection,
-  } = useCreateProductForm({ isOpen, onCreated, onClose });
+  } = useCreateProductForm({ isOpen, onCreated, onClose, token });
 
   const productPageUrl = `${window.location.origin}/product/${successPayload?.hash}`;
 

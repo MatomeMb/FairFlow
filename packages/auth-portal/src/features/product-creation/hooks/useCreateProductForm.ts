@@ -107,6 +107,7 @@ export function useCreateProductForm({ isOpen, onCreated, onClose, token }: UseC
     setIsUploadingImage(true);
     setField('image_url', '');
     setErrors((prev) => ({ ...prev, image_url: undefined }));
+    console.log('[upload-debug] token received:', token);
     if (!token) {
       setImageUploadError('Authentication token missing. Please refresh and try again.');
       setIsUploadingImage(false);
