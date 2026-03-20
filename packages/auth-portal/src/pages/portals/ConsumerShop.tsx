@@ -144,7 +144,7 @@ export const ConsumerShop: React.FC = () => {
                 placeholder="Search products..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-white pl-8 pr-3 text-xs text-[var(--ff-ink)] placeholder:text-[var(--ff-ink-muted)] focus:outline-none focus:border-[var(--ff-accent)]"
+                className="h-8 w-56 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] pl-8 pr-3 text-xs text-[var(--ff-ink)] placeholder:text-[var(--ff-ink-muted)] focus:outline-none focus:border-[var(--ff-accent)]"
               />
             </div>
           </div>
@@ -160,7 +160,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={selectedCategory || ''}
                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm text-[var(--ff-ink)]"
               >
                 <option value="">All Categories</option>
                 {categories.map(cat => (
@@ -174,7 +174,7 @@ export const ConsumerShop: React.FC = () => {
               <select
                 value={minScore}
                 onChange={(e) => setMinScore(parseInt(e.target.value))}
-                className="w-full rounded-lg border border-[var(--ff-border)] bg-white px-4 py-2 text-sm text-[var(--ff-ink)]"
+                className="w-full rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-2 text-sm text-[var(--ff-ink)]"
               >
                 <option value="0">Any Score</option>
                 <option value="3">3+ Stars</option>
@@ -214,7 +214,7 @@ export const ConsumerShop: React.FC = () => {
               <div className="p-4 space-y-3">
                 <div className="flex items-start justify-between gap-2">
                   <div className="flex-1">
-                    <h3 className="font-bold group-hover:text-emerald-400 transition">{product.name}</h3>
+                    <h3 className="font-bold text-[var(--ff-ink)] group-hover:text-emerald-400 transition">{product.name}</h3>
                     <p className="mt-1 font-mono text-xs text-[var(--ff-ink-muted)]">{product.merchant}</p>
                   </div>
                   <button
@@ -244,7 +244,7 @@ export const ConsumerShop: React.FC = () => {
                   <span className="text-lg font-bold text-[var(--ff-ink)]">R {product.price.toFixed(2)}</span>
                   <button
                     onClick={() => handleBuyClick(product)}
-                    className="flex items-center gap-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs font-medium text-white transition hover:bg-[var(--ff-cta-hover)] focus:ring-2 focus:ring-[var(--ff-focus)]/50"
+                    className="flex items-center gap-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs font-semibold text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] focus:ring-2 focus:ring-[var(--ff-focus)]/50"
                   >
                     <ShoppingCart className="w-3 h-3" /> Buy
                   </button>
@@ -261,26 +261,26 @@ export const ConsumerShop: React.FC = () => {
 
       {/* How It Works */}
       <div className="rounded-xl border border-[var(--ff-border)] bg-[#1A2D42] p-8">
-        <h3 className="text-2xl font-bold mb-8 text-center">How It Works</h3>
+        <h3 className="text-2xl font-bold mb-8 text-center text-[var(--ff-ink)]">How It Works</h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
           <div className="text-center">
             <Search className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
-            <h4 className="font-bold mb-2">Discover</h4>
+            <h4 className="font-bold mb-2 text-[var(--ff-ink)]">Discover</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Browse our curated selection of ethical products from trusted merchants</p>
           </div>
           <div className="text-center">
             <CheckCircle2 className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
-            <h4 className="font-bold mb-2">Verify</h4>
+            <h4 className="font-bold mb-2 text-[var(--ff-ink)]">Verify</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Check ethical scores and certifications for transparency</p>
           </div>
           <div className="text-center">
             <ShoppingCart className="w-8 h-8 mx-auto mb-3 text-emerald-500" />
-            <h4 className="font-bold mb-2">Purchase</h4>
+            <h4 className="font-bold mb-2 text-[var(--ff-ink)]">Purchase</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Buy directly with secure Paystack checkout</p>
           </div>
           <div className="text-center">
             <Heart className="w-8 h-8 mx-auto mb-3 text-emerald-500 fill-current" />
-            <h4 className="font-bold mb-2">Impact</h4>
+            <h4 className="font-bold mb-2 text-[var(--ff-ink)]">Impact</h4>
             <p className="text-sm text-[var(--ff-ink-muted)]">Support merchants changing the world, one ethical choice at a time</p>
           </div>
         </div>
@@ -305,10 +305,10 @@ export const ConsumerShop: React.FC = () => {
                     {getProductIcon()}
                   </div>
                   <div className="p-4">
-                    <h3 className="font-bold mb-2">{product.name}</h3>
+                    <h3 className="font-bold mb-2 text-[var(--ff-ink)]">{product.name}</h3>
                     <p className="mb-3 text-xs text-[var(--ff-ink-muted)]">{product.merchant}</p>
                     <div className="flex items-center justify-between">
-                      <span className="font-bold font-mono">R {product.price.toFixed(2)}</span>
+                      <span className="font-bold font-mono text-[var(--ff-ink)]">R {product.price.toFixed(2)}</span>
                       <button
                         onClick={() => toggleWishlist(product.id)}
                         className="text-red-500 hover:text-red-600 transition focus:ring-2 focus:ring-emerald-500/50 rounded-lg"
@@ -328,33 +328,33 @@ export const ConsumerShop: React.FC = () => {
 
   const renderAccount = () => (
     <div className="space-y-6">
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-6">
-        <h3 className="font-bold mb-4">Account Info</h3>
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] p-6">
+        <h3 className="font-bold mb-4 text-[var(--ff-ink)]">Account Info</h3>
         <div className="space-y-3">
-          <div className="flex justify-between">
+          <div className="flex justify-between gap-4">
             <span className="text-[var(--ff-ink-muted)]">Name</span>
-            <span>{user?.name || user?.email}</span>
+            <span className="text-[var(--ff-ink)] text-right">{user?.name || user?.email}</span>
           </div>
-          <div className="flex justify-between border-t border-[var(--ff-border)] pt-3">
+          <div className="flex justify-between gap-4 border-t border-[var(--ff-border)] pt-3">
             <span className="text-[var(--ff-ink-muted)]">Email</span>
-            <span className="font-mono text-sm break-all">{user?.email}</span>
+            <span className="font-mono text-sm break-all text-[var(--ff-ink)] text-right">{user?.email}</span>
           </div>
-          <div className="flex justify-between border-t border-[var(--ff-border)] pt-3">
+          <div className="flex justify-between gap-4 border-t border-[var(--ff-border)] pt-3">
             <span className="text-[var(--ff-ink-muted)]">Role</span>
-            <span className="capitalize text-teal-500">{user?.role}</span>
+            <span className="capitalize text-[var(--ff-success)]">{user?.role}</span>
           </div>
         </div>
       </div>
 
-      <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-6">
-        <h3 className="font-bold mb-4">Preferences</h3>
+      <div className="rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] p-6">
+        <h3 className="font-bold mb-4 text-[var(--ff-ink)]">Preferences</h3>
         <div className="space-y-3">
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" defaultChecked className="w-4 h-4" />
+          <label className="flex items-center gap-3 cursor-pointer text-[var(--ff-ink)]">
+            <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[var(--ff-border)] text-[var(--ff-cta)] focus:ring-[var(--ff-focus)]" />
             <span className="text-sm">Email me about new products</span>
           </label>
-          <label className="flex items-center gap-3 cursor-pointer">
-            <input type="checkbox" defaultChecked className="w-4 h-4" />
+          <label className="flex items-center gap-3 cursor-pointer text-[var(--ff-ink)]">
+            <input type="checkbox" defaultChecked className="h-4 w-4 rounded border-[var(--ff-border)] text-[var(--ff-cta)] focus:ring-[var(--ff-focus)]" />
             <span className="text-sm">Share my ethical score publicly</span>
           </label>
         </div>

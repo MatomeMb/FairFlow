@@ -213,7 +213,7 @@ export function MerchantRegister() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-white transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-neutral-muted)]"
+              className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-neutral-muted)]"
             >
               {isLoading ? "Creating account..." : "Create Account"}
             </button>

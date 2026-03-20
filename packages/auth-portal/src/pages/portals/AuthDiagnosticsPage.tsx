@@ -166,7 +166,7 @@ export function AuthDiagnosticsPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-white hover:bg-[var(--ff-cta-hover)] disabled:opacity-50"
+              className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-[var(--ff-on-accent)] hover:bg-[var(--ff-cta-hover)] disabled:opacity-50"
             >
               {loading ? "Testing..." : "Run Auth Check"}
             </button>

@@ -188,7 +188,7 @@ export function MerchantLogin() {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-white transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
+            className="w-full rounded-xl bg-[var(--ff-cta)] py-3 font-medium text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
           >
             {isLoading ? "Signing in..." : "Sign In"}
           </button>
@@ -232,7 +232,7 @@ export function MerchantLogin() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="flex-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs text-white hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
+                className="flex-1 rounded-lg bg-[var(--ff-cta)] px-3 py-2 text-xs font-medium text-[var(--ff-on-accent)] hover:bg-[var(--ff-cta-hover)] disabled:bg-[var(--ff-cta-active)]/60"
               >
                 Send reset link
               </button>

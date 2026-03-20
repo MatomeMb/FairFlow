@@ -68,7 +68,7 @@ export function ConfirmReceipt() {
               <button
                 onClick={handleConfirm}
                 disabled={loading}
-                className="w-full bg-[var(--ff-cta)] text-white font-semibold py-4 px-6 rounded-lg hover:bg-[var(--ff-cta-hover)] active:bg-[var(--ff-cta-active)] disabled:bg-[var(--ff-neutral-muted)] disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+                className="w-full bg-[var(--ff-cta)] text-[var(--ff-on-accent)] font-semibold py-4 px-6 rounded-lg hover:bg-[var(--ff-cta-hover)] active:bg-[var(--ff-cta-active)] disabled:bg-[var(--ff-neutral-muted)] disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
                 {loading ? (
                   <>

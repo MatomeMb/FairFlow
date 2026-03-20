@@ -26,6 +26,32 @@
   --ff-accent-light: rgba(170,255,69,0.15);
   --ff-accent-warm: #AAFF45;
   --ff-border: rgba(255,255,255,0.07);
+  /* Used across merchant/admin shells (were undefined → broken contrast on CTAs/cards) */
+  --ff-cta: #aaff45;
+  --ff-cta-hover: #95e830;
+  --ff-cta-active: #7bc922;
+  --ff-on-accent: #0d1b2a;
+  --ff-focus: #aaff45;
+  --ff-neutral: #ffffff;
+  --ff-neutral-bold: #e8eef4;
+  --ff-neutral-muted: #94a3b8;
+  --ff-neutral-subtle: rgba(255, 255, 255, 0.08);
+  --ff-form-text: #e8eef4;
+  --ff-border-light: rgba(255, 255, 255, 0.12);
+  --ff-border-mid: rgba(255, 255, 255, 0.2);
+  --ff-success: #4ade80;
+  --ff-success-bold: #22c55e;
+  --ff-success-subtle: rgba(74, 222, 128, 0.18);
+  --ff-error: #f87171;
+  --ff-error-bold: #ef4444;
+  --ff-error-subtle: rgba(248, 113, 113, 0.18);
+  --ff-warning: #fbbf24;
+  --ff-warning-bold: #d97706;
+  --ff-warning-subtle: rgba(251, 191, 36, 0.15);
+  --ff-warning-border: rgba(251, 191, 36, 0.35);
+  --ff-info: #38bdf8;
+  --ff-info-bold: #0ea5e9;
+  --ff-info-subtle: rgba(56, 189, 248, 0.18);
 }
 
 body {

@@ -21,11 +21,11 @@ interface MerchantOrdersProps {
 }
 
 const PAYMENT_BADGE: Record<string, { label: string; className: string }> = {
-  held: { label: 'Held', className: 'bg-amber-100 text-amber-800' },
-  shipped: { label: 'Shipped', className: 'bg-[var(--ff-info-subtle)] text-[var(--ff-info-bold)]' },
-  confirmed: { label: 'Confirmed', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]' },
-  released: { label: 'Released', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]' },
-  disputed: { label: 'Disputed', className: 'bg-[var(--ff-error-subtle)] text-[var(--ff-error-bold)]' },
+  held: { label: 'Held', className: 'bg-amber-500/20 text-amber-100 ring-1 ring-amber-400/35' },
+  shipped: { label: 'Shipped', className: 'bg-[var(--ff-info-subtle)] text-[var(--ff-info)]' },
+  confirmed: { label: 'Confirmed', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' },
+  released: { label: 'Released', className: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success)]' },
+  disputed: { label: 'Disputed', className: 'bg-[var(--ff-error-subtle)] text-[var(--ff-error)]' },
 };
 
 export function MerchantOrders({
@@ -61,13 +61,13 @@ export function MerchantOrders({
       )}
 
       {ordersLoading ? (
-        <div className="rounded-xl border border-[var(--ff-border)] bg-white/85 overflow-hidden">
+        <div className="rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] overflow-hidden">
           <table className="w-full text-sm">
             <tbody>
               {[0, 1, 2].map((index) => (
                 <tr key={index} className="border-t border-[var(--ff-border)]">
                   <td colSpan={2} className="py-3 px-4">
-                    <div className="h-4 w-full animate-pulse rounded bg-[var(--ff-surface)]" />
+                    <div className="h-4 w-full animate-pulse rounded bg-white/10" />
                   </td>
                 </tr>
               ))}
@@ -81,7 +81,7 @@ export function MerchantOrders({
           {orders.map((order) => (
             <div
               key={order.id}
-              className="rounded-xl border border-[var(--ff-border)] bg-white/85 p-5"
+              className="rounded-xl border border-[var(--ff-border)] bg-[var(--ff-surface)] p-5"
             >
               <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
                 <div className="space-y-1">
@@ -106,7 +106,7 @@ export function MerchantOrders({
                     </span>
                   )}
                   {(order.fulfillment_status === 'shipped' || order.fulfillment_status === 'fulfilled' || order.fulfillment_status === 'delivered') ? (
-                    <span className="text-xs px-2 py-1 rounded bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]">Shipped ✓</span>
+                    <span className="text-xs px-2 py-1 rounded bg-[var(--ff-success-subtle)] text-[var(--ff-success)]">Shipped ✓</span>
                   ) : (
                     <div className="flex gap-2">
                       <label className="flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg border border-[var(--ff-border)] bg-[var(--ff-surface)] px-4 py-3 text-xs font-medium text-[var(--ff-ink)] hover:brightness-95">
@@ -128,7 +128,7 @@ export function MerchantOrders({
                         onClick={() => order.shipment_slip_url && onMarkAsShipped(order.id, order.shipment_slip_url)}
                         disabled={!order.shipment_slip_url || fulfillingOrderId === order.id}
                         title={!order.shipment_slip_url ? 'Upload shipment slip first' : ''}
-                        className="flex min-h-[44px] items-center gap-2 rounded-lg bg-[var(--ff-cta)] px-4 py-3 text-xs font-medium text-white transition hover:bg-[var(--ff-cta-hover)] disabled:cursor-not-allowed disabled:bg-[var(--ff-cta-active)]/60"
+                        className="flex min-h-[44px] items-center gap-2 rounded-lg bg-[var(--ff-cta)] px-4 py-3 text-xs font-semibold text-[var(--ff-on-accent)] transition hover:bg-[var(--ff-cta-hover)] disabled:cursor-not-allowed disabled:bg-white/10 disabled:text-[var(--ff-ink-muted)] disabled:ring-1 disabled:ring-white/15"
                       >
                         <Truck className="w-4 h-4" />
                         {fulfillingOrderId === order.id ? 'Updating...' : 'Mark as Shipped'}
