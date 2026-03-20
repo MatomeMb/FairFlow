@@ -343,7 +343,7 @@ merchantProductsRouter.post('/', async (c) => {
   const priceCents = typeof priceRaw === 'number' ? Math.max(0, Math.floor(priceRaw)) : 0;
   const currency = typeof (body as Record<string, unknown>).currency === 'string'
     ? ((body as Record<string, unknown>).currency as string).toUpperCase().slice(0, 3)
-    : 'USD';
+    : 'ZAR';
   const imageUrl = typeof (body as Record<string, unknown>).image_url === 'string'
     ? ((body as Record<string, unknown>).image_url as string).trim()
     : '';

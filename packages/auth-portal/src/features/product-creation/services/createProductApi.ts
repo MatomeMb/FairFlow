@@ -32,6 +32,7 @@ export async function submitProductForm(
         title: form.title.trim(),
         description: form.description.trim() || undefined,
         price_cents: form.price_cents,
+        currency: 'ZAR',
         category: form.category,
         stock_count: Number(form.stock_count),
         image_url: form.image_url.trim(),

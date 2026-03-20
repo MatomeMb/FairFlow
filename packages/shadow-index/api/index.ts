@@ -3321,10 +3321,17 @@ app.post('/checkout/create-session', async (c) => {
     };
 
     const paystack = await getPaystack();
+    // fairflow ZA: portal omitted currency for a period → API stored USD; Paystack ZA rejects USD.
+    const rawCurrency = (product.currency || 'ZAR').toUpperCase().slice(0, 3);
+    const checkoutCurrency =
+      rawCurrency === 'USD' && process.env.PAYSTACK_LEGACY_USD_AS_ZAR !== '0'
+        ? 'ZAR'
+        : rawCurrency || 'ZAR';
+
     const init = await paystack.transaction.initialize({
       email: customer_email,
-      amount: consumerPriceCents, // ZAR: smallest unit is cents (per Paystack)
-      currency: (product.currency || 'ZAR').toUpperCase().slice(0, 3),
+      amount: consumerPriceCents, // smallest currency unit (ZAR cents, NGN kobo, etc.)
+      currency: checkoutCurrency,
       callback_url: callbackUrl,
       metadata: JSON.stringify(metadata),
     });
