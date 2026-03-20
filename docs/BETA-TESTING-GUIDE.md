@@ -21,9 +21,11 @@ Ensure `mcj/packages/shadow-index/.env` has:
 
 ```env
 ADMIN_SECRET_KEY=mor-admin-secret-local
+SHADOW_INDEX_API_KEY=<your-api-key>
 JWT_SECRET=<64-char-hex-string>
-STRIPE_SECRET_KEY=sk_test_...
-# ... other vars from .env.example
+# Paystack (ZA beta default) — see packages/shadow-index/.env.example
+# PAYSTACK_SECRET_KEY=sk_test_...
+# ... remaining vars from .env.example
 ```
 
 ### 1.3 Auth-portal `.env`
@@ -34,8 +36,11 @@ Ensure `mcj/packages/auth-portal/.env` has:
 VITE_SUPABASE_URL=https://YOUR_PROJECT.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
 VITE_API_BASE_URL=http://localhost:3000
+VITE_API_KEY=<same as SHADOW_INDEX_API_KEY or an entry in SHADOW_INDEX_API_KEYS>
 VITE_ADMIN_SECRET=mor-admin-secret-local
 ```
+
+`VITE_API_KEY` is required for the **Admin → Payouts** tab: the API enforces the Shadow Index key on `GET /v1/admin/payouts` before `validateAdminAuth` runs.
 
 ### 1.4 Admin access
 
@@ -98,12 +103,15 @@ npm run dev
    - **Reject** — add reason, confirm
 5. Confirm merchant status updates in portal
 
-### 3.5 Commerce Flow (Optional)
+### 3.5 Commerce flow (optional — production stack)
 
-1. **Compile** — POST product JSON to `/compile`
-2. **Resolve** — GET `/resolve/:hash`
-3. **Checkout** — Create Stripe checkout session
-4. **Webhook** — Verify `checkout.session.completed` handled
+Beta checkout uses **Paystack** via `POST /checkout/create-session` from the public product page. For a full pass:
+
+1. Open `/product/:hash`, complete checkout with a Paystack test card.
+2. Confirm **Paystack webhook** delivery to `/webhooks/paystack` (staging/production).
+3. Confirm the order appears under the merchant **Orders** tab.
+
+*(Legacy Stripe paths may exist in older docs; treat Paystack as the ZA beta default.)*
 
 ---
 
@@ -174,7 +182,9 @@ curl -H "Authorization: Bearer mor-admin-secret-local" http://localhost:3000/v1/
 | Key | Location |
 |-----|----------|
 | `ADMIN_SECRET_KEY` | shadow-index `.env` |
-| `VITE_ADMIN_SECRET` | auth-portal `.env` (must match) |
+| `SHADOW_INDEX_API_KEY` | shadow-index `.env` |
+| `VITE_ADMIN_SECRET` | auth-portal `.env` (must match `ADMIN_SECRET_KEY`) |
+| `VITE_API_KEY` | auth-portal `.env` (must match a registered Shadow Index API key) |
 | Admin emails | `AuthContext.tsx` `ADMIN_EMAILS` |
 
 ---

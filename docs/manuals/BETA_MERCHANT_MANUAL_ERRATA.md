@@ -1,16 +1,24 @@
-# Merchant manual errata (beta, March 2026)
+# Merchant manual — supplementary notes (engineering)
 
-Use this alongside `fairflow_merchant_manual.pdf` until the PDF is regenerated.
+**Canonical user content:** `fairflow_merchant_manual.pdf` and `fairflow_beta_manual_v2.pdf` (**v1.1**, `docs/manuals/`).  
+This Markdown file is **optional**: use it for internal alignment or when PDFs lag a release.
 
-## Order fulfilment
+---
 
-- **Product links after “remove”:** Removing a product from **My Products** **archives** the listing. The public product URL and `matter://` URI **still resolve**; the page shows that the product is no longer available and **does not** offer checkout.
-- **Proof / shipment documentation:** The portal supports **Upload slip** (PDF/JPG/PNG) and **Mark as Shipped** for the merchant-of-record flow, and **Mark as Fulfilled** for a simpler fulfilment path. If the printed manual refers to a generic “proof of delivery” step only, treat it as **optional slip upload** plus your chosen fulfilment action—not a separate undocumented screen.
+## Product lifecycle
+
+- **Remove from My Products** performs a **soft archive** (`status: archived`). The public **HTTPS product URL** and **`matter://` URI** continue to resolve; the page shows that the product is unavailable and **does not** offer checkout.
+
+## Fulfilment
+
+- **Merchant-of-record path:** upload **shipment slip** (PDF/JPG/PNG), then **Mark as Shipped**.  
+- **Simpler path:** **Mark as Fulfilled** remains available where the UI exposes it.  
+- Wording in older PDFs that refers only to generic “proof of delivery” maps to the **slip upload** above, not a separate hidden screen.
 
 ## Notifications
 
-- New orders surface under the **bell** in the merchant header and on the **Notifications** tab; the list refreshes about every 30 seconds while the portal is open.
+- New orders appear under the **header bell** and on the **Notifications** tab; while the portal is open, the client **polls about every 30 seconds** for updates.
 
-## Payouts
+## Payouts and fees
 
-- fairflow applies a **platform fee** (default **3%**) on each sale. Payout tables show **gross**, **commission**, and **net** amounts.
+- Platform fee defaults to **3%** unless configured otherwise. Payout history should show **gross**, **commission**, and **net** where the UI provides a breakdown.

@@ -1,11 +1,20 @@
 # Engineering review: Fairflow user manuals (`docs/manuals/`)
 
-**Scope:** `fairflow_merchant_manual.pdf`, `fairflow_beta_manual_v2.pdf`  
+## Update — March 2026
+
+**PDFs v1.1** in this directory incorporated the bulk of the corrections below (fulfilment wording, notifications, admin login path, security hygiene, portability / `matter://` where applicable).  
+**Code** now matches the manuals on major audit items (e.g. merchant routes + `MerchantPortalGuard`, soft archive, `price_cents`, admin KYC field mapping, payouts dual-auth headers).
+
+Treat the remainder of this document as a **historical review record** and checklist for the next PDF revision cycle—not as a list of current production blockers.
+
+---
+
+**Original scope:** `fairflow_merchant_manual.pdf`, `fairflow_beta_manual_v2.pdf`  
 **Reviewed against:** `packages/auth-portal` routes/UI, `packages/shadow-index` merchant JWT (`issueMerchantToken`).
 
 ---
 
-## Executive summary
+## Executive summary (historical)
 
 | Document | Strengths | Critical gaps |
 |----------|-----------|----------------|
