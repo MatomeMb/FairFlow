@@ -1,4 +1,5 @@
-import { apiBase, apiKey } from '../../../lib/config';
+import { apiBase } from '../../../lib/config';
+import { getMerchantToken } from '../../../lib/merchantTokenStorage';
 import type { FormState, SuccessPayload } from '../types/productCreation';
 import type { MerchantProductApi } from '../../../types/merchant';
 
@@ -22,7 +23,7 @@ export async function submitProductForm(form: FormState): Promise<SubmitProductR
       headers: {
         'Content-Type': 'application/json',
         'x-merchant-id': 'dev-merchant-001',
-        'x-api-key': apiKey,
+        // 'x-api-key': apiKey,
       },
       body: JSON.stringify({
         title: form.title.trim(),
@@ -57,13 +58,12 @@ export async function submitProductForm(form: FormState): Promise<SubmitProductR
   } catch {
     return { success: false, error: 'Network error while creating product' };
   }
-}
 
-export async function uploadProductImage(file: File): Promise<UploadImageResult> {
   try {
-    const headers: HeadersInit = { 'x-merchant-id': 'dev-merchant-001' };
-    if (apiKey) {
-      headers['x-api-key'] = apiKey;
+    const headers: { [key: string]: string } = { 'x-merchant-id': 'dev-merchant-001' };
+    const token = getMerchantToken();
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
     }
 
     const payload = new FormData();
@@ -80,7 +80,7 @@ export async function uploadProductImage(file: File): Promise<UploadImageResult>
       return { success: false, error: data?.message || 'Failed to upload image' };
     }
 
-    return { success: true, image_url: data.image_url };
+    return { success: true, image_url: data.image_url } as UploadImageResult;
   } catch {
     return { success: false, error: 'Network error while uploading image' };
   }
