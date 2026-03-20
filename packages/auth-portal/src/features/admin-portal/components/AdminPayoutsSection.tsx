@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { DollarSign, RefreshCw, Send } from 'lucide-react';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import { Toast } from '../../../components/shared/Toast';
-import { apiBase } from '../../../lib/config';
+import { apiBase, apiKey } from '../../../lib/config';
 
 interface Payout {
   id: string;
@@ -41,7 +41,8 @@ export function AdminPayoutsSection() {
 
       const res = await fetch(`${apiBase}/v1/admin/payouts`, {
         headers: {
-          'Authorization': `Bearer ${adminSecret}`,
+          Authorization: `Bearer ${adminSecret}`,
+          'x-api-key': apiKey,
         },
       });
 
@@ -84,7 +85,8 @@ export function AdminPayoutsSection() {
       const res = await fetch(`${apiBase}/v1/admin/payouts/release`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${adminSecret}`,
+          Authorization: `Bearer ${adminSecret}`,
+          'x-api-key': apiKey,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({

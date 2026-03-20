@@ -3,12 +3,61 @@ import { apiBase } from '../../../lib/config';
 
 export interface KYCSubmission {
   id: string;
+  /** Merchant account id when distinct from `id` (usually same as `id`). */
+  merchantId?: string;
   businessName: string;
   email: string;
   kycStatus: 'pending' | 'approved' | 'rejected';
   submittedAt: string;
   kycData: { id_number: string; date_of_birth: string; phone: string; address: string };
   bankAccount: { account_holder_name: string; bank_name: string; account_number: string; branch_code: string; account_type: string };
+}
+
+const emptyKycData = (): KYCSubmission['kycData'] => ({
+  id_number: '',
+  date_of_birth: '',
+  phone: '',
+  address: '',
+});
+
+const emptyBankAccount = (): KYCSubmission['bankAccount'] => ({
+  account_holder_name: '',
+  bank_name: '',
+  account_number: '',
+  branch_code: '',
+  account_type: 'cheque',
+});
+
+function mapPendingKycFromApi(item: Record<string, unknown>): KYCSubmission {
+  const rawStatus = item.kyc_status;
+  const kycStatus: KYCSubmission['kycStatus'] =
+    rawStatus === 'approved' || rawStatus === 'rejected' || rawStatus === 'pending' ? rawStatus : 'pending';
+
+  const kd = item.kyc_data;
+  const kycData =
+    kd && typeof kd === 'object'
+      ? { ...emptyKycData(), ...(kd as Partial<KYCSubmission['kycData']>) }
+      : emptyKycData();
+
+  const ba = item.bank_account;
+  const bankAccount =
+    ba && typeof ba === 'object'
+      ? { ...emptyBankAccount(), ...(ba as Partial<KYCSubmission['bankAccount']>) }
+      : emptyBankAccount();
+
+  const id = String(item.id ?? '');
+  const merchantId = item.merchant_id != null ? String(item.merchant_id) : id;
+
+  return {
+    id,
+    merchantId,
+    businessName: String(item.business_name ?? ''),
+    email: String(item.email ?? ''),
+    kycStatus,
+    submittedAt: String(item.submitted_at ?? ''),
+    kycData,
+    bankAccount,
+  };
 }
 
 type ActionType = 'approve' | 'reject';
@@ -26,8 +75,10 @@ export function useAdminKYCQueue(token: string, onToast?: (message: string, type
     setLoadingKYC(true);
     try {
       const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, { headers: { Authorization: `Bearer ${token}` } });
-      const data = await response.json();
-      if (data.ok && data.pending) setPendingKYC(data.pending);
+      const data = (await response.json()) as { ok?: boolean; pending?: Record<string, unknown>[] };
+      if (data.ok && Array.isArray(data.pending)) {
+        setPendingKYC(data.pending.map((row) => mapPendingKycFromApi(row)));
+      }
     } catch {
       onToast?.('Failed to fetch pending KYC', 'error');
     } finally {

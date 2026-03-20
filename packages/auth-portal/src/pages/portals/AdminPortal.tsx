@@ -244,8 +244,13 @@ export const AdminPortal: React.FC = () => {
               </h1>
             </div>
             <div className="flex items-center gap-4">
-              <button className="p-2 text-[#8A99AA] hover:text-white hover:bg-[var(--ff-surface)] rounded-lg">
-                <Bell className="w-5 h-5" />
+              <button
+                type="button"
+                disabled
+                aria-label="Notifications — coming soon"
+                className="p-2 rounded-lg text-[#8A99AA] opacity-50 cursor-not-allowed"
+              >
+                <Bell className="w-5 h-5" aria-hidden />
               </button>
             </div>
           </div>
