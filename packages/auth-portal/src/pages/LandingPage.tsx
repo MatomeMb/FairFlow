@@ -6,6 +6,7 @@ import {
   Clock3,
   HandCoins,
   Leaf,
+  Link2,
   Menu,
   ShieldCheck,
   Store,
@@ -148,14 +149,14 @@ export function LandingPage() {
               Circular commerce platform
             </p>
             <h1
-              className="ff-hero-2 text-4xl leading-[1.05] text-[var(--ff-ink)] sm:text-5xl lg:text-6xl"
+              className="ff-hero-2 text-4xl leading-[1.08] text-[var(--ff-ink)] sm:text-5xl lg:text-6xl"
               style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600 }}
             >
-              Getting your goods{" "}
-              <span style={{ color: "var(--ff-accent)" }}>online.</span>
+              Sell anywhere with a single link. No storefront needed.
             </h1>
-            <p className="ff-hero-3 mt-6 max-w-xl text-base leading-7 text-[var(--ff-ink-muted)] sm:text-lg">
-              Fairflow helps you to get your products online, sell them and stay connected with your customers.
+            <p className="ff-hero-3 mt-6 max-w-xl text-sm leading-7 text-[var(--ff-ink-muted)] sm:text-base">
+              Wherever your customers are — WhatsApp, Instagram, email, SMS — your store is already there. Go live in
+              seconds, get paid instantly.
             </p>
             <div className="ff-hero-4 mt-8 flex flex-col gap-3 sm:flex-row">
               <Link
@@ -207,32 +208,33 @@ export function LandingPage() {
 
         <section id="how" className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 lg:px-8">
           <RevealSection>
-            <h2
-              className="text-3xl sm:text-4xl"
-              style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 550 }}
-            >
-              Three simple steps.
-            </h2>
-            <p className="mt-4 max-w-2xl text-[var(--ff-ink-muted)]">
-              From listing your product to getting paid — it all happens in one place.
-            </p>
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ff-ink)]">HOW IT WORKS</h2>
           </RevealSection>
 
           <div className="mt-8 grid gap-5 md:grid-cols-3">
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-1">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">1. List</p>
-              <h3 className="text-lg font-semibold">List your products</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Add what you are selling. Set your price, add a photo, and you are live in minutes.</p>
+              <Store size={22} className="mb-4 text-[var(--ff-accent)]" aria-hidden />
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink-muted)]">Step 1</p>
+              <h3 className="text-lg font-semibold text-[var(--ff-ink)]">List your product in seconds</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">
+                Fill in your product details and go live instantly. No website, no developer, no hassle.
+              </p>
             </RevealSection>
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-2">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">2. Sell</p>
-              <h3 className="text-lg font-semibold">Customers buy from you</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">They pay securely online. No cash, no chasing payments — it just comes to you.</p>
+              <Link2 size={22} className="mb-4 text-[var(--ff-accent)]" aria-hidden />
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink-muted)]">Step 2</p>
+              <h3 className="text-lg font-semibold text-[var(--ff-ink)]">Your link works everywhere</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">
+                One link. WhatsApp, Instagram, email, SMS — wherever your customers are, your store is already there.
+              </p>
             </RevealSection>
             <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-6" delayClass="ff-reveal-delay-3">
-              <p className="mb-2 inline-flex rounded-full bg-[var(--ff-accent-light)] px-3 py-1 text-xs font-semibold text-[var(--ff-accent)]">3. Connect</p>
-              <h3 className="text-lg font-semibold">Stay in touch</h3>
-              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">Know when every order is placed and when it is delivered. Your customers always know what is happening.</p>
+              <HandCoins size={22} className="mb-4 text-[var(--ff-accent)]" aria-hidden />
+              <p className="mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-[var(--ff-ink-muted)]">Step 3</p>
+              <h3 className="text-lg font-semibold text-[var(--ff-ink)]">Get paid on a reliable schedule</h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--ff-ink-muted)]">
+                Customers checkout securely. Funds are held safely and released to you every week — no chasing payments.
+              </p>
             </RevealSection>
           </div>
         </section>
@@ -300,6 +302,22 @@ export function LandingPage() {
             </div>
           </RevealSection>
         </section>
+
+        <section id="pricing" className="mx-auto w-full max-w-6xl px-4 pb-16 sm:px-6 lg:px-8">
+          <RevealSection className="rounded-2xl border border-[var(--ff-border)] bg-[#1A2D42] p-8 sm:p-10">
+            <h2 className="text-xs font-semibold uppercase tracking-[0.2em] text-[var(--ff-ink)]">PRICING</h2>
+            <p
+              className="mt-6 text-2xl font-semibold leading-tight text-[var(--ff-accent)] sm:text-3xl"
+              style={{ fontFamily: "'Fraunces', Georgia, serif", fontWeight: 600 }}
+            >
+              Free for merchants. Always.
+            </p>
+            <p className="mt-4 max-w-2xl text-sm leading-7 text-[var(--ff-ink-muted)] sm:text-base">
+              A 3% service fee is added to the customer&apos;s total at checkout — you receive your full selling price,
+              every time.
+            </p>
+          </RevealSection>
+        </section>
       </main>
 
       <footer id="contact" className="border-t border-[var(--ff-border)] bg-[#0D1B2A]">
@@ -309,7 +327,7 @@ export function LandingPage() {
               <div className="mb-3 flex items-center gap-3 text-[var(--ff-ink)]">
                 <FairflowLogo markHeight={30} showWordmark variant="light" />
               </div>
-              <p>Professional commerce for merchants, teams, and trusted customer journeys.</p>
+              <p>Wherever your customers are — WhatsApp, Instagram, email, SMS — your store is already there.</p>
               <p className="mt-3">Contact: hello@fairflow.co.za</p>
             </div>
 
