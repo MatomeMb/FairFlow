@@ -58,7 +58,7 @@ export function MerchantAccountSection({
             <input type="text" value={businessProfile.yearEstablished} onChange={(event) => onBusinessProfileChange({ yearEstablished: event.target.value })} className="w-full rounded-lg border border-[var(--ff-border-light)] bg-[var(--ff-neutral-subtle)] px-4 py-3 text-[var(--ff-form-text)]" />
           </div>
         </div>
-        <button onClick={onSaveChanges} className="mt-6 rounded-xl bg-[#AAFF45] px-6 py-3 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">
+        <button onClick={onSaveChanges} className="mt-6 rounded-xl bg-[#1a9e4a] px-6 py-3 font-medium transition hover:brightness-95 text-[#0D1B2A]">
           Save Changes
         </button>
       </div>
@@ -94,7 +94,7 @@ export function MerchantAccountSection({
             </div>
           )}
         </div>
-        <button onClick={() => void onUpdateBankDetails()} className="mt-6 rounded-xl bg-[#AAFF45] px-6 py-3 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">
+        <button onClick={() => void onUpdateBankDetails()} className="mt-6 rounded-xl bg-[#1a9e4a] px-6 py-3 font-medium transition hover:brightness-95 text-[#0D1B2A]">
           Update Bank Details
         </button>
       </div>
@@ -104,7 +104,7 @@ export function MerchantAccountSection({
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <span className="text-[var(--ff-ink-muted)]">Two-Factor Authentication</span>
-            <button className="text-sm rounded-xl bg-[#AAFF45] px-6 py-2 font-medium transition hover:bg-[#95E830] text-[#0D1B2A]">Enable</button>
+            <button className="text-sm rounded-xl bg-[#1a9e4a] px-6 py-2 font-medium transition hover:brightness-95 text-[#0D1B2A]">Enable</button>
           </div>
         </div>
       </div>

@@ -269,7 +269,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated, token }
                 type="submit"
                 form="create-product-form"
                 disabled={isSubmitting || isUploadingImage}
-                className="rounded-lg bg-[#AAFF45] px-4 py-2 text-sm font-semibold text-[#0D1B2A] transition-colors hover:bg-[#95E830] disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-lg bg-[#1a9e4a] px-4 py-2 text-sm font-semibold text-[#0D1B2A] transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {isUploadingImage ? 'Uploading image...' : isSubmitting ? 'Creating product...' : 'Create Product'}
               </button>
@@ -286,7 +286,7 @@ export default function CreateProductModal({ isOpen, onClose, onCreated, token }
               <button
                 type="button"
                 onClick={handleDone}
-                className="rounded-lg bg-[#AAFF45] px-4 py-2 text-sm font-semibold text-[#0D1B2A] transition-colors hover:bg-[#95E830]"
+                className="rounded-lg bg-[#1a9e4a] px-4 py-2 text-sm font-semibold text-[#0D1B2A] transition-colors hover:brightness-95"
               >
                 Done
               </button>

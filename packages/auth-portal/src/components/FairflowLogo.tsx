@@ -33,7 +33,7 @@ export function FairflowLogo({
   style = 'geo-tech',
 }: FairflowLogoProps) {
   const markColor = variant === 'dark' ? '#F5F5F0' : '#1B2330';
-  const markBg = '#AAFF45';
+  const markBg = '#1a9e4a';
   const wordSize = Math.round(markHeight * 0.38);
   const fontWeight = style === 'soft-premium' || style === 'aero' ? 600 : 700;
 

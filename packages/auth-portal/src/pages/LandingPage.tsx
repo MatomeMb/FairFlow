@@ -265,7 +265,7 @@ export function LandingPage() {
               </ul>
             </RevealSection>
 
-            <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[rgba(170,255,69,0.08)] border border-[rgba(170,255,69,0.25)] p-7" delayClass="ff-reveal-delay-2">
+            <RevealSection className="rounded-3xl border border-[var(--ff-border)] bg-[rgba(26,158,74,0.08)] border border-[rgba(26,158,74,0.25)] p-7" delayClass="ff-reveal-delay-2">
               <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--ff-ink-muted)]">Merchant note</p>
               <p className="mt-4 text-lg leading-8 text-[var(--ff-ink)]">
                 "The platform turned order follow-up from scattered messages into one clear timeline. That gave our team back hours each week."

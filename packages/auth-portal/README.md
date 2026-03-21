@@ -60,7 +60,7 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 ### Colors
 - **Primary navy:** `#0D1B2A` — Background
 - **Secondary navy:** `#1A2D42` — Panels, cards
-- **Accent lime:** `#AAFF45` — CTAs, highlights
+- **Accent green:** `#1a9e4a` — CTAs, highlights
 - **Text:** White on dark backgrounds, `#8A99AA` for muted text
 - **Semantic:** Green (success), Red (error), Amber (warning)
 

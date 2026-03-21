@@ -126,7 +126,7 @@ export function AdminPayoutsSection() {
   if (payouts.length === 0) {
     return (
       <div className="p-6">
-        <EmptyState icon={<DollarSign className="w-10 h-10 text-[#AAFF45]" />} title="No Pending Payouts" description="All payouts have been released or there are no payouts pending." />
+        <EmptyState icon={<DollarSign className="w-10 h-10 text-[#1a9e4a]" />} title="No Pending Payouts" description="All payouts have been released or there are no payouts pending." />
       </div>
     );
   }
@@ -170,7 +170,7 @@ export function AdminPayoutsSection() {
                   <button
                     onClick={() => handleReleaseClick(payout)}
                     disabled={submitting}
-                    className="flex items-center gap-2 px-4 py-2 bg-[#AAFF45] hover:bg-[#95E830] disabled:opacity-50 text-[#0D1B2A] rounded-lg transition font-medium text-xs"
+                    className="flex items-center gap-2 px-4 py-2 bg-[#1a9e4a] hover:brightness-95 disabled:opacity-50 text-[#0D1B2A] rounded-lg transition font-medium text-xs"
                   >
                     <Send className="w-3 h-3" />
                     Release
@@ -205,7 +205,7 @@ export function AdminPayoutsSection() {
               <button
                 onClick={handleConfirmRelease}
                 disabled={submitting}
-                className="flex items-center gap-2 px-4 py-2 bg-[#AAFF45] hover:bg-[#95E830] disabled:opacity-50 text-[#0D1B2A] rounded-lg transition font-medium"
+                className="flex items-center gap-2 px-4 py-2 bg-[#1a9e4a] hover:brightness-95 disabled:opacity-50 text-[#0D1B2A] rounded-lg transition font-medium"
               >
                 <Send className="w-4 h-4" />
                 {submitting ? 'Releasing...' : 'Release'}

@@ -275,7 +275,7 @@ export const KYCForm: React.FC<KYCFormProps> = ({
         <button
           type="submit"
           disabled={submitting}
-          className="bg-[#AAFF45] hover:bg-[#95E830] disabled:bg-[#95E830]/60 px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-[#0D1B2A]"
+          className="bg-[#1a9e4a] hover:brightness-95 disabled:bg-[#1a9e4a]/60 px-4 py-3 min-h-[44px] rounded-lg text-sm font-medium text-[#0D1B2A]"
         >
           {buttonLabel}
         </button>

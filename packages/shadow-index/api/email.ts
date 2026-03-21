@@ -40,7 +40,7 @@ const allowedImageUrl = (url: string | undefined | null): string | null => {
 const emailBrandHeader = (): string => {
   const logo = escapeHtml(brandLogoUrl());
   return `<tr>
-  <td style="background:#0D1B2A;padding:22px 32px;border-bottom:3px solid #AAFF45;">
+  <td style="background:#0D1B2A;padding:22px 32px;border-bottom:3px solid #1a9e4a;">
     <table cellpadding="0" cellspacing="0" role="presentation"><tr>
       <td style="vertical-align:middle;padding-right:14px;">
         <img src="${logo}" alt="fairflow" width="40" height="40" style="display:block;width:40px;height:40px;border:0;" />
@@ -217,7 +217,7 @@ export async function sendMerchantOrderNotification(
             <table cellpadding="0" cellspacing="0">
               <tr>
                 <td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;">
-                  <a href="${escapeHtml(dashboardLink)}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">View order in dashboard</a>
+                  <a href="${escapeHtml(dashboardLink)}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">View order in dashboard</a>
                 </td>
               </tr>
             </table>
@@ -311,7 +311,7 @@ export async function sendCustomerOrderConfirmation(order: OrderDetails): Promis
             <table cellpadding="0" cellspacing="0" style="margin-top:8px;">
               <tr>
                 <td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;">
-                  <a href="${orderStatusUrl}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">Track your order</a>
+                  <a href="${orderStatusUrl}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">Track your order</a>
                 </td>
               </tr>
             </table>
@@ -360,7 +360,7 @@ export async function sendLowStockWarning(details: LowStockDetails): Promise<voi
           <p style="margin:0 0 24px;font-size:15px;color:#18181b;"><strong>${ptitle}</strong> has only <strong>${details.stockCount} unit${details.stockCount === 1 ? '' : 's'}</strong> remaining.</p>
             </td></tr>
           </table>
-          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${dashboardLink}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">Restock in dashboard</a></td></tr></table>
+          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${dashboardLink}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">Restock in dashboard</a></td></tr></table>
         </td></tr>
         ${emailFooter()}
       </table>
@@ -411,7 +411,7 @@ export async function sendKycStatusEmail(details: KycStatusDetails): Promise<voi
         ${emailBrandHeader()}
         <tr><td style="padding:32px;">
           ${bodyHtml}
-          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${dashboardLink}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">Go to dashboard</a></td></tr></table>
+          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${dashboardLink}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">Go to dashboard</a></td></tr></table>
         </td></tr>
         ${emailFooter()}
       </table>
@@ -453,7 +453,7 @@ export async function sendOrderCheckinEmail(details: OrderCheckinEmailDetails): 
           <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${ptitle} — Order ${ordShort}</p>
           <p style="margin:0 0 24px;font-size:15px;color:#18181b;">${mbiz} is preparing your order.</p>
           ${deliveryLine}
-          <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${statusUrl}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
+          <table cellpadding="0" cellspacing="0" style="margin-bottom:24px;"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${statusUrl}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
           <p style="margin:0;font-size:13px;color:#a1a1aa;line-height:1.6;">Questions? Reply to this email or contact ${mbiz} directly.</p>
         </td></tr>
         ${emailFooter('Powered by Fairflow.')}
@@ -505,7 +505,7 @@ export async function sendDeliveryDateEmail(details: DeliveryDateEmailDetails): 
             <tr><td><p style="margin:0 0 4px;font-size:13px;color:#16a34a;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Estimated delivery</p><p style="margin:0;font-size:20px;font-weight:700;color:#14532d;">${formattedDate}</p></td></tr>
           </table>
           <p style="margin:0 0 24px;font-size:15px;color:#18181b;">${mbiz} has confirmed your order will arrive by this date. You will receive another update when it is marked as shipped.</p>
-          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${orderStatusUrl}" style="color:#AAFF45;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
+          <table cellpadding="0" cellspacing="0"><tr><td style="background:#0D1B2A;border-radius:8px;padding:14px 26px;"><a href="${orderStatusUrl}" style="color:#1a9e4a;font-size:15px;font-weight:600;text-decoration:none;">View order status</a></td></tr></table>
         </td></tr>
         ${emailFooter('Powered by Fairflow.')}
       </table>
