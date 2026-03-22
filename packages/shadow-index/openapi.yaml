@@ -310,6 +310,49 @@ components:
             country:
               type: string
 
+    KycStartResponse:
+      type: object
+      required: [ok, access_token, applicant_id, kyc_status]
+      properties:
+        ok:
+          type: boolean
+        access_token:
+          type: string
+          description: Sumsub Web SDK access token
+        applicant_id:
+          type: string
+          description: Sumsub applicant ID
+        kyc_status:
+          type: string
+          enum: [pending]
+
+    SumsubCallbackRequest:
+      type: object
+      required: [type, applicantId, externalUserId]
+      properties:
+        type:
+          type: string
+          example: applicantReviewed
+        applicantId:
+          type: string
+        externalUserId:
+          type: string
+          description: Maps to merchant user_id
+        reviewResult:
+          type: object
+          properties:
+            reviewAnswer:
+              type: string
+              enum: [GREEN, RED]
+            rejectLabels:
+              type: array
+              items:
+                type: string
+            reviewRejectType:
+              type: string
+        reviewStatus:
+          type: string
+
     # ── Notifications ──────────────────────────────────────
     Notification:
       type: object
@@ -863,6 +906,81 @@ paths:
           $ref: "#/components/responses/BadRequest"
         "401":
           $ref: "#/components/responses/Unauthorized"
+
+  /v1/merchant/kyc/start:
+    post:
+      tags: [Merchant]
+      summary: Start Sumsub KYC verification
+      operationId: startMerchantKyc
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Sumsub Web SDK session created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/KycStartResponse"
+              example:
+                ok: true
+                access_token: sumsub_sdk_token_abc
+                applicant_id: applicant_xyz
+                kyc_status: pending
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          description: Merchant KYC is already approved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                ok: false
+                error: KYC already approved
+        "502":
+          description: KYC provider unavailable
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                ok: false
+                error: KYC provider unavailable
+
+  /v1/merchant/kyc/callback:
+    post:
+      tags: [Merchant]
+      summary: Receive Sumsub KYC webhook
+      operationId: merchantKycCallback
+      description: |
+        Webhook authenticated via x-payload-digest HMAC-SHA256 header
+        using SUMSUB_WEBHOOK_SECRET
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SumsubCallbackRequest"
+      responses:
+        "200":
+          description: Callback accepted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Ok"
+              example:
+                ok: true
+        "400":
+          description: Invalid callback payload or signature verification failed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Error"
+              example:
+                ok: false
+                error: Signature verification failed
+        "404":
+          $ref: "#/components/responses/NotFound"
 
   /v1/merchant/notifications:
     get:

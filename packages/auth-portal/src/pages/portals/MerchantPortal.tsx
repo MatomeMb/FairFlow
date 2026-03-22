@@ -6,7 +6,8 @@ import { MetricCard } from '../../components/shared/MetricCard';
 import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
 import CreateProductModal from '../../components/CreateProductModal';
-import { type KycSubmitPayload } from '../../components/KYCForm';
+import type { KycStartResponse } from '../../features/merchant-portal/components/KYCStatusPanel';
+import { useKYCStatusPoller } from '../../hooks/useKYCStatusPoller';
 import { Package, Bell } from 'lucide-react';
 import type { MerchantProductApi, MerchantOrder, MerchantNotification, MerchantAccount, PayoutLog } from '../../types/merchant';
 import { MerchantOrders } from './merchant/MerchantOrders';
@@ -117,21 +118,6 @@ export const MerchantPortal: React.FC = () => {
   const [restockingProductId, setRestockingProductId] = useState<string | null>(null);
   const [copiedMatterId, setCopiedMatterId] = useState<string | null>(null);
   const [copiedPageId, setCopiedPageId] = useState<string | null>(null);
-  const [kycSubmitting, setKycSubmitting] = useState(false);
-  const [kycForm, setKycForm] = useState<KycSubmitPayload>({
-    business_name: '',
-    id_number: '',
-    date_of_birth: '',
-    residential_address: '',
-    phone: '',
-    bank_account: {
-      account_holder_name: '',
-      bank_name: 'ABSA',
-      account_number: '',
-      branch_code: '',
-      account_type: 'cheque',
-    },
-  });
   const [businessProfile, setBusinessProfile] = useState({
     businessName: 'Ethical Threads SA',
     contactEmail: 'contact@ethicalthreads.co.za',
@@ -370,17 +356,6 @@ export const MerchantPortal: React.FC = () => {
       }
       const data = await res.json();
       setMerchantAccount(data);
-      setKycForm((prev) => ({
-        ...prev,
-        business_name: data.business_name || prev.business_name,
-        bank_account: {
-          account_holder_name: data.bank_account?.account_holder_name || prev.bank_account.account_holder_name,
-          bank_name: data.bank_account?.bank_name || prev.bank_account.bank_name,
-          account_number: '',
-          branch_code: data.bank_account?.branch_code || prev.bank_account.branch_code,
-          account_type: data.bank_account?.account_type || prev.bank_account.account_type,
-        },
-      }));
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load merchant account';
       setAccountError(msg);
@@ -421,28 +396,24 @@ export const MerchantPortal: React.FC = () => {
     fetchPayoutLogs();
   }, [activeTab, fetchMerchantAccount, fetchPayoutLogs, hasApiAuth]);
 
-  const handleStartKyc = async (payload: KycSubmitPayload = kycForm) => {
-    setKycSubmitting(true);
-    try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/kyc/submit`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify(payload),
-      });
-      if (!res.ok) {
-        throw new Error(await apiError(res, 'Failed to submit KYC'));
-      }
-      const updated = await res.json();
-      setMerchantAccount(updated.account || updated);
-      setKycForm(payload);
-      showToast('KYC submitted for review', 'success');
-    } catch (e) {
-      const msg = e instanceof Error ? e.message : 'Failed to submit KYC';
-      showToast(msg, 'error');
-    } finally {
-      setKycSubmitting(false);
+  useKYCStatusPoller(
+    Boolean(hasApiAuth && activeTab === 'kyc-payouts' && merchantAccount?.kyc_status === 'pending'),
+    30_000,
+    fetchMerchantAccount,
+  );
+
+  const handleStartKyc = useCallback(async (): Promise<KycStartResponse> => {
+    const res = await merchantFetch(`${apiBase}/v1/merchant/kyc/start`, {
+      method: 'POST',
+      headers: { Accept: 'application/json' },
+    });
+    if (!res.ok) {
+      throw new Error(await apiError(res, 'Could not start verification'));
     }
-  };
+    const data = (await res.json()) as KycStartResponse;
+    await fetchMerchantAccount();
+    return data;
+  }, [apiBase, merchantFetch, fetchMerchantAccount]);
 
   const fetchNotifications = useCallback(async () => {
     setNotificationsLoading(true);
@@ -516,14 +487,6 @@ export const MerchantPortal: React.FC = () => {
       showToast(msg, 'error');
     }
   }, [apiBase]);
-
-  useEffect(() => {
-    if (activeTab !== 'notifications') return;
-    const timeoutId = window.setTimeout(() => {
-      markAllNotificationsRead();
-    }, 2000);
-    return () => window.clearTimeout(timeoutId);
-  }, [activeTab, markAllNotificationsRead]);
 
   const handleMarkAsFulfilled = async (orderId: string) => {
     setFulfillingOrderId(orderId);
@@ -1171,6 +1134,10 @@ export const MerchantPortal: React.FC = () => {
     return `R ${(numeric / 100).toFixed(2)}`;
   };
 
+  const handleGoToKycPayouts = useCallback(() => {
+    setActiveTab('kyc-payouts');
+  }, []);
+
   const renderNotifications = () => (
     <MerchantNotifications
       notifications={notifications}
@@ -1180,16 +1147,16 @@ export const MerchantPortal: React.FC = () => {
       onDismissNotificationsError={() => setNotificationsError(null)}
       onMarkAllNotificationsRead={markAllNotificationsRead}
       onMarkNotificationRead={markNotificationRead}
+      onRetryKyc={handleGoToKycPayouts}
       formatRelativeTime={formatRelativeTime}
     />
   );
 
+  // Counts all unread notifications regardless of type, including kyc_approved and kyc_rejected.
   const unreadCount = notifications.filter((n) => !n.read).length;
 
   const renderKycPayouts = () => (
     <MerchantKYCPayouts
-      kycSubmitting={kycSubmitting}
-      kycForm={kycForm}
       merchantAccount={merchantAccount}
       payoutLogs={payoutLogs}
       payoutsLoading={payoutsLoading}
@@ -1198,6 +1165,7 @@ export const MerchantPortal: React.FC = () => {
       commissionRate={commissionRate}
       onDismissAccountError={() => setAccountError(null)}
       onStartKyc={handleStartKyc}
+      onAfterKycClose={fetchMerchantAccount}
       formatCents={formatCents}
     />
   );

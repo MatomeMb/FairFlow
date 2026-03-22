@@ -37,6 +37,9 @@ import {
   writeProducts,
   getConsumerPriceCents,
   getMerchantPriceCents,
+  findMerchantProductByThingHash,
+  findMerchantProductByThingHashAnyStatus,
+  buildThingJsonFromMerchantProduct,
   type MerchantProduct,
 } from './merchant-products.js';
 import {
@@ -47,6 +50,16 @@ import {
   sendOrderCheckinEmail,
   sendDeliveryDateEmail,
 } from './email.js';
+import {
+  buildKycNotifiedKey,
+  computeNextPayoutDateIso,
+  extractSumsubReviewResult,
+  generateSumsubSdkAccessToken,
+  getSumsubRejectionReason,
+  mapSumsubStatus,
+  resolveSumsubApplicantId,
+  verifySumsubWebhookSignature,
+} from './sumsub-kyc.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -121,19 +134,34 @@ export function selectRail(): 'paystack' {
 
 const app = new Hono();
 
-// Allow extension/page on different origin (e.g. localhost:5177) to call API
-app.use('*', cors());
+// Allow only configured origins (production domains + localhost for dev)
+const prodOrigins = [
+  'https://fairflow.co.za',
+  'https://www.fairflow.co.za',
+  'https://portal.fairflow.co.za',
+  'https://api.fairflow.co.za',
+];
+const devOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5178',
+  'http://127.0.0.1:3000',
+  'http://127.0.0.1:5178',
+];
+const allowedOrigins = process.env.NODE_ENV === 'production' ? prodOrigins : [...prodOrigins, ...devOrigins];
+app.use(
+  '*',
+  cors({
+    origin: allowedOrigins,
+    allowHeaders: ['Content-Type', 'Authorization', 'x-merchant-id', 'x-api-key', 'x-auth-portal-base-url'],
+    allowMethods: ['GET', 'HEAD', 'PUT', 'POST', 'DELETE', 'PATCH', 'OPTIONS'],
+  }),
+);
 
 /** Optional API key (MVP-09). If set, require x-api-key or Authorization: Bearer <key>. Supports revocation via SHADOW_INDEX_REVOKED_KEYS. */
 app.use('*', async (c, next) => {
   const requestPath = c.req.path;
-  const isPublicAuthRoute = requestPath === '/v1/auth/google'
-    || requestPath === '/v1/auth/google/callback'
-    || requestPath === '/v1/auth/merchant/register'
-    || requestPath === '/v1/auth/merchant/login'
-    || requestPath === '/v1/auth/merchant/forgot-password'
-    || requestPath === '/v1/auth/merchant/me';
-  if (isPublicAuthRoute) {
+  // All /v1/auth/* routes validate their own credentials (OAuth, merchant JWT, etc.)
+  if (requestPath.startsWith('/v1/auth/')) {
     return next();
   }
 
@@ -156,6 +184,10 @@ app.use('*', async (c, next) => {
   }
 
   if (requestPath === '/webhooks/stripe' || requestPath === '/webhooks/paystack') {
+    return next();
+  }
+
+  if (requestPath === '/v1/merchant/kyc/callback' && c.req.method === 'POST') {
     return next();
   }
 
@@ -234,6 +266,9 @@ function getClientId(c: { req: { header: (n: string) => string | undefined } }):
   return c.req.header('x-real-ip') ?? 'unknown';
 }
 app.use('*', async (c, next) => {
+  if (c.req.path === '/v1/merchant/kyc/callback') {
+    return next();
+  }
   const id = getClientId(c);
   const now = Date.now();
   let entry = rateLimitMap.get(id);
@@ -378,12 +413,21 @@ type MerchantAccount = {
   email: string;
   password_hash?: string;
   auth_provider?: 'password' | 'google';
-  kyc_status?: 'not_started' | 'pending' | 'approved' | 'rejected';
+  kyc_status?: 'not_started' | 'pending' | 'approved' | 'rejected' | 'expired';
   commission_rate?: number;
   payout_frequency?: 'weekly' | 'monthly';
   payout_minimum?: number;
   total_earnings?: number;
   pending_payout?: number;
+  payout_eligible?: boolean;
+  next_payout_date?: string;
+  kyc_verified_at?: string;
+  smile_id_job_id?: string;
+  smile_id_session_id?: string;
+  smile_id_result_code?: string;
+  smile_id_result_text?: string;
+  kyc_rejection_reason?: string;
+  smile_kyc_notified_key?: string;
   kyc_data?: {
     id_number: string;
     date_of_birth: string;
@@ -404,9 +448,10 @@ type MerchantAccount = {
 };
 
 const slipsDir = path.join(dataRoot, 'slips');
-const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? 'http://localhost:5178';
-const publicApiBase = process.env.PUBLIC_API_BASE_URL || `http://localhost:${process.env.PORT || 3000}`;
-const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? 'dev-jwt-secret-change-me';
+const isProduction = process.env.NODE_ENV === 'production';
+const authPortalBaseUrl = process.env.AUTH_PORTAL_BASE_URL ?? (isProduction ? (() => { throw new Error('AUTH_PORTAL_BASE_URL must be set in production'); })() : 'http://localhost:5178');
+const publicApiBase = process.env.PUBLIC_API_BASE_URL || (isProduction ? (() => { throw new Error('PUBLIC_API_BASE_URL must be set in production'); })() : `http://localhost:${process.env.PORT || 3000}`);
+const jwtSecret = process.env.JWT_SECRET ?? process.env.SHADOW_INDEX_API_KEY ?? (isProduction ? (() => { throw new Error('JWT_SECRET or SHADOW_INDEX_API_KEY must be set in production'); })() : 'dev-jwt-secret-change-me');
 
 const registerSchema = z.object({
   business_name: z.string().trim().min(1, 'Business name is required'),
@@ -508,6 +553,18 @@ const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
     payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
     total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
     pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
+    payout_eligible:
+      typeof row.payout_eligible === 'boolean'
+        ? row.payout_eligible
+        : (row.kyc_status === 'approved' ? true : undefined),
+    next_payout_date: typeof row.next_payout_date === 'string' ? row.next_payout_date : undefined,
+    kyc_verified_at: typeof row.kyc_verified_at === 'string' ? row.kyc_verified_at : undefined,
+    smile_id_job_id: typeof row.smile_id_job_id === 'string' ? row.smile_id_job_id : undefined,
+    smile_id_session_id: typeof row.smile_id_session_id === 'string' ? row.smile_id_session_id : undefined,
+    smile_id_result_code: typeof row.smile_id_result_code === 'string' ? row.smile_id_result_code : undefined,
+    smile_id_result_text: typeof row.smile_id_result_text === 'string' ? row.smile_id_result_text : undefined,
+    kyc_rejection_reason: typeof row.kyc_rejection_reason === 'string' ? row.kyc_rejection_reason : undefined,
+    smile_kyc_notified_key: typeof row.smile_kyc_notified_key === 'string' ? row.smile_kyc_notified_key : undefined,
     kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
     bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
     created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
@@ -531,6 +588,15 @@ const saveMerchantAccounts = async (accounts: MerchantAccount[]) => {
     payout_minimum: account.payout_minimum ?? 50000,
     total_earnings: account.total_earnings ?? 0,
     pending_payout: account.pending_payout ?? 0,
+    payout_eligible: account.payout_eligible ?? false,
+    next_payout_date: account.next_payout_date ?? null,
+    kyc_verified_at: account.kyc_verified_at ?? null,
+    smile_id_job_id: account.smile_id_job_id ?? null,
+    smile_id_session_id: account.smile_id_session_id ?? null,
+    smile_id_result_code: account.smile_id_result_code ?? null,
+    smile_id_result_text: account.smile_id_result_text ?? null,
+    kyc_rejection_reason: account.kyc_rejection_reason ?? null,
+    smile_kyc_notified_key: account.smile_kyc_notified_key ?? null,
     created_at: account.created_at ?? new Date().toISOString(),
     updated_at: account.updated_at ?? new Date().toISOString(),
   }));
@@ -595,7 +661,7 @@ type MerchantOrder = {
 type MerchantNotification = {
   id: string;
   merchant_id?: string;
-  type?: 'order' | 'payout' | 'kyc' | 'system' | 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected';
+  type?: 'order' | 'payout' | 'kyc' | 'system' | 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected' | 'high_value_order';
   title?: string;
   message?: string;
   read?: boolean;
@@ -764,7 +830,14 @@ const saveNotifications = async (items: MerchantNotification[]): Promise<void> =
   if (items.length === 0) return;
 
   const normalizeNotificationType = (type: MerchantNotification['type']) => {
-    if (type === 'order_received' || type === 'low_stock' || type === 'payout_processed' || type === 'kyc_approved' || type === 'kyc_rejected') {
+    if (
+      type === 'order_received' ||
+      type === 'low_stock' ||
+      type === 'payout_processed' ||
+      type === 'kyc_approved' ||
+      type === 'kyc_rejected' ||
+      type === 'high_value_order'
+    ) {
       return type;
     }
     if (type === 'order') return 'order_received';
@@ -883,7 +956,7 @@ async function queueOrderForPayout(orderId: string): Promise<PayoutLog | null> {
   }
 
   const grossAmount = typeof order.amount === 'number' ? order.amount : 0;
-  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.06');
+  const commissionRate = parseFloat(process.env.PLATFORM_COMMISSION_RATE ?? '0.03');
   const commissionAmount = Math.round(grossAmount * commissionRate);
   const netAmount = grossAmount - commissionAmount;
 
@@ -1100,6 +1173,15 @@ const sanitizeMerchantAccount = (account: MerchantAccount) => {
     safe.bank_account = { ...safe.bank_account, account_number: masked };
   }
   return safe;
+};
+
+const unlockPayoutsAfterKycApproval = (merchant: MerchantAccount): string => {
+  const frequency = merchant.payout_frequency ?? 'weekly';
+  const nextIso = computeNextPayoutDateIso(frequency);
+  merchant.payout_eligible = true;
+  merchant.next_payout_date = nextIso;
+  merchant.kyc_verified_at = new Date().toISOString();
+  return nextIso;
 };
 
 const issueMerchantToken = (account: MerchantAccount): string => {
@@ -1495,6 +1577,39 @@ app.post('/v1/auth/merchant/login', async (c) => {
   });
 });
 
+app.post('/v1/auth/merchant/refresh', async (c) => {
+  const authHeader = c.req.header('Authorization');
+  const token = extractBearerToken(authHeader);
+  if (!token) {
+    return c.json(err('unauthorized', 'Missing Bearer token'), 401);
+  }
+
+  const payload = verifyJwt(token, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return c.json(err('unauthorized', 'Invalid or expired token'), 401);
+  }
+
+  const subject = typeof payload.sub === 'string' ? payload.sub : null;
+  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
+  if (!subject && !email) {
+    return c.json(err('unauthorized', 'Token payload is missing subject'), 401);
+  }
+
+  const accounts = await loadMerchantAccounts();
+  const account = accounts.find((candidate) =>
+    subject ? candidate.id === subject : candidate.email.toLowerCase() === email
+  );
+  if (!account) {
+    return c.json(err('unauthorized', 'Account not found for token'), 401);
+  }
+
+  const newToken = issueMerchantToken(account);
+  return c.json({
+    token: newToken,
+    account: sanitizeMerchantAccount(account),
+  });
+});
+
 app.get('/v1/auth/merchant/me', async (c) => {
   const token = extractBearerToken(c.req.header('Authorization'));
   if (!token) {
@@ -1687,6 +1802,17 @@ const imageExtensionByMime: Record<string, string> = {
 };
 
 app.post('/v1/merchant/uploads/image', async (c) => {
+  // Merchant JWT validation (same as other merchant routes)
+  const auth = c.req.header('Authorization');
+  const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
+  if (!bearer) {
+    return c.json(err('unauthorized', 'Authentication required'), 401);
+  }
+  const payload = verifyJwt(bearer, jwtSecret);
+  if (!payload || payload.typ !== 'merchant_auth') {
+    return c.json(err('unauthorized', 'Invalid merchant token'), 401);
+  }
+
   const parsedBody = await c.req.parseBody().catch(() => null);
   if (!parsedBody || typeof parsedBody !== 'object') {
     return c.json(err('invalid_upload', 'Expected multipart form data'), 400);
@@ -2042,6 +2168,42 @@ app.get('/v1/slips/:filename', async (c) => {
   }
 });
 
+// GET /v1/admin/payouts - List pending payouts for admin release
+app.get('/v1/admin/payouts', async (c) => {
+  if (!validateAdminAuth(c.req.header('authorization'))) {
+    return c.json({ ok: false, error: 'Forbidden' }, 403);
+  }
+
+  const [payoutLogs, merchants] = await Promise.all([loadPayoutLogs(), loadMerchantAccounts()]);
+  
+  // Filter to pending payouts and enrich with merchant names
+  const pending = payoutLogs
+    .filter((log) => log.status === 'pending')
+    .map((log) => {
+      const merchant = merchants.find((m) => m.id === log.merchant_id);
+      return {
+        id: log.id,
+        payout_log_id: log.id,
+        merchant_id: log.merchant_id,
+        merchant_name: merchant?.business_name || 'Unknown Merchant',
+        net_amount: log.net_amount ?? 0,
+        gross_amount: log.gross_amount ?? 0,
+        commission_amount: log.commission_amount ?? 0,
+        currency: log.currency ?? 'ZAR',
+        status: log.status,
+        created_at: log.created_at,
+        orders_count: Array.isArray(log.orders_included) ? log.orders_included.length : 0,
+      };
+    })
+    .sort((a, b) => {
+      const aTime = typeof a.created_at === 'string' ? new Date(a.created_at).getTime() : 0;
+      const bTime = typeof b.created_at === 'string' ? new Date(b.created_at).getTime() : 0;
+      return aTime - bTime; // Oldest first
+    });
+
+  return c.json({ ok: true, payouts: pending, count: pending.length });
+});
+
 app.post('/v1/admin/payouts/release', async (c) => {
   if (!validateAdminAuth(c.req.header('authorization'))) {
     return c.json({ ok: false, error: 'Forbidden' }, 403);
@@ -2279,6 +2441,240 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
   return c.json({ ok: true, account: sanitizeMerchantAccount(target) });
 });
 
+app.post('/v1/merchant/kyc/start', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
+  if (account.kyc_status === 'approved') {
+    return c.json({ ok: false, error: 'KYC already approved' }, 409);
+  }
+
+  const appToken = process.env.SUMSUB_APP_TOKEN?.trim();
+  const secretKey = process.env.SUMSUB_SECRET_KEY?.trim();
+  const levelName = process.env.SUMSUB_FLOW_NAME?.trim() || 'merchant-kyc';
+
+  if (!appToken || !secretKey) {
+    console.error('[Sumsub KYC] Missing SUMSUB_APP_TOKEN or SUMSUB_SECRET_KEY', { merchant_id: account.id });
+    return c.json(err('sumsub_config', 'KYC provider is not configured on this server'), 503);
+  }
+
+  const externalUserId = account.id;
+
+  try {
+    const applicantId = await resolveSumsubApplicantId(appToken, secretKey, externalUserId, levelName);
+    const accessToken = await generateSumsubSdkAccessToken(appToken, secretKey, externalUserId, levelName);
+
+    const accounts = await loadMerchantAccounts();
+    const target = accounts.find((m) => m.id === account.id);
+    if (!target) {
+      return c.json(err('not_found', 'Merchant account not found'), 404);
+    }
+
+    target.kyc_status = 'pending';
+    target.smile_id_session_id = applicantId;
+    target.smile_id_result_code = undefined;
+    target.smile_id_result_text = undefined;
+    target.updated_at = new Date().toISOString();
+    await saveMerchantAccounts(accounts);
+
+    return c.json({
+      ok: true,
+      access_token: accessToken,
+      applicant_id: applicantId,
+      kyc_status: 'pending' as const,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error('[Sumsub KYC] start failed', { merchant_id: account.id, error: message });
+    return c.json({ ok: false, error: 'KYC provider unavailable' }, 502);
+  }
+});
+
+app.post('/v1/merchant/kyc/callback', async (c) => {
+  const rawBody = await c.req.text();
+  const digest = c.req.header('x-payload-digest');
+  const webhookSecret = process.env.SUMSUB_WEBHOOK_SECRET?.trim() ?? '';
+  const skipSig = process.env.SUMSUB_SKIP_SIGNATURE_VERIFY === 'true';
+
+  if (!webhookSecret && !skipSig) {
+    console.error('[Sumsub KYC] callback: missing SUMSUB_WEBHOOK_SECRET');
+    return c.json(err('sumsub_config', 'Not configured'), 503);
+  }
+
+  if (!skipSig && !verifySumsubWebhookSignature(rawBody, digest, webhookSecret)) {
+    console.error('[Sumsub KYC] Invalid webhook signature');
+    return c.json(err('invalid_signature', 'Signature verification failed'), 400);
+  }
+
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(rawBody) as Record<string, unknown>;
+  } catch {
+    return c.json(err('invalid_json', 'Expected JSON body'), 400);
+  }
+
+  const eventType = typeof parsed.type === 'string' ? parsed.type : '';
+  if (eventType !== 'applicantReviewed') {
+    return c.json({ ok: true });
+  }
+
+  const externalUserId = typeof parsed.externalUserId === 'string' ? parsed.externalUserId : '';
+  const applicantId = typeof parsed.applicantId === 'string' ? parsed.applicantId : '';
+  const reviewResult = extractSumsubReviewResult(parsed);
+  const mapped = mapSumsubStatus(reviewResult);
+
+  const accounts = await loadMerchantAccounts();
+  const merchant = accounts.find((m) => m.id === externalUserId || (applicantId && m.smile_id_session_id === applicantId));
+  if (!merchant) {
+    console.error('[Sumsub KYC] Unknown merchant for webhook', { externalUserId, applicantId });
+    return c.json(err('not_found', 'Merchant not found'), 404);
+  }
+
+  const reviewAnswerKey = (reviewResult?.reviewAnswer ?? 'UNKNOWN').toUpperCase();
+  const notifyKey = buildKycNotifiedKey(applicantId || merchant.id, reviewAnswerKey);
+
+  if (mapped === 'approved' && merchant.kyc_status === 'approved') {
+    return c.json({ ok: true });
+  }
+
+  merchant.smile_id_result_code = reviewAnswerKey;
+  merchant.smile_id_result_text =
+    typeof reviewResult?.reviewRejectType === 'string'
+      ? reviewResult.reviewRejectType
+      : reviewResult?.reviewAnswer ?? undefined;
+
+  if (mapped === 'pending') {
+    merchant.kyc_status = 'pending';
+    merchant.updated_at = new Date().toISOString();
+    await saveMerchantAccounts(accounts);
+    return c.json({ ok: true, status: 'pending' });
+  }
+
+  const shouldNotify = merchant.smile_kyc_notified_key !== notifyKey;
+
+  if (mapped === 'approved') {
+    merchant.kyc_status = 'approved';
+    merchant.kyc_rejection_reason = undefined;
+    unlockPayoutsAfterKycApproval(merchant);
+  } else {
+    merchant.kyc_status = 'rejected';
+    merchant.kyc_rejection_reason = getSumsubRejectionReason(reviewResult);
+    merchant.payout_eligible = false;
+  }
+
+  merchant.updated_at = new Date().toISOString();
+  if (shouldNotify) {
+    merchant.smile_kyc_notified_key = notifyKey;
+  }
+  await saveMerchantAccounts(accounts);
+
+  if (shouldNotify) {
+    const dash = `${authPortalBaseUrl.replace(/\/$/, '')}/dashboard/merchant`;
+    if (mapped === 'approved') {
+      const nextPayoutIso =
+        merchant.next_payout_date ?? computeNextPayoutDateIso(merchant.payout_frequency ?? 'weekly');
+      const notifications = await loadNotifications();
+      notifications.push({
+        id: crypto.randomUUID(),
+        merchant_id: merchant.id,
+        type: 'kyc_approved',
+        title: 'Identity Verified — Payouts Unlocked',
+        message: `Your identity has been verified. Your first payout is scheduled for ${new Date(nextPayoutIso).toLocaleDateString('en-ZA', { dateStyle: 'long' })}.`,
+        kyc_verified_at: merchant.kyc_verified_at,
+        next_payout_date: nextPayoutIso,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
+      await saveNotifications(notifications);
+
+      sendKycStatusEmail({
+        merchantEmail: merchant.email,
+        merchantBusinessName: merchant.business_name,
+        approved: true,
+        payoutsActivated: true,
+        nextPayoutDate: nextPayoutIso,
+        dashboardUrl: dash,
+      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+    } else {
+      const notifications = await loadNotifications();
+      notifications.push({
+        id: crypto.randomUUID(),
+        merchant_id: merchant.id,
+        type: 'kyc_rejected',
+        title: 'Verification Failed',
+        message: merchant.kyc_rejection_reason || 'Sumsub could not verify your identity.',
+        rejection_reason: merchant.kyc_rejection_reason,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
+      await saveNotifications(notifications);
+
+      sendKycStatusEmail({
+        merchantEmail: merchant.email,
+        merchantBusinessName: merchant.business_name,
+        approved: false,
+        notes: merchant.kyc_rejection_reason,
+        dashboardUrl: dash,
+      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+    }
+  }
+
+  return c.json({ ok: true, status: mapped });
+});
+
+// PATCH /v1/merchant/account - Update merchant profile (business name, contact info)
+app.patch('/v1/merchant/account', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+  const accounts = await loadMerchantAccounts();
+  const target = accounts.find((candidate) => candidate.id === account.id);
+  if (!target) {
+    return c.json(err('not_found', 'Merchant account not found'), 404);
+  }
+
+  const body = await c.req.json().catch(() => null);
+  if (body === null || body === undefined || typeof body !== 'object') {
+    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
+  }
+
+  const payload = body as {
+    business_name?: string;
+    phone?: string;
+    address?: string;
+  };
+
+  // Update account fields
+  if (payload.business_name !== undefined) {
+    target.business_name = payload.business_name;
+  }
+  if (payload.phone !== undefined || payload.address !== undefined) {
+    if (!target.kyc_data) {
+      target.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
+    }
+    if (payload.phone !== undefined) {
+      if (target.kyc_data) target.kyc_data.phone = payload.phone;
+    }
+    if (payload.address !== undefined) {
+      if (target.kyc_data) target.kyc_data.address = payload.address;
+    }
+  }
+  target.updated_at = new Date().toISOString();
+
+  await saveMerchantAccounts(accounts);
+  
+  logger.info('Merchant account profile updated', { merchant_id: target.id, business_name: target.business_name });
+  
+  return c.json({ 
+    ok: true, 
+    message: 'Account profile updated successfully',
+    account: sanitizeMerchantAccount(target) 
+  });
+});
+
 // PATCH /v1/merchant/account/bank - Update bank account details for payouts
 app.patch('/v1/merchant/account/bank', async (c) => {
   const { account } = await getMerchantIdentity(c);
@@ -2396,26 +2792,18 @@ app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
     return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
   }
 
-  // Validate required KYC data before approval
-  if (!merchant.kyc_data?.id_number || !merchant.kyc_data?.date_of_birth || !merchant.kyc_data?.phone) {
-    return c.json(err('invalid_request', 'Incomplete KYC data - missing required fields'), 400);
-  }
-
-  if (!merchant.bank_account?.account_number || !merchant.bank_account?.account_holder_name) {
-    return c.json(err('invalid_request', 'Incomplete bank account - missing required fields'), 400);
-  }
-
   // Approve merchant
   merchant.kyc_status = 'approved';
   merchant.updated_at = new Date().toISOString();
-  
+  const nextPayoutIso = unlockPayoutsAfterKycApproval(merchant);
+
   // Store approval metadata
   if (!merchant.kyc_data) {
     merchant.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
   }
 
   await saveMerchantAccounts(accounts);
-  
+
   logger.info('Merchant KYC approved', {
     merchant_id: merchantId,
     business_name: merchant.business_name,
@@ -2427,6 +2815,8 @@ app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
     merchantBusinessName: merchant.business_name,
     approved: true,
     notes: approvalNotes || undefined,
+    nextPayoutDate: nextPayoutIso,
+    payoutsActivated: true,
   }).catch((error) => console.error('[KYC] Status email error:', error));
 
   return c.json({
@@ -2594,6 +2984,20 @@ app.get('/gist/:hash', async (c) => {
   });
 });
 
+/** If this hash is an archived merchant row, mark JSON so the storefront hides checkout. */
+async function mergeArchivedListingFlag(thing: unknown, thingHash: string): Promise<unknown> {
+  const mp = await findMerchantProductByThingHashAnyStatus(thingHash);
+  if (mp?.status !== 'archived') return thing;
+  if (!thing || typeof thing !== 'object') return thing;
+  const obj = { ...(thing as Record<string, unknown>) };
+  const meta = obj.metadata;
+  obj.metadata =
+    meta && typeof meta === 'object'
+      ? { ...(meta as Record<string, unknown>), fairflow_listing: 'archived' }
+      : { fairflow_listing: 'archived' };
+  return obj;
+}
+
 // Get full thing file (product detail) by hash
 app.get('/thing/:hash', async (c) => {
   let hash = c.req.param('hash');
@@ -2601,22 +3005,50 @@ app.get('/thing/:hash', async (c) => {
   if (hash.endsWith('.json')) {
     hash = hash.slice(0, -5);
   }
-  const thingPath = path.join(thingsDir, `${hash}.json`);
+  const jsonPath = path.join(thingsDir, `${hash}.json`);
   try {
-    const content = await fs.readFile(thingPath, 'utf8');
+    const content = await fs.readFile(jsonPath, 'utf8');
     const thing = JSON.parse(content);
+    const merged = await mergeArchivedListingFlag(thing, hash);
     c.header('Content-Type', 'application/json');
-    return c.json(thing);
+    return c.json(merged);
   } catch (error) {
     const nodeError = error as NodeJS.ErrnoException;
-    if (nodeError.code === 'ENOENT') {
-      return c.json(err('not_found', `Thing file not found for hash: ${hash}`, { hash }), 404);
+    if (nodeError.code !== 'ENOENT') {
+      return c.json(
+        err('internal_error', 'Failed to load thing file', { hash, error: nodeError.message }),
+        500,
+      );
     }
-    return c.json(
-      err('internal_error', 'Failed to load thing file', { hash, error: nodeError.message }),
-      500
-    );
   }
+
+  // Legacy compile path writes {hash}.thing (not .json)
+  const thingPath = path.join(thingsDir, `${hash}.thing`);
+  try {
+    const content = await fs.readFile(thingPath, 'utf8');
+    const parsed = JSON.parse(content) as Record<string, unknown>;
+    if (parsed && typeof parsed === 'object' && 'product' in parsed && 'commerce' in parsed) {
+      const merged = (await mergeArchivedListingFlag(parsed, hash)) as Record<string, unknown>;
+      c.header('Content-Type', 'application/json');
+      return c.json(merged);
+    }
+  } catch {
+    // continue to Supabase fallback
+  }
+
+  // Merchant dashboard creates hashes in Supabase only — no local file on Vercel
+  const mpAny = await findMerchantProductByThingHashAnyStatus(hash);
+  if (mpAny) {
+    const body = buildThingJsonFromMerchantProduct(mpAny, hash);
+    if (mpAny.status === 'archived') {
+      const meta = (body.metadata ?? {}) as Record<string, unknown>;
+      body.metadata = { ...meta, fairflow_listing: 'archived' };
+    }
+    c.header('Content-Type', 'application/json');
+    return c.json(body);
+  }
+
+  return c.json(err('not_found', `Thing file not found for hash: ${hash}`, { hash }), 404);
 });
 
 // Batch compilation endpoint (Sprint 4 — MVP-11)
@@ -3117,15 +3549,23 @@ app.post('/checkout/create-session', async (c) => {
       return c.json(err('invalid_request', 'Missing product_hash or product_id'), 400);
     }
 
-    const products = await readProducts();
-    const product = products.find((p: MerchantProduct) => p.thing_file?.hash === hash || p.id === hash);
+    const rowAny = await findMerchantProductByThingHashAnyStatus(hash);
+    if (rowAny?.status === 'archived') {
+      return c.json(err('product_archived', 'This product is no longer available for purchase'), 409);
+    }
+
+    let product: MerchantProduct | null = await findMerchantProductByThingHash(hash);
+    if (!product) {
+      const products = await readProducts();
+      product = products.find((p: MerchantProduct) => p.id === hash && p.status !== 'archived') ?? null;
+    }
 
     if (!product) {
       return c.json(err('product_not_found', `Product not found: ${hash}`), 404);
     }
 
     if ((product.stock_count ?? 0) <= 0) {
-      return c.json(err('out_of_stock', 'This product is out of stock'), 400);
+      return c.json(err('out_of_stock', 'This product is out of stock'), 409);
     }
 
     const consumerPriceCents = getConsumerPriceCents(product);
@@ -3147,13 +3587,28 @@ app.post('/checkout/create-session', async (c) => {
     };
 
     const paystack = await getPaystack();
+    // fairflow ZA: portal omitted currency for a period → API stored USD; Paystack ZA rejects USD.
+    const rawCurrency = (product.currency || 'ZAR').toUpperCase().slice(0, 3);
+    const checkoutCurrency =
+      rawCurrency === 'USD' && process.env.PAYSTACK_LEGACY_USD_AS_ZAR !== '0'
+        ? 'ZAR'
+        : rawCurrency || 'ZAR';
+
     const init = await paystack.transaction.initialize({
       email: customer_email,
-      amount: consumerPriceCents, // Paystack expects amount in subunit (ZAR cents)
-      currency: (product.currency || 'ZAR').toUpperCase().slice(0, 3),
+      amount: consumerPriceCents, // smallest currency unit (ZAR cents, NGN kobo, etc.)
+      currency: checkoutCurrency,
       callback_url: callbackUrl,
-      metadata,
+      metadata: JSON.stringify(metadata),
     });
+
+    if (init.status === false) {
+      logger.warn('Paystack initialize rejected', { message: init.message, init });
+      return c.json(
+        err('checkout_failed', init.message || 'Payment provider rejected the transaction'),
+        400,
+      );
+    }
 
     const data = init.data as { authorization_url?: string; reference?: string } | undefined;
     if (!data?.authorization_url) {
@@ -3173,6 +3628,279 @@ app.post('/checkout/create-session', async (c) => {
     return c.json(err('checkout_failed', 'Failed to create checkout session'), 500);
   }
 });
+
+type PaystackChargeSuccessInput = {
+  reference: string;
+  metadata?: unknown;
+  customer?: { email?: string };
+  currency?: string;
+};
+
+/** Idempotent: persist order from Paystack charge (webhook or transaction verify). */
+async function ensureOrderFromPaystackChargePayload(
+  data: PaystackChargeSuccessInput,
+): Promise<MerchantOrder | null> {
+  const reference = typeof data.reference === 'string' ? data.reference.trim() : '';
+  if (!reference) return null;
+
+  const orders = await loadOrders();
+  const existing = orders.find(
+    (o) => o.paystack_reference === reference || o.session_id === reference || o.id === reference,
+  );
+  if (existing) {
+    return existing;
+  }
+
+  let meta: Record<string, string> = {};
+  const rawMeta = data.metadata;
+  if (typeof rawMeta === 'string') {
+    try {
+      meta = JSON.parse(rawMeta) as Record<string, string>;
+    } catch {
+      // ignore
+    }
+  } else if (rawMeta && typeof rawMeta === 'object') {
+    meta = rawMeta as Record<string, string>;
+  }
+
+  const productId = meta.product_id;
+  const productHash = meta.product_hash;
+  const merchantId = meta.merchant_id;
+  const merchantPriceCents = parseInt(meta.merchant_price_cents ?? '0', 10);
+  const consumerPriceCents = parseInt(meta.consumer_price_cents ?? '0', 10);
+  const platformRevenueCents =
+    parseInt(meta.platform_revenue_cents ?? '0', 10) || (consumerPriceCents - merchantPriceCents);
+
+  let deliveryAddress: DeliveryAddress = {};
+  try {
+    const da = meta.delivery_address;
+    if (typeof da === 'string') deliveryAddress = JSON.parse(da) as DeliveryAddress;
+  } catch {
+    // ignore
+  }
+
+  let billingAddress: Record<string, unknown> | null = null;
+  try {
+    const ba = meta.billing_address;
+    if (typeof ba === 'string') billingAddress = JSON.parse(ba) as Record<string, unknown>;
+  } catch {
+    // ignore
+  }
+
+  const customerEmail = data.customer?.email ?? '';
+
+  const now = new Date().toISOString();
+  const orderId = crypto.randomUUID();
+  const orderCurrency = (data.currency ?? 'ZAR').toUpperCase().slice(0, 3);
+  const order: MerchantOrder = {
+    id: orderId,
+    paystack_reference: reference,
+    session_id: reference,
+    product_id: productId,
+    product_hash: productHash,
+    merchant_id: merchantId,
+    merchant_price_cents: merchantPriceCents,
+    consumer_price_cents: consumerPriceCents,
+    platform_revenue_cents: platformRevenueCents,
+    amount: consumerPriceCents,
+    currency: orderCurrency,
+    customer: {
+      email: customerEmail,
+      delivery_address: deliveryAddress,
+      billing_address: billingAddress,
+    },
+    customer_email: customerEmail,
+    delivery_address: deliveryAddress,
+    billing_address: billingAddress,
+    status: 'paid',
+    payment_status: 'held',
+    fulfillment_status: 'pending',
+    held_at: now,
+    rail_used: 'paystack',
+    created_at: now,
+    updated_at: now,
+  };
+
+  const products = await readProducts();
+  const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
+  let stockAfter: number | null = null;
+  let stockBefore = 0;
+
+  if (product?.id && product.merchant_id) {
+    stockBefore = product.stock_count ?? 0;
+    if (stockBefore > 0) {
+      const { data: updatedRow, error: stockErr } = await db
+        .from('merchant_products')
+        .update({ stock_count: stockBefore - 1, updated_at: now })
+        .eq('id', product.id)
+        .eq('merchant_id', product.merchant_id)
+        .eq('stock_count', stockBefore)
+        .select('stock_count')
+        .maybeSingle();
+
+      if (
+        !stockErr &&
+        updatedRow &&
+        typeof (updatedRow as { stock_count?: number }).stock_count === 'number'
+      ) {
+        stockAfter = (updatedRow as { stock_count: number }).stock_count;
+        product.stock_count = stockAfter;
+        product.updated_at = now;
+        await writeProducts(products);
+      }
+    }
+  } else if (product) {
+    stockBefore = product.stock_count ?? 0;
+    stockAfter = Math.max(0, stockBefore - 1);
+    product.stock_count = stockAfter;
+    product.updated_at = now;
+    await writeProducts(products);
+  }
+
+  if (product?.merchant_id && product.id && stockAfter !== null) {
+    await db.from('inventory_logs').insert({
+      product_id: product.id,
+      merchant_id: product.merchant_id,
+      transaction_type: 'order',
+      quantity_change: -1,
+      stock_before: stockBefore,
+      stock_after: stockAfter,
+      reference_id: orderId,
+    });
+
+    if (stockAfter < 5) {
+      const notifs = await loadNotifications();
+      const lowTitle = stockAfter === 0 ? `Sold out: ${product.title}` : `Low stock: ${product.title}`;
+      const lowMsg =
+        stockAfter === 0
+          ? `${product.title} is now out of stock.`
+          : `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`;
+      notifs.push({
+        id: crypto.randomUUID(),
+        merchant_id: product.merchant_id,
+        type: 'low_stock',
+        title: lowTitle,
+        message: lowMsg,
+        read: false,
+        created_at: now,
+      });
+      await saveNotifications(notifs);
+
+      const merchantAccounts = await loadMerchantAccounts();
+      const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
+      if (merchant?.email) {
+        sendLowStockWarning({
+          merchantEmail: merchant.email,
+          merchantBusinessName: merchant.business_name,
+          productTitle: product.title,
+          stockCount: stockAfter,
+          productImageUrl: product.image_url,
+        }).catch((error) => logger.warn('Low stock email failed', { error: String(error) }));
+      }
+    }
+  }
+
+  const ordersBeforeInsert = await loadOrders();
+  const raced = ordersBeforeInsert.find(
+    (o) => o.paystack_reference === reference || o.session_id === reference,
+  );
+  if (raced) {
+    return raced;
+  }
+
+  const allOrders = await loadOrders();
+  allOrders.push(order);
+  await saveOrders(allOrders);
+
+  const merchantAccounts = await loadMerchantAccounts();
+  const merchant = merchantAccounts.find(
+    (account) => account.id === (merchantId || product?.merchant_id || ''),
+  );
+  const merchantBusinessName = merchant?.business_name ?? 'Fairflow Merchant';
+
+  if (merchant?.email) {
+    sendMerchantOrderNotification(merchant.email, {
+      orderId: order.id,
+      productTitle: product?.title ?? 'Product',
+      amountCents: consumerPriceCents,
+      customerEmail,
+      deliveryAddress: order.customer?.delivery_address ?? null,
+      merchantBusinessName,
+      productImageUrl: product?.image_url,
+      currency: order.currency,
+      paystackReference: order.paystack_reference,
+    }).catch((error) => console.error('[Webhook] Merchant email error:', error));
+  }
+
+  if (customerEmail) {
+    sendCustomerOrderConfirmation({
+      orderId: order.id,
+      productTitle: product?.title ?? 'Product',
+      amountCents: consumerPriceCents,
+      customerEmail,
+      deliveryAddress: order.customer?.delivery_address ?? null,
+      estimatedDeliveryDate: order.estimated_delivery_date ?? null,
+      merchantBusinessName,
+      productImageUrl: product?.image_url,
+      currency: order.currency,
+      paystackReference: order.paystack_reference,
+    }).catch((error) => console.error('[Webhook] Customer email error:', error));
+  }
+
+  const notifs = await loadNotifications();
+  const productTitle = product?.title ?? 'Product';
+  notifs.push({
+    id: crypto.randomUUID(),
+    merchant_id: merchantId || product?.merchant_id || '',
+    type: 'order_received',
+    title: `New order: ${productTitle}`,
+    message: `Customer ${customerEmail || '—'} · ${productTitle} · ${orderCurrency} ${(consumerPriceCents / 100).toFixed(2)}`,
+    read: false,
+    created_at: now,
+  });
+  await saveNotifications(notifs);
+
+  logger.info('Order created from Paystack charge', {
+    orderId,
+    reference,
+    merchant_id: merchantId,
+    consumer_price_cents: consumerPriceCents,
+  });
+
+  return order;
+}
+
+/** When the user hits /order/confirmation before the webhook runs, verify with Paystack and create the row. */
+async function tryReconcileOrderWithPaystackVerify(lookup: string): Promise<MerchantOrder | null> {
+  if (!process.env.PAYSTACK_SECRET_KEY?.trim()) return null;
+  if (/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(lookup)) {
+    return null;
+  }
+
+  try {
+    const paystack = await getPaystack();
+    const res = await paystack.transaction.verify({ reference: lookup });
+    if (res.status !== true) return null;
+    const d = res.data as Record<string, unknown> | undefined;
+    if (!d || String(d.status) !== 'success') return null;
+
+    const reference = typeof d.reference === 'string' && d.reference.trim() ? d.reference : lookup;
+    const currency = typeof d.currency === 'string' ? d.currency : undefined;
+
+    return await ensureOrderFromPaystackChargePayload({
+      reference,
+      metadata: d.metadata,
+      customer: d.customer as { email?: string } | undefined,
+      currency,
+    });
+  } catch (error) {
+    logger.warn('Paystack verify reconcile failed', {
+      lookup,
+      error: error instanceof Error ? error.message : String(error),
+    });
+    return null;
+  }
+}
 
 // POST /webhooks/paystack - Paystack webhook (charge.success, transfer.success, transfer.failed)
 app.post('/webhooks/paystack', async (c) => {
@@ -3205,184 +3933,23 @@ app.post('/webhooks/paystack', async (c) => {
 
   try {
     if (event.event === 'charge.success') {
-      const data = event.data as { reference?: string; metadata?: Record<string, string>; customer?: { email?: string } } | undefined;
+      const data = event.data as { reference?: string; metadata?: unknown; customer?: { email?: string } } | undefined;
       if (!data?.reference) {
         logger.warn('Paystack charge.success missing reference', { event });
         return c.json({ ok: true }, 200);
       }
-
-      let meta: Record<string, string> = {};
-      const rawMeta = data.metadata;
-      if (typeof rawMeta === 'string') {
-        try {
-          meta = JSON.parse(rawMeta) as Record<string, string>;
-        } catch {
-          // ignore
-        }
-      } else if (rawMeta && typeof rawMeta === 'object') {
-        meta = rawMeta as Record<string, string>;
-      }
-      const productId = meta.product_id;
-      const productHash = meta.product_hash;
-      const merchantId = meta.merchant_id;
-      const merchantPriceCents = parseInt(meta.merchant_price_cents ?? '0', 10);
-      const consumerPriceCents = parseInt(meta.consumer_price_cents ?? '0', 10);
-      const platformRevenueCents = parseInt(meta.platform_revenue_cents ?? '0', 10) || (consumerPriceCents - merchantPriceCents);
-
-      let deliveryAddress: DeliveryAddress = {};
       try {
-        const da = meta.delivery_address;
-        if (typeof da === 'string') deliveryAddress = JSON.parse(da) as DeliveryAddress;
-      } catch {
-        // ignore
+        await ensureOrderFromPaystackChargePayload({
+          reference: data.reference,
+          metadata: data.metadata,
+          customer: data.customer,
+        });
+      } catch (error) {
+        logger.error('Paystack charge.success order persistence failed', {
+          reference: data.reference,
+          error: error instanceof Error ? error.message : String(error),
+        });
       }
-
-      let billingAddress: Record<string, unknown> | null = null;
-      try {
-        const ba = meta.billing_address;
-        if (typeof ba === 'string') billingAddress = JSON.parse(ba) as Record<string, unknown>;
-      } catch {
-        // ignore
-      }
-
-      const customerEmail = data.customer?.email ?? '';
-
-      const orders = await loadOrders();
-      const existing = orders.find((o) => o.paystack_reference === data.reference || o.id === data.reference);
-      if (existing) {
-        logger.info('Paystack charge.success order already exists', { reference: data.reference });
-        return c.json({ ok: true }, 200);
-      }
-
-      const now = new Date().toISOString();
-      const orderId = crypto.randomUUID();
-      const order: MerchantOrder = {
-        id: orderId,
-        paystack_reference: data.reference,
-        session_id: data.reference,
-        product_id: productId,
-        product_hash: productHash,
-        merchant_id: merchantId,
-        merchant_price_cents: merchantPriceCents,
-        consumer_price_cents: consumerPriceCents,
-        platform_revenue_cents: platformRevenueCents,
-        amount: consumerPriceCents,
-        currency: 'ZAR',
-        customer: {
-          email: customerEmail,
-          delivery_address: deliveryAddress,
-          billing_address: billingAddress,
-        },
-        customer_email: customerEmail,
-        delivery_address: deliveryAddress,
-        billing_address: billingAddress,
-        status: 'paid',
-        payment_status: 'held',
-        fulfillment_status: 'pending',
-        held_at: now,
-        rail_used: 'paystack',
-        created_at: now,
-        updated_at: now,
-      };
-
-      const products = await readProducts();
-      const product = products.find((p) => p.id === productId || p.thing_file?.hash === productHash);
-      if (product) {
-        const stockBefore = product.stock_count ?? 0;
-        const stockAfter = Math.max(0, stockBefore - 1);
-        product.stock_count = stockAfter;
-        product.updated_at = now;
-        await writeProducts(products);
-
-        if (product.merchant_id && product.id) {
-          await db.from('inventory_logs').insert({
-            product_id: product.id,
-            merchant_id: product.merchant_id,
-            transaction_type: 'order',
-            quantity_change: -1,
-            stock_before: stockBefore,
-            stock_after: stockAfter,
-            reference_id: orderId,
-          });
-
-          if (stockAfter < 5) {
-            const notifs = await loadNotifications();
-            notifs.push({
-              id: crypto.randomUUID(),
-              merchant_id: product.merchant_id,
-              type: 'low_stock',
-              title: `Low stock: ${product.title}`,
-              message: `Only ${stockAfter} unit${stockAfter === 1 ? '' : 's'} remaining.`,
-              read: false,
-              created_at: now,
-            });
-            await saveNotifications(notifs);
-
-            const merchantAccounts = await loadMerchantAccounts();
-            const merchant = merchantAccounts.find((account) => account.id === product.merchant_id);
-            if (merchant?.email) {
-              sendLowStockWarning({
-                merchantEmail: merchant.email,
-                merchantBusinessName: merchant.business_name,
-                productTitle: product.title,
-                stockCount: stockAfter,
-              }).catch((error) => console.error('[Stock] Low stock email error:', error));
-            }
-          }
-        }
-      }
-
-      const allOrders = await loadOrders();
-      allOrders.push(order);
-      await saveOrders(allOrders);
-
-      const merchantAccounts = await loadMerchantAccounts();
-      const merchant = merchantAccounts.find(
-        (account) => account.id === (merchantId || product?.merchant_id || ''),
-      );
-      const merchantBusinessName = merchant?.business_name ?? 'Fairflow Merchant';
-
-      if (merchant?.email) {
-        sendMerchantOrderNotification(merchant.email, {
-          orderId: order.id,
-          productTitle: product?.title ?? 'Product',
-          amountCents: consumerPriceCents,
-          customerEmail,
-          deliveryAddress: order.customer?.delivery_address ?? null,
-          merchantBusinessName,
-        }).catch((error) => console.error('[Webhook] Merchant email error:', error));
-      }
-
-      if (customerEmail) {
-        sendCustomerOrderConfirmation({
-          orderId: order.id,
-          productTitle: product?.title ?? 'Product',
-          amountCents: consumerPriceCents,
-          customerEmail,
-          deliveryAddress: order.customer?.delivery_address ?? null,
-          estimatedDeliveryDate: order.estimated_delivery_date ?? null,
-          merchantBusinessName,
-        }).catch((error) => console.error('[Webhook] Customer email error:', error));
-      }
-
-      const notifs = await loadNotifications();
-      notifs.push({
-        id: crypto.randomUUID(),
-        merchant_id: merchantId,
-        type: 'order',
-        title: 'New order received',
-        message: `Order #${orderId.slice(0, 8)} for ${consumerPriceCents / 100} ZAR. Delivery: ${deliveryAddress.name ?? ''} - ${deliveryAddress.line1 ?? ''}`,
-        read: false,
-        created_at: now,
-      });
-      await saveNotifications(notifs);
-
-      logger.info('Order created from Paystack charge.success', {
-        orderId,
-        reference: data.reference,
-        merchant_id: merchantId,
-        consumer_price_cents: consumerPriceCents,
-      });
     } else if (event.event === 'transfer.success' || event.event === 'transfer.failed') {
       const data = event.data as { reference?: string; status?: string } | undefined;
       if (data?.reference) {
@@ -3514,8 +4081,18 @@ app.get('/orders/:idOrReference', async (c) => {
       return c.json(err('invalid_request', 'Missing order ID or reference'), 400);
     }
 
-    const orders = await loadOrders();
-    const order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+    let orders = await loadOrders();
+    let order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+
+    if (!order) {
+      const reconciled = await tryReconcileOrderWithPaystackVerify(lookup);
+      if (reconciled) {
+        order = reconciled;
+      } else {
+        orders = await loadOrders();
+        order = orders.find((o) => o.id === lookup || o.session_id === lookup || o.paystack_reference === lookup);
+      }
+    }
 
     if (!order) {
       return c.json(err('not_found', `Order not found: ${lookup}`), 404);

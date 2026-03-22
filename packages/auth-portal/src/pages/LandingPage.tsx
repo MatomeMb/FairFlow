@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, type CSSProperties } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
@@ -8,23 +8,25 @@ import {
   Menu,
   X,
 } from "lucide-react";
-import { FairflowLogo } from "../components/FairflowLogo";
 import { useReveal } from "../hooks/useReveal";
 
 function RevealSection({
   children,
   className = "",
   delayClass = "",
+  style,
 }: {
   children: React.ReactNode;
   className?: string;
   delayClass?: string;
+  style?: CSSProperties;
 }) {
   const { ref, isVisible } = useReveal<HTMLDivElement>(0.18);
   return (
     <div
       ref={ref}
       className={`ff-reveal ${isVisible ? "is-visible" : ""} ${delayClass} ${className}`.trim()}
+      style={style}
     >
       {children}
     </div>
@@ -64,7 +66,7 @@ export function LandingPage() {
         style={{
           backgroundColor: scrolled ? "rgba(13,27,42,0.92)" : "transparent",
           backdropFilter: scrolled ? "blur(12px)" : "none",
-          borderBottom: scrolled ? "1px solid rgba(170,255,69,0.25)" : "none",
+          borderBottom: scrolled ? "1px solid rgba(26,158,74,0.25)" : "none",
         }}
       >
         <div className="mx-auto flex w-full max-w-6xl items-center justify-between px-4 py-4 sm:px-6 lg:px-8">
@@ -184,7 +186,7 @@ export function LandingPage() {
             className="absolute inset-0 pointer-events-none"
             style={{
               background:
-                "radial-gradient(circle at 50% 50%, rgba(170,255,69,0.1) 0%, transparent 50%)",
+                "radial-gradient(circle at 50% 50%, rgba(26,158,74,0.1) 0%, transparent 50%)",
             }}
           />
 
