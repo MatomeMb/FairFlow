@@ -50,6 +50,16 @@ import {
   sendOrderCheckinEmail,
   sendDeliveryDateEmail,
 } from './email.js';
+import {
+  buildKycNotifiedKey,
+  computeNextPayoutDateIso,
+  extractSumsubReviewResult,
+  generateSumsubSdkAccessToken,
+  getSumsubRejectionReason,
+  mapSumsubStatus,
+  resolveSumsubApplicantId,
+  verifySumsubWebhookSignature,
+} from './sumsub-kyc.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -177,6 +187,10 @@ app.use('*', async (c, next) => {
     return next();
   }
 
+  if (requestPath === '/v1/merchant/kyc/callback' && c.req.method === 'POST') {
+    return next();
+  }
+
   // Allow public access to product detail pages (/thing/:hash.json)
   if (requestPath.match(/^\/thing\/.+\.json$/)) {
     return next();
@@ -252,6 +266,9 @@ function getClientId(c: { req: { header: (n: string) => string | undefined } }):
   return c.req.header('x-real-ip') ?? 'unknown';
 }
 app.use('*', async (c, next) => {
+  if (c.req.path === '/v1/merchant/kyc/callback') {
+    return next();
+  }
   const id = getClientId(c);
   const now = Date.now();
   let entry = rateLimitMap.get(id);
@@ -396,12 +413,21 @@ type MerchantAccount = {
   email: string;
   password_hash?: string;
   auth_provider?: 'password' | 'google';
-  kyc_status?: 'not_started' | 'pending' | 'approved' | 'rejected';
+  kyc_status?: 'not_started' | 'pending' | 'approved' | 'rejected' | 'expired';
   commission_rate?: number;
   payout_frequency?: 'weekly' | 'monthly';
   payout_minimum?: number;
   total_earnings?: number;
   pending_payout?: number;
+  payout_eligible?: boolean;
+  next_payout_date?: string;
+  kyc_verified_at?: string;
+  smile_id_job_id?: string;
+  smile_id_session_id?: string;
+  smile_id_result_code?: string;
+  smile_id_result_text?: string;
+  kyc_rejection_reason?: string;
+  smile_kyc_notified_key?: string;
   kyc_data?: {
     id_number: string;
     date_of_birth: string;
@@ -527,6 +553,18 @@ const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
     payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
     total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
     pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
+    payout_eligible:
+      typeof row.payout_eligible === 'boolean'
+        ? row.payout_eligible
+        : (row.kyc_status === 'approved' ? true : undefined),
+    next_payout_date: typeof row.next_payout_date === 'string' ? row.next_payout_date : undefined,
+    kyc_verified_at: typeof row.kyc_verified_at === 'string' ? row.kyc_verified_at : undefined,
+    smile_id_job_id: typeof row.smile_id_job_id === 'string' ? row.smile_id_job_id : undefined,
+    smile_id_session_id: typeof row.smile_id_session_id === 'string' ? row.smile_id_session_id : undefined,
+    smile_id_result_code: typeof row.smile_id_result_code === 'string' ? row.smile_id_result_code : undefined,
+    smile_id_result_text: typeof row.smile_id_result_text === 'string' ? row.smile_id_result_text : undefined,
+    kyc_rejection_reason: typeof row.kyc_rejection_reason === 'string' ? row.kyc_rejection_reason : undefined,
+    smile_kyc_notified_key: typeof row.smile_kyc_notified_key === 'string' ? row.smile_kyc_notified_key : undefined,
     kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
     bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
     created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
@@ -550,6 +588,15 @@ const saveMerchantAccounts = async (accounts: MerchantAccount[]) => {
     payout_minimum: account.payout_minimum ?? 50000,
     total_earnings: account.total_earnings ?? 0,
     pending_payout: account.pending_payout ?? 0,
+    payout_eligible: account.payout_eligible ?? false,
+    next_payout_date: account.next_payout_date ?? null,
+    kyc_verified_at: account.kyc_verified_at ?? null,
+    smile_id_job_id: account.smile_id_job_id ?? null,
+    smile_id_session_id: account.smile_id_session_id ?? null,
+    smile_id_result_code: account.smile_id_result_code ?? null,
+    smile_id_result_text: account.smile_id_result_text ?? null,
+    kyc_rejection_reason: account.kyc_rejection_reason ?? null,
+    smile_kyc_notified_key: account.smile_kyc_notified_key ?? null,
     created_at: account.created_at ?? new Date().toISOString(),
     updated_at: account.updated_at ?? new Date().toISOString(),
   }));
@@ -614,7 +661,7 @@ type MerchantOrder = {
 type MerchantNotification = {
   id: string;
   merchant_id?: string;
-  type?: 'order' | 'payout' | 'kyc' | 'system' | 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected';
+  type?: 'order' | 'payout' | 'kyc' | 'system' | 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected' | 'high_value_order';
   title?: string;
   message?: string;
   read?: boolean;
@@ -783,7 +830,14 @@ const saveNotifications = async (items: MerchantNotification[]): Promise<void> =
   if (items.length === 0) return;
 
   const normalizeNotificationType = (type: MerchantNotification['type']) => {
-    if (type === 'order_received' || type === 'low_stock' || type === 'payout_processed' || type === 'kyc_approved' || type === 'kyc_rejected') {
+    if (
+      type === 'order_received' ||
+      type === 'low_stock' ||
+      type === 'payout_processed' ||
+      type === 'kyc_approved' ||
+      type === 'kyc_rejected' ||
+      type === 'high_value_order'
+    ) {
       return type;
     }
     if (type === 'order') return 'order_received';
@@ -1119,6 +1173,15 @@ const sanitizeMerchantAccount = (account: MerchantAccount) => {
     safe.bank_account = { ...safe.bank_account, account_number: masked };
   }
   return safe;
+};
+
+const unlockPayoutsAfterKycApproval = (merchant: MerchantAccount): string => {
+  const frequency = merchant.payout_frequency ?? 'weekly';
+  const nextIso = computeNextPayoutDateIso(frequency);
+  merchant.payout_eligible = true;
+  merchant.next_payout_date = nextIso;
+  merchant.kyc_verified_at = new Date().toISOString();
+  return nextIso;
 };
 
 const issueMerchantToken = (account: MerchantAccount): string => {
@@ -2378,6 +2441,189 @@ app.post('/v1/merchant/kyc/submit', async (c) => {
   return c.json({ ok: true, account: sanitizeMerchantAccount(target) });
 });
 
+app.post('/v1/merchant/kyc/start', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+
+  if (account.kyc_status === 'approved') {
+    return c.json({ ok: false, error: 'KYC already approved' }, 409);
+  }
+
+  const appToken = process.env.SUMSUB_APP_TOKEN?.trim();
+  const secretKey = process.env.SUMSUB_SECRET_KEY?.trim();
+  const levelName = process.env.SUMSUB_FLOW_NAME?.trim() || 'merchant-kyc';
+
+  if (!appToken || !secretKey) {
+    console.error('[Sumsub KYC] Missing SUMSUB_APP_TOKEN or SUMSUB_SECRET_KEY', { merchant_id: account.id });
+    return c.json(err('sumsub_config', 'KYC provider is not configured on this server'), 503);
+  }
+
+  const externalUserId = account.id;
+
+  try {
+    const applicantId = await resolveSumsubApplicantId(appToken, secretKey, externalUserId, levelName);
+    const accessToken = await generateSumsubSdkAccessToken(appToken, secretKey, externalUserId, levelName);
+
+    const accounts = await loadMerchantAccounts();
+    const target = accounts.find((m) => m.id === account.id);
+    if (!target) {
+      return c.json(err('not_found', 'Merchant account not found'), 404);
+    }
+
+    target.kyc_status = 'pending';
+    target.smile_id_session_id = applicantId;
+    target.smile_id_result_code = undefined;
+    target.smile_id_result_text = undefined;
+    target.updated_at = new Date().toISOString();
+    await saveMerchantAccounts(accounts);
+
+    return c.json({
+      ok: true,
+      access_token: accessToken,
+      applicant_id: applicantId,
+      kyc_status: 'pending' as const,
+    });
+  } catch (e) {
+    const message = e instanceof Error ? e.message : String(e);
+    console.error('[Sumsub KYC] start failed', { merchant_id: account.id, error: message });
+    return c.json({ ok: false, error: 'KYC provider unavailable' }, 502);
+  }
+});
+
+app.post('/v1/merchant/kyc/callback', async (c) => {
+  const rawBody = await c.req.text();
+  const digest = c.req.header('x-payload-digest');
+  const webhookSecret = process.env.SUMSUB_WEBHOOK_SECRET?.trim() ?? '';
+  const skipSig = process.env.SUMSUB_SKIP_SIGNATURE_VERIFY === 'true';
+
+  if (!webhookSecret && !skipSig) {
+    console.error('[Sumsub KYC] callback: missing SUMSUB_WEBHOOK_SECRET');
+    return c.json(err('sumsub_config', 'Not configured'), 503);
+  }
+
+  if (!skipSig && !verifySumsubWebhookSignature(rawBody, digest, webhookSecret)) {
+    console.error('[Sumsub KYC] Invalid webhook signature');
+    return c.json(err('invalid_signature', 'Signature verification failed'), 400);
+  }
+
+  let parsed: Record<string, unknown>;
+  try {
+    parsed = JSON.parse(rawBody) as Record<string, unknown>;
+  } catch {
+    return c.json(err('invalid_json', 'Expected JSON body'), 400);
+  }
+
+  const eventType = typeof parsed.type === 'string' ? parsed.type : '';
+  if (eventType !== 'applicantReviewed') {
+    return c.json({ ok: true });
+  }
+
+  const externalUserId = typeof parsed.externalUserId === 'string' ? parsed.externalUserId : '';
+  const applicantId = typeof parsed.applicantId === 'string' ? parsed.applicantId : '';
+  const reviewResult = extractSumsubReviewResult(parsed);
+  const mapped = mapSumsubStatus(reviewResult);
+
+  const accounts = await loadMerchantAccounts();
+  const merchant = accounts.find((m) => m.id === externalUserId || (applicantId && m.smile_id_session_id === applicantId));
+  if (!merchant) {
+    console.error('[Sumsub KYC] Unknown merchant for webhook', { externalUserId, applicantId });
+    return c.json(err('not_found', 'Merchant not found'), 404);
+  }
+
+  const reviewAnswerKey = (reviewResult?.reviewAnswer ?? 'UNKNOWN').toUpperCase();
+  const notifyKey = buildKycNotifiedKey(applicantId || merchant.id, reviewAnswerKey);
+
+  if (mapped === 'approved' && merchant.kyc_status === 'approved') {
+    return c.json({ ok: true });
+  }
+
+  merchant.smile_id_result_code = reviewAnswerKey;
+  merchant.smile_id_result_text =
+    typeof reviewResult?.reviewRejectType === 'string'
+      ? reviewResult.reviewRejectType
+      : reviewResult?.reviewAnswer ?? undefined;
+
+  if (mapped === 'pending') {
+    merchant.kyc_status = 'pending';
+    merchant.updated_at = new Date().toISOString();
+    await saveMerchantAccounts(accounts);
+    return c.json({ ok: true, status: 'pending' });
+  }
+
+  const shouldNotify = merchant.smile_kyc_notified_key !== notifyKey;
+
+  if (mapped === 'approved') {
+    merchant.kyc_status = 'approved';
+    merchant.kyc_rejection_reason = undefined;
+    unlockPayoutsAfterKycApproval(merchant);
+  } else {
+    merchant.kyc_status = 'rejected';
+    merchant.kyc_rejection_reason = getSumsubRejectionReason(reviewResult);
+    merchant.payout_eligible = false;
+  }
+
+  merchant.updated_at = new Date().toISOString();
+  if (shouldNotify) {
+    merchant.smile_kyc_notified_key = notifyKey;
+  }
+  await saveMerchantAccounts(accounts);
+
+  if (shouldNotify) {
+    const dash = `${authPortalBaseUrl.replace(/\/$/, '')}/dashboard/merchant`;
+    if (mapped === 'approved') {
+      const nextPayoutIso =
+        merchant.next_payout_date ?? computeNextPayoutDateIso(merchant.payout_frequency ?? 'weekly');
+      const notifications = await loadNotifications();
+      notifications.push({
+        id: crypto.randomUUID(),
+        merchant_id: merchant.id,
+        type: 'kyc_approved',
+        title: 'Identity Verified — Payouts Unlocked',
+        message: `Your identity has been verified. Your first payout is scheduled for ${new Date(nextPayoutIso).toLocaleDateString('en-ZA', { dateStyle: 'long' })}.`,
+        kyc_verified_at: merchant.kyc_verified_at,
+        next_payout_date: nextPayoutIso,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
+      await saveNotifications(notifications);
+
+      sendKycStatusEmail({
+        merchantEmail: merchant.email,
+        merchantBusinessName: merchant.business_name,
+        approved: true,
+        payoutsActivated: true,
+        nextPayoutDate: nextPayoutIso,
+        dashboardUrl: dash,
+      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+    } else {
+      const notifications = await loadNotifications();
+      notifications.push({
+        id: crypto.randomUUID(),
+        merchant_id: merchant.id,
+        type: 'kyc_rejected',
+        title: 'Verification Failed',
+        message: merchant.kyc_rejection_reason || 'Sumsub could not verify your identity.',
+        rejection_reason: merchant.kyc_rejection_reason,
+        read: false,
+        created_at: new Date().toISOString(),
+      });
+      await saveNotifications(notifications);
+
+      sendKycStatusEmail({
+        merchantEmail: merchant.email,
+        merchantBusinessName: merchant.business_name,
+        approved: false,
+        notes: merchant.kyc_rejection_reason,
+        dashboardUrl: dash,
+      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+    }
+  }
+
+  return c.json({ ok: true, status: mapped });
+});
+
 // PATCH /v1/merchant/account - Update merchant profile (business name, contact info)
 app.patch('/v1/merchant/account', async (c) => {
   const { account } = await getMerchantIdentity(c);
@@ -2546,26 +2792,18 @@ app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
     return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
   }
 
-  // Validate required KYC data before approval
-  if (!merchant.kyc_data?.id_number || !merchant.kyc_data?.date_of_birth || !merchant.kyc_data?.phone) {
-    return c.json(err('invalid_request', 'Incomplete KYC data - missing required fields'), 400);
-  }
-
-  if (!merchant.bank_account?.account_number || !merchant.bank_account?.account_holder_name) {
-    return c.json(err('invalid_request', 'Incomplete bank account - missing required fields'), 400);
-  }
-
   // Approve merchant
   merchant.kyc_status = 'approved';
   merchant.updated_at = new Date().toISOString();
-  
+  const nextPayoutIso = unlockPayoutsAfterKycApproval(merchant);
+
   // Store approval metadata
   if (!merchant.kyc_data) {
     merchant.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
   }
 
   await saveMerchantAccounts(accounts);
-  
+
   logger.info('Merchant KYC approved', {
     merchant_id: merchantId,
     business_name: merchant.business_name,
@@ -2577,6 +2815,8 @@ app.patch('/v1/admin/kyc/approve/:merchantId', async (c) => {
     merchantBusinessName: merchant.business_name,
     approved: true,
     notes: approvalNotes || undefined,
+    nextPayoutDate: nextPayoutIso,
+    payoutsActivated: true,
   }).catch((error) => console.error('[KYC] Status email error:', error));
 
   return c.json({

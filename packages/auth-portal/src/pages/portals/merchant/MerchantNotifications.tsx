@@ -1,4 +1,5 @@
-import { AlertTriangle, Bell, ShoppingCart } from 'lucide-react';
+import type { ReactElement } from 'react';
+import { AlertTriangle, Bell, ShieldCheck, ShieldX, ShoppingCart } from 'lucide-react';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import type { MerchantNotification } from '../../../types/merchant';
 
@@ -10,15 +11,65 @@ interface MerchantNotificationsProps {
   onDismissNotificationsError: () => void;
   onMarkAllNotificationsRead: () => void;
   onMarkNotificationRead: (id: string) => void;
+  onRetryKyc: () => void;
   formatRelativeTime: (iso: string) => string;
 }
 
-const renderNotificationIcon = (type: MerchantNotification['type']) => {
-  if (type === 'order_received') return <ShoppingCart className="w-4 h-4 text-[var(--ff-success)]" />;
-  if (type === 'low_stock') return <AlertTriangle className="w-4 h-4 text-amber-300" />;
-  if (type === 'high_value_order') return <AlertTriangle className="w-4 h-4 text-[var(--ff-error)]" />;
-  return <Bell className="w-4 h-4 text-[var(--ff-ink-muted)]" />;
+type NotificationTone = {
+  icon: ReactElement;
+  badgeLabel?: string;
+  badgeClassName?: string;
 };
+
+const getNotificationTone = (type: MerchantNotification['type']): NotificationTone => {
+  if (type === 'order_received') {
+    return {
+      icon: <ShoppingCart className="w-4 h-4 text-[var(--ff-success)]" />,
+    };
+  }
+  if (type === 'low_stock') {
+    return {
+      icon: <AlertTriangle className="w-4 h-4 text-amber-300" />,
+    };
+  }
+  if (type === 'high_value_order') {
+    return {
+      icon: <AlertTriangle className="w-4 h-4 text-[var(--ff-error)]" />,
+    };
+  }
+  if (type === 'kyc_approved') {
+    return {
+      icon: <ShieldCheck className="w-4 h-4 text-green-700" />,
+      badgeLabel: 'Verified',
+      badgeClassName: 'bg-green-50 text-green-700',
+    };
+  }
+  if (type === 'kyc_rejected') {
+    return {
+      icon: <ShieldX className="w-4 h-4 text-red-700" />,
+      badgeLabel: 'Action Required',
+      badgeClassName: 'bg-red-50 text-red-700',
+    };
+  }
+  return {
+    icon: <Bell className="w-4 h-4 text-[var(--ff-ink-muted)]" />,
+  };
+};
+
+const formatNotificationDate = (iso: string): string =>
+  new Date(iso).toLocaleDateString('en-ZA', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
+
+const formatNotificationTime = (iso: string): string =>
+  new Date(iso).toLocaleTimeString('en-ZA', {
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  });
 
 export function MerchantNotifications({
   notifications,
@@ -28,6 +79,7 @@ export function MerchantNotifications({
   onDismissNotificationsError,
   onMarkAllNotificationsRead,
   onMarkNotificationRead,
+  onRetryKyc,
   formatRelativeTime,
 }: MerchantNotificationsProps) {
   return (
@@ -68,41 +120,83 @@ export function MerchantNotifications({
         <EmptyState icon={<Bell className="w-10 h-10 text-[var(--ff-ink-muted)]" />} title="No notifications" description="You're all caught up — no notifications." />
       ) : (
         <div className="space-y-3">
-          {notifications.map((notification) => (
-            <div
-              key={notification.id}
-              className={`border rounded-xl p-4 ${
-                notification.type === 'high_value_order'
+          {notifications.map((notification) => {
+            const tone = getNotificationTone(notification.type);
+
+            return (
+              <div
+                key={notification.id}
+                className={`border rounded-xl p-4 ${
+                  notification.type === 'high_value_order'
                     ? 'border-[var(--ff-error)] bg-[var(--ff-error-subtle)]'
-                  : notification.read
-                    ? 'bg-[var(--ff-surface)] border-[var(--ff-border)]'
-                    : 'bg-[var(--ff-surface)] border-[var(--ff-border)] border-l-[3px] border-l-[var(--ff-cta)] ring-1 ring-[var(--ff-cta)]/15'
-              }`}
-            >
-              <div className="flex items-start justify-between gap-3">
-                <div className="flex items-start gap-3 min-w-0">
-                  <div className="mt-0.5">{renderNotificationIcon(notification.type)}</div>
-                  <div className="min-w-0">
-                    <p className="text-[10px] uppercase tracking-wide text-[var(--ff-ink-muted)]">
-                      {(notification.type ?? 'notice').replace(/_/g, ' ')}
-                    </p>
-                    <p className={`text-sm ${notification.read ? 'text-[var(--ff-ink)]' : 'text-[var(--ff-ink)] font-semibold'}`}>{notification.title}</p>
-                    <p className="text-xs text-[var(--ff-ink-muted)] mt-1">{notification.message}</p>
-                    <p className="text-xs text-[var(--ff-ink-muted)] mt-2">{formatRelativeTime(notification.created_at)}</p>
+                    : notification.read
+                      ? 'bg-[var(--ff-surface)] border-[var(--ff-border)]'
+                      : 'bg-[var(--ff-surface)] border-[var(--ff-border)] border-l-[3px] border-l-[var(--ff-cta)] ring-1 ring-[var(--ff-cta)]/15'
+                }`}
+              >
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 min-w-0">
+                    <div className="mt-0.5">{tone.icon}</div>
+                    <div className="min-w-0">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p className="text-[10px] uppercase tracking-wide text-[var(--ff-ink-muted)]">
+                          {(notification.type ?? 'notice').replace(/_/g, ' ')}
+                        </p>
+                        {tone.badgeLabel && tone.badgeClassName && (
+                          <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${tone.badgeClassName}`}>
+                            {tone.badgeLabel}
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-sm ${notification.read ? 'text-[var(--ff-ink)]' : 'text-[var(--ff-ink)] font-semibold'}`}>
+                        {notification.title}
+                      </p>
+                      <p className="text-xs text-[var(--ff-ink-muted)] mt-1">{notification.message}</p>
+
+                      {notification.type === 'kyc_approved' && notification.data.next_payout_date && (
+                        <p className="mt-2 text-xs text-green-700">
+                          First payout scheduled: {formatNotificationDate(notification.data.next_payout_date)}
+                        </p>
+                      )}
+
+                      {notification.type === 'kyc_approved' && notification.data.kyc_verified_at && (
+                        <p className="mt-1 text-xs text-[var(--ff-ink-muted)]">
+                          Verified at {formatNotificationTime(notification.data.kyc_verified_at)}
+                        </p>
+                      )}
+
+                      {notification.type === 'kyc_rejected' && notification.data.rejection_reason && (
+                        <p className="mt-2 text-xs text-red-600 bg-red-50 rounded px-2 py-1">
+                          {notification.data.rejection_reason}
+                        </p>
+                      )}
+
+                      {notification.type === 'kyc_rejected' && (
+                        <button
+                          type="button"
+                          onClick={onRetryKyc}
+                          className="mt-2 inline-flex items-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 min-h-[44px]"
+                        >
+                          Retry Verification
+                        </button>
+                      )}
+
+                      <p className="text-xs text-[var(--ff-ink-muted)] mt-2">{formatRelativeTime(notification.created_at)}</p>
+                    </div>
                   </div>
+                  {!notification.read && (
+                    <button
+                      onClick={() => onMarkNotificationRead(notification.id)}
+                      disabled={updatingNotificationId === notification.id}
+                      className="text-xs text-[var(--ff-success)] hover:text-[var(--ff-success-bold)] disabled:text-[var(--ff-ink-muted)] px-3 py-3 min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-white/5"
+                    >
+                      {updatingNotificationId === notification.id ? 'Updating...' : 'Mark as read'}
+                    </button>
+                  )}
                 </div>
-                {!notification.read && (
-                  <button
-                    onClick={() => onMarkNotificationRead(notification.id)}
-                    disabled={updatingNotificationId === notification.id}
-                    className="text-xs text-[var(--ff-success)] hover:text-[var(--ff-success-bold)] disabled:text-[var(--ff-ink-muted)] px-3 py-3 min-h-[44px] rounded-lg border border-[var(--ff-border)] bg-white/5"
-                  >
-                    {updatingNotificationId === notification.id ? 'Updating...' : 'Mark as read'}
-                  </button>
-                )}
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

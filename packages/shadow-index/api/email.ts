@@ -100,6 +100,10 @@ interface KycStatusDetails {
   approved: boolean;
   notes?: string;
   dashboardUrl?: string;
+  /** ISO date — first scheduled payout after KYC approval */
+  nextPayoutDate?: string | null;
+  /** Use “payouts active” subject/body (automated KYC approval path) */
+  payoutsActivated?: boolean;
 }
 
 interface OrderCheckinEmailDetails {
@@ -385,20 +389,29 @@ export async function sendKycStatusEmail(details: KycStatusDetails): Promise<voi
   const notesBlock = details.notes
     ? `<br/><br/><strong>Reason:</strong> ${escapeHtml(details.notes)}`
     : '';
+  const payoutLine =
+    details.approved && details.nextPayoutDate
+      ? `<p style="margin:0 0 24px;font-size:15px;color:#18181b;"><strong>First payout:</strong> ${escapeHtml(
+          new Date(details.nextPayoutDate).toLocaleDateString('en-ZA', { dateStyle: 'long' })
+        )} (ZAR, per your payout schedule).</p>`
+      : '';
   const subject = details.approved
-    ? 'Your Fairflow account is verified'
+    ? details.payoutsActivated
+      ? "You're verified — payouts are now active"
+      : 'Your Fairflow account is verified'
     : 'Action required: Fairflow KYC update';
 
   const bodyHtml = details.approved
     ? `
-      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">Account verified ✓</h1>
+      <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">${details.payoutsActivated ? 'Identity verified — payouts unlocked' : 'Account verified ✓'}</h1>
       <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${biz}</p>
-      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">Congratulations! Your KYC verification is approved. Your account is now fully verified and you can start selling on Fairflow.</p>
-      <p style="margin:0 0 24px;font-size:15px;color:#18181b;"><strong>Payouts Unlocked:</strong> All earnings from your sales will be automatically transferred to your bank account on a weekly basis.</p>`
+      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">Congratulations! Your identity verification is approved. Your account is fully verified on Fairflow.</p>
+      ${payoutLine}
+      <p style="margin:0 0 24px;font-size:15px;color:#18181b;"><strong>Payouts:</strong> Earnings can be paid out according to your schedule once your bank details are on file.</p>`
     : `
       <h1 style="margin:0 0 8px;font-size:22px;font-weight:700;color:#18181b;">KYC verification update</h1>
       <p style="margin:0 0 24px;font-size:15px;color:#71717a;">${biz}</p>
-      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">We were unable to verify your account with the information provided.${notesBlock}<br/><br/>Please log in to your dashboard and resubmit your KYC information.</p>`;
+      <p style="margin:0 0 24px;font-size:15px;color:#18181b;">We were unable to verify your account with the information provided.${notesBlock}<br/><br/>Please log in to your dashboard and try verification again or contact support.</p>`;
 
   const html = `
 <!DOCTYPE html>

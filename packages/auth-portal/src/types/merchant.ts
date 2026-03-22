@@ -63,7 +63,7 @@ export interface MerchantOrder {
 export interface MerchantNotification {
   id: string;
   merchant_id: string;
-  type: 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'high_value_order';
+  type: 'order_received' | 'low_stock' | 'payout_processed' | 'kyc_approved' | 'kyc_rejected' | 'high_value_order';
   title: string;
   message: string;
   data: {
@@ -73,6 +73,9 @@ export interface MerchantNotification {
     order_total?: number;
     customer_email?: string;
     delivery_address?: string;
+    next_payout_date?: string;
+    kyc_verified_at?: string;
+    rejection_reason?: string;
   };
   read: boolean;
   created_at: string;
@@ -82,13 +85,21 @@ export interface MerchantAccount {
   id: string;
   business_name: string;
   email: string;
-  kyc_status: 'not_started' | 'pending' | 'approved' | 'rejected';
+  kyc_status: 'not_started' | 'pending' | 'approved' | 'rejected' | 'expired';
   kyc_data?: {
     id_number: string;
     date_of_birth: string;
     address: string;
     phone: string;
   };
+  kyc_verified_at?: string;
+  kyc_rejection_reason?: string;
+  payout_eligible?: boolean;
+  next_payout_date?: string;
+  smile_id_job_id?: string;
+  smile_id_session_id?: string;
+  smile_id_result_code?: string;
+  smile_id_result_text?: string;
   bank_account?: {
     account_holder_name: string;
     account_number: string;
