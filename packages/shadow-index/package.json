@@ -16,8 +16,7 @@
     "load-test": "node scripts/sustained-load-test.mjs",
     "type-check": "tsc --noEmit",
     "lint": "eslint . --ext .ts",
-    "format": "prettier --write \"**/*.{ts,json,md}\"",
-    "prepare": "npx husky install"
+    "format": "prettier --write \"**/*.{ts,json,md}\""
   },
   "keywords": [
     "api",
