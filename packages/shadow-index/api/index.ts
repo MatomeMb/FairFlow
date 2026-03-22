@@ -16,7 +16,7 @@ import {
 } from './middleware/rateLimit.js';
 import { apiKeyMiddleware } from './middleware/apiKey.js';
 import { err } from './shared/errors.js';
-import { signJwt, verifyJwt, issueMerchantToken } from './shared/jwt.js';
+import { verifyJwt } from './shared/jwt.js';
 import type { MerchantAccount } from './shared/merchant-types.js';
 import {
   dataRoot,
@@ -44,7 +44,14 @@ import { isR2Configured, uploadThing, getThing, checkR2Health } from '../lib/sto
 import { invalidateCache } from '../lib/query-cache.js';
 import { logError } from '../lib/error-logger.js';
 import { logger } from '../lib/logger.js';
+import { getMerchantIdentity } from './auth/merchant-identity.js';
+import {
+  loadMerchantAccounts,
+  saveMerchantAccounts,
+  sanitizeMerchantAccount,
+} from './repos/merchant-accounts.js';
 import { analyticsRouter } from './routes/analytics.js';
+import { authRouter } from './routes/auth.js';
 import { RetentionPolicy } from '../lib/retention-policy.js';
 import { db } from './db.js';
 import {
@@ -91,6 +98,7 @@ app.use('*', rateLimitMiddleware);
 app.use('*', apiKeyMiddleware);
 
 app.route('/v1/analytics', analyticsRouter);
+app.route('/v1/auth', authRouter);
 
 const storageMode = process.env.STORAGE_MODE || 'local';
 const useR2 = storageMode === 'r2' && isR2Configured();
@@ -179,116 +187,6 @@ const BATCH_MAX_SIZE = Math.min(
   Math.max(1, parseInt(process.env.BATCH_MAX_SIZE ?? '100', 10) || 100),
   500
 );
-
-const registerSchema = z.object({
-  business_name: z.string().trim().min(1, 'Business name is required'),
-  email: z.string().trim().email('Valid email is required'),
-  password: z.string().min(8, 'Password must be at least 8 characters'),
-});
-
-const loginSchema = z.object({
-  email: z.string().trim().email('Valid email is required'),
-  password: z.string().min(1, 'Password is required'),
-});
-
-const forgotPasswordSchema = z.object({
-  email: z.string().trim().email('Valid email is required'),
-});
-
-const hashPassword = (password: string): string => {
-  const salt = crypto.randomBytes(16).toString('hex');
-  const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
-  return `${salt}:${derived}`;
-};
-
-const verifyPassword = (password: string, storedHash?: string): boolean => {
-  if (!storedHash) return false;
-  const [salt, expected] = storedHash.split(':');
-  if (!salt || !expected) return false;
-  const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
-  const providedBuf = Buffer.from(derived, 'utf8');
-  const expectedBuf = Buffer.from(expected, 'utf8');
-  return providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf);
-};
-
-const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
-  const { data, error } = await db
-    .from('merchant_accounts')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    throw new Error(`Failed to load merchant accounts: ${error.message}`);
-  }
-
-  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
-    id: String(row.id ?? ''),
-    business_name: String(row.business_name ?? ''),
-    email: String(row.email ?? ''),
-    password_hash: typeof row.password_hash === 'string' ? row.password_hash : undefined,
-    auth_provider: (typeof row.password_hash === 'string' && row.password_hash.length > 0) ? 'password' : 'google',
-    kyc_status: row.kyc_status as MerchantAccount['kyc_status'],
-    commission_rate: typeof row.commission_rate === 'number' ? row.commission_rate : undefined,
-    payout_frequency: row.payout_frequency as MerchantAccount['payout_frequency'],
-    payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
-    total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
-    pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
-    payout_eligible:
-      typeof row.payout_eligible === 'boolean'
-        ? row.payout_eligible
-        : (row.kyc_status === 'approved' ? true : undefined),
-    next_payout_date: typeof row.next_payout_date === 'string' ? row.next_payout_date : undefined,
-    kyc_verified_at: typeof row.kyc_verified_at === 'string' ? row.kyc_verified_at : undefined,
-    smile_id_job_id: typeof row.smile_id_job_id === 'string' ? row.smile_id_job_id : undefined,
-    smile_id_session_id: typeof row.smile_id_session_id === 'string' ? row.smile_id_session_id : undefined,
-    smile_id_result_code: typeof row.smile_id_result_code === 'string' ? row.smile_id_result_code : undefined,
-    smile_id_result_text: typeof row.smile_id_result_text === 'string' ? row.smile_id_result_text : undefined,
-    kyc_rejection_reason: typeof row.kyc_rejection_reason === 'string' ? row.kyc_rejection_reason : undefined,
-    smile_kyc_notified_key: typeof row.smile_kyc_notified_key === 'string' ? row.smile_kyc_notified_key : undefined,
-    kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
-    bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
-    created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
-    updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
-  }));
-};
-
-const saveMerchantAccounts = async (accounts: MerchantAccount[]) => {
-  if (accounts.length === 0) return;
-
-  const rows = accounts.map((account) => ({
-    id: account.id,
-    business_name: account.business_name,
-    email: account.email.toLowerCase(),
-    password_hash: account.password_hash ?? null,
-    kyc_status: account.kyc_status ?? 'not_started',
-    kyc_data: account.kyc_data ?? null,
-    bank_account: account.bank_account ?? null,
-    commission_rate: account.commission_rate ?? 0.03,
-    payout_frequency: account.payout_frequency ?? 'weekly',
-    payout_minimum: account.payout_minimum ?? 50000,
-    total_earnings: account.total_earnings ?? 0,
-    pending_payout: account.pending_payout ?? 0,
-    payout_eligible: account.payout_eligible ?? false,
-    next_payout_date: account.next_payout_date ?? null,
-    kyc_verified_at: account.kyc_verified_at ?? null,
-    smile_id_job_id: account.smile_id_job_id ?? null,
-    smile_id_session_id: account.smile_id_session_id ?? null,
-    smile_id_result_code: account.smile_id_result_code ?? null,
-    smile_id_result_text: account.smile_id_result_text ?? null,
-    kyc_rejection_reason: account.kyc_rejection_reason ?? null,
-    smile_kyc_notified_key: account.smile_kyc_notified_key ?? null,
-    created_at: account.created_at ?? new Date().toISOString(),
-    updated_at: account.updated_at ?? new Date().toISOString(),
-  }));
-
-  const { error } = await db
-    .from('merchant_accounts')
-    .upsert(rows, { onConflict: 'id' });
-
-  if (error) {
-    throw new Error(`Failed to save merchant accounts: ${error.message}`);
-  }
-};
 
 type DeliveryAddress = {
   name?: string;
@@ -837,17 +735,6 @@ async function buildMoRStatus(): Promise<MoRStatusResponse> {
   };
 }
 
-const sanitizeMerchantAccount = (account: MerchantAccount) => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const { password_hash: _ph, reset_token: _rt, reset_expires_at: _re, ...safe } = account;
-  // Mask bank account number
-  if (safe.bank_account?.account_number) {
-    const masked = safe.bank_account.account_number.slice(-4).padStart(safe.bank_account.account_number.length, '*');
-    safe.bank_account = { ...safe.bank_account, account_number: masked };
-  }
-  return safe;
-};
-
 const unlockPayoutsAfterKycApproval = (merchant: MerchantAccount): string => {
   const frequency = merchant.payout_frequency ?? 'weekly';
   const nextIso = computeNextPayoutDateIso(frequency);
@@ -855,143 +742,6 @@ const unlockPayoutsAfterKycApproval = (merchant: MerchantAccount): string => {
   merchant.next_payout_date = nextIso;
   merchant.kyc_verified_at = new Date().toISOString();
   return nextIso;
-};
-
-const normalizePortalBaseUrl = (baseUrl: string): string =>
-  baseUrl.endsWith('/') ? baseUrl : `${baseUrl}/`;
-
-const inferPortalBaseUrl = (c: { req: { header: (name: string) => string | undefined } }): string => {
-  const explicit = c.req.header('x-auth-portal-base-url');
-  if (explicit) {
-    try {
-      const parsed = new URL(explicit);
-      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-        return parsed.origin;
-      }
-    } catch {
-      // ignore invalid override
-    }
-  }
-
-  const referer = c.req.header('referer');
-  if (referer) {
-    try {
-      const parsed = new URL(referer);
-      if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-        return parsed.origin;
-      }
-    } catch {
-      // ignore invalid referer
-    }
-  }
-
-  return authPortalBaseUrl;
-};
-
-const buildPortalUrl = (pathName: string, params?: Record<string, string>, portalBaseUrl?: string): string => {
-  const baseUrl = normalizePortalBaseUrl(portalBaseUrl ?? authPortalBaseUrl);
-  const target = new URL(pathName, baseUrl);
-  if (params) {
-    for (const [key, value] of Object.entries(params)) {
-      target.searchParams.set(key, value);
-    }
-  }
-  return target.toString();
-};
-
-const extractBearerToken = (authHeader: string | undefined): string | null => {
-  if (!authHeader) return null;
-  if (!authHeader.startsWith('Bearer ')) return null;
-  return authHeader.slice(7).trim() || null;
-};
-
-const getGoogleOAuthConfig = () => {
-  const clientId = process.env.GOOGLE_CLIENT_ID?.trim();
-  const clientSecret = process.env.GOOGLE_CLIENT_SECRET?.trim();
-  const redirectUri = process.env.GOOGLE_REDIRECT_URI?.trim();
-  if (!clientId || !clientSecret || !redirectUri) return null;
-  return { clientId, clientSecret, redirectUri };
-};
-
-const exchangeGoogleCode = async (
-  code: string,
-  config: { clientId: string; clientSecret: string; redirectUri: string }
-): Promise<{ access_token?: string } | null> => {
-  const body = new URLSearchParams({
-    code,
-    client_id: config.clientId,
-    client_secret: config.clientSecret,
-    redirect_uri: config.redirectUri,
-    grant_type: 'authorization_code',
-  });
-
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-  });
-
-  if (!response.ok) {
-    const errBody = await response.text().catch(() => 'unable to read error body');
-    console.error('[OAuth] Token exchange failed:', response.status, errBody);
-    return null;
-  }
-  return (await response.json()) as { access_token?: string };
-};
-
-const fetchGoogleProfile = async (accessToken: string): Promise<{ email?: string; name?: string } | null> => {
-  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!response.ok) return null;
-  return (await response.json()) as { email?: string; name?: string };
-};
-
-const buildGoogleState = (portalBaseUrl: string): string => {
-  const nowSeconds = Math.floor(Date.now() / 1000);
-  return signJwt(
-    {
-      typ: 'google_oauth_state',
-      nonce: crypto.randomUUID(),
-      return_to: portalBaseUrl,
-      iat: nowSeconds,
-      exp: nowSeconds + 60 * 10,
-    },
-    getJwtSecret()
-  );
-};
-
-const parseGoogleState = (state: string | null): Record<string, unknown> | null => {
-  if (!state) return null;
-  const payload = verifyJwt(state, getJwtSecret());
-  if (payload?.typ !== 'google_oauth_state') return null;
-  return payload;
-};
-
-const getMerchantIdentity = async (c: { req: { header: (name: string) => string | undefined } }): Promise<{
-  account: MerchantAccount | null;
-  merchantIds: string[];
-}> => {
-  const token = extractBearerToken(c.req.header('Authorization'));
-  if (!token) {
-    return { account: null, merchantIds: [] };
-  }
-
-  const payload = verifyJwt(token, getJwtSecret());
-  if (!payload || payload.typ !== 'merchant_auth') {
-    return { account: null, merchantIds: [] };
-  }
-
-  const subject = typeof payload.sub === 'string' ? payload.sub : null;
-  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
-  const accounts = await loadMerchantAccounts();
-  const account = accounts.find((candidate) =>
-    (subject && candidate.id === subject) || (email && candidate.email.toLowerCase() === email)
-  ) ?? null;
-
-  const merchantIds: string[] = [];
-  if (account?.id) merchantIds.push(account.id);
-  return { account, merchantIds };
 };
 
 /** Parse CSV body to array of product-like objects. Header: title,price,currency,image_url,checkout_url (order flexible). */
@@ -1163,270 +913,6 @@ app.get('/health', async (c) => {
     timestamp: new Date().toISOString(),
     checks,
   }, httpStatus);
-});
-
-// Merchant self-serve auth endpoints
-app.post('/v1/auth/merchant/register', async (c) => {
-  const body = await c.req.json().catch(() => null);
-  if (body === null || body === undefined) {
-    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
-  }
-
-  const parsed = registerSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(err('invalid_request', 'Invalid registration payload', parsed.error.flatten()), 400);
-  }
-
-  const email = parsed.data.email.toLowerCase();
-  const accounts = await loadMerchantAccounts();
-  const exists = accounts.some((account) => account.email.toLowerCase() === email);
-  if (exists) {
-    return c.json(err('account_exists', 'A merchant account with this email already exists'), 409);
-  }
-
-  const now = new Date().toISOString();
-  const account: MerchantAccount = {
-    id: crypto.randomUUID(),
-    business_name: parsed.data.business_name,
-    email,
-    password_hash: hashPassword(parsed.data.password),
-    auth_provider: 'password',
-    kyc_status: 'not_started',
-    commission_rate: 0.03,
-    payout_frequency: 'weekly',
-    payout_minimum: 50000,
-    total_earnings: 0,
-    pending_payout: 0,
-    created_at: now,
-    updated_at: now,
-  };
-
-  accounts.push(account);
-  await saveMerchantAccounts(accounts);
-
-  return c.json(
-    {
-      token: issueMerchantToken(account, getJwtSecret()),
-      account: sanitizeMerchantAccount(account),
-    },
-    201
-  );
-});
-
-app.post('/v1/auth/merchant/login', async (c) => {
-  const body = await c.req.json().catch(() => null);
-  if (body === null || body === undefined) {
-    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
-  }
-
-  const parsed = loginSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(err('invalid_request', 'Invalid login payload', parsed.error.flatten()), 400);
-  }
-
-  const email = parsed.data.email.toLowerCase();
-  const accounts = await loadMerchantAccounts();
-  const account = accounts.find((candidate) => candidate.email.toLowerCase() === email);
-  if (!account || !verifyPassword(parsed.data.password, account.password_hash)) {
-    return c.json(err('invalid_credentials', 'Invalid email or password'), 401);
-  }
-
-  account.updated_at = new Date().toISOString();
-  await saveMerchantAccounts(accounts);
-
-  return c.json({
-    token: issueMerchantToken(account, getJwtSecret()),
-    account: sanitizeMerchantAccount(account),
-  });
-});
-
-app.post('/v1/auth/merchant/refresh', async (c) => {
-  const authHeader = c.req.header('Authorization');
-  const token = extractBearerToken(authHeader);
-  if (!token) {
-    return c.json(err('unauthorized', 'Missing Bearer token'), 401);
-  }
-
-  const payload = verifyJwt(token, getJwtSecret());
-  if (!payload || payload.typ !== 'merchant_auth') {
-    return c.json(err('unauthorized', 'Invalid or expired token'), 401);
-  }
-
-  const subject = typeof payload.sub === 'string' ? payload.sub : null;
-  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
-  if (!subject && !email) {
-    return c.json(err('unauthorized', 'Token payload is missing subject'), 401);
-  }
-
-  const accounts = await loadMerchantAccounts();
-  const account = accounts.find((candidate) =>
-    subject ? candidate.id === subject : candidate.email.toLowerCase() === email
-  );
-  if (!account) {
-    return c.json(err('unauthorized', 'Account not found for token'), 401);
-  }
-
-  const newToken = issueMerchantToken(account, getJwtSecret());
-  return c.json({
-    token: newToken,
-    account: sanitizeMerchantAccount(account),
-  });
-});
-
-app.get('/v1/auth/merchant/me', async (c) => {
-  const token = extractBearerToken(c.req.header('Authorization'));
-  if (!token) {
-    return c.json(err('unauthorized', 'Missing Bearer token'), 401);
-  }
-
-  const payload = verifyJwt(token, getJwtSecret());
-  if (!payload || payload.typ !== 'merchant_auth') {
-    return c.json(err('unauthorized', 'Invalid or expired token'), 401);
-  }
-
-  const subject = typeof payload.sub === 'string' ? payload.sub : null;
-  const email = typeof payload.email === 'string' ? payload.email.toLowerCase() : null;
-  if (!subject && !email) {
-    return c.json(err('unauthorized', 'Token payload is missing subject'), 401);
-  }
-
-  const accounts = await loadMerchantAccounts();
-  const account = accounts.find((candidate) =>
-    subject ? candidate.id === subject : candidate.email.toLowerCase() === email
-  );
-  if (!account) {
-    return c.json(err('unauthorized', 'Account not found for token'), 401);
-  }
-
-  return c.json({ account: sanitizeMerchantAccount(account) });
-});
-
-app.post('/v1/auth/merchant/forgot-password', async (c) => {
-  const body = await c.req.json().catch(() => null);
-  if (body === null || body === undefined) {
-    return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
-  }
-
-  const parsed = forgotPasswordSchema.safeParse(body);
-  if (!parsed.success) {
-    return c.json(err('invalid_request', 'Invalid forgot-password payload', parsed.error.flatten()), 400);
-  }
-
-  const email = parsed.data.email.toLowerCase();
-  const accounts = await loadMerchantAccounts();
-  const account = accounts.find((candidate) => candidate.email.toLowerCase() === email);
-  if (!account) {
-    return c.json({ ok: true, message: 'If the account exists, a reset token has been generated.' });
-  }
-
-  const resetToken = crypto.randomBytes(24).toString('hex');
-  account.reset_token = resetToken;
-  account.reset_expires_at = new Date(Date.now() + 60 * 60 * 1000).toISOString();
-  account.updated_at = new Date().toISOString();
-  await saveMerchantAccounts(accounts);
-
-  return c.json({
-    ok: true,
-    message: 'Reset token generated.',
-    reset_token: resetToken,
-  });
-});
-
-app.get('/v1/auth/google', async (c) => {
-  const portalBaseUrl = inferPortalBaseUrl(c);
-  const config = getGoogleOAuthConfig();
-  if (!config) {
-    return c.json({
-      ok: false,
-      error: 'Google OAuth not configured. Missing GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, or GOOGLE_REDIRECT_URI.',
-      missing: {
-        GOOGLE_CLIENT_ID: !process.env.GOOGLE_CLIENT_ID,
-        GOOGLE_CLIENT_SECRET: !process.env.GOOGLE_CLIENT_SECRET,
-        GOOGLE_REDIRECT_URI: !process.env.GOOGLE_REDIRECT_URI,
-      }
-    }, 500);
-  }
-
-  const params = new URLSearchParams({
-    client_id: config.clientId,
-    redirect_uri: config.redirectUri,
-    response_type: 'code',
-    scope: 'openid email profile',
-    access_type: 'offline',
-    prompt: 'select_account',
-    state: buildGoogleState(portalBaseUrl),
-  });
-
-  return c.redirect(`https://accounts.google.com/o/oauth2/v2/auth?${params.toString()}`);
-});
-
-app.get('/v1/auth/google/callback', async (c) => {
-  const parsedState = parseGoogleState(c.req.query('state') ?? null);
-  const stateReturnTo = parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
-  const portalBaseUrl = stateReturnTo ?? authPortalBaseUrl;
-
-  const errorCode = c.req.query('error');
-  if (errorCode) {
-    const mapped = errorCode === 'access_denied' ? 'google_cancelled' : 'google_token_failed';
-    return c.redirect(buildPortalUrl('/merchant/login', { error: mapped }, portalBaseUrl));
-  }
-
-  if (!parsedState) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const code = c.req.query('code');
-  if (!code) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const config = getGoogleOAuthConfig();
-  if (!config) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
-  }
-
-  const tokenResponse = await exchangeGoogleCode(code, config);
-  const accessToken = tokenResponse?.access_token;
-  if (!accessToken) {
-    console.error('[OAuth] Token exchange failed — no access_token returned');
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const profile = await fetchGoogleProfile(accessToken);
-  const profileEmail = profile?.email?.toLowerCase();
-  if (!profileEmail) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_no_email' }, portalBaseUrl));
-  }
-
-  const now = new Date().toISOString();
-  const accounts = await loadMerchantAccounts();
-  let account = accounts.find((candidate) => candidate.email.toLowerCase() === profileEmail);
-
-  if (!account) {
-    account = {
-      id: crypto.randomUUID(),
-      business_name: profile?.name?.trim() || profileEmail.split('@')[0],
-      email: profileEmail,
-      auth_provider: 'google',
-      kyc_status: 'not_started',
-      commission_rate: 0.03,
-      payout_frequency: 'weekly',
-      payout_minimum: 50000,
-      total_earnings: 0,
-      pending_payout: 0,
-      created_at: now,
-      updated_at: now,
-    };
-    accounts.push(account);
-  } else {
-    account.auth_provider = 'google';
-    account.updated_at = now;
-  }
-
-  await saveMerchantAccounts(accounts);
-
-  const merchantToken = issueMerchantToken(account, getJwtSecret());
-  return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
 });
 
 type UploadedImageFile = {
