@@ -17,10 +17,12 @@ describe('api-key-registry', () => {
     else delete process.env.SHADOW_INDEX_REVOKED_KEYS;
   });
 
-  it('returns true for any non-empty key when no keys configured (open API)', () => {
+  it('returns true when no keys configured (open API), including missing key', () => {
     delete process.env.SHADOW_INDEX_API_KEY;
     delete process.env.SHADOW_INDEX_API_KEYS;
     expect(isApiKeyValid('any')).toBe(true);
+    expect(isApiKeyValid(null)).toBe(true);
+    expect(isApiKeyValid(undefined)).toBe(true);
   });
 
   it('returns false for null/empty when keys are configured', () => {

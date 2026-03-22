@@ -268,3 +268,18 @@ export async function getReport(
     summary: { totalViews, totalClicks },
   };
 }
+
+/** Append one analytics event as a JSONL line (local disk or Vitest; matches aggregateFile shape). */
+export async function appendEventJsonl(
+  eventsDir: string,
+  payload: Record<string, unknown>
+): Promise<void> {
+  await fs.mkdir(eventsDir, { recursive: true });
+  const ts =
+    typeof payload.timestamp === 'string' && payload.timestamp.length >= 10
+      ? payload.timestamp
+      : new Date().toISOString();
+  const dateStr = ts.slice(0, 10);
+  const filePath = path.join(eventsDir, `${dateStr}.jsonl`);
+  await fs.appendFile(filePath, `${JSON.stringify({ ...payload, timestamp: ts })}\n`, 'utf8');
+}

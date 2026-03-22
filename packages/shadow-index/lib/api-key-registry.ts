@@ -28,11 +28,11 @@ function getValidKeys(): string[] {
 
 /** Check if API key is valid and not revoked */
 export function isApiKeyValid(key: string | null | undefined): boolean {
+  const valid = getValidKeys();
+  if (valid.length === 0) return true; // No keys configured = open (dev / test after key strip)
   if (!key?.trim()) return false;
   const revoked = getRevokedSet();
   if (revoked.has(key)) return false;
-  const valid = getValidKeys();
-  if (valid.length === 0) return true; // No keys configured = open
   return valid.includes(key);
 }
 

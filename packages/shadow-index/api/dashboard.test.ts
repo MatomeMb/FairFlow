@@ -10,6 +10,10 @@ import { resetErrorLogger } from '../lib/error-logger.js';
 
 const BASE = 'http://localhost';
 
+const adminAuthHeaders = (): Record<string, string> => ({
+  Authorization: `Bearer ${process.env.ADMIN_SECRET_KEY ?? 'test-admin-secret'}`,
+});
+
 async function request(path: string, init?: RequestInit): Promise<Response> {
   return app.request(new Request(`${BASE}${path}`, init));
 }
@@ -68,6 +72,7 @@ describe('POST /v1/admin/retention/run', () => {
     const res = await request('/v1/admin/retention/run', {
       method: 'POST',
       headers: {
+        ...adminAuthHeaders(),
         'Accept': 'text/html',
         'Content-Type': 'application/x-www-form-urlencoded'
       }
@@ -80,7 +85,7 @@ describe('POST /v1/admin/retention/run', () => {
   it('runs retention and returns json if requested', async () => {
     const res = await request('/v1/admin/retention/run', {
       method: 'POST',
-      headers: { 'Accept': 'application/json' }
+      headers: { ...adminAuthHeaders(), 'Accept': 'application/json' }
     });
 
     expect(res.status).toBe(200);

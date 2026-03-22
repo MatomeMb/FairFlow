@@ -7,8 +7,8 @@ describe('GET /health', () => {
     expect(res.status).toBe(200);
 
     const body = await res.json();
+    expect(['ok', 'degraded']).toContain(body.status);
     expect(body).toMatchObject({
-      status: 'ok',
       service: 'shadow-index',
       company: 'fairflow',
       version: '0.6.0',

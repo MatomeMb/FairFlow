@@ -39,16 +39,16 @@ const getNotificationTone = (type: MerchantNotification['type']): NotificationTo
   }
   if (type === 'kyc_approved') {
     return {
-      icon: <ShieldCheck className="w-4 h-4 text-green-700" />,
+      icon: <ShieldCheck className="w-4 h-4 text-[var(--ff-success-bold)]" />,
       badgeLabel: 'Verified',
-      badgeClassName: 'bg-green-50 text-green-700',
+      badgeClassName: 'bg-[var(--ff-success-subtle)] text-[var(--ff-success-bold)]',
     };
   }
   if (type === 'kyc_rejected') {
     return {
-      icon: <ShieldX className="w-4 h-4 text-red-700" />,
+      icon: <ShieldX className="w-4 h-4 text-[var(--ff-error-bold)]" />,
       badgeLabel: 'Action Required',
-      badgeClassName: 'bg-red-50 text-red-700',
+      badgeClassName: 'bg-[var(--ff-error-subtle)] text-[var(--ff-error-bold)]',
     };
   }
   return {
@@ -154,7 +154,7 @@ export function MerchantNotifications({
                       <p className="text-xs text-[var(--ff-ink-muted)] mt-1">{notification.message}</p>
 
                       {notification.type === 'kyc_approved' && notification.data.next_payout_date && (
-                        <p className="mt-2 text-xs text-green-700">
+                        <p className="mt-2 text-xs text-[var(--ff-success-bold)]">
                           First payout scheduled: {formatNotificationDate(notification.data.next_payout_date)}
                         </p>
                       )}
@@ -166,7 +166,7 @@ export function MerchantNotifications({
                       )}
 
                       {notification.type === 'kyc_rejected' && notification.data.rejection_reason && (
-                        <p className="mt-2 text-xs text-red-600 bg-red-50 rounded px-2 py-1">
+                        <p className="mt-2 text-xs text-[var(--ff-error-bold)] bg-[var(--ff-error-subtle)] rounded px-2 py-1">
                           {notification.data.rejection_reason}
                         </p>
                       )}
@@ -175,7 +175,7 @@ export function MerchantNotifications({
                         <button
                           type="button"
                           onClick={onRetryKyc}
-                          className="mt-2 inline-flex items-center rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-medium text-red-700 hover:bg-red-100 min-h-[44px]"
+                          className="mt-2 inline-flex items-center rounded-lg border border-[var(--ff-error)] bg-[var(--ff-error-subtle)] px-3 py-2 text-xs font-medium text-[var(--ff-error-bold)] hover:opacity-90 min-h-[44px]"
                         >
                           Retry Verification
                         </button>

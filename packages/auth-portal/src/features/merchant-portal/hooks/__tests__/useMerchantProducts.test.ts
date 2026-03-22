@@ -56,7 +56,7 @@ describe('useMerchantProducts', () => {
       });
 
       expect(mockMerchantFetch).toHaveBeenCalledWith(
-        'https://api.test.com/v1/merchant/products',
+        'https://api.test.com/v1/merchant/products?page=1&limit=20',
         expect.objectContaining({
           headers: { Accept: 'application/json', 'x-merchant-id': 'dev-merchant-001' },
         })
