@@ -3,7 +3,7 @@
  * Uses app.request() so no server required; all tests run in-process.
  */
 
-import app from './index';
+import app from './index.js';
 
 const BASE = 'http://localhost';
 

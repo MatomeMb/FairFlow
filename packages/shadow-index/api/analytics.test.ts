@@ -3,7 +3,7 @@
  * POST /v1/analytics/event — view and click events
  */
 
-import app from './index';
+import app from './index.js';
 
 const BASE = 'http://localhost';
 

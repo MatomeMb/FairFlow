@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { getMerchantPriceCents, getConsumerPriceCents, type MerchantProduct } from './merchant-products';
+import { getMerchantPriceCents, getConsumerPriceCents, type MerchantProduct } from './merchant-products.js';
 
 const baseProduct = (): MerchantProduct => ({
   id: 'p1',
