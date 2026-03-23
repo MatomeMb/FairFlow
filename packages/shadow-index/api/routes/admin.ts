@@ -1,17 +1,12 @@
 import { Hono } from 'hono';
 import path from 'node:path';
-import crypto from 'node:crypto';
 import { validateAdminAuth } from '../middleware/adminAuth.js';
 import { err } from '../shared/errors.js';
 import { logger } from '../../lib/logger.js';
 import { invalidateCache } from '../../lib/query-cache.js';
 import { RetentionPolicy } from '../../lib/retention-policy.js';
 import { getEventsDir, dataRoot } from '../shared/server-paths.js';
-import {
-  loadMerchantAccounts,
-  saveMerchantAccounts,
-  sanitizeMerchantAccount,
-} from '../repos/merchant-accounts.js';
+import { loadMerchantAccounts, saveMerchantAccounts } from '../repos/merchant-accounts.js';
 import {
   loadPayoutLogs,
   releasePayoutLog,
@@ -19,11 +14,14 @@ import {
   buildMoRStatus,
   loadOrders,
   releaseToMerchant,
-  loadNotifications,
-  saveNotifications,
 } from '../services/commerce-store.js';
-import { unlockPayoutsAfterKycApproval } from '../shared/unlock-payouts-after-kyc.js';
-import { sendKycStatusEmail } from '../email.js';
+import {
+  getPendingKycSubmissions,
+  approveKycMerchant,
+  rejectKycMerchant,
+} from '../services/admin-kyc-service.js';
+import { listPendingAdminPayouts, releaseAdminPayoutByLogId } from '../services/admin-payout-service.js';
+import { AdminHttpError } from '../services/admin-http-error.js';
 
 export const adminRouter = new Hono();
 // GET /v1/admin/payouts - List pending payouts for admin release
@@ -32,50 +30,10 @@ adminRouter.get('/payouts', async (c) => {
     return c.json({ ok: false, error: 'Forbidden' }, 403);
   }
 
-  const [payoutLogs, merchants] = await Promise.all([loadPayoutLogs(), loadMerchantAccounts()]);
-  
-  // Filter to pending payouts and enrich with merchant names
-  const pending = payoutLogs
-    .filter((log) => log.status === 'pending')
-    .map((log) => {
-      const merchant = merchants.find((m) => m.id === log.merchant_id);
-      return {
-        id: log.id,
-        payout_log_id: log.id,
-        merchant_id: log.merchant_id,
-        merchant_name: merchant?.business_name || 'Unknown Merchant',
-        net_amount: log.net_amount ?? 0,
-        gross_amount: log.gross_amount ?? 0,
-        commission_amount: log.commission_amount ?? 0,
-        currency: log.currency ?? 'ZAR',
-        status: log.status,
-        created_at: log.created_at,
-        orders_count: Array.isArray(log.orders_included) ? log.orders_included.length : 0,
-      };
-    })
-    .sort((a, b) => {
-      const aTime = typeof a.created_at === 'string' ? new Date(a.created_at).getTime() : 0;
-      const bTime = typeof b.created_at === 'string' ? new Date(b.created_at).getTime() : 0;
-      return aTime - bTime; // Oldest first
-    });
-
   const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10));
   const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') ?? '20', 10)));
-  const offset = (page - 1) * limit;
-  const total = pending.length;
-  const pageItems = pending.slice(offset, offset + limit);
-
-  return c.json({
-    ok: true,
-    payouts: pageItems,
-    count: total,
-    pagination: {
-      page,
-      limit,
-      total,
-      pages: Math.max(1, Math.ceil(total / limit)),
-    },
-  });
+  const body = await listPendingAdminPayouts(page, limit);
+  return c.json(body);
 });
 
 adminRouter.post('/payouts/release', async (c) => {
@@ -83,26 +41,13 @@ adminRouter.post('/payouts/release', async (c) => {
     return c.json({ ok: false, error: 'Forbidden' }, 403);
   }
 
-  const body = await c.req.json().catch(() => null) as { payout_log_id?: string } | null;
-  const payoutLogId = body?.payout_log_id;
-  if (!payoutLogId) {
-    return c.json({ ok: false, error: 'Missing payout_log_id' }, 400);
-  }
-
+  const body = (await c.req.json().catch(() => null)) as { payout_log_id?: string } | null;
   try {
-    const released = await releasePayoutLog(payoutLogId, 'admin_manual');
-    return c.json({ ok: true, payout_log: released });
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error);
-    const currentStatus = (error as { currentStatus?: string }).currentStatus;
-    if (message.includes('not found')) {
-      return c.json({ ok: false, error: 'Payout log not found' }, 404);
-    }
-    if (currentStatus) {
-      return c.json({ ok: false, error: 'Payout already processed', current_status: currentStatus }, 400);
-    }
-    logger.error('Payout release failed', { payout_log_id: payoutLogId, error: message });
-    return c.json({ ok: false, error: 'Release failed', detail: message }, 500);
+    const jsonBody = await releaseAdminPayoutByLogId(body?.payout_log_id ?? '');
+    return c.json(jsonBody);
+  } catch (e) {
+    if (e instanceof AdminHttpError) return c.json(e.body, e.status);
+    throw e;
   }
 });
 
@@ -247,47 +192,10 @@ adminRouter.get('/kyc/pending', async (c) => {
     return c.json({ ok: false, error: 'Forbidden' }, 403);
   }
 
-  const accounts = await loadMerchantAccounts();
-  const pending = accounts
-    .filter((account) => account.kyc_status === 'pending')
-    .map((account) => ({
-      id: account.id,
-      business_name: account.business_name,
-      email: account.email,
-      kyc_status: account.kyc_status,
-      submitted_at: account.updated_at,
-      kyc_data: account.kyc_data,
-      bank_account: account.bank_account ? {
-        account_holder_name: account.bank_account.account_holder_name,
-        bank_name: account.bank_account.bank_name,
-        account_number: account.bank_account.account_number.slice(-4).padStart(account.bank_account.account_number.length, '*'),
-        branch_code: account.bank_account.branch_code,
-        account_type: account.bank_account.account_type,
-      } : null,
-    }))
-    .sort((a, b) => {
-      const aTime = typeof a.submitted_at === 'string' ? new Date(a.submitted_at).getTime() : 0;
-      const bTime = typeof b.submitted_at === 'string' ? new Date(b.submitted_at).getTime() : 0;
-      return aTime - bTime; // Oldest first
-    });
-
   const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10));
   const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') ?? '20', 10)));
-  const offset = (page - 1) * limit;
-  const total = pending.length;
-  const pageItems = pending.slice(offset, offset + limit);
-
-  return c.json({
-    ok: true,
-    pending: pageItems,
-    count: total,
-    pagination: {
-      page,
-      limit,
-      total,
-      pages: Math.max(1, Math.ceil(total / limit)),
-    },
-  });
+  const body = await getPendingKycSubmissions(page, limit);
+  return c.json(body);
 });
 
 // PATCH /v1/admin/kyc/approve/:merchantId - Approve KYC submission
@@ -297,60 +205,15 @@ adminRouter.patch('/kyc/approve/:merchantId', async (c) => {
   }
 
   const merchantId = c.req.param('merchantId');
-  const body = await c.req.json().catch(() => null) as { notes?: string } | null;
+  const body = (await c.req.json().catch(() => null)) as { notes?: string } | null;
   const approvalNotes = (body?.notes || '').trim();
-
-  if (!merchantId) {
-    return c.json(err('invalid_request', 'Missing merchantId'), 400);
+  try {
+    const jsonBody = await approveKycMerchant(merchantId, approvalNotes);
+    return c.json(jsonBody);
+  } catch (e) {
+    if (e instanceof AdminHttpError) return c.json(e.body, e.status);
+    throw e;
   }
-
-  const accounts = await loadMerchantAccounts();
-  const merchant = accounts.find((m) => m.id === merchantId);
-
-  if (!merchant) {
-    return c.json(err('not_found', `Merchant ${merchantId} not found`), 404);
-  }
-
-  if (merchant.kyc_status === 'approved') {
-    return c.json(err('invalid_request', 'KYC already approved'), 400);
-  }
-
-  if (merchant.kyc_status !== 'pending') {
-    return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
-  }
-
-  // Approve merchant
-  merchant.kyc_status = 'approved';
-  merchant.updated_at = new Date().toISOString();
-  const nextPayoutIso = unlockPayoutsAfterKycApproval(merchant);
-
-  // Store approval metadata
-  if (!merchant.kyc_data) {
-    merchant.kyc_data = { id_number: '', date_of_birth: '', address: '', phone: '' };
-  }
-
-  await saveMerchantAccounts(accounts);
-
-  logger.info('Merchant KYC approved', {
-    merchant_id: merchantId,
-    business_name: merchant.business_name,
-    approval_notes: approvalNotes,
-  });
-
-  sendKycStatusEmail({
-    merchantEmail: merchant.email,
-    merchantBusinessName: merchant.business_name,
-    approved: true,
-    notes: approvalNotes || undefined,
-    nextPayoutDate: nextPayoutIso,
-    payoutsActivated: true,
-  }).catch((error) => console.error('[KYC] Status email error:', error));
-
-  return c.json({
-    ok: true,
-    message: 'KYC approved successfully',
-    merchant: sanitizeMerchantAccount(merchant),
-  });
 });
 
 // PATCH /v1/admin/kyc/reject/:merchantId - Reject KYC submission
@@ -362,68 +225,13 @@ adminRouter.patch('/kyc/reject/:merchantId', async (c) => {
   const merchantId = c.req.param('merchantId');
   const body = await c.req.json().catch(() => null) as { reason?: string } | null;
   const rejectionReason = (body?.reason || '').trim();
-
-  if (!merchantId) {
-    return c.json(err('invalid_request', 'Missing merchantId'), 400);
+  try {
+    const jsonBody = await rejectKycMerchant(merchantId, rejectionReason);
+    return c.json(jsonBody);
+  } catch (e) {
+    if (e instanceof AdminHttpError) return c.json(e.body, e.status);
+    throw e;
   }
-
-  if (!rejectionReason) {
-    return c.json(err('invalid_request', 'Rejection reason is required'), 400);
-  }
-
-  const accounts = await loadMerchantAccounts();
-  const merchant = accounts.find((m) => m.id === merchantId);
-
-  if (!merchant) {
-    return c.json(err('not_found', `Merchant ${merchantId} not found`), 404);
-  }
-
-  if (merchant.kyc_status === 'rejected') {
-    return c.json(err('invalid_request', 'KYC already rejected'), 400);
-  }
-
-  if (merchant.kyc_status !== 'pending') {
-    return c.json(err('invalid_request', `KYC status is ${merchant.kyc_status}, expected pending`), 400);
-  }
-
-  // Reject merchant
-  merchant.kyc_status = 'rejected';
-  merchant.updated_at = new Date().toISOString();
-
-  await saveMerchantAccounts(accounts);
-
-  // Notify merchant of rejection
-  const notification = {
-    id: crypto.randomUUID(),
-    merchant_id: merchant.id,
-    type: 'kyc' as const,
-    title: 'KYC Verification Rejected',
-    message: `Your KYC verification was rejected. Reason: ${rejectionReason}. Please resubmit with corrected information.`,
-    read: false,
-    created_at: new Date().toISOString(),
-  };
-  const notifications = await loadNotifications();
-  notifications.push(notification);
-  await saveNotifications(notifications);
-
-  logger.info('Merchant KYC rejected', {
-    merchant_id: merchantId,
-    business_name: merchant.business_name,
-    rejection_reason: rejectionReason,
-  });
-
-  sendKycStatusEmail({
-    merchantEmail: merchant.email,
-    merchantBusinessName: merchant.business_name,
-    approved: false,
-    notes: rejectionReason || undefined,
-  }).catch((error) => console.error('[KYC] Status email error:', error));
-
-  return c.json({
-    ok: true,
-    message: 'KYC rejected. Merchant has been notified.',
-    merchant: sanitizeMerchantAccount(merchant),
-  });
 });
 
 // Sprint 4 Week 2: Retention policy — manual trigger (POST /v1/admin/retention/run)

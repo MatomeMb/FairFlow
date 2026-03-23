@@ -22,12 +22,16 @@ import { authRouter } from './routes/auth.js';
 import { webhooksRouter } from './routes/webhooks.js';
 import { adminRouter } from './routes/admin.js';
 import { checkoutRouter, checkoutPublicRouter } from './routes/checkout.js';
-import { merchantRouter } from './routes/merchant.js';
+import {
+  merchantRouter,
+  merchantUploadsPublicRouter,
+  merchantSlipsPublicRouter,
+} from './routes/merchant.js';
+import { schedulerRouter } from './routes/scheduler.js';
+import { adminProxyRouter } from './routes/admin-proxy.js';
 import { merchantProductsRouter } from './merchant-products.js';
 import { platformRouter } from './routes/platform.js';
 import { compilerRouter } from './routes/compiler.js';
-import { legacyRouter } from './routes/legacy.js';
-
 const app = new Hono();
 
 const storageMode = process.env.STORAGE_MODE || 'local';
@@ -41,13 +45,16 @@ app.route('/v1/analytics', analyticsRouter);
 app.route('/v1/auth', authRouter);
 app.route('/webhooks', webhooksRouter);
 app.route('/v1/admin', adminRouter);
+app.route('/v1/admin-proxy', adminProxyRouter);
 app.route('/checkout', checkoutRouter);
 app.route('/', checkoutPublicRouter);
 app.route('/v1/merchant/products', merchantProductsRouter);
 app.route('/v1/merchant', merchantRouter);
+app.route('/uploads', merchantUploadsPublicRouter);
+app.route('/v1/slips', merchantSlipsPublicRouter);
+app.route('/v1/cron', schedulerRouter);
 app.route('/', platformRouter);
 app.route('/', compilerRouter);
-app.route('/', legacyRouter);
 
 app.onError((error, c) => {
   const msg = error instanceof Error ? error.message : String(error);

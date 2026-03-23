@@ -782,3 +782,49 @@ merchantRouter.patch('/notifications/:notificationId', async (c) => {
   await saveNotifications(notifications);
   return c.json({ ok: true, notification: target });
 });
+
+/** Public file serving for merchant-uploaded product images (URLs match upload responses: /uploads/...). */
+export const merchantUploadsPublicRouter = new Hono();
+merchantUploadsPublicRouter.get('/:filename', async (c) => {
+  const requested = c.req.param('filename');
+  if (!/^[A-Za-z0-9._-]+$/.test(requested)) {
+    return c.json(err('invalid_request', 'Invalid file name'), 400);
+  }
+
+  const safeName = path.basename(requested);
+  const filePath = path.join(uploadsDir, safeName);
+
+  try {
+    const imageBuffer = await fs.readFile(filePath);
+    const ext = path.extname(safeName).toLowerCase();
+    c.header('Content-Type', imageMimeByExtension[ext] || 'application/octet-stream');
+    c.header('Cache-Control', 'public, max-age=31536000, immutable');
+    return c.body(imageBuffer);
+  } catch (error) {
+    const nodeError = error as NodeJS.ErrnoException;
+    if (nodeError.code === 'ENOENT') {
+      return c.json(err('not_found', 'Uploaded image not found'), 404);
+    }
+    return c.json(err('internal_error', 'Failed to load uploaded image'), 500);
+  }
+});
+
+/** Public slip files (e.g. shipment PDFs) at /v1/slips/:filename. */
+export const merchantSlipsPublicRouter = new Hono();
+merchantSlipsPublicRouter.get('/:filename', async (c) => {
+  const filename = c.req.param('filename');
+  if (!filename || filename.includes('..')) {
+    return c.json(err('invalid_request', 'Invalid filename'), 400);
+  }
+  const filePath = path.join(slipsDir, filename);
+  try {
+    const data = await fs.readFile(filePath);
+    const ext = path.extname(filename).toLowerCase();
+    const ct = ext === '.pdf' ? 'application/pdf' : ext === '.png' ? 'image/png' : 'image/jpeg';
+    return c.body(new Uint8Array(data), 200, { 'Content-Type': ct });
+  } catch (e) {
+    const nodeErr = e as NodeJS.ErrnoException;
+    if (nodeErr.code === 'ENOENT') return c.json(err('not_found', 'Slip not found'), 404);
+    throw e;
+  }
+});

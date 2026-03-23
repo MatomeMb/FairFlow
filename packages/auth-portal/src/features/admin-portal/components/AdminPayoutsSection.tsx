@@ -3,6 +3,7 @@ import { DollarSign, RefreshCw, Send } from 'lucide-react';
 import { EmptyState } from '../../../components/shared/EmptyState';
 import { Toast } from '../../../components/shared/Toast';
 import { apiBase, apiKey } from '../../../lib/config';
+import { supabase } from '../../../lib/supabase';
 
 interface Payout {
   id: string;
@@ -23,8 +24,11 @@ interface ConfirmDialogState {
   payout: Payout | null;
 }
 
+type PayoutPagination = { page: number; limit: number; total: number; pages: number };
+
 export function AdminPayoutsSection() {
   const [payouts, setPayouts] = useState<Payout[]>([]);
+  const [pagination, setPagination] = useState<PayoutPagination | null>(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [confirmDialog, setConfirmDialog] = useState<ConfirmDialogState>({ isOpen: false, payout: null });
@@ -33,15 +37,18 @@ export function AdminPayoutsSection() {
   const loadPayouts = useCallback(async () => {
     setLoading(true);
     try {
-      const adminSecret = import.meta.env.VITE_ADMIN_SECRET;
-      if (!adminSecret) {
-        setToast({ message: 'Admin credentials not configured', type: 'error' });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const supabaseToken = session?.access_token ?? '';
+      if (!supabaseToken) {
+        setToast({ message: 'Sign in required to load payouts', type: 'error' });
         return;
       }
 
-      const res = await fetch(`${apiBase}/v1/admin/payouts`, {
+      const res = await fetch(`${apiBase}/v1/admin-proxy/payouts?page=1&limit=20`, {
         headers: {
-          Authorization: `Bearer ${adminSecret}`,
+          Authorization: `Bearer ${supabaseToken}`,
           'x-api-key': apiKey,
         },
       });
@@ -50,8 +57,9 @@ export function AdminPayoutsSection() {
         throw new Error(`Failed to load payouts: ${res.status}`);
       }
 
-      const data = await res.json();
+      const data = (await res.json()) as { payouts?: Payout[]; pagination?: PayoutPagination };
       setPayouts(data.payouts || []);
+      setPagination(data.pagination ?? null);
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Failed to load payouts';
       setToast({ message, type: 'error' });
@@ -59,6 +67,31 @@ export function AdminPayoutsSection() {
       setLoading(false);
     }
   }, []);
+
+  const loadMorePayouts = useCallback(async () => {
+    if (!pagination || pagination.page >= pagination.pages) return;
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    const supabaseToken = session?.access_token ?? '';
+    if (!supabaseToken) return;
+    const nextPage = pagination.page + 1;
+    setLoading(true);
+    try {
+      const res = await fetch(`${apiBase}/v1/admin-proxy/payouts?page=${nextPage}&limit=20`, {
+        headers: {
+          Authorization: `Bearer ${supabaseToken}`,
+          'x-api-key': apiKey,
+        },
+      });
+      if (!res.ok) return;
+      const data = (await res.json()) as { payouts?: Payout[]; pagination?: PayoutPagination };
+      setPayouts((prev) => [...prev, ...(data.payouts || [])]);
+      setPagination(data.pagination ?? null);
+    } finally {
+      setLoading(false);
+    }
+  }, [apiKey, pagination]);
 
   useEffect(() => {
     loadPayouts();
@@ -76,16 +109,19 @@ export function AdminPayoutsSection() {
     setConfirmDialog({ isOpen: false, payout: null });
 
     try {
-      const adminSecret = import.meta.env.VITE_ADMIN_SECRET;
-      if (!adminSecret) {
-        setToast({ message: 'Admin credentials not configured', type: 'error' });
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+      const supabaseToken = session?.access_token ?? '';
+      if (!supabaseToken) {
+        setToast({ message: 'Sign in required to release payouts', type: 'error' });
         return;
       }
 
-      const res = await fetch(`${apiBase}/v1/admin/payouts/release`, {
+      const res = await fetch(`${apiBase}/v1/admin-proxy/payouts/release`, {
         method: 'POST',
         headers: {
-          Authorization: `Bearer ${adminSecret}`,
+          Authorization: `Bearer ${supabaseToken}`,
           'x-api-key': apiKey,
           'Content-Type': 'application/json',
         },
@@ -137,7 +173,9 @@ export function AdminPayoutsSection() {
         <div>
           <h2 className="text-xl font-bold text-[var(--ff-ink)]">Pending Payouts</h2>
           <p className="text-sm text-white mt-1">
-            {payouts.length} payout{payouts.length !== 1 ? 's' : ''} pending release
+            Showing {payouts.length}
+            {pagination ? ` of ${pagination.total}` : ''} pending payout
+            {pagination && pagination.total !== 1 ? 's' : ''}
           </p>
         </div>
         <button onClick={() => loadPayouts()} disabled={loading} className="flex items-center gap-2 px-4 py-2 bg-[var(--ff-cta)] hover:bg-[var(--ff-cta-hover)] disabled:opacity-50 text-[var(--ff-neutral)] rounded-lg transition">
@@ -181,6 +219,19 @@ export function AdminPayoutsSection() {
           </tbody>
         </table>
       </div>
+
+      {pagination && pagination.page < pagination.pages && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            onClick={() => void loadMorePayouts()}
+            disabled={loading}
+            className="px-4 py-2 rounded-lg border border-[rgba(255,255,255,0.12)] text-[var(--ff-ink)] text-sm hover:bg-[rgba(255,255,255,0.04)] disabled:opacity-50"
+          >
+            {loading ? 'Loading…' : 'Load more payouts'}
+          </button>
+        </div>
+      )}
 
       {/* Confirmation Dialog */}
       {confirmDialog.isOpen && confirmDialog.payout && (

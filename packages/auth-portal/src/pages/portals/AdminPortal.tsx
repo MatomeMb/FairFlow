@@ -7,7 +7,6 @@ import { MetricCard } from '../../components/shared/MetricCard';
 import { RoleBadge } from '../../components/shared/RoleBadge';
 import { Toast } from '../../components/shared/Toast';
 import { EmptyState } from '../../components/shared/EmptyState';
-import { adminSecret, isUsingDefaultAdminSecret } from '../../lib/config';
 import { useAdminNavigation } from '../../features/admin-portal/hooks/useAdminNavigation';
 import { useAdminShellState } from '../../features/admin-portal/hooks/useAdminShellState';
 import { useAdminKYCQueue } from '../../features/admin-portal/hooks/useAdminKYCQueue';
@@ -32,11 +31,8 @@ const NAVIGATION_ICON_MAP: Record<string, NavIcon> = {
 
 export const AdminPortal: React.FC = () => {
   const { signOut } = useAuth();
-  const hasConfiguredAdminSecret = Boolean(import.meta.env.VITE_ADMIN_SECRET);
-  const showAdminSecretWarning = !hasConfiguredAdminSecret || isUsingDefaultAdminSecret;
   const [toast, setToast] = useState<ToastState>(null);
   const [apiOnline, setApiOnline] = useState(true);
-  const token = adminSecret;
   const { navigation, activeSection, setActiveSection } = useAdminNavigation();
   const {
     sidebarOpen,
@@ -56,7 +52,7 @@ export const AdminPortal: React.FC = () => {
     openKYCAction,
     resetKYCAction,
     handleKYCAction,
-  } = useAdminKYCQueue(token, (message, type) => setToast({ message, type }));
+  } = useAdminKYCQueue((message, type) => setToast({ message, type }));
 
   const { data: analytics, error: apiError, secondsSince, refresh, checkHealth } = useAnalytics();
   const { users, loading: _usersLoading, refresh: _refreshUsers } = useSupabaseUsers();
@@ -147,9 +143,25 @@ export const AdminPortal: React.FC = () => {
     );
   };
 
-  const renderSystem = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2><div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5"><p className="text-sm text-white">System features coming soon</p></div></div>;
+  const renderSystem = () => (
+    <div className="p-6 space-y-6">
+      <h2 className="text-xl font-bold text-[var(--ff-ink)]">System</h2>
+      <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5 text-center py-12 text-[#8A99AA]">
+        <p className="text-sm">Platform system controls — planned for v0.7</p>
+        <p className="text-xs mt-2">Service toggles, feature flags, and environment diagnostics</p>
+      </div>
+    </div>
+  );
 
-  const renderFinancials = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2><div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5"><p className="text-sm text-white">Financial reporting coming soon</p></div></div>;
+  const renderFinancials = () => (
+    <div className="p-6 space-y-6">
+      <h2 className="text-xl font-bold text-[var(--ff-ink)]">Financials</h2>
+      <div className="bg-[#1A2D42] border border-[rgba(255,255,255,0.07)] rounded-xl p-5 text-center py-12 text-[#8A99AA]">
+        <p className="text-sm">Financials dashboard — planned for v0.7</p>
+        <p className="text-xs mt-2">Platform revenue, commission, and merchant payout rollups</p>
+      </div>
+    </div>
+  );
 
   const renderSettings = () => <div className="p-6 space-y-6"><h2 className="text-xl font-bold text-[var(--ff-ink)]">Settings</h2><button onClick={signOut} className="flex items-center gap-2 px-6 py-3 bg-[var(--ff-error)] hover:bg-[var(--ff-error-bold)] text-[var(--ff-neutral)] rounded-lg transition"><LogOut className="w-4 h-4" />Sign Out</button></div>;
 
@@ -255,14 +267,6 @@ export const AdminPortal: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {showAdminSecretWarning && (
-          <div className="mx-4 md:mx-6 mt-4 rounded-lg border border-[var(--ff-warning-border)] bg-[var(--ff-warning-subtle)] px-4 py-3">
-            <p className="text-sm text-[var(--ff-warning-bold)]">
-              Admin API secret is not configured. Set `VITE_ADMIN_SECRET` to match backend `ADMIN_SECRET_KEY`.
-            </p>
-          </div>
-        )}
 
         <div className="flex-1 overflow-y-auto">
           {renderContent()}

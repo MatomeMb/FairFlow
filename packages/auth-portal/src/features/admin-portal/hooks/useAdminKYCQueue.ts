@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { apiBase } from '../../../lib/config';
+import { supabase } from '../../../lib/supabase';
 
 export interface KYCSubmission {
   id: string;
@@ -63,7 +64,14 @@ function mapPendingKycFromApi(item: Record<string, unknown>): KYCSubmission {
 type ActionType = 'approve' | 'reject';
 type ToastType = 'success' | 'error' | 'info';
 
-export function useAdminKYCQueue(token: string, onToast?: (message: string, type: ToastType) => void) {
+async function getSupabaseAccessToken(): Promise<string> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+  return session?.access_token ?? '';
+}
+
+export function useAdminKYCQueue(onToast?: (message: string, type: ToastType) => void) {
   const [pendingKYC, setPendingKYC] = useState<KYCSubmission[]>([]);
   const [loadingKYC, setLoadingKYC] = useState(false);
   const [selectedKYC, setSelectedKYC] = useState<KYCSubmission | null>(null);
@@ -74,10 +82,19 @@ export function useAdminKYCQueue(token: string, onToast?: (message: string, type
   const loadKYCQueue = async () => {
     setLoadingKYC(true);
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/pending`, { headers: { Authorization: `Bearer ${token}` } });
+      const supabaseToken = await getSupabaseAccessToken();
+      if (!supabaseToken) {
+        onToast?.('Sign in required to load KYC queue', 'error');
+        return;
+      }
+      const response = await fetch(`${apiBase}/v1/admin-proxy/kyc/pending?page=1&limit=100`, {
+        headers: { Authorization: `Bearer ${supabaseToken}` },
+      });
       const data = (await response.json()) as { ok?: boolean; pending?: Record<string, unknown>[] };
       if (data.ok && Array.isArray(data.pending)) {
         setPendingKYC(data.pending.map((row) => mapPendingKycFromApi(row)));
+      } else if (!response.ok) {
+        onToast?.('Failed to fetch pending KYC', 'error');
       }
     } catch {
       onToast?.('Failed to fetch pending KYC', 'error');
@@ -104,9 +121,14 @@ export function useAdminKYCQueue(token: string, onToast?: (message: string, type
     const path = kycAction === 'approve' ? 'approve' : 'reject';
     const payload = kycAction === 'approve' ? { notes: approvalNotes } : { reason: rejectionReason };
     try {
-      const response = await fetch(`${apiBase}/v1/admin/kyc/${path}/${selectedKYC.id}`, {
+      const supabaseToken = await getSupabaseAccessToken();
+      if (!supabaseToken) {
+        onToast?.('Sign in required', 'error');
+        return;
+      }
+      const response = await fetch(`${apiBase}/v1/admin-proxy/kyc/${path}/${selectedKYC.id}`, {
         method: 'PATCH',
-        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        headers: { Authorization: `Bearer ${supabaseToken}`, 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
       const data = await response.json();

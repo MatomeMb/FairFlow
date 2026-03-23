@@ -4,7 +4,7 @@ import { authPortalBaseUrl } from '../shared/runtime-config.js';
 import { logger } from '../../lib/logger.js';
 import { getPaystack } from '../services/paystack-client.js';
 import { tryReconcileOrderWithPaystackVerify } from '../services/paystack-order-flow.js';
-import { loadOrders } from '../services/commerce-store.js';
+import { loadOrders, saveOrders, releaseToMerchant } from '../services/commerce-store.js';
 import {
   readProducts,
   findMerchantProductByThingHash,
@@ -134,6 +134,36 @@ checkoutPublicRouter.get('/v1/orders/:id/status', async (c) => {
       currency: order.currency ?? 'ZAR',
     },
   });
+});
+
+checkoutPublicRouter.post('/v1/orders/:orderId/confirm-receipt', async (c) => {
+  const orderId = c.req.param('orderId');
+  const orders = await loadOrders();
+  const order = orders.find((o) => o.id === orderId);
+  if (!order) return c.json(err('not_found', 'Order not found'), 404);
+
+  if (order.fulfillment_status !== 'shipped' && order.fulfillment_status !== 'fulfilled') {
+    return c.json(err('invalid_request', 'Order has not been shipped yet'), 400);
+  }
+  if (!order.shipment_slip_url) {
+    return c.json(err('invalid_request', 'Merchant has not confirmed shipment yet'), 400);
+  }
+  if (order.payment_status === 'released') {
+    return c.json({ ok: true, message: 'Already confirmed' }, 200);
+  }
+
+  const now = new Date().toISOString();
+  order.payment_status = 'confirmed';
+  order.customer_confirmed_at = now;
+  order.updated_at = now;
+
+  const idx = orders.findIndex((o) => o.id === orderId);
+  if (idx >= 0) orders[idx] = order;
+  await saveOrders(orders);
+
+  await releaseToMerchant(order);
+
+  return c.json({ ok: true, message: 'Thank you! Payment has been released to the merchant.' }, 200);
 });
 
 // GET /orders/:idOrReference - Fetch order by ID or Paystack reference
