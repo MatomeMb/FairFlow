@@ -145,6 +145,7 @@ export async function ensureOrderFromPaystackChargePayload(
         await writeProducts(products);
       } else {
         // FINAL-POLISH: emit structured error when atomic stock decrement did not commit successfully.
+        // ALERT_THRESHOLD: stock_decrement_failure_rate > 0.001
         apiLogger.error(
           {
             reference,

@@ -1,6 +1,6 @@
 import crypto from 'node:crypto';
 import { err } from '../shared/errors.js';
-import { logger } from '../../lib/logger.js';
+import { emitMetric, apiLogger } from '../shared/logger.js';
 import {
   loadMerchantAccounts,
   saveMerchantAccounts,
@@ -60,6 +60,7 @@ export async function getPendingKycSubmissions(page: number, limit: number) {
 }
 
 export async function approveKycMerchant(merchantId: string, approvalNotes: string) {
+  const startedAt = performance.now();
   if (!merchantId) {
     throw new AdminHttpError(400, err('invalid_request', 'Missing merchantId'));
   }
@@ -92,7 +93,8 @@ export async function approveKycMerchant(merchantId: string, approvalNotes: stri
 
   await saveMerchantAccounts(accounts);
 
-  logger.info('Merchant KYC approved', {
+  apiLogger.info({
+    msg: 'merchant_kyc_approved',
     merchant_id: merchantId,
     business_name: merchant.business_name,
     approval_notes: approvalNotes,
@@ -105,7 +107,15 @@ export async function approveKycMerchant(merchantId: string, approvalNotes: stri
     notes: approvalNotes || undefined,
     nextPayoutDate: nextPayoutIso,
     payoutsActivated: true,
-  }).catch((error) => console.error('[KYC] Status email error:', error));
+  }).catch((error) => apiLogger.error({ error: String(error) }, 'kyc_status_email_failed'));
+
+  const latencyMs = Math.round((performance.now() - startedAt) * 100) / 100;
+  emitMetric(apiLogger, 'kyc.approval.duration_ms', latencyMs, { merchantId });
+  // FINAL-POLISH: codify operational alert thresholds with greppable markers.
+  // ALERT_THRESHOLD: kyc_approval_duration_ms > 1000
+  if (latencyMs > 1000) {
+    apiLogger.warn({ merchantId, latencyMs }, 'kyc_approval_latency_high');
+  }
 
   return {
     ok: true,
@@ -115,6 +125,7 @@ export async function approveKycMerchant(merchantId: string, approvalNotes: stri
 }
 
 export async function rejectKycMerchant(merchantId: string, rejectionReason: string) {
+  const startedAt = performance.now();
   if (!merchantId) {
     throw new AdminHttpError(400, err('invalid_request', 'Missing merchantId'));
   }
@@ -159,7 +170,8 @@ export async function rejectKycMerchant(merchantId: string, rejectionReason: str
   notifications.push(notification);
   await saveNotifications(notifications);
 
-  logger.info('Merchant KYC rejected', {
+  apiLogger.info({
+    msg: 'merchant_kyc_rejected',
     merchant_id: merchantId,
     business_name: merchant.business_name,
     rejection_reason: rejectionReason,
@@ -170,7 +182,10 @@ export async function rejectKycMerchant(merchantId: string, rejectionReason: str
     merchantBusinessName: merchant.business_name,
     approved: false,
     notes: rejectionReason || undefined,
-  }).catch((error) => console.error('[KYC] Status email error:', error));
+  }).catch((error) => apiLogger.error({ error: String(error) }, 'kyc_status_email_failed'));
+
+  const latencyMs = Math.round((performance.now() - startedAt) * 100) / 100;
+  emitMetric(apiLogger, 'kyc.rejection.duration_ms', latencyMs, { merchantId });
 
   return {
     ok: true,

@@ -131,6 +131,8 @@ analyticsRouter.get('/report', async (c) => {
   const t0 = performance.now();
   try {
     const cachedResult = getCached(cacheKey);
+    // FINAL-POLISH: codify cache behaviour alert threshold for operations dashboards.
+    // ALERT_THRESHOLD: cache_miss_ratio > 0.3 over 5 min
     if (cachedResult) {
       const durationMs = Math.round(performance.now() - t0);
       recordQuery(params, durationMs, cachedResult.rows.length);
