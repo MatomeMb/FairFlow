@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import { db } from '../db.js';
 import type { MerchantAccount } from '../shared/merchant-types.js';
+import { logger } from '../../lib/logger.js';
 
 /** Stored when the merchant has no password (Google OAuth). `verifyPassword` rejects it (no `salt:hex` pair). */
 export const OAUTH_NO_PASSWORD_SENTINEL = '!oauth-no-password!';
@@ -86,9 +87,12 @@ const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => {
 export const findMerchantAccountByEmail = async (email: string): Promise<MerchantAccount | null> => {
   const normalized = email.toLowerCase();
 
-  const byEq = await db.from('merchant_accounts').select('*').eq('email', normalized).limit(1);
+  const byEq = await db.from('merchant_accounts').select('*').eq('email', normalized).limit(2);
   if (byEq.error) {
     throw formatPgErr('find merchant by email (eq)', byEq.error);
+  }
+  if ((byEq.data?.length ?? 0) > 1) {
+    logger.warn('duplicate_merchant_accounts_email_eq', { email: normalized, count: byEq.data?.length ?? 0 });
   }
   const row0 = byEq.data?.[0];
   if (row0 && typeof row0 === 'object') {
@@ -99,9 +103,12 @@ export const findMerchantAccountByEmail = async (email: string): Promise<Merchan
     .from('merchant_accounts')
     .select('*')
     .ilike('email', escapeIlikeExact(normalized))
-    .limit(1);
+    .limit(2);
   if (byIlike.error) {
     throw formatPgErr('find merchant by email (ilike)', byIlike.error);
+  }
+  if ((byIlike.data?.length ?? 0) > 1) {
+    logger.warn('duplicate_merchant_accounts_email_ilike', { email: normalized, count: byIlike.data?.length ?? 0 });
   }
   const row1 = byIlike.data?.[0];
   if (!row1 || typeof row1 !== 'object') return null;
