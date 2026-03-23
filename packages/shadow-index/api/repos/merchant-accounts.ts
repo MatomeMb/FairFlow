@@ -18,6 +18,54 @@ export const verifyPassword = (password: string, storedHash?: string): boolean =
   return providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf);
 };
 
+const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => ({
+  id: String(row.id ?? ''),
+  business_name: String(row.business_name ?? ''),
+  email: String(row.email ?? ''),
+  password_hash: typeof row.password_hash === 'string' ? row.password_hash : undefined,
+  auth_provider: typeof row.password_hash === 'string' && row.password_hash.length > 0 ? 'password' : 'google',
+  kyc_status: row.kyc_status as MerchantAccount['kyc_status'],
+  commission_rate: typeof row.commission_rate === 'number' ? row.commission_rate : undefined,
+  payout_frequency: row.payout_frequency as MerchantAccount['payout_frequency'],
+  payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
+  total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
+  pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
+  payout_eligible:
+    typeof row.payout_eligible === 'boolean'
+      ? row.payout_eligible
+      : row.kyc_status === 'approved'
+        ? true
+        : undefined,
+  next_payout_date: typeof row.next_payout_date === 'string' ? row.next_payout_date : undefined,
+  kyc_verified_at: typeof row.kyc_verified_at === 'string' ? row.kyc_verified_at : undefined,
+  smile_id_job_id: typeof row.smile_id_job_id === 'string' ? row.smile_id_job_id : undefined,
+  smile_id_session_id: typeof row.smile_id_session_id === 'string' ? row.smile_id_session_id : undefined,
+  smile_id_result_code: typeof row.smile_id_result_code === 'string' ? row.smile_id_result_code : undefined,
+  smile_id_result_text: typeof row.smile_id_result_text === 'string' ? row.smile_id_result_text : undefined,
+  kyc_rejection_reason: typeof row.kyc_rejection_reason === 'string' ? row.kyc_rejection_reason : undefined,
+  smile_kyc_notified_key: typeof row.smile_kyc_notified_key === 'string' ? row.smile_kyc_notified_key : undefined,
+  kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
+  bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
+  created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
+  updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
+});
+
+/** Single-row lookup by email — avoids relying on a full-table scan for OAuth (unique email conflicts, etc.). */
+export const findMerchantAccountByEmail = async (email: string): Promise<MerchantAccount | null> => {
+  const normalized = email.toLowerCase();
+  const { data, error } = await db
+    .from('merchant_accounts')
+    .select('*')
+    .eq('email', normalized)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to load merchant account: ${error.message}`);
+  }
+  if (!data || typeof data !== 'object') return null;
+  return mapMerchantRow(data as Record<string, unknown>);
+};
+
 export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
   const { data, error } = await db
     .from('merchant_accounts')
@@ -28,37 +76,7 @@ export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
     throw new Error(`Failed to load merchant accounts: ${error.message}`);
   }
 
-  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => ({
-    id: String(row.id ?? ''),
-    business_name: String(row.business_name ?? ''),
-    email: String(row.email ?? ''),
-    password_hash: typeof row.password_hash === 'string' ? row.password_hash : undefined,
-    auth_provider: typeof row.password_hash === 'string' && row.password_hash.length > 0 ? 'password' : 'google',
-    kyc_status: row.kyc_status as MerchantAccount['kyc_status'],
-    commission_rate: typeof row.commission_rate === 'number' ? row.commission_rate : undefined,
-    payout_frequency: row.payout_frequency as MerchantAccount['payout_frequency'],
-    payout_minimum: typeof row.payout_minimum === 'number' ? row.payout_minimum : undefined,
-    total_earnings: typeof row.total_earnings === 'number' ? row.total_earnings : undefined,
-    pending_payout: typeof row.pending_payout === 'number' ? row.pending_payout : undefined,
-    payout_eligible:
-      typeof row.payout_eligible === 'boolean'
-        ? row.payout_eligible
-        : row.kyc_status === 'approved'
-          ? true
-          : undefined,
-    next_payout_date: typeof row.next_payout_date === 'string' ? row.next_payout_date : undefined,
-    kyc_verified_at: typeof row.kyc_verified_at === 'string' ? row.kyc_verified_at : undefined,
-    smile_id_job_id: typeof row.smile_id_job_id === 'string' ? row.smile_id_job_id : undefined,
-    smile_id_session_id: typeof row.smile_id_session_id === 'string' ? row.smile_id_session_id : undefined,
-    smile_id_result_code: typeof row.smile_id_result_code === 'string' ? row.smile_id_result_code : undefined,
-    smile_id_result_text: typeof row.smile_id_result_text === 'string' ? row.smile_id_result_text : undefined,
-    kyc_rejection_reason: typeof row.kyc_rejection_reason === 'string' ? row.kyc_rejection_reason : undefined,
-    smile_kyc_notified_key: typeof row.smile_kyc_notified_key === 'string' ? row.smile_kyc_notified_key : undefined,
-    kyc_data: (row.kyc_data as MerchantAccount['kyc_data']) ?? undefined,
-    bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
-    created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
-    updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
-  }));
+  return ((data ?? []) as Array<Record<string, unknown>>).map((row) => mapMerchantRow(row));
 };
 
 const merchantAccountToDbRow = (account: MerchantAccount) => ({

@@ -15,6 +15,7 @@ import {
   parseGoogleState,
 } from '../auth/portal-oauth.js';
 import {
+  findMerchantAccountByEmail,
   hashPassword,
   loadMerchantAccounts,
   saveMerchantAccounts,
@@ -284,8 +285,7 @@ authRouter.get('/google/callback', async (c) => {
     }
 
     const now = new Date().toISOString();
-    const accounts = await loadMerchantAccounts();
-    let account = accounts.find((candidate) => candidate.email.toLowerCase() === profileEmail);
+    let account = await findMerchantAccountByEmail(profileEmail);
 
     if (!account) {
       account = {

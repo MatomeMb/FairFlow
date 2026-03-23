@@ -39,7 +39,6 @@ if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
 
 const REQUIRED_ENV_VARS = [
   'SUPABASE_URL',
-  'SUPABASE_SERVICE_KEY',
   'JWT_SECRET',
   'GOOGLE_CLIENT_ID',
   'GOOGLE_CLIENT_SECRET',
@@ -48,6 +47,9 @@ const REQUIRED_ENV_VARS = [
   'PAYSTACK_SECRET_KEY',
 ];
 const _missingEnv = REQUIRED_ENV_VARS.filter((key) => !process.env[key]);
+if (!process.env.SUPABASE_SERVICE_KEY && !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  _missingEnv.push('SUPABASE_SERVICE_KEY or SUPABASE_SERVICE_ROLE_KEY');
+}
 if (_missingEnv.length > 0) {
   console.error(`[FATAL] Missing environment variables: ${_missingEnv.join(', ')}`);
 }

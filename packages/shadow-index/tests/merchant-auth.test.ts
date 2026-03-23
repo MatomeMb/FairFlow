@@ -20,6 +20,12 @@ vi.mock('../api/db.js', () => ({
       return {
         select: () => ({
           order: () => Promise.resolve({ data: [...rows], error: null }),
+          eq: (col: string, val: unknown) => ({
+            maybeSingle: () => {
+              const row = rows.find((r) => (r as Record<string, unknown>)[col] === val) ?? null;
+              return Promise.resolve({ data: row, error: null });
+            },
+          }),
         }),
         upsert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
           const list = Array.isArray(data) ? data : [data];
