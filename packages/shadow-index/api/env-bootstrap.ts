@@ -64,6 +64,12 @@ if (
   !process.env.SHADOW_INDEX_API_KEY &&
   !process.env.SHADOW_INDEX_API_KEYS
 ) {
-  console.error('[FATAL] SHADOW_INDEX_API_KEY is required. Refusing to start.');
-  process.exit(1);
+  const msg = '[FATAL] SHADOW_INDEX_API_KEY is required.';
+  if (process.env.VERCEL) {
+    // Keep the function alive in hosted runtimes and surface the misconfiguration in logs.
+    console.error(`${msg} Continuing startup on Vercel to avoid total API outage.`);
+  } else {
+    console.error(`${msg} Refusing to start.`);
+    process.exit(1);
+  }
 }
