@@ -1,4 +1,4 @@
-# CI: type-check, lint, test for shadow-index (lead package)
+# CI: type-check, lint, test for shadow-index and auth-portal
 name: CI
 
 on:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: mcj/packages/shadow-index
+        working-directory: packages/shadow-index
 
     steps:
       - uses: actions/checkout@v4
@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: mcj/packages/shadow-index/package-lock.json
+          cache-dependency-path: packages/shadow-index/package-lock.json
 
       - name: Install dependencies
         run: npm ci 2>/dev/null || npm install
@@ -36,3 +36,34 @@ jobs:
 
       - name: Test
         run: npm run test -- --run
+
+  auth-portal-quality:
+    name: auth-portal
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: packages/auth-portal
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: packages/auth-portal/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci 2>/dev/null || npm install
+
+      - name: Type-check
+        run: npx tsc --noEmit
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Build
+        run: npm run build

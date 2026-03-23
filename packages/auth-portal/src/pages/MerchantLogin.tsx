@@ -34,6 +34,8 @@ export function MerchantLogin() {
         google_profile_failed: "Could not retrieve your Google profile. Please try again.",
         google_no_email: "Google account email is required to continue.",
         google_not_configured: "Google sign-in is not configured yet.",
+        oauth_failed:
+          "We could not finish sign-in due to a server error. Please try again or use email and password.",
         account_exists: "An account with a different email already exists.",
       };
       setError(messages[urlError] || "Sign-in failed. Please try again.");

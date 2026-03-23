@@ -8,6 +8,8 @@
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
 import { db } from './db.js';
+import { verifyJwt } from './shared/jwt.js';
+import { getJwtSecret } from './shared/runtime-config.js';
 
 /** Merchant product with stock, status, and thing linkage */
 export type MerchantProduct = {
@@ -49,38 +51,6 @@ type MerchantProductRow = {
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const isUuid = (value: unknown): value is string => typeof value === 'string' && UUID_RE.test(value);
 
-const base64UrlDecode = (value: string): Buffer => {
-  const normalized = value.replace(/-/g, '+').replace(/_/g, '/');
-  const pad = normalized.length % 4 === 0 ? '' : '='.repeat(4 - (normalized.length % 4));
-  return Buffer.from(`${normalized}${pad}`, 'base64');
-};
-
-const hmacSha256 = (input: string, secret: string): string =>
-  crypto.createHmac('sha256', secret).update(input).digest('base64url');
-
-const verifyJwt = (token: string, secret: string): Record<string, unknown> | null => {
-  const parts = token.split('.');
-  if (parts.length !== 3) return null;
-  const [headerB64, payloadB64, signatureB64] = parts;
-  const signingInput = `${headerB64}.${payloadB64}`;
-  const expected = hmacSha256(signingInput, secret);
-
-  const providedBuf = Buffer.from(signatureB64, 'utf8');
-  const expectedBuf = Buffer.from(expected, 'utf8');
-  if (providedBuf.length !== expectedBuf.length || !crypto.timingSafeEqual(providedBuf, expectedBuf)) {
-    return null;
-  }
-
-  try {
-    const payload = JSON.parse(base64UrlDecode(payloadB64).toString('utf8')) as Record<string, unknown>;
-    const exp = payload.exp;
-    if (typeof exp === 'number' && Date.now() >= exp * 1000) return null;
-    return payload;
-  } catch {
-    return null;
-  }
-};
-
 const resolveMerchantId = async (c: {
   req: { header: (name: string) => string | undefined };
   get?: (key: string) => unknown;
@@ -94,7 +64,7 @@ const resolveMerchantId = async (c: {
     return null;
   }
 
-  const jwtSecret = process.env.JWT_SECRET;
+  const jwtSecret = getJwtSecret();
   if (!jwtSecret) return null;
   const payload = verifyJwt(bearer, jwtSecret);
   if (!payload || payload.typ !== 'merchant_auth') return null;
@@ -323,12 +293,17 @@ merchantProductsRouter.get('/', async (c) => {
     return c.json(err('unauthorized', 'Unauthorized'), 401);
   }
 
-  const { data, error } = await db
+  const page = Math.max(1, parseInt(c.req.query('page') ?? '1', 10));
+  const limit = Math.min(100, Math.max(1, parseInt(c.req.query('limit') ?? '20', 10)));
+  const offset = (page - 1) * limit;
+
+  const { data, error, count } = await db
     .from('merchant_products')
-    .select('*')
+    .select('*', { count: 'exact' })
     .eq('merchant_id', merchantId)
     .neq('status', 'archived')
-    .order('created_at', { ascending: false });
+    .order('created_at', { ascending: false })
+    .range(offset, offset + limit - 1);
 
   if (error) {
     return c.json(err('storage_error', `Failed to load products: ${error.message}`), 500);
@@ -336,7 +311,16 @@ merchantProductsRouter.get('/', async (c) => {
 
   const rows = (data ?? []) as MerchantProductRow[];
   const enriched = rows.map((row) => enrichProductWithThingFile(rowToProduct(row)));
-  return c.json({ products: enriched }, 200);
+  const total = count ?? 0;
+  return c.json({
+    products: enriched,
+    pagination: {
+      page,
+      limit,
+      total,
+      pages: Math.max(1, Math.ceil(total / limit)),
+    },
+  }, 200);
 });
 
 /** POST /v1/merchant/products — create product */

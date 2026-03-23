@@ -13,26 +13,49 @@ async function apiError(res: Response, fallback: string): Promise<string> {
   }
 }
 
+type OrderPagination = { page: number; limit: number; total: number; pages: number };
+
 export function useMerchantOrders(
   token: string | null,
   merchantFetch: (url: string, options?: RequestInit) => Promise<Response>
 ) {
   const [orders, setOrders] = useState<MerchantOrder[]>([]);
   const [isLoadingOrders, setIsLoadingOrders] = useState(false);
+  const [ordersPagination, setOrdersPagination] = useState<OrderPagination | null>(null);
   const [fulfillingOrderId, setFulfillingOrderId] = useState<string | null>(null);
   const [uploadingSlipOrderId, setUploadingSlipOrderId] = useState<string | null>(null);
 
   const loadOrders = useCallback(async () => {
     setIsLoadingOrders(true);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/orders`, { headers: { Accept: 'application/json' } });
+      const res = await merchantFetch(`${apiBase}/v1/merchant/orders?page=1&limit=20`, {
+        headers: { Accept: 'application/json' },
+      });
       if (!res.ok) throw new Error(await apiError(res, 'Failed to load orders'));
-      const data = await res.json();
+      const data = (await res.json()) as { orders?: MerchantOrder[]; pagination?: OrderPagination };
       setOrders(data.orders || []);
+      setOrdersPagination(data.pagination ?? null);
     } finally {
       setIsLoadingOrders(false);
     }
   }, [merchantFetch, token]);
+
+  const loadMoreOrders = useCallback(async () => {
+    if (!ordersPagination || ordersPagination.page >= ordersPagination.pages) return;
+    const nextPage = ordersPagination.page + 1;
+    setIsLoadingOrders(true);
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/orders?page=${nextPage}&limit=20`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error(await apiError(res, 'Failed to load orders'));
+      const data = (await res.json()) as { orders?: MerchantOrder[]; pagination?: OrderPagination };
+      setOrders((prev) => [...prev, ...(data.orders || [])]);
+      setOrdersPagination(data.pagination ?? null);
+    } finally {
+      setIsLoadingOrders(false);
+    }
+  }, [merchantFetch, token, ordersPagination]);
 
   const fulfillOrder = useCallback(async (orderId: string) => {
     setFulfillingOrderId(orderId);
@@ -92,7 +115,9 @@ export function useMerchantOrders(
   return {
     orders,
     isLoadingOrders,
+    ordersPagination,
     loadOrders,
+    loadMoreOrders,
     fulfillOrder,
     uploadSlip,
     markAsShipped,

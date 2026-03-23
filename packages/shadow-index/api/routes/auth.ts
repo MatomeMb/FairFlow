@@ -19,8 +19,11 @@ import {
   loadMerchantAccounts,
   saveMerchantAccounts,
   sanitizeMerchantAccount,
+  upsertMerchantAccount,
   verifyPassword,
 } from '../repos/merchant-accounts.js';
+import { logError } from '../../lib/error-logger.js';
+import { logger } from '../../lib/logger.js';
 import { err } from '../shared/errors.js';
 import { issueMerchantToken, verifyJwt } from '../shared/jwt.js';
 import type { MerchantAccount } from '../shared/merchant-types.js';
@@ -241,70 +244,78 @@ authRouter.get('/google', async (c) => {
 });
 
 authRouter.get('/google/callback', async (c) => {
-  const parsedState = parseGoogleState(c.req.query('state') ?? null);
-  const stateReturnTo = parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
-  const portalBaseUrl = stateReturnTo ?? authPortalBaseUrl;
+  let portalBaseUrl = authPortalBaseUrl;
+  try {
+    const parsedState = parseGoogleState(c.req.query('state') ?? null);
+    const stateReturnTo = parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
+    portalBaseUrl = stateReturnTo ?? authPortalBaseUrl;
 
-  const errorCode = c.req.query('error');
-  if (errorCode) {
-    const mapped = errorCode === 'access_denied' ? 'google_cancelled' : 'google_token_failed';
-    return c.redirect(buildPortalUrl('/merchant/login', { error: mapped }, portalBaseUrl));
+    const errorCode = c.req.query('error');
+    if (errorCode) {
+      const mapped = errorCode === 'access_denied' ? 'google_cancelled' : 'google_token_failed';
+      return c.redirect(buildPortalUrl('/merchant/login', { error: mapped }, portalBaseUrl));
+    }
+
+    if (!parsedState) {
+      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+    }
+
+    const code = c.req.query('code');
+    if (!code) {
+      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+    }
+
+    const config = getGoogleOAuthConfig();
+    if (!config) {
+      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
+    }
+
+    const tokenResponse = await exchangeGoogleCode(code, config);
+    const accessToken = tokenResponse?.access_token;
+    if (!accessToken) {
+      logger.error('[OAuth] Token exchange failed — no access_token returned');
+      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+    }
+
+    const profile = await fetchGoogleProfile(accessToken);
+    const profileEmail = profile?.email?.toLowerCase();
+    if (!profileEmail) {
+      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_no_email' }, portalBaseUrl));
+    }
+
+    const now = new Date().toISOString();
+    const accounts = await loadMerchantAccounts();
+    let account = accounts.find((candidate) => candidate.email.toLowerCase() === profileEmail);
+
+    if (!account) {
+      account = {
+        id: crypto.randomUUID(),
+        business_name: profile?.name?.trim() || profileEmail.split('@')[0],
+        email: profileEmail,
+        auth_provider: 'google',
+        kyc_status: 'not_started',
+        commission_rate: 0.03,
+        payout_frequency: 'weekly',
+        payout_minimum: 50000,
+        total_earnings: 0,
+        pending_payout: 0,
+        created_at: now,
+        updated_at: now,
+      };
+    } else {
+      account.auth_provider = 'google';
+      account.updated_at = now;
+    }
+
+    await upsertMerchantAccount(account);
+
+    const merchantToken = issueMerchantToken(account, getJwtSecret());
+    return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
+  } catch (error) {
+    const msg = error instanceof Error ? error.message : String(error);
+    const stack = error instanceof Error ? error.stack : undefined;
+    logError({ path: c.req.path, method: c.req.method, flow: 'google_oauth_callback' }, msg, stack);
+    logger.error('Google OAuth callback failed', { error: msg });
+    return c.redirect(buildPortalUrl('/merchant/login', { error: 'oauth_failed' }, portalBaseUrl));
   }
-
-  if (!parsedState) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const code = c.req.query('code');
-  if (!code) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const config = getGoogleOAuthConfig();
-  if (!config) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
-  }
-
-  const tokenResponse = await exchangeGoogleCode(code, config);
-  const accessToken = tokenResponse?.access_token;
-  if (!accessToken) {
-    console.error('[OAuth] Token exchange failed — no access_token returned');
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
-  }
-
-  const profile = await fetchGoogleProfile(accessToken);
-  const profileEmail = profile?.email?.toLowerCase();
-  if (!profileEmail) {
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_no_email' }, portalBaseUrl));
-  }
-
-  const now = new Date().toISOString();
-  const accounts = await loadMerchantAccounts();
-  let account = accounts.find((candidate) => candidate.email.toLowerCase() === profileEmail);
-
-  if (!account) {
-    account = {
-      id: crypto.randomUUID(),
-      business_name: profile?.name?.trim() || profileEmail.split('@')[0],
-      email: profileEmail,
-      auth_provider: 'google',
-      kyc_status: 'not_started',
-      commission_rate: 0.03,
-      payout_frequency: 'weekly',
-      payout_minimum: 50000,
-      total_earnings: 0,
-      pending_payout: 0,
-      created_at: now,
-      updated_at: now,
-    };
-    accounts.push(account);
-  } else {
-    account.auth_provider = 'google';
-    account.updated_at = now;
-  }
-
-  await saveMerchantAccounts(accounts);
-
-  const merchantToken = issueMerchantToken(account, getJwtSecret());
-  return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
 });

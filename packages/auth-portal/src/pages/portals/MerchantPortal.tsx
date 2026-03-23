@@ -79,13 +79,17 @@ export const MerchantPortal: React.FC = () => {
     products,
     isLoadingProducts,
     loadProducts,
+    loadMoreProducts,
+    productsPagination,
     handleDeleteProduct,
     handleRestockProduct: restockProduct,
   } = useMerchantProducts(authToken, merchantFetch);
   const {
     orders,
     isLoadingOrders,
+    ordersPagination,
     loadOrders,
+    loadMoreOrders,
     fulfillOrder,
     uploadSlip,
     markAsShipped,
@@ -152,6 +156,8 @@ export const MerchantPortal: React.FC = () => {
         google_profile_failed: 'Could not retrieve your Google profile. Please try again.',
         google_no_email: 'Google account email is required to continue.',
         google_not_configured: 'Google sign-in is not configured yet.',
+        oauth_failed:
+          'We could not finish sign-in due to a server error. Please try again or use email and password.',
         account_exists: 'An account with a different email already exists.',
       };
       showToast(messages[urlError] || 'Sign-in failed. Please try again.', 'error');
@@ -310,14 +316,15 @@ export const MerchantPortal: React.FC = () => {
     setNotificationsLoading(true);
     setNotificationsError(null);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/notifications`, {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/notifications?page=1&limit=50`, {
         headers: { Accept: 'application/json' },
       });
       if (!res.ok) {
         throw new Error('Failed to load notifications');
       }
-      const data = await res.json();
-      setNotifications(Array.isArray(data) ? data : []);
+      const raw = await res.json() as MerchantNotification[] | { notifications?: MerchantNotification[] };
+      const list = Array.isArray(raw) ? raw : (raw.notifications ?? []);
+      setNotifications(list);
     } catch (e) {
       const msg = e instanceof Error ? e.message : 'Failed to load notifications';
       setNotificationsError(msg);
@@ -597,22 +604,36 @@ export const MerchantPortal: React.FC = () => {
   }, [loadProductsWithError, showToast]);
 
   const renderOrders = () => (
-    <MerchantOrders
-      orders={orders}
-      ordersLoading={isLoadingOrders}
-      ordersError={ordersError}
-      fulfillingOrderId={fulfillingOrderId}
-      uploadingSlipOrderId={uploadingSlipOrderId}
-      commissionRate={commissionRate}
-      onDismissOrdersError={handleDismissOrdersError}
-      onMarkAsFulfilled={handleMarkAsFulfilled}
-      onUploadSlip={handleUploadSlip}
-      onMarkAsShipped={handleMarkAsShipped}
-      onDeliveryDateSaved={(orderId, date) => updateOrder(orderId, { estimated_delivery_date: date })}
-      getPayoutStatusLabel={getPayoutStatusLabel}
-      apiBase={apiBase}
-      authToken={authToken}
-    />
+    <div className="space-y-4">
+      <MerchantOrders
+        orders={orders}
+        ordersLoading={isLoadingOrders}
+        ordersError={ordersError}
+        fulfillingOrderId={fulfillingOrderId}
+        uploadingSlipOrderId={uploadingSlipOrderId}
+        commissionRate={commissionRate}
+        onDismissOrdersError={handleDismissOrdersError}
+        onMarkAsFulfilled={handleMarkAsFulfilled}
+        onUploadSlip={handleUploadSlip}
+        onMarkAsShipped={handleMarkAsShipped}
+        onDeliveryDateSaved={(orderId, date) => updateOrder(orderId, { estimated_delivery_date: date })}
+        getPayoutStatusLabel={getPayoutStatusLabel}
+        apiBase={apiBase}
+        authToken={authToken}
+      />
+      {ordersPagination && ordersPagination.page < ordersPagination.pages && (
+        <div className="flex justify-center">
+          <button
+            type="button"
+            className="px-4 py-2 rounded-lg bg-[var(--ff-neutral)]/20 text-sm text-[var(--ff-ink)] border border-[var(--ff-border-light)] hover:bg-[var(--ff-neutral)]/30 disabled:opacity-50"
+            disabled={isLoadingOrders}
+            onClick={() => void loadMoreOrders()}
+          >
+            {isLoadingOrders ? 'Loading…' : 'Load more orders'}
+          </button>
+        </div>
+      )}
+    </div>
   );
 
   const formatRelativeTime = (iso: string) => {
@@ -687,36 +708,50 @@ export const MerchantPortal: React.FC = () => {
     >
       <div className="space-y-6">
         {activeTab === 'products' && (
-          <MerchantProductsSection
-            ErrorBanner={ErrorBanner}
-            InlineSpinner={InlineSpinner}
-            products={products}
-            orders={orders}
-            merchantAccount={merchantAccount}
-            analyticsError={analyticsError}
-            ordersError={ordersError}
-            accountError={accountError}
-            productsError={productsError}
-            onDismissAnalyticsError={handleDismissAnalyticsError}
-            onDismissOrdersError={handleDismissOrdersError}
-            onDismissAccountError={handleDismissAccountError}
-            onDismissProductsError={handleDismissProductsError}
-            isLoadingOrders={isLoadingOrders}
-            accountLoading={accountLoading}
-            isLoadingProducts={isLoadingProducts}
-            showOnboardingBanner={showOnboardingBanner}
-            onDismissOnboardingBanner={handleDismissOnboardingBanner}
-            onOpenCreateModal={handleOpenCreateModal}
-            onGoToKycPayouts={handleGoToKycPayouts}
-            stats={stats}
-            restockingProductId={restockingProductId}
-            onRestockProduct={handleRestockProduct}
-            copiedMatterId={copiedMatterId}
-            copiedPageId={copiedPageId}
-            onCopyMatter={handleCopyMatter}
-            onCopyPage={handleCopyPage}
-            onRemoveProduct={handleRemoveProduct}
-          />
+          <div className="space-y-4">
+            <MerchantProductsSection
+              ErrorBanner={ErrorBanner}
+              InlineSpinner={InlineSpinner}
+              products={products}
+              orders={orders}
+              merchantAccount={merchantAccount}
+              analyticsError={analyticsError}
+              ordersError={ordersError}
+              accountError={accountError}
+              productsError={productsError}
+              onDismissAnalyticsError={handleDismissAnalyticsError}
+              onDismissOrdersError={handleDismissOrdersError}
+              onDismissAccountError={handleDismissAccountError}
+              onDismissProductsError={handleDismissProductsError}
+              isLoadingOrders={isLoadingOrders}
+              accountLoading={accountLoading}
+              isLoadingProducts={isLoadingProducts}
+              showOnboardingBanner={showOnboardingBanner}
+              onDismissOnboardingBanner={handleDismissOnboardingBanner}
+              onOpenCreateModal={handleOpenCreateModal}
+              onGoToKycPayouts={handleGoToKycPayouts}
+              stats={stats}
+              restockingProductId={restockingProductId}
+              onRestockProduct={handleRestockProduct}
+              copiedMatterId={copiedMatterId}
+              copiedPageId={copiedPageId}
+              onCopyMatter={handleCopyMatter}
+              onCopyPage={handleCopyPage}
+              onRemoveProduct={handleRemoveProduct}
+            />
+            {productsPagination && productsPagination.page < productsPagination.pages && (
+              <div className="flex justify-center">
+                <button
+                  type="button"
+                  className="px-4 py-2 rounded-lg bg-[var(--ff-neutral)]/20 text-sm text-[var(--ff-ink)] border border-[var(--ff-border-light)] hover:bg-[var(--ff-neutral)]/30 disabled:opacity-50"
+                  disabled={isLoadingProducts}
+                  onClick={() => void loadMoreProducts()}
+                >
+                  {isLoadingProducts ? 'Loading…' : 'Load more products'}
+                </button>
+              </div>
+            )}
+          </div>
         )}
         {activeTab === 'analytics' && (
           <MerchantAnalyticsSection

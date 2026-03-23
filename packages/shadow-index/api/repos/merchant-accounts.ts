@@ -61,34 +61,47 @@ export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
   }));
 };
 
+const merchantAccountToDbRow = (account: MerchantAccount) => ({
+  id: account.id,
+  business_name: account.business_name,
+  email: account.email.toLowerCase(),
+  password_hash: account.password_hash ?? null,
+  kyc_status: account.kyc_status ?? 'not_started',
+  kyc_data: account.kyc_data ?? null,
+  bank_account: account.bank_account ?? null,
+  commission_rate: account.commission_rate ?? 0.03,
+  payout_frequency: account.payout_frequency ?? 'weekly',
+  payout_minimum: account.payout_minimum ?? 50000,
+  total_earnings: account.total_earnings ?? 0,
+  pending_payout: account.pending_payout ?? 0,
+  payout_eligible: account.payout_eligible ?? false,
+  next_payout_date: account.next_payout_date ?? null,
+  kyc_verified_at: account.kyc_verified_at ?? null,
+  smile_id_job_id: account.smile_id_job_id ?? null,
+  smile_id_session_id: account.smile_id_session_id ?? null,
+  smile_id_result_code: account.smile_id_result_code ?? null,
+  smile_id_result_text: account.smile_id_result_text ?? null,
+  kyc_rejection_reason: account.kyc_rejection_reason ?? null,
+  smile_kyc_notified_key: account.smile_kyc_notified_key ?? null,
+  created_at: account.created_at ?? new Date().toISOString(),
+  updated_at: account.updated_at ?? new Date().toISOString(),
+});
+
+/** Persist one account (OAuth, targeted updates) without re-upserting every merchant row. */
+export const upsertMerchantAccount = async (account: MerchantAccount): Promise<void> => {
+  const { error } = await db
+    .from('merchant_accounts')
+    .upsert([merchantAccountToDbRow(account)], { onConflict: 'id' });
+
+  if (error) {
+    throw new Error(`Failed to save merchant account: ${error.message}`);
+  }
+};
+
 export const saveMerchantAccounts = async (accounts: MerchantAccount[]): Promise<void> => {
   if (accounts.length === 0) return;
 
-  const rows = accounts.map((account) => ({
-    id: account.id,
-    business_name: account.business_name,
-    email: account.email.toLowerCase(),
-    password_hash: account.password_hash ?? null,
-    kyc_status: account.kyc_status ?? 'not_started',
-    kyc_data: account.kyc_data ?? null,
-    bank_account: account.bank_account ?? null,
-    commission_rate: account.commission_rate ?? 0.03,
-    payout_frequency: account.payout_frequency ?? 'weekly',
-    payout_minimum: account.payout_minimum ?? 50000,
-    total_earnings: account.total_earnings ?? 0,
-    pending_payout: account.pending_payout ?? 0,
-    payout_eligible: account.payout_eligible ?? false,
-    next_payout_date: account.next_payout_date ?? null,
-    kyc_verified_at: account.kyc_verified_at ?? null,
-    smile_id_job_id: account.smile_id_job_id ?? null,
-    smile_id_session_id: account.smile_id_session_id ?? null,
-    smile_id_result_code: account.smile_id_result_code ?? null,
-    smile_id_result_text: account.smile_id_result_text ?? null,
-    kyc_rejection_reason: account.kyc_rejection_reason ?? null,
-    smile_kyc_notified_key: account.smile_kyc_notified_key ?? null,
-    created_at: account.created_at ?? new Date().toISOString(),
-    updated_at: account.updated_at ?? new Date().toISOString(),
-  }));
+  const rows = accounts.map(merchantAccountToDbRow);
 
   const { error } = await db.from('merchant_accounts').upsert(rows, { onConflict: 'id' });
 
