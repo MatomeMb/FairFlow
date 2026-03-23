@@ -17,16 +17,26 @@ vi.mock('../api/db.js', () => ({
           }),
         };
       }
-      return {
-        select: () => ({
-          order: () => Promise.resolve({ data: [...rows], error: null }),
-          eq: (col: string, val: unknown) => ({
-            maybeSingle: () => {
-              const row = rows.find((r) => (r as Record<string, unknown>)[col] === val) ?? null;
-              return Promise.resolve({ data: row, error: null });
-            },
-          }),
+      const selectChain = () => ({
+        order: () => Promise.resolve({ data: [...rows], error: null }),
+        eq: (col: string, val: unknown) => ({
+          maybeSingle: () => {
+            const row = rows.find((r) => (r as Record<string, unknown>)[col] === val) ?? null;
+            return Promise.resolve({ data: row, error: null });
+          },
         }),
+        ilike: (col: string, val: unknown) => ({
+          maybeSingle: () => {
+            const pattern = String(val).replace(/\\([\\%_])/g, '$1').toLowerCase();
+            const row =
+              rows.find((r) => String((r as Record<string, unknown>)[col]).toLowerCase() === pattern) ??
+              null;
+            return Promise.resolve({ data: row, error: null });
+          },
+        }),
+      });
+      return {
+        select: () => selectChain(),
         upsert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
           const list = Array.isArray(data) ? data : [data];
           for (const row of list) {

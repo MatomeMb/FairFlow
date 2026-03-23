@@ -2,6 +2,12 @@ import crypto from 'node:crypto';
 import { db } from '../db.js';
 import type { MerchantAccount } from '../shared/merchant-types.js';
 
+/** Stored when the merchant has no password (Google OAuth). `verifyPassword` rejects it (no `salt:hex` pair). */
+export const OAUTH_NO_PASSWORD_SENTINEL = '!oauth-no-password!';
+
+const escapeIlikeExact = (value: string): string =>
+  value.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+
 export const hashPassword = (password: string): string => {
   const salt = crypto.randomBytes(16).toString('hex');
   const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
@@ -18,12 +24,18 @@ export const verifyPassword = (password: string, storedHash?: string): boolean =
   return providedBuf.length === expectedBuf.length && crypto.timingSafeEqual(providedBuf, expectedBuf);
 };
 
-const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => ({
+const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => {
+  const rawPh = row.password_hash;
+  const password_hash =
+    typeof rawPh === 'string' && rawPh !== OAUTH_NO_PASSWORD_SENTINEL ? rawPh : undefined;
+  const hasRealPassword = Boolean(password_hash?.includes(':'));
+
+  return {
   id: String(row.id ?? ''),
   business_name: String(row.business_name ?? ''),
   email: String(row.email ?? ''),
-  password_hash: typeof row.password_hash === 'string' ? row.password_hash : undefined,
-  auth_provider: typeof row.password_hash === 'string' && row.password_hash.length > 0 ? 'password' : 'google',
+  password_hash,
+  auth_provider: hasRealPassword ? 'password' : 'google',
   kyc_status: row.kyc_status as MerchantAccount['kyc_status'],
   commission_rate: typeof row.commission_rate === 'number' ? row.commission_rate : undefined,
   payout_frequency: row.payout_frequency as MerchantAccount['payout_frequency'],
@@ -48,22 +60,32 @@ const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => ({
   bank_account: (row.bank_account as MerchantAccount['bank_account']) ?? undefined,
   created_at: typeof row.created_at === 'string' ? row.created_at : undefined,
   updated_at: typeof row.updated_at === 'string' ? row.updated_at : undefined,
-});
+  };
+};
+
 
 /** Single-row lookup by email — avoids relying on a full-table scan for OAuth (unique email conflicts, etc.). */
 export const findMerchantAccountByEmail = async (email: string): Promise<MerchantAccount | null> => {
   const normalized = email.toLowerCase();
-  const { data, error } = await db
+
+  const byEq = await db.from('merchant_accounts').select('*').eq('email', normalized).maybeSingle();
+  if (byEq.error) {
+    throw new Error(`Failed to load merchant account: ${byEq.error.message}`);
+  }
+  if (byEq.data && typeof byEq.data === 'object') {
+    return mapMerchantRow(byEq.data as Record<string, unknown>);
+  }
+
+  const byIlike = await db
     .from('merchant_accounts')
     .select('*')
-    .eq('email', normalized)
+    .ilike('email', escapeIlikeExact(normalized))
     .maybeSingle();
-
-  if (error) {
-    throw new Error(`Failed to load merchant account: ${error.message}`);
+  if (byIlike.error) {
+    throw new Error(`Failed to load merchant account: ${byIlike.error.message}`);
   }
-  if (!data || typeof data !== 'object') return null;
-  return mapMerchantRow(data as Record<string, unknown>);
+  if (!byIlike.data || typeof byIlike.data !== 'object') return null;
+  return mapMerchantRow(byIlike.data as Record<string, unknown>);
 };
 
 export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
@@ -83,7 +105,7 @@ const merchantAccountToDbRow = (account: MerchantAccount) => ({
   id: account.id,
   business_name: account.business_name,
   email: account.email.toLowerCase(),
-  password_hash: account.password_hash ?? null,
+  password_hash: account.password_hash ?? OAUTH_NO_PASSWORD_SENTINEL,
   kyc_status: account.kyc_status ?? 'not_started',
   kyc_data: account.kyc_data ?? null,
   bank_account: account.bank_account ?? null,

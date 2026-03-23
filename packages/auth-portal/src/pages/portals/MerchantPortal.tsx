@@ -11,6 +11,7 @@ import { MerchantOrders } from './merchant/MerchantOrders';
 import { MerchantNotifications } from './merchant/MerchantNotifications';
 import { MerchantKYCPayouts } from './merchant/MerchantKYCPayouts';
 import { apiBase } from '../../lib/config';
+import { hasPendingMerchantOAuthHandoff } from '../../lib/merchantTokenStorage';
 import { useMerchantAuthToken } from '../../features/merchant-portal/hooks/useMerchantAuthToken';
 import { useMerchantProducts } from '../../features/merchant-portal/hooks/useMerchantProducts';
 import { useMerchantOrders } from '../../features/merchant-portal/hooks/useMerchantOrders';
@@ -169,12 +170,13 @@ export const MerchantPortal: React.FC = () => {
     const timer = setTimeout(() => {
       const fromUrl = new URLSearchParams(window.location.search).get('token');
       const fromStorage = sessionStorage.getItem('merchantToken') || sessionStorage.getItem('merchant_token');
-      if (!fromUrl && !fromStorage && !authToken && !import.meta.env.VITE_API_KEY) {
+      const pendingHandoff = hasPendingMerchantOAuthHandoff();
+      if (!fromUrl && !fromStorage && !pendingHandoff && !authToken && !import.meta.env.VITE_API_KEY) {
         window.location.href = '/merchant/login';
       }
-    }, 500); // Wait 500ms to allow URL/storage to be processed
+    }, 500); // Wait 500ms to allow URL/storage/cookie handoff to be processed
     return () => clearTimeout(timer);
-  }, []);
+  }, [authToken]);
 
   useEffect(() => {
     if (merchantAccount?.kyc_status !== 'not_started' || products.length > 0) {

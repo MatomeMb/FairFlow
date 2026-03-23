@@ -1,6 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import { getMerchantToken } from "../lib/merchantTokenStorage";
+import { getMerchantToken, hasPendingMerchantOAuthHandoff } from "../lib/merchantTokenStorage";
 
 interface MerchantPortalGuardProps {
   children: React.ReactNode;
@@ -13,8 +13,8 @@ export function MerchantPortalGuard({ children }: MerchantPortalGuardProps) {
   // Merchant API requires a merchant token (or API key), so gate entry on it.
   const hasToken =
     typeof window !== "undefined" &&
-    (new URLSearchParams(window.location.search).get("token") ||
-      getMerchantToken() ||
+    (getMerchantToken() ||
+      hasPendingMerchantOAuthHandoff() ||
       import.meta.env.VITE_API_KEY);
 
   if (hasToken) {

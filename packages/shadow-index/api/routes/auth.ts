@@ -30,6 +30,18 @@ import { issueMerchantToken, verifyJwt } from '../shared/jwt.js';
 import type { MerchantAccount } from '../shared/merchant-types.js';
 import { authPortalBaseUrl, getJwtSecret } from '../shared/runtime-config.js';
 
+/**
+ * When set to e.g. `.fairflow.co.za`, OAuth sets `ff_merchant_oauth` and redirects without `?token=`
+ * (avoids long `Location` headers / broken redirects). Portal must set the same value in
+ * `VITE_MERCHANT_OAUTH_COOKIE_DOMAIN` so the client can clear the cookie after copying to sessionStorage.
+ */
+const merchantOAuthCookieHeader = (token: string): string | null => {
+  const domain = process.env.MERCHANT_OAUTH_COOKIE_DOMAIN?.trim();
+  if (!domain) return null;
+  const enc = encodeURIComponent(token);
+  return `ff_merchant_oauth=${enc}; Domain=${domain}; Path=/; Max-Age=600; SameSite=Lax; Secure`;
+};
+
 const registerSchema = z.object({
   business_name: z.string().trim().min(1, 'Business name is required'),
   email: z.string().trim().email('Valid email is required'),
@@ -310,6 +322,11 @@ authRouter.get('/google/callback', async (c) => {
     await upsertMerchantAccount(account);
 
     const merchantToken = issueMerchantToken(account, getJwtSecret());
+    const cookie = merchantOAuthCookieHeader(merchantToken);
+    if (cookie) {
+      c.header('Set-Cookie', cookie);
+      return c.redirect(buildPortalUrl('/dashboard/merchant', undefined, portalBaseUrl));
+    }
     return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);

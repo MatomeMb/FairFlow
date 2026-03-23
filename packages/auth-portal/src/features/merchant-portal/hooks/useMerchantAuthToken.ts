@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 import {
+  consumeOAuthHandoffToStorage,
   getMerchantToken,
   setMerchantToken,
   clearMerchantToken,
@@ -27,6 +28,11 @@ export function useMerchantAuthToken() {
     getMerchantToken()
   );
   const isRefreshing = useRef(false);
+
+  useEffect(() => {
+    const handoff = consumeOAuthHandoffToStorage();
+    if (handoff) setToken(handoff);
+  }, []);
 
   const refreshToken = useCallback(async (currentToken: string) => {
     if (isRefreshing.current) return;
