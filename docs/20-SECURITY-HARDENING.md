@@ -162,17 +162,23 @@ function isApiKeyValid(key: string | null | undefined): boolean {
 
 ### CORS Configuration
 
-```typescript
-app.use('*', cors());  // Current: Allow all origins
+Production CORS is implemented in `packages/shadow-index/api/middleware/cors.ts` using `hono/cors`:
 
-// Better for production:
-app.use('*', cors({
-  origin: ['https://fairflow.app', 'http://localhost:5178'],
-  credentials: true,
-  methods: ['GET', 'POST', 'PATCH', 'DELETE'],
-  headers: ['Content-Type', 'Authorization']
-}));
-```
+- **Production:** `origin` is restricted to `https://fairflow.co.za`, `https://www.fairflow.co.za`, `https://portal.fairflow.co.za`, and `https://api.fairflow.co.za`.
+- **Non-production:** the same production origins plus local dev hosts (`http://localhost:3000`, `http://localhost:5178`, and `127.0.0.1` variants).
+- **Allowed headers** include `Content-Type`, `Authorization`, `x-merchant-id`, `x-api-key`, and `x-auth-portal-base-url`.
+
+Do not revert to `cors()` with unrestricted origins.
+
+---
+
+## Architectural sprint hardening (March 2026)
+
+Three changes tightened the API surface without changing merchant checkout flows:
+
+1. **Unified JWT verification** — HS256 merchant and OAuth state tokens are verified only in `packages/shadow-index/api/shared/jwt.ts`. Route modules and `merchant-products.ts` import `verifyJwt` / `issueMerchantToken` from there; do not duplicate HMAC verification logic in handlers.
+2. **Admin secret out of the browser bundle** — CEO/CTO actions that previously depended on `VITE_ADMIN_SECRET` now call `/v1/admin-proxy/*`. The handler validates the Supabase access token server-side (service role client + `user_roles` for `ceo` / `cto`). `ADMIN_SECRET_KEY` stays on the server for `/v1/admin/*` (cron, tooling).
+3. **Restricted CORS** — As above, allowed origins are explicit in `middleware/cors.ts` instead of wildcard.
 
 ---
 

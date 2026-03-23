@@ -131,25 +131,31 @@ Two authentication systems are supported:
    - Use in header: `Authorization: Bearer <token>`
    - Tokens expire in 7 days
 
-2. **Admin Secret** — For admin operations only
-   - Use in header: `Authorization: <ADMIN_SECRET_KEY>`
-   - Long-lived; rotate regularly
+2. **Admin secret** — Server-side only for `/v1/admin/*` (cron, tooling, dashboards). Send as `Authorization: Bearer <ADMIN_SECRET_KEY>` or `x-api-key` per deployment convention.
 
-### Core Routes
+3. **Supabase session (staff)** — `Authorization: Bearer <Supabase access_token>` on `/v1/admin-proxy/*`. Validated in `routes/admin-proxy.ts` with `SUPABASE_SERVICE_KEY` and `user_roles` (`ceo` / `cto`).
 
-#### Health & Monitoring
+4. **API key** — `x-api-key` or `Authorization: Bearer <SHADOW_INDEX_API_KEY>` on routes that are not public (see `middleware/apiKey.ts`). `/v1/admin-proxy/*` is public to the API-key middleware so the browser can call it with only the Supabase token.
+
+### Endpoints by route module
+
+#### `routes/platform.ts`
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `GET` | `/health` | None | Liveness check (returns 200) |
-| `GET` | `/healthz` | None | Function-level health probe |
+| `GET` | `/` | None | Service metadata JSON |
+| `GET` | `/health` | None | Liveness + dependency checks |
 
-#### Merchant Authentication
+Vercel may expose `/healthz` via `vercel.json`; the Hono app serves `/health`.
+
+#### `routes/auth.ts` (`/v1/auth`)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
 | `POST` | `/v1/auth/merchant/register` | None | Email/password signup |
 | `POST` | `/v1/auth/merchant/login` | None | Email/password login (returns JWT) |
+| `POST` | `/v1/auth/merchant/refresh` | None | Refresh merchant JWT |
+| `GET` | `/v1/auth/merchant/me` | Merchant JWT | Current merchant from token |
 | `POST` | `/v1/auth/merchant/forgot-password` | None | Request password reset email |
 | `GET` | `/v1/auth/google` | None | Redirect to Google OAuth consent screen |
 | `GET` | `/v1/auth/google/callback` | None | OAuth callback (returns JWT in URL) |
@@ -167,23 +173,38 @@ curl -X POST http://localhost:3000/v1/auth/merchant/register \
 # Response: { token: "eyJhbGc...", merchant_id: "uuid" }
 ```
 
-#### Merchant Portal (JWT Required)
+#### `merchant-products.ts` (`/v1/merchant/products`)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `GET` | `/v1/merchant/account` | Merchant JWT | Get profile info |
-| `PATCH` | `/v1/merchant/account` | Merchant JWT | Update account details |
+| `GET` | `/v1/merchant/products` | Merchant JWT | List / paginate products |
 | `POST` | `/v1/merchant/products` | Merchant JWT | Create product |
-| `GET` | `/v1/merchant/products` | Merchant JWT | List merchant products |
-| `GET` | `/v1/merchant/products/:id` | Merchant JWT | Get product detail |
+| `GET` | `/v1/merchant/products/:id` | Merchant JWT | Get product |
 | `PATCH` | `/v1/merchant/products/:id` | Merchant JWT | Update product |
 | `DELETE` | `/v1/merchant/products/:id` | Merchant JWT | Delete product |
-| `POST` | `/v1/merchant/products/:id/restock` | Merchant JWT | Adjust stock level |
-| `GET` | `/v1/merchant/orders` | Merchant JWT | List merchant orders |
-| `PATCH` | `/v1/merchant/orders/:id/fulfill` | Merchant JWT | Mark order as fulfilled |
+
+#### `routes/merchant.ts` (`/v1/merchant`, plus public upload/slip routers)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/v1/merchant/uploads/image` | Merchant JWT | Upload product image |
+| `POST` | `/v1/merchant/products/:productId/restock` | Merchant JWT | Adjust stock |
+| `GET` | `/v1/merchant/orders` | Merchant JWT | List orders |
+| `PATCH` | `/v1/merchant/orders/:id/delivery-date` | Merchant JWT | Set estimated delivery |
+| `PATCH` | `/v1/merchant/orders/:orderId/fulfill` | Merchant JWT | Mark fulfilled |
+| `POST` | `/v1/merchant/orders/:orderId/upload-slip` | Merchant JWT | Upload shipment slip |
+| `PATCH` | `/v1/merchant/orders/:orderId/ship` | Merchant JWT | Mark shipped |
+| `GET` | `/v1/merchant/account` | Merchant JWT | Account profile |
+| `PATCH` | `/v1/merchant/account` | Merchant JWT | Update account |
+| `PATCH` | `/v1/merchant/account/bank` | Merchant JWT | Update bank details |
 | `GET` | `/v1/merchant/payouts` | Merchant JWT | Payout history |
-| `POST` | `/v1/merchant/kyc/submit` | Merchant JWT | Submit KYC documentation |
-| `GET` | `/v1/merchant/kyc/status` | Merchant JWT | Get KYC approval status |
+| `POST` | `/v1/merchant/kyc/submit` | Merchant JWT | Submit KYC |
+| `POST` | `/v1/merchant/kyc/start` | Merchant JWT | Start Sumsub / KYC flow |
+| `POST` | `/v1/merchant/kyc/callback` | Merchant JWT | KYC provider callback |
+| `GET` | `/v1/merchant/notifications` | Merchant JWT | Notifications |
+| `PATCH` | `/v1/merchant/notifications/:notificationId` | Merchant JWT | Mark notification read |
+| `GET` | `/uploads/:filename` | None | Public uploaded image |
+| `GET` | `/v1/slips/:filename` | None | Public slip asset |
 
 **Example:** Create product
 ```bash
@@ -200,14 +221,20 @@ curl -X POST http://localhost:3000/v1/merchant/products \
   }'
 ```
 
-#### Checkout & Payment (Public)
+#### `routes/checkout.ts`
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `POST` | `/checkout/create-session` | None | Initialize Paystack checkout |
-| `POST` | `/webhooks/paystack` | Signature | Paystack payment webhook |
-| `POST` | `/webhooks/stripe` | Signature | Stripe payment webhook (fallback) |
-| `GET` | `/orders/:session_id` | None | Fetch order by session ID |
+| `POST` | `/checkout/create-session` | None | Initialize Paystack transaction (returns `authorization_url` / `url`) |
+| `GET` | `/v1/orders/:id/status` | None | Order status JSON |
+| `POST` | `/v1/orders/:orderId/confirm-receipt` | None | Customer receipt confirmation |
+| `GET` | `/orders/:idOrReference` | None | Order lookup by id or Paystack reference |
+
+#### `routes/webhooks.ts` (`/webhooks`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/webhooks/paystack` | `x-paystack-signature` HMAC | Paystack events (`charge.success`, transfers, etc.) |
 
 **Example:** Create checkout session
 ```bash
@@ -228,13 +255,13 @@ curl -X POST http://localhost:3000/checkout/create-session \
 # Response: { url: "https://checkout.paystack.com/xyz..." }
 ```
 
-#### Analytics (MVP-14)
+#### `routes/analytics.ts` (`/v1/analytics`)
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `POST` | `/v1/analytics/event` | None | Ingest view/click event |
+| `POST` | `/v1/analytics/event` | None | Ingest view/click/purchase events |
 | `GET` | `/v1/analytics/report` | Merchant JWT | Aggregated merchant report |
-| `GET` | `/v1/analytics/dashboard` | Admin Secret | HTML observability dashboard |
+| `GET` | `/v1/analytics/dashboard` | None (API-key middleware exempt) | HTML observability dashboard |
 
 **Example:** Track event
 ```bash
@@ -248,16 +275,41 @@ curl -X POST http://localhost:3000/v1/analytics/event \
   }'
 ```
 
-#### Admin Operations (Admin Secret Required)
+#### `routes/admin.ts` (`/v1/admin`) — admin secret
 
 | Method | Path | Auth | Description |
 |--------|------|------|-------------|
-| `GET` | `/v1/admin/kyc/pending` | Admin Secret | List pending KYC applications |
-| `PATCH` | `/v1/admin/kyc/approve/:merchant_id` | Admin Secret | Approve KYC and activate merchant |
-| `PATCH` | `/v1/admin/kyc/reject/:merchant_id` | Admin Secret | Reject KYC application |
-| `GET` | `/v1/admin/merchants` | Admin Secret | List all merchants |
-| `POST` | `/v1/admin/payouts/release` | Admin Secret | Release merchant payout |
-| `GET` | `/v1/admin/dashboard` | Admin Secret | Admin dashboard summary |
+| `GET` | `/v1/admin/kyc/pending` | Admin secret | Pending KYC queue |
+| `PATCH` | `/v1/admin/kyc/approve/:merchantId` | Admin secret | Approve KYC |
+| `PATCH` | `/v1/admin/kyc/reject/:merchantId` | Admin secret | Reject KYC |
+| `GET` | `/v1/admin/payouts` | Admin secret | Pending payouts list |
+| `POST` | `/v1/admin/payouts/release` | Admin secret | Release payout |
+| `POST` | `/v1/admin/payouts/release-to-merchant` | Admin secret | Release to merchant |
+| `POST` | `/v1/admin/payouts/backfill` | Admin secret | Backfill payouts |
+| `GET` | `/v1/admin/mor-status` | Admin secret | MoR / rail status |
+| `POST` | `/v1/admin/retention/run` | Admin secret | Run analytics retention |
+| `POST` | `/v1/admin/cron/release-escrow` | Admin secret | Escrow release job |
+| `POST` | `/v1/admin/cache/clear` | Admin secret | Clear caches |
+
+#### `routes/admin-proxy.ts` (`/v1/admin-proxy`) — Supabase CEO/CTO
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `GET` | `/v1/admin-proxy/kyc/pending` | Supabase Bearer + role | Pending KYC (portal) |
+| `PATCH` | `/v1/admin-proxy/kyc/approve/:merchantId` | Supabase Bearer + role | Approve KYC |
+| `PATCH` | `/v1/admin-proxy/kyc/reject/:merchantId` | Supabase Bearer + role | Reject KYC |
+| `GET` | `/v1/admin-proxy/payouts` | Supabase Bearer + role | Pending payouts |
+| `POST` | `/v1/admin-proxy/payouts/release` | Supabase Bearer + role | Release payout |
+
+#### `routes/scheduler.ts` (`/v1/cron`)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| `POST` | `/v1/cron/order-checkins` | `CRON_SECRET` via `x-cron-secret` or `Authorization: Bearer` | Scheduled buyer check-in emails |
+
+#### `routes/compiler.ts` (mounted at `/`)
+
+Compiler, resolve, batch, catalog, and static `.thing` routes — see `routes/compiler.ts` for `POST /compile`, `GET /resolve/:hash`, `GET /thing/:hash`, `POST /batch`, catalog import/public, etc.
 
 **Example:** Approve KYC
 ```bash
@@ -371,36 +423,25 @@ Analytics are ingested as events (view, click, purchase) and stored in JSONL for
 ## Architecture
 
 ```
-src/
-├── api/
-│   ├── index.ts              — Hono app setup, middleware, routing
-│   ├── merchant-products.ts  — Product CRUD routes
-│   ├── merchant-auth.ts      — Authentication routes
-│   ├── admin-kyc.ts          — KYC approval routes
-│   ├── checkout.ts           — Payment checkout routes
-│   ├── webhooks.ts           — Payment webhooks
-│   └── analytics.ts          — Analytics ingestion and reporting
-│
-├── lib/
-│   ├── storage.ts            — R2 / local file storage abstraction
-│   ├── analytics-report.ts   — JSONL event aggregation
-│   ├── dashboard-metrics.ts  — In-memory metric calculations
-│   ├── api-key-registry.ts   — Multi-key auth with revocation
-│   ├── error-logger.ts       — Structured error logging
-│   └── retention-policy.ts   — Analytics data lifecycle
-│
-├── types/
-│   ├── api.ts                — API request/response types
-│   ├── merchant.ts           — Merchant domain types
-│   └── orders.ts             — Order domain types
-│
-├── middleware/
-│   ├── auth.ts               — JWT and secret key validation
-│   ├── rate-limit.ts         — Request rate limiting
-│   └── error-handler.ts      — Error handling and formatting
-│
-├── index.ts                  — Application entry point
-└── env.ts                    — Environment variable validation
+api/
+├── index.ts                 — Composition root: middleware + route mounts
+├── env-bootstrap.ts
+├── merchant-products.ts     — /v1/merchant/products/*
+├── db.ts                    — Supabase client
+├── middleware/              — cors, rateLimit, apiKey, adminAuth, merchantAuth
+├── routes/
+│   ├── platform.ts          — /, /health
+│   ├── auth.ts              — /v1/auth/*
+│   ├── merchant.ts          — /v1/merchant/*, /uploads, /v1/slips
+│   ├── checkout.ts          — /checkout/*, order status helpers
+│   ├── webhooks.ts          — /webhooks/*
+│   ├── analytics.ts         — /v1/analytics/*
+│   ├── admin.ts             — /v1/admin/*
+│   ├── admin-proxy.ts       — /v1/admin-proxy/*
+│   ├── scheduler.ts         — /v1/cron/*
+│   └── compiler.ts          — /compile, /resolve, /thing, catalog, batch
+├── services/                — commerce-store, paystack-*, admin-*-service, …
+└── shared/                  — jwt, errors, runtime-config, server-paths, …
 ```
 
 ## Testing
@@ -459,7 +500,7 @@ See [docs/DEPLOYMENT.md](../../docs/DEPLOYMENT.md) for full deployment guide.
 
 - **Passwords:** PBKDF2 with 100,000 iterations
 - **JWTs:** HS256 with 7-day expiry
-- **Webhooks:** HMAC signature verification (Paystack, Stripe)
+- **Webhooks:** Paystack HMAC (`x-paystack-signature`, SHA-512)
 - **Rate limiting:** 100 requests per minute per IP
 - **CORS:** Configured for production domains only
 
@@ -471,8 +512,7 @@ PORT=3001 npm run dev
 ```
 
 **Paystack webhook not being received?**
-- Verify `PAYSTACK_CALLBACK_URL` matches your domain
-- Check webhook configuration in Paystack dashboard
+- Register the HTTPS URL for `POST /webhooks/paystack` in the Paystack dashboard (distinct from `PAYSTACK_CALLBACK_URL`, which is the buyer return URL after payment)
 - Review server logs for webhook processing errors
 
 **Authentication errors?**
@@ -496,13 +536,3 @@ Please follow [docs/DEVELOPMENT-STANDARDS.md](../../docs/DEVELOPMENT-STANDARDS.m
 ## License
 
 MIT
-
-```bash
-npm test                    # Full suite
-npm test -- --run           # Single pass (no watch)
-npm test -- path/to/test    # Single file
-```
-
-Test files mirror the source layout: `api/index.test.ts`, `lib/analytics-report.ts`, etc.
-
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for deep-dive design decisions.

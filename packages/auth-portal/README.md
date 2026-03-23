@@ -35,8 +35,7 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 | **Login Page** | Unauthenticated | Email/password login, Google OAuth, merchant registration |
 | **Merchant Portal** | Merchant | Product CRUD, order management, KYC submission, payout history, analytics |
 | **Admin Portal** | CEO/CTO | KYC approvals, merchant management, user roles, health dashboards, financials |
-| **CEO Dashboard** | CEO | Platform metrics, revenue, user growth, roadmap status |
-| **CTO Dashboard** | CTO | System health, infrastructure status, deployments, error logs |
+| **Admin (CEO & CTO)** | CEO / CTO | Same `AdminPortal` at `/dashboard/admin` (legacy `/dashboard/ceo`, `/dashboard/cto` redirect here) |
 | **Consumer Shop** | Consumer | Product browsing, search, checkout (Paystack/Stripe), order history |
 | **Investor Portal** | Investor | Financial overview, platform metrics, roadmap, team info |
 
@@ -47,8 +46,7 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 - **MerchantLogin** — Merchant email/password login
 - **MerchantPortal** — Dashboard with product, order, analytics, KYC, payouts
 - **AdminPortal** — Admin dashboard with KYC approvals, user management, health
-- **CEODashboard** — Strategic metrics and business intelligence
-- **CTOAdminPanel** — Technical health and deployment monitoring
+- **AuthDiagnosticsPage** — CTO/CEO-only auth diagnostics (`/dashboard/cto/auth-diagnostics`)
 - **ConsumerShop** — Product catalog with search and checkout
 - **InvestorMode** — Investor-facing KPIs and business overview
 - **ProductPage** — Product detail page (public, supports checkout)
@@ -105,10 +103,10 @@ src/
 │   └── shared/             — Shared utility components
 │
 ├── features/               — Feature modules
-│   ├── analytics/
-│   ├── kyc/                — KYC form and workflows
-│   ├── products/           — Product management
-│   └── orders/             — Order management
+│   ├── admin-portal/       — Admin KYC queue, payouts, hooks
+│   ├── merchant-portal/    — Merchant hooks (`useMerchantProducts`, orders, analytics)
+│   ├── analytics/          — Shared analytics helpers
+│   └── kyc/                — KYC form and workflows (where present)
 │
 ├── router/                 — Route configuration
 │   ├── PortalRouter.tsx    — Main router
@@ -217,13 +215,19 @@ MerchantPortal component:
 
 ## Role-Based Access
 
-Portals are protected by role-based guards and route configuration:
+Routes are defined in `src/router/PortalRouter.tsx`:
 
-- **`/merchant/*`** — Merchant-only routes; requires valid merchantToken
-- **`/dashboard/admin`** — Admin-only; requires Supabase auth + CEO/CTO role
-- **`/dashboard/merchant`** — Merchant dashboard; via merchantToken or ?token=
-- **`/shop`** — Consumer portal; Supabase session optional
-- **`/dashboard/investor`** — Investor portal; Supabase session, investor role
+- **`/login`**, **`/merchant/login`**, **`/merchant/register`** — Public auth entry
+- **`/product/:hash`**, **`/order/*`** — Public product and order pages
+- **`/`** — `LandingPage`
+- **`/dashboard`** — Redirects by Supabase role (`ceo`/`cto` → `/dashboard/admin`, `merchant` → `/dashboard/merchant`, etc.)
+- **`/dashboard/admin`** — `AdminPortal` (CEO & CTO via `RoleGuard`)
+- **`/dashboard/ceo`**, **`/dashboard/cto`** — Legacy paths; same `AdminPortal` with role-specific guard
+- **`/dashboard/cto/auth-diagnostics`** — `AuthDiagnosticsPage` (CEO/CTO)
+- **`/dashboard/merchant`** — `MerchantPortal` behind `MerchantPortalGuard` (merchant JWT or `?token=`)
+- **`/dashboard/investor`** — `InvestorMode`
+- **`/shop`** — `ConsumerShop`
+- **`/auth/callback`** — OAuth return; role redirect
 
 ## API Communication
 
@@ -256,24 +260,16 @@ const result = await fetch(`${API_BASE}/v1/admin-proxy/kyc/approve/${merchantId}
 
 ## Testing
 
-Tests are organized by feature:
+Vitest tests live next to features, for example:
 
-```
-src/test/
-├── auth.test.tsx       — Authentication flows
-├── portal.test.tsx     — Portal routing and access
-├── products.test.tsx   — Merchant product CRUD
-├── kyc.test.tsx        — KYC workflows
-└── fixtures/           — Test data and mocks
-```
-
-Run tests with:
+- `src/features/merchant-portal/hooks/__tests__/useMerchantProducts.test.ts`
+- `src/features/merchant-portal/hooks/__tests__/useMerchantAnalytics.test.ts`
+- `src/lib/__tests__/merchantTokenStorage.test.ts`
 
 ```bash
 npm test                  # All tests
-npm test auth            # Specific test file
-npm test:watch           # Watch mode
-npm test:coverage        # Coverage report
+npm run test:watch        # Watch mode
+npm run test:coverage     # Coverage report
 ```
 
 ## Styling & Design

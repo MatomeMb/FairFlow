@@ -51,21 +51,53 @@ npm run test:e2e
 | `VITE_SUPABASE_URL` | Yes |
 | `VITE_SUPABASE_ANON_KEY` | Yes |
 | `VITE_API_BASE_URL` | Yes |
-| `VITE_ADMIN_SECRET` | Yes (for KYC) |
+| `VITE_API_KEY` | Optional (public product/analytics calls when configured) |
+
+Staff KYC and payout actions use the Supabase session and `/v1/admin-proxy/*`; do not set `VITE_ADMIN_SECRET`.
 
 ---
 
-## Post-Deploy Verification
+## Environment Variables — API (Vercel)
+
+- [ ] `SUPABASE_URL` set
+- [ ] `SUPABASE_SERVICE_KEY` set (used by `admin-proxy.ts` and server-side DB access)
+- [ ] `JWT_SECRET` set (min 32 chars)
+- [ ] `ADMIN_SECRET_KEY` set (strong random value, never the default)
+- [ ] `PAYSTACK_SECRET_KEY` set
+- [ ] `PAYSTACK_PUBLIC_KEY` set (where required for client flows)
+- [ ] `PUBLIC_API_BASE_URL` set to `https://api.fairflow.co.za` (artifact URLs and callbacks)
+- [ ] `AUTH_PORTAL_BASE_URL` set to the portal origin (e.g. `https://portal.fairflow.co.za`)
+- [ ] `RESEND_API_KEY` set (transactional email)
+- [ ] `NODE_ENV` set to `production`
+
+## Environment Variables — Edge Functions (Supabase)
+
+If you use Supabase Edge Functions, align names with the Supabase dashboard (often `SUPABASE_SERVICE_ROLE_KEY` instead of `SUPABASE_SERVICE_KEY`). Keep service-role material out of client bundles.
+
+- [ ] `SUPABASE_URL` set
+- [ ] `SUPABASE_SERVICE_ROLE_KEY` set (when the function needs service role)
+- [ ] `SUPABASE_ANON_KEY` set (when the function validates or proxies anon-scoped calls)
+
+## Post-deployment verification
+
+- [ ] `GET https://api.fairflow.co.za/health` returns 200
+- [ ] Admin proxy: `GET /v1/admin-proxy/kyc/pending` with `Authorization: Bearer <valid Supabase CEO/CTO access_token>` returns 200
+- [ ] Merchant login returns a valid merchant JWT (`POST /v1/auth/merchant/login` or OAuth callback)
+- [ ] Paystack webhook HMAC verification passes on a signed test event (`POST /webhooks/paystack` with `x-paystack-signature`)
+
+---
+
+## Post-Deploy Verification (manual)
 
 | Check | Command |
 |-------|---------|
 | Smoke suite (recommended first) | `cd packages/shadow-index && npm run smoke:prod -- https://your-api-domain` |
 | API health | `curl https://your-api/health` |
 | Compile | `curl -X POST https://your-api/compile -H "Content-Type: application/json" -d '{"title":"Test","price":100,"currency":"USD"}'` |
-| Admin KYC | `curl -H "Authorization: Bearer $ADMIN_SECRET_KEY" https://your-api/v1/admin/kyc/pending` |
+| Admin KYC (server secret) | `curl -H "Authorization: Bearer $ADMIN_SECRET_KEY" https://your-api/v1/admin/kyc/pending` |
 | Portal login | Sign in at portal URL |
 | Merchant flow | Register at /merchant/register, submit KYC |
-| Admin KYC | Approve KYC at /dashboard/admin → KYC Approvals |
+| Admin KYC (UI) | Approve KYC at /dashboard/admin → KYC Approvals (uses admin-proxy + Supabase session) |
 
 ---
 

@@ -20,6 +20,8 @@ graph TB
     Database["💾 Supabase DB<br/>(PostgreSQL)"]
     Storage["☁️ Storage<br/>(Cloudflare R2)"]
     PayStack["💳 PayStack<br/>(Payments)"]
+    Resend["📧 Resend<br/>(Email)"]
+    Sumsub["🪪 Sumsub<br/>(KYC)"]
     
     Consumer -->|View Product| ProductPage
     ProductPage -->|POST /analytics/event| ShadowAPI
@@ -38,6 +40,8 @@ graph TB
     
     ShadowAPI -->|Read/Write| Database
     ShadowAPI -->|Store Files| Storage
+    ShadowAPI -->|Transactional email| Resend
+    ShadowAPI -->|KYC webhooks / SDK| Sumsub
     AuthService -->|User/Role Data| Database
     
     style Consumer fill:#e1f5ff
@@ -49,6 +53,43 @@ graph TB
     style Database fill:#f1f8e9
     style Storage fill:#f1f8e9
     style PayStack fill:#ffe0b2
+    style Resend fill:#e3f2fd
+    style Sumsub fill:#fff8e1
+```
+
+**API structure:** Cross-cutting layers live under `packages/shadow-index/api/middleware/` and `api/shared/`; route handlers are composed from `api/index.ts` (see `docs/adr/ADR-001-api-framework.md`).
+
+### Shadow Index API route modules (composition root)
+
+```mermaid
+graph TB
+    subgraph "packages/shadow-index/api"
+        IDX["index.ts\ncomposition root"]
+        IDX --> AUTH["routes/auth.ts\n/v1/auth/*"]
+        IDX --> MERCH["routes/merchant.ts\n/v1/merchant/*"]
+        IDX --> PROD["merchant-products.ts\n/v1/merchant/products/*"]
+        IDX --> ADMIN["routes/admin.ts\n/v1/admin/*"]
+        IDX --> PROXY["routes/admin-proxy.ts\n/v1/admin-proxy/*\n(Supabase session auth)"]
+        IDX --> CHECKOUT["routes/checkout.ts\n/checkout/*"]
+        IDX --> WEBHOOKS["routes/webhooks.ts\n/webhooks/*"]
+        IDX --> ANALYTICS["routes/analytics.ts\n/v1/analytics/*"]
+        IDX --> COMPILER["routes/compiler.ts\n/compile /resolve /thing"]
+        IDX --> SCHED["routes/scheduler.ts\n/v1/cron/*"]
+        IDX --> PLATFORM["routes/platform.ts\nGET / and /health"]
+    end
+```
+
+### Services layer (selected)
+
+```mermaid
+graph LR
+    subgraph "api/services/"
+        KYC["admin-kyc-service.ts"]
+        PAYOUT["admin-payout-service.ts"]
+        COMMERCE["commerce-store.ts"]
+        PAYSTACK["paystack-client.ts"]
+        FLOW["paystack-order-flow.ts"]
+    end
 ```
 
 **Components:**
@@ -63,6 +104,8 @@ graph TB
 | **PostgreSQL Database** | RLS Policies | Merchants, products, orders, KYC, payouts, events |
 | **Cloudflare R2** | S3-compatible Object Storage | Product catalogs (CSV), compiled .thing files, exports |
 | **PayStack** | Payment Gateway | Credit card processing, webhook notifications |
+| **Resend** | Email API | Order and KYC notifications from shadow-index |
+| **Sumsub** | Identity verification | KYC applicant flow and webhooks |
 
 ---
 
@@ -379,15 +422,12 @@ graph TB
 - [02-TECHNICAL-ARCHITECTURE.md](./02-TECHNICAL-ARCHITECTURE.md) — Detailed narrative description
 - [03-PRODUCT-REQUIREMENTS-DOCUMENT.md](./03-PRODUCT-REQUIREMENTS-DOCUMENT.md) — Feature specifications
 - [20-SECURITY-HARDENING.md](./20-SECURITY-HARDENING.md) — Security architecture and data protection
--> shadow-index (upload/index) -> hash -> lens-extension (resolve) -> overlay
--> auth-portal (analytics, management)
-```
 
 ---
 
 ## Component Diagram
 
 - matter-core: Rust compiler
-- shadow-index: Node.js/Hono API
+- shadow-index: Node.js/Hono API (`api/index.ts` composes `routes/*` and `middleware/*`)
 - auth-portal: React/Vite
 - lens-extension: Chrome MV3

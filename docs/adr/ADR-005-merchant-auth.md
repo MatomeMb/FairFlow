@@ -27,7 +27,7 @@ Supabase remains the source of truth for **staff** (CEO/CTO) sessions in auth-po
 
 ## Resolution (March 2026)
 
-The `VITE_ADMIN_SECRET` browser-bundle exposure was resolved by implementing `packages/shadow-index/api/routes/admin-proxy.ts`. Admin mutations now require a valid Supabase session with CEO/CTO role in `user_roles`. `ADMIN_SECRET_KEY` remains server-side only for `/v1/admin/*` (cron, internal tools). The auth-portal sends the Supabase access token as `Authorization: Bearer` for all `/v1/admin-proxy/*` calls.
+The `VITE_ADMIN_SECRET` browser-bundle exposure was resolved by implementing `packages/shadow-index/api/routes/admin-proxy.ts` (landed with admin-proxy resolution in commit `0c8b0a7`). Admin mutations now require a valid Supabase session with CEO/CTO role in `user_roles`. `ADMIN_SECRET_KEY` remains server-side only for `/v1/admin/*` (cron, internal tools). The auth-portal sends the Supabase access token as `Authorization: Bearer` for all `/v1/admin-proxy/*` calls. The API key middleware treats `/v1/admin-proxy/*` as a public path so the browser is not required to send `x-api-key` for those routes; authorization is enforced inside `admin-proxy.ts` via Supabase.
 
 ## Future improvement
 
