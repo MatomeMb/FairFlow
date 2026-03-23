@@ -302,14 +302,14 @@ return c.json({ ok: true, message: 'If account exists, reset sent' }, 200);
 
 ### PCI DSS (Payment Security)
 
-Since fairflow uses Stripe Checkout (no card storage):
+Since fairflow uses **Paystack** hosted checkout (no card storage on fairflow servers):
 - ✅ No cardholder data stored
-- ✅ No direct payment processing
-- ✅ PCI compliance delegated to Stripe
+- ✅ No direct card processing in fairflow application code
+- ✅ PCI scope reduced; payment capture is delegated to Paystack
 
 **Still requires:**
-- [ ] HTTPS for auth portal
-- [ ] Secure JWT handling
+- [ ] HTTPS for auth portal and API
+- [ ] Secure JWT and webhook HMAC handling
 - [ ] Order PII protection
 - [ ] Regular security audits
 

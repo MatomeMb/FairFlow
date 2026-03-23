@@ -199,14 +199,14 @@ npm run pre-aggregate          # Pre-aggregation performance
 ### Rate Limiting
 
 - **Default:** 100 req/min per IP
-- **Stripe webhooks:** No limit (webhook secret required)
+- **Payment webhooks (e.g. Paystack):** No limit (HMAC signature required)
 - **Auth endpoints:** Stricter limits (10 req/min for login attempts)
 
 ### Data Protection
 
 - **Secrets:** Environment variables only, never commit
 - **KYC data:** AES-256 encryption at rest (demo only)
-- **Payment data:** Never stored, Stripe Checkout flow only
+- **Payment data:** Never stored; Paystack hosted checkout for beta
 
 ---
 

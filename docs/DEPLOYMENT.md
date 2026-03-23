@@ -7,10 +7,10 @@ Production and staging deployment procedures for fairflow.
 ## Prerequisites
 
 - Node.js 18+
-- Environment variables configured (see [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md))
-- Cloudflare R2 bucket (production)
-- Stripe account (test keys for staging, live for production)
-- Supabase project
+- Environment variables configured (see [API_KEYS_GUIDE.md](./API_KEYS_GUIDE.md) and [DEPLOYMENT-CHECKLIST.md](./DEPLOYMENT-CHECKLIST.md))
+- Cloudflare R2 bucket (production, when `STORAGE_MODE=r2`)
+- Paystack account (test keys for staging, live for production)
+- Supabase project (Postgres + Auth for staff; service role used server-side)
 
 ---
 
@@ -21,15 +21,19 @@ Production and staging deployment procedures for fairflow.
 | Variable | Purpose |
 |----------|---------|
 | `PORT` | API server port (default: 3000) |
-| `STRIPE_SECRET_KEY` | Stripe API secret (sk_test_* or sk_live_*) |
-| `STRIPE_WEBHOOK_SECRET` | Webhook signing secret |
+| `PAYSTACK_SECRET_KEY`, `PAYSTACK_PUBLIC_KEY`, `PAYSTACK_CALLBACK_URL` | Paystack (primary ZAR checkout and webhooks) |
 | `JWT_SECRET` | Merchant JWT signing (≥32 chars) |
-| `ADMIN_SECRET_KEY` | Admin API access (use strong random in production) |
-| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` | OAuth |
+| `ADMIN_SECRET_KEY` | `/v1/admin/*` cron and tooling (server-only) |
+| `SUPABASE_URL`, `SUPABASE_SERVICE_KEY` | Server-side Postgres + `admin-proxy` CEO/CTO validation |
+| `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET`, `GOOGLE_REDIRECT_URI` | Merchant Google OAuth |
 | `AUTH_PORTAL_BASE_URL` | Portal URL (e.g. https://portal.fairflow.co.za) |
-| `PUBLIC_API_BASE_URL` | Public API URL for thing_url (e.g. https://api.fairflow.co.za) |
+| `PUBLIC_API_BASE_URL` | Public API URL for thing URLs and callbacks (e.g. https://api.fairflow.co.za) |
+| `SHADOW_INDEX_API_KEY` / `SHADOW_INDEX_API_KEYS` | Optional API key gate for public routes (see middleware) |
 | `STORAGE_MODE` | `local` or `r2` |
 | `R2_ACCOUNT_ID`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY`, `R2_BUCKET_NAME` | R2 (when STORAGE_MODE=r2) |
+| `RESEND_API_KEY` | Transactional email (optional in dev) |
+
+Optional Stripe envs remain only if you enable that rail (`STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`).
 
 ### auth-portal (build-time)
 
@@ -38,7 +42,9 @@ Production and staging deployment procedures for fairflow.
 | `VITE_SUPABASE_URL` | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | Supabase anon key |
 | `VITE_API_BASE_URL` | shadow-index API URL |
-| `VITE_ADMIN_SECRET` | Must match shadow-index ADMIN_SECRET_KEY |
+| `VITE_API_KEY` | Optional; must match a registered shadow-index API key when the API enforces keys |
+
+Staff admin actions (KYC, payouts in the UI) use the **Supabase session** and `POST`/`GET` `/v1/admin-proxy/*` on the API — do **not** put `ADMIN_SECRET_KEY` in any `VITE_*` variable.
 
 ---
 
@@ -50,7 +56,7 @@ Production and staging deployment procedures for fairflow.
 - [ ] Type-check: `npm run type-check`
 - [ ] Lint: `npm run lint`
 - [ ] `.env` not committed (use platform secrets)
-- [ ] Staging Stripe keys (test mode)
+- [ ] Staging Paystack keys (test mode)
 - [ ] Staging Supabase project
 
 ### 1. Shadow Index API (Vercel)
@@ -62,12 +68,12 @@ Production and staging deployment procedures for fairflow.
    npx vercel
    ```
    The API runs as a serverless function via `api/vercel-entry.ts`.
-3. Verify: `curl https://staging-api.fairflow.co.za/healthz`
+3. Verify: `curl https://staging-api.fairflow.co.za/health` (and `/healthz` if exposed by the edge config)
 4. Configure Paystack webhook: `https://staging-api.fairflow.co.za/webhooks/paystack`
 
 ### 2. Auth Portal (Vercel)
 
-1. Set build env in Vercel: `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_ADMIN_SECRET`
+1. Set build env in Vercel: `VITE_API_BASE_URL`, `VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, and `VITE_API_KEY` if your API requires it
 2. Deploy from `packages/auth-portal`:
    ```bash
    cd packages/auth-portal
@@ -83,7 +89,8 @@ Production and staging deployment procedures for fairflow.
 | Compile | POST product JSON to `/compile` |
 | Resolve | GET `/resolve/:hash` |
 | Login | Sign in at auth-portal staging URL |
-| Admin KYC | `curl -H "Authorization: Bearer $ADMIN_SECRET_KEY" https://staging-api/v1/admin/kyc/pending` |
+| Admin KYC (secret) | `curl -H "Authorization: Bearer $ADMIN_SECRET_KEY" https://staging-api/v1/admin/kyc/pending` |
+| Admin KYC (portal) | Browser: KYC Approvals uses `/v1/admin-proxy/kyc/pending` with Supabase `Authorization: Bearer` |
 
 ---
 
@@ -121,7 +128,7 @@ npm audit
 
 4. **Verify**:
    ```bash
-   curl https://api.fairflow.co.za/healthz
+   curl https://api.fairflow.co.za/health
    ```
 
 ### Rollback

@@ -57,14 +57,14 @@ graph TB
     style Sumsub fill:#fff8e1
 ```
 
-**API structure:** Cross-cutting layers live under `packages/shadow-index/api/middleware/` and `api/shared/`; route handlers are composed from `api/index.ts` (see `docs/adr/ADR-001-api-framework.md`).
+**API structure:** Cross-cutting layers live under `packages/shadow-index/api/middleware/` and `api/shared/`; route modules under `api/routes/` and `merchant-products.ts` are mounted from `api/index.ts` (~104 lines) as the composition root (see `docs/adr/ADR-001-api-framework.md`).
 
 ### Shadow Index API route modules (composition root)
 
 ```mermaid
 graph TB
     subgraph "packages/shadow-index/api"
-        IDX["index.ts\ncomposition root"]
+        IDX["index.ts (~104 lines)\ncomposition root"]
         IDX --> AUTH["routes/auth.ts\n/v1/auth/*"]
         IDX --> MERCH["routes/merchant.ts\n/v1/merchant/*"]
         IDX --> PROD["merchant-products.ts\n/v1/merchant/products/*"]

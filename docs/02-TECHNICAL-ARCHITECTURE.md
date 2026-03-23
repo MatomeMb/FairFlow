@@ -25,13 +25,12 @@ The resolution and commerce API, built on Hono running on Node.js (v0.6.0). Serv
 
 ### auth-portal (React/Vite Frontend)
 
-A role-based dashboard built with React, Vite, and Tailwind CSS. Supabase handles authentication. Five portal views:
+A role-based dashboard built with React, Vite, and Tailwind CSS. Supabase handles **staff** authentication (CEO/CTO). Merchants use **custom JWTs** issued by shadow-index after login/OAuth. Primary portal views:
 
-- **CEO Portal** — revenue dashboards, platform metrics, strategic reporting
-- **CTO Portal** — system health, deployment status, technical analytics
-- **Merchant Portal** — product management, upload artifacts, view sales
-- **Investor Portal** — growth metrics, investor-facing KPIs
-- **Consumer Portal** — purchase history, artifact verification
+- **Admin Portal** (CEO and CTO roles) — unified shell: overview, KYC queue, merchants, payouts, platform health, users and roles
+- **Merchant Portal** — products (Supabase `merchant_products`), orders, analytics, KYC and payouts, notifications
+- **Investor Mode** — read-only investor view
+- **Consumer shop** — product browse and checkout (Paystack)
 
 ### lens-extension (Chrome Extension)
 
@@ -63,29 +62,41 @@ Content script renders overlay on the host page
 
 ## API Layer
 
-The Hono application organizes routes into four groups:
+The Hono application mounts domain routers from `packages/shadow-index/api/index.ts` (composition root). Prefixes below are the live paths.
 
-### Auth Routes (`/auth/*`)
-- `POST /auth/register` — merchant registration (PBKDF2 password hashing)
-- `POST /auth/login` — issue JWT access token
-- `POST /auth/refresh` — rotate refresh token
-- `GET /auth/me` — current merchant profile
+### Auth (`/v1/auth/*`) — `routes/auth.ts`
+- `POST /v1/auth/merchant/register`, `POST /v1/auth/merchant/login`, `POST /v1/auth/merchant/refresh`
+- `GET /v1/auth/merchant/me`
+- `GET /v1/auth/google`, `GET /v1/auth/google/callback` — Google OAuth for merchants
 
-### Merchant Routes (`/merchant/*`)
-- `POST /merchant/artifacts` — upload compiled artifact
-- `GET /merchant/artifacts` — list merchant artifacts
-- `PUT /merchant/artifacts/:hash` — update artifact metadata
-- `DELETE /merchant/artifacts/:hash` — delist artifact
+### Merchant catalog and operations
+- `merchant-products.ts` — `GET|POST /v1/merchant/products`, `GET|PATCH|DELETE /v1/merchant/products/:id`
+- `routes/merchant.ts` — orders, KYC submit/start/callback, payouts, uploads, notifications, public `/uploads/*` and `/v1/slips/*`
 
-### Analytics Routes (`/analytics/*`)
-- `POST /analytics/events` — ingest interaction events
-- `GET /analytics/reports/:merchantId` — aggregated merchant reports
-- `GET /analytics/dashboard` — platform-wide metrics
+### Analytics (`/v1/analytics/*`) — `routes/analytics.ts`
+- `POST /v1/analytics/event` — ingest view / click / purchase events
+- `GET /v1/analytics/report` — merchant JWT; aggregated report
+- `GET /v1/analytics/dashboard` — HTML ops dashboard (see `middleware/apiKey.ts` public allowlist)
 
-### Commerce Routes (`/commerce/*`)
-- `GET /commerce/resolve/:hash` — resolve hash to artifact
-- `POST /commerce/checkout` — initiate Stripe checkout session
-- `POST /commerce/webhook` — handle Stripe webhook events
+### Admin
+- `routes/admin.ts` — `/v1/admin/*` — KYC queue, payouts, retention, cron helpers; `Authorization: Bearer <ADMIN_SECRET_KEY>` (and/or `x-api-key` per deployment)
+- `routes/admin-proxy.ts` — `/v1/admin-proxy/*` — same mutations for portal staff; `Authorization: Bearer <Supabase access_token>` with CEO/CTO in `user_roles` (no admin secret in the browser)
+
+### Commerce, compiler, platform
+- `routes/checkout.ts` — `POST /checkout/create-session`, order status / confirm-receipt helpers
+- `routes/webhooks.ts` — `POST /webhooks/paystack` (HMAC-SHA512 via `x-paystack-signature`)
+- `routes/compiler.ts` — `POST /compile`, `GET /resolve/:hash`, `GET /thing/:hash`, batch, catalog import, etc.
+- `routes/platform.ts` — `GET /`, `GET /health`
+- `routes/scheduler.ts` — `POST /v1/cron/order-checkins` (cron secret)
+
+### API layout (shadow-index)
+- **Middleware:** `api/middleware/` — CORS (allowlisted origins), per-IP rate limit (ADR-006), API key + merchant-JWT gate
+- **Shared:** `api/shared/` — errors, **single** JWT implementation (`jwt.ts`), runtime paths and config
+- **Routes:** `api/routes/*` plus `merchant-products.ts`; all mounted from `api/index.ts` (see `api/routes/README.md`)
+
+### Email and KYC integrations
+- **Resend** — transactional email (`packages/shadow-index/api/email.ts`); disabled in dev/test when no API key
+- **Sumsub** — KYC webhook and SDK token helpers (`sumsub-kyc.ts`, merchant KYC flows)
 
 ## Storage Strategy
 
@@ -121,7 +132,7 @@ Merchant passwords are hashed with PBKDF2 (SHA-256, 100k iterations, 32-byte sal
 ### Resolution Flow
 1. Content script detects candidate hashes via DOM mutation observer
 2. Sends resolution request to background service worker
-3. Service worker checks local cache, then calls `GET /commerce/resolve/:hash`
+3. Service worker checks local cache, then calls `GET /resolve/:hash`
 4. On cache hit or API response, posts artifact metadata back to content script
 5. Content script renders a non-intrusive overlay adjacent to the hash element
 
@@ -134,7 +145,7 @@ Resolved artifacts are cached in `chrome.storage.local` with a 1-hour TTL. The s
 User interaction (view, click, purchase)
     |
     v
-[lens-extension / auth-portal] --POST /analytics/events-->
+[lens-extension / auth-portal] --POST /v1/analytics/event-->
     |
     v
 [shadow-index] --append--> JSONL file (partitioned by YYYY-MM-DD)
@@ -165,4 +176,4 @@ Service-to-service calls require an `X-API-Key` header. Keys are validated again
 All request bodies are validated against TypeScript schemas at the Hono middleware layer. Artifact hashes are validated as 64-character lowercase hex strings. File uploads are size-limited and type-checked.
 
 ### Webhook Security
-Stripe webhooks are verified using the `stripe-signature` header and the webhook signing secret. Unverified payloads are rejected with `400`.
+Paystack webhooks are verified using the `x-paystack-signature` header and HMAC-SHA512 with `PAYSTACK_SECRET_KEY`. Sumsub webhooks use `verifySumsubWebhookSignature` when configured. Unverified payloads are rejected with `400`.

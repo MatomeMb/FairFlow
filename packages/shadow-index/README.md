@@ -261,7 +261,7 @@ curl -X POST http://localhost:3000/checkout/create-session \
 |--------|------|------|-------------|
 | `POST` | `/v1/analytics/event` | None | Ingest view/click/purchase events |
 | `GET` | `/v1/analytics/report` | Merchant JWT | Aggregated merchant report |
-| `GET` | `/v1/analytics/dashboard` | None (API-key middleware exempt) | HTML observability dashboard |
+| `GET` | `/v1/analytics/dashboard` | None (allowlisted in API-key middleware) | HTML observability dashboard — restrict at edge in production if exposed |
 
 **Example:** Track event
 ```bash

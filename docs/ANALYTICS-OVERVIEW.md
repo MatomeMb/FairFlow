@@ -180,7 +180,7 @@ RETENTION_DAYS=90  # Keep 90 days of event data
 ### Dashboard: Internal Metrics
 
 **Endpoint:** `GET /v1/analytics/dashboard`  
-**Auth:** Admin Secret  
+**Auth:** None at the API-key middleware layer (path is allowlisted in `middleware/apiKey.ts`); treat as **internal observability** — protect at the edge (network/VPN) or add auth if you expose it publicly.  
 **Response:** HTML page with embedded charts and metrics
 
 Returns an interactive HTML dashboard showing:
@@ -202,11 +202,10 @@ curl "http://localhost:3000/v1/analytics/report?from=2026-02-18&to=2026-03-19&gr
 
 ### Via Dashboard (Admin)
 
-Visit `https://api.fairflow.co.za/v1/analytics/dashboard` (requires admin secret in auth header):
+Visit or fetch `https://api.fairflow.co.za/v1/analytics/dashboard` (no API key required by default middleware; restrict at the edge in production if needed):
 
 ```bash
-curl "https://api.fairflow.co.za/v1/analytics/dashboard" \
-  -H "Authorization: your-admin-secret-key"
+curl "https://api.fairflow.co.za/v1/analytics/dashboard"
 ```
 
 ### Raw Event Access (Advanced)
@@ -331,7 +330,7 @@ For higher volumes (> 1M events/day):
 
 ### Dashboard shows no data
 
-1. **Verify admin secret:** `Authorization: your-admin-secret-key` header must match `ADMIN_SECRET_KEY`
+1. **Verify access:** If you added edge auth, confirm credentials; default app middleware does not require an admin secret for this path
 2. **Check dates:** Dashboard defaults to last 30 days; expand date range if no recent data
 3. **Review logs:** Check server logs for aggregation job errors
 

@@ -36,7 +36,7 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 | **Merchant Portal** | Merchant | Product CRUD, order management, KYC submission, payout history, analytics |
 | **Admin Portal** | CEO/CTO | KYC approvals, merchant management, user roles, health dashboards, financials |
 | **Admin (CEO & CTO)** | CEO / CTO | Same `AdminPortal` at `/dashboard/admin` (legacy `/dashboard/ceo`, `/dashboard/cto` redirect here) |
-| **Consumer Shop** | Consumer | Product browsing, search, checkout (Paystack/Stripe), order history |
+| **Consumer Shop** | Consumer | Product browsing, search, checkout (Paystack), order history |
 | **Investor Portal** | Investor | Financial overview, platform metrics, roadmap, team info |
 
 ### Key Pages

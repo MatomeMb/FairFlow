@@ -33,9 +33,11 @@ npm run test:e2e
 |----------|----------|-------|
 | `PORT` | No | Default 3000 |
 | `JWT_SECRET` | Yes | ≥32 chars |
-| `ADMIN_SECRET_KEY` | Yes | Strong random in production |
-| `STRIPE_SECRET_KEY` | Yes | sk_test_* or sk_live_* |
-| `STRIPE_WEBHOOK_SECRET` | Yes | From Stripe webhook |
+| `ADMIN_SECRET_KEY` | Yes | Strong random in production; `/v1/admin/*` only |
+| `PAYSTACK_SECRET_KEY` | Yes | Test or live secret; webhook HMAC |
+| `PAYSTACK_PUBLIC_KEY` | Often | Client/initialize flows |
+| `SUPABASE_URL` | Yes | Postgres + Auth integration |
+| `SUPABASE_SERVICE_KEY` | Yes | `admin-proxy`, server-side DB |
 | `GOOGLE_CLIENT_ID` | Yes | OAuth |
 | `GOOGLE_CLIENT_SECRET` | Yes | OAuth |
 | `GOOGLE_REDIRECT_URI` | Yes | Callback URL |
@@ -61,6 +63,7 @@ Staff KYC and payout actions use the Supabase session and `/v1/admin-proxy/*`; d
 
 - [ ] `SUPABASE_URL` set
 - [ ] `SUPABASE_SERVICE_KEY` set (used by `admin-proxy.ts` and server-side DB access)
+- [ ] `SUPABASE_ANON_KEY` set (only if a server path uses the anon client; not required for `admin-proxy` alone)
 - [ ] `JWT_SECRET` set (min 32 chars)
 - [ ] `ADMIN_SECRET_KEY` set (strong random value, never the default)
 - [ ] `PAYSTACK_SECRET_KEY` set
@@ -116,11 +119,12 @@ For full setup template, see `docs/VERCEL-UPTIME-RUNBOOK.md`.
 
 ---
 
-## Stripe Webhook
+## Paystack webhook
 
-1. Create webhook endpoint: `https://your-api/webhooks/stripe`
-2. Event: `checkout.session.completed`
-3. Add signing secret to `STRIPE_WEBHOOK_SECRET`
+1. Register `POST https://your-api/webhooks/paystack` in the Paystack dashboard.
+2. Verification uses HMAC-SHA512 with `PAYSTACK_SECRET_KEY` and header `x-paystack-signature`.
+
+Optional **Stripe** webhook (only if that rail is enabled): `https://your-api/webhooks/stripe`, event `checkout.session.completed`, secret `STRIPE_WEBHOOK_SECRET`.
 
 ---
 
