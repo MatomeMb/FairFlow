@@ -158,7 +158,7 @@ Vercel may expose `/healthz` via `vercel.json`; the Hono app serves `/health`.
 | `GET` | `/v1/auth/merchant/me` | Merchant JWT | Current merchant from token |
 | `POST` | `/v1/auth/merchant/forgot-password` | None | Request password reset email |
 | `GET` | `/v1/auth/google` | None | Redirect to Google OAuth consent screen |
-| `GET` | `/v1/auth/google/callback` | None | OAuth callback (returns JWT in URL) |
+| `GET` | `/v1/auth/google/callback` | None | OAuth callback (merchant session handoff via URL token or short-lived cookie) |
 
 **Example:** Register merchant
 ```bash
@@ -167,7 +167,7 @@ curl -X POST http://localhost:3000/v1/auth/merchant/register \
   -d '{
     "email": "merchant@example.com",
     "password": "secure-password",
-    "merchant_name": "My Store"
+    "business_name": "My Store"
   }'
 
 # Response: { token: "eyJhbGc...", merchant_id: "uuid" }
@@ -214,9 +214,9 @@ curl -X POST http://localhost:3000/v1/merchant/products \
   -d '{
     "title": "Ceramic Mug",
     "description": "Handmade ceramic coffee mug",
-    "price": 25000,
+    "price_cents": 25000,
     "currency": "ZAR",
-    "stock": 50,
+    "stock_count": 50,
     "image_url": "https://..."
   }'
 ```

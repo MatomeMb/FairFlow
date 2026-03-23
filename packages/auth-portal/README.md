@@ -77,74 +77,40 @@ Auth Portal is the React frontend for the fairflow commerce platform. It provide
 
 ```
 src/
-├── pages/                  — Full-screen page components
+├── pages/                         — Public pages and portal pages
 │   ├── LoginPage.tsx
 │   ├── MerchantLogin.tsx
 │   ├── MerchantRegister.tsx
 │   ├── ProductPage.tsx
 │   ├── OrderConfirmation.tsx
 │   ├── OrderStatusPage.tsx
+│   ├── ConfirmReceipt.tsx
 │   ├── LandingPage.tsx
 │   ├── UnauthorizedPage.tsx
-│   ├── ConfirmReceipt.tsx
-│   └── portals/            — Role-based portal pages
-│       ├── AdminPortal.tsx          — Admin dashboard
-│       ├── CEODashboard.tsx         — CEO metrics
-│       ├── CTOAdminPanel.tsx        — CTO technical dashboard
-│       ├── ConsumerShop.tsx         — Consumer product catalog
-│       ├── InvestorMode.tsx         — Investor KPI view
-│       ├── MerchantPortal.tsx       — Merchant dashboard
-│       └── merchant/                — Merchant features
-│           └── (merchant-specific components)
-│
-├── components/             — Reusable UI components
-│   ├── FairflowLogo.tsx
-│   ├── layout/             — Layout components
-│   └── shared/             — Shared utility components
-│
-├── features/               — Feature modules
-│   ├── admin-portal/       — Admin KYC queue, payouts, hooks
-│   ├── merchant-portal/    — Merchant hooks (`useMerchantProducts`, orders, analytics)
-│   ├── analytics/          — Shared analytics helpers
-│   └── kyc/                — KYC form and workflows (where present)
-│
-├── router/                 — Route configuration
-│   ├── PortalRouter.tsx    — Main router
-│   ├── AuthPages.tsx       — Auth route definitions
-│   ├── RouteGuard.tsx      — Protected route wrapper
-│   └── MerchantPortalGuard.tsx  — Merchant route protection
-│
-├── context/                — React context
-│   ├── AuthContext.tsx     — Authentication state
-│   ├── ThemeContext.tsx    — Dark/light theme toggle
-│   └── RoleContext.tsx     — User role and permissions
-│
-├── hooks/                  — Custom React hooks
-│   ├── useAuth.ts          — Authentication hook
-│   ├── usePortalRole.ts    — Portal role determination
-│   ├── useAnalytics.ts     — Analytics data fetching
-│   └── useApi.ts           — API communication wrapper
-│
-├── lib/                    — Utility functions
-│   ├── config.ts           — Configuration constants
-│   ├── format.ts           — Data formatting (currency, dates)
-│   ├── supabase.ts         — Supabase client initialization
-│   └── fetch-wrappers.ts   — API request helpers
-│
-├── design-system/          — Design tokens and primitives
-│   ├── colors.ts           — Color palette
-│   ├── typography.ts       — Font configuration
-│   └── components.ts       — Primitive components
-│
-├── types/                  — TypeScript definitions
-│   ├── api.ts
-│   ├── auth.ts
-│   └── portal.ts
-│
-├── test.tsx               — Vitest configuration
-├── index.css              — Global styles
-├── main.tsx               — Application entry point
-└── vite-env.d.ts          — Vite type definitions
+│   └── portals/
+│       ├── AdminPortal.tsx
+│       ├── MerchantPortal.tsx
+│       ├── InvestorMode.tsx
+│       ├── ConsumerShop.tsx
+│       ├── AuthDiagnosticsPage.tsx
+│       ├── CEODashboard.tsx
+│       ├── CTOAdminPanel.tsx
+│       └── merchant/              — Merchant tab components
+├── features/                      — Domain modules
+│   ├── admin-portal/
+│   ├── merchant-portal/
+│   ├── ceo-dashboard/
+│   └── product-creation/
+├── components/                    — Shared UI, guards, layout, and forms
+├── router/PortalRouter.tsx        — Route map and guards
+├── context/AuthContext.tsx        — Supabase auth/session context
+├── hooks/                         — Shared hooks (analytics, polling, visibility)
+├── lib/                           — config, supabase client, token storage, helpers
+├── design-system/                 — Badge/Card/Status primitives
+├── types/                         — Shared TypeScript models
+├── index.css
+├── main.tsx
+└── vite-env.d.ts
 ```
 
 ## Build and Scripts
@@ -158,9 +124,7 @@ npm run preview         # Preview production build locally
 npm run build           # TypeScript check + Vite build (output: dist/)
 
 # Code Quality
-npm run type-check     # TypeScript type checking
 npm run lint           # ESLint on all TS/TSX files
-npm run lint:fix       # Auto-fix lint issues
 
 # Testing
 npm test               # Run Vitest suite once
@@ -196,16 +160,16 @@ VITE_API_KEY=your-shadow-index-api-key
 
 ### Merchant JWT Auth (via shadow-index)
 1. Merchant clicks "Sign in with Google" or registers with email/password
-2. Frontend redirects to `https://api.fairflow.co.za/v1/auth/google` or calls `POST /v1/auth/merchant/login`
+2. Frontend redirects to `${VITE_API_BASE_URL}/v1/auth/google` or calls `POST /v1/auth/merchant/login`
 3. shadow-index API returns JWT token
 4. Frontend stores token in sessionStorage: `merchantToken`
 5. All merchant API calls include `Authorization: Bearer <token>`
 6. `MerchantPortalGuard` checks for token before rendering MerchantPortal
 
 ### Token-Based Redirect
-After OAuth or merchant login, the API redirects with a token in the URL:
+After OAuth or merchant login, the API completes session handoff via URL token or short-lived cookie:
 ```
-http://localhost:5178/dashboard/merchant?token=eyJhbGc...
+https://portal-host/dashboard/merchant?token=eyJhbGc...
 ```
 
 MerchantPortal component:

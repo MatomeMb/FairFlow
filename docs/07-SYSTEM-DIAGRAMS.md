@@ -64,7 +64,7 @@ graph TB
 ```mermaid
 graph TB
     subgraph "packages/shadow-index/api"
-        IDX["index.ts (~104 lines)\ncomposition root"]
+        IDX["index.ts (96 lines)\ncomposition root"]
         IDX --> AUTH["routes/auth.ts\n/v1/auth/*"]
         IDX --> MERCH["routes/merchant.ts\n/v1/merchant/*"]
         IDX --> PROD["merchant-products.ts\n/v1/merchant/products/*"]
@@ -83,7 +83,7 @@ graph TB
 
 ```mermaid
 graph LR
-    subgraph "api/services/"
+    subgraph "services/"
         KYC["admin-kyc-service.ts"]
         PAYOUT["admin-payout-service.ts"]
         COMMERCE["commerce-store.ts"]
