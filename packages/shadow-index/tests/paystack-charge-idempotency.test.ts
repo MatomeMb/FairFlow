@@ -157,4 +157,33 @@ describe('ensureOrderFromPaystackChargePayload', () => {
     expect(dbInventoryInsertFn).not.toHaveBeenCalled();
     expect(writeProductsFn).not.toHaveBeenCalled();
   });
+
+  it('processes concurrent duplicate deliveries for one reference exactly once', async () => {
+    let currentStock = 5;
+    const sharedOrders: Array<{ id: string; paystack_reference?: string; session_id?: string }> = [];
+
+    readProductsFn.mockResolvedValue([{ ...product, stock_count: currentStock }]);
+    loadOrdersFn.mockImplementation(async () => sharedOrders as unknown[]);
+    saveOrdersFn.mockImplementation(async (orders: unknown[]) => {
+      sharedOrders.splice(0, sharedOrders.length, ...(orders as typeof sharedOrders));
+    });
+    dbUpdateMaybeSingleFn.mockImplementation(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 20));
+      currentStock -= 1;
+      return { data: { stock_count: currentStock }, error: null };
+    });
+
+    const payload = { ...chargePayload, reference: 'ref-concurrent' };
+    const [first, second] = await Promise.all([
+      ensureOrderFromPaystackChargePayload(payload),
+      ensureOrderFromPaystackChargePayload(payload),
+    ]);
+
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    expect(sharedOrders).toHaveLength(1);
+    expect(sharedOrders[0]?.paystack_reference).toBe('ref-concurrent');
+    expect(dbUpdateMaybeSingleFn).toHaveBeenCalledTimes(1);
+    expect(dbInventoryInsertFn).toHaveBeenCalledTimes(1);
+  });
 });

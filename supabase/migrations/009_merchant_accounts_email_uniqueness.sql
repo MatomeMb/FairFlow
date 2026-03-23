@@ -1,5 +1,7 @@
-﻿-- Normalize and enforce unique merchant account emails for OAuth stability.
+-- Normalize and enforce unique merchant account emails for OAuth stability.
 -- Keeps the oldest row per lower(email), deletes newer duplicates.
+
+begin;
 
 update public.merchant_accounts
 set email = lower(trim(email))
@@ -25,3 +27,5 @@ where m.ctid = r.ctid
 create unique index if not exists merchant_accounts_email_unique_ci
   on public.merchant_accounts (lower(email))
   where email is not null and trim(email) <> '';
+
+commit;
