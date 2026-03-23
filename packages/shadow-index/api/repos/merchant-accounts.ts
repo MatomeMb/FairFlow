@@ -8,6 +8,21 @@ export const OAUTH_NO_PASSWORD_SENTINEL = '!oauth-no-password!';
 const escapeIlikeExact = (value: string): string =>
   value.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
 
+type PgErr = { message: string; code?: string; details?: string; hint?: string };
+
+const formatPgErr = (ctx: string, err: PgErr): Error =>
+  new Error(
+    [
+      ctx,
+      err.message,
+      err.code && `code=${err.code}`,
+      err.details && `details=${err.details}`,
+      err.hint && `hint=${err.hint}`,
+    ]
+      .filter(Boolean)
+      .join(' | ')
+  );
+
 export const hashPassword = (password: string): string => {
   const salt = crypto.randomBytes(16).toString('hex');
   const derived = crypto.pbkdf2Sync(password, salt, 100_000, 32, 'sha256').toString('hex');
@@ -64,28 +79,33 @@ const mapMerchantRow = (row: Record<string, unknown>): MerchantAccount => {
 };
 
 
-/** Single-row lookup by email — avoids relying on a full-table scan for OAuth (unique email conflicts, etc.). */
+/**
+ * Lookup by email. Uses `.limit(1)` instead of `.maybeSingle()` so duplicate email rows
+ * (data issue) return one row instead of PostgREST error PGRST116.
+ */
 export const findMerchantAccountByEmail = async (email: string): Promise<MerchantAccount | null> => {
   const normalized = email.toLowerCase();
 
-  const byEq = await db.from('merchant_accounts').select('*').eq('email', normalized).maybeSingle();
+  const byEq = await db.from('merchant_accounts').select('*').eq('email', normalized).limit(1);
   if (byEq.error) {
-    throw new Error(`Failed to load merchant account: ${byEq.error.message}`);
+    throw formatPgErr('find merchant by email (eq)', byEq.error);
   }
-  if (byEq.data && typeof byEq.data === 'object') {
-    return mapMerchantRow(byEq.data as Record<string, unknown>);
+  const row0 = byEq.data?.[0];
+  if (row0 && typeof row0 === 'object') {
+    return mapMerchantRow(row0 as Record<string, unknown>);
   }
 
   const byIlike = await db
     .from('merchant_accounts')
     .select('*')
     .ilike('email', escapeIlikeExact(normalized))
-    .maybeSingle();
+    .limit(1);
   if (byIlike.error) {
-    throw new Error(`Failed to load merchant account: ${byIlike.error.message}`);
+    throw formatPgErr('find merchant by email (ilike)', byIlike.error);
   }
-  if (!byIlike.data || typeof byIlike.data !== 'object') return null;
-  return mapMerchantRow(byIlike.data as Record<string, unknown>);
+  const row1 = byIlike.data?.[0];
+  if (!row1 || typeof row1 !== 'object') return null;
+  return mapMerchantRow(row1 as Record<string, unknown>);
 };
 
 export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
@@ -95,7 +115,7 @@ export const loadMerchantAccounts = async (): Promise<MerchantAccount[]> => {
     .order('created_at', { ascending: false });
 
   if (error) {
-    throw new Error(`Failed to load merchant accounts: ${error.message}`);
+    throw formatPgErr('load merchant_accounts', error);
   }
 
   return ((data ?? []) as Array<Record<string, unknown>>).map((row) => mapMerchantRow(row));
@@ -134,8 +154,55 @@ export const upsertMerchantAccount = async (account: MerchantAccount): Promise<v
     .upsert([merchantAccountToDbRow(account)], { onConflict: 'id' });
 
   if (error) {
-    throw new Error(`Failed to save merchant account: ${error.message}`);
+    throw formatPgErr('upsert merchant_accounts', error);
   }
+};
+
+/**
+ * Google OAuth: insert new row or update existing. On unique violation (email/id race), merge onto DB row and update.
+ */
+export const persistMerchantAccountForOAuth = async (
+  account: MerchantAccount,
+  isNew: boolean
+): Promise<void> => {
+  if (!isNew) {
+    const { error } = await db
+      .from('merchant_accounts')
+      .update(merchantAccountToDbRow(account))
+      .eq('id', account.id);
+    if (error) throw formatPgErr('oauth update merchant_accounts', error);
+    return;
+  }
+
+  const row = merchantAccountToDbRow(account);
+  const { error: insErr } = await db.from('merchant_accounts').insert(row);
+  if (!insErr) return;
+
+  const code = (insErr as PgErr).code;
+  if (code === '23505') {
+    const existing = await findMerchantAccountByEmail(account.email);
+    if (!existing) throw formatPgErr('oauth insert duplicate but email not found', insErr);
+
+    const merged: MerchantAccount = {
+      ...existing,
+      ...account,
+      id: existing.id,
+      password_hash: existing.password_hash ?? account.password_hash,
+      created_at: existing.created_at ?? account.created_at,
+      business_name: account.business_name || existing.business_name,
+      updated_at: row.updated_at as string,
+    };
+    Object.assign(account, merged);
+
+    const { error: upErr } = await db
+      .from('merchant_accounts')
+      .update(merchantAccountToDbRow(account))
+      .eq('id', account.id);
+    if (upErr) throw formatPgErr('oauth reconcile after unique violation', upErr);
+    return;
+  }
+
+  throw formatPgErr('oauth insert merchant_accounts', insErr);
 };
 
 export const saveMerchantAccounts = async (accounts: MerchantAccount[]): Promise<void> => {
@@ -146,7 +213,7 @@ export const saveMerchantAccounts = async (accounts: MerchantAccount[]): Promise
   const { error } = await db.from('merchant_accounts').upsert(rows, { onConflict: 'id' });
 
   if (error) {
-    throw new Error(`Failed to save merchant accounts: ${error.message}`);
+    throw formatPgErr('save merchant_accounts', error);
   }
 };
 

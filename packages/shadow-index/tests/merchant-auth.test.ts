@@ -20,23 +20,41 @@ vi.mock('../api/db.js', () => ({
       const selectChain = () => ({
         order: () => Promise.resolve({ data: [...rows], error: null }),
         eq: (col: string, val: unknown) => ({
-          maybeSingle: () => {
+          limit: () => {
             const row = rows.find((r) => (r as Record<string, unknown>)[col] === val) ?? null;
-            return Promise.resolve({ data: row, error: null });
+            return Promise.resolve({ data: row ? [row] : [], error: null });
           },
         }),
         ilike: (col: string, val: unknown) => ({
-          maybeSingle: () => {
+          limit: () => {
             const pattern = String(val).replace(/\\([\\%_])/g, '$1').toLowerCase();
             const row =
               rows.find((r) => String((r as Record<string, unknown>)[col]).toLowerCase() === pattern) ??
               null;
-            return Promise.resolve({ data: row, error: null });
+            return Promise.resolve({ data: row ? [row] : [], error: null });
           },
         }),
       });
       return {
         select: () => selectChain(),
+        insert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
+          const list = Array.isArray(data) ? data : [data];
+          for (const row of list) {
+            const email = (row as { email?: string }).email;
+            if (email && rows.some((r) => (r as { email?: string }).email === email)) {
+              return Promise.resolve({ error: { message: 'duplicate key', code: '23505' } });
+            }
+            rows.push({ ...row });
+          }
+          return Promise.resolve({ error: null });
+        },
+        update: (patch: Record<string, unknown>) => ({
+          eq: (col: string, val: unknown) => {
+            const idx = rows.findIndex((r) => (r as Record<string, unknown>)[col] === val);
+            if (idx >= 0) rows[idx] = { ...rows[idx], ...patch };
+            return Promise.resolve({ error: null });
+          },
+        }),
         upsert: (data: Record<string, unknown> | Record<string, unknown>[]) => {
           const list = Array.isArray(data) ? data : [data];
           for (const row of list) {

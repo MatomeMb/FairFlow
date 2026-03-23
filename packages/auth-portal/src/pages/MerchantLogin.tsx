@@ -28,17 +28,23 @@ export function MerchantLogin() {
     }
 
     if (urlError) {
+      const rid = params.get("rid");
+      const ref = rid ? ` Reference: ${rid} (include this if you contact support).` : "";
       const messages: Record<string, string> = {
         google_cancelled: "Google sign-in was cancelled.",
         google_token_failed: "Could not complete Google sign-in. Please try again.",
         google_profile_failed: "Could not retrieve your Google profile. Please try again.",
         google_no_email: "Google account email is required to continue.",
         google_not_configured: "Google sign-in is not configured yet.",
+        oauth_db_read: "We could not load your account from the database. Check API logs for this request.",
+        oauth_db_write: "We could not save your account. Often this is a Supabase schema or constraint issue — check API logs.",
+        oauth_session_failed: "Sign-in succeeded but we could not create a session token. Check JWT_SECRET on the API.",
+        oauth_redirect_failed: "Sign-in succeeded but the redirect URL was invalid. Check AUTH_PORTAL_BASE_URL.",
         oauth_failed:
-          "We could not finish sign-in due to a server error. Please try again or use email and password.",
+          "We could not finish sign-in due to an unexpected server error. Try email/password or retry later.",
         account_exists: "An account with a different email already exists.",
       };
-      setError(messages[urlError] || "Sign-in failed. Please try again.");
+      setError((messages[urlError] || "Sign-in failed. Please try again.") + ref);
       window.history.replaceState({}, "", "/merchant/login");
     }
   }, [navigate]);

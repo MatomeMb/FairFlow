@@ -4,9 +4,9 @@
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
 import { z } from 'zod';
+import { buildPortalUrlSafe, sanitizeOAuthPortalOrigin } from '../auth/oauth-portal-url.js';
 import {
   buildGoogleState,
-  buildPortalUrl,
   exchangeGoogleCode,
   extractBearerToken,
   fetchGoogleProfile,
@@ -18,9 +18,9 @@ import {
   findMerchantAccountByEmail,
   hashPassword,
   loadMerchantAccounts,
+  persistMerchantAccountForOAuth,
   saveMerchantAccounts,
   sanitizeMerchantAccount,
-  upsertMerchantAccount,
   verifyPassword,
 } from '../repos/merchant-accounts.js';
 import { logError } from '../../lib/error-logger.js';
@@ -257,82 +257,119 @@ authRouter.get('/google', async (c) => {
 });
 
 authRouter.get('/google/callback', async (c) => {
+  const rid = crypto.randomUUID();
   let portalBaseUrl = authPortalBaseUrl;
+
+  const redirectLogin = (errorCode: string) =>
+    c.redirect(buildPortalUrlSafe('/merchant/login', { error: errorCode, rid }, portalBaseUrl, rid));
+
   try {
     const parsedState = parseGoogleState(c.req.query('state') ?? null);
-    const stateReturnTo = parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
-    portalBaseUrl = stateReturnTo ?? authPortalBaseUrl;
+    const stateReturnTo =
+      parsedState && typeof parsedState.return_to === 'string' ? parsedState.return_to : undefined;
+    portalBaseUrl = sanitizeOAuthPortalOrigin(stateReturnTo, rid);
 
     const errorCode = c.req.query('error');
     if (errorCode) {
       const mapped = errorCode === 'access_denied' ? 'google_cancelled' : 'google_token_failed';
-      return c.redirect(buildPortalUrl('/merchant/login', { error: mapped }, portalBaseUrl));
+      return redirectLogin(mapped);
     }
 
     if (!parsedState) {
-      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+      logger.warn('oauth_invalid_state', { rid });
+      return redirectLogin('google_token_failed');
     }
 
     const code = c.req.query('code');
     if (!code) {
-      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+      return redirectLogin('google_token_failed');
     }
 
     const config = getGoogleOAuthConfig();
     if (!config) {
-      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_not_configured' }, portalBaseUrl));
+      return redirectLogin('google_not_configured');
     }
 
     const tokenResponse = await exchangeGoogleCode(code, config);
     const accessToken = tokenResponse?.access_token;
     if (!accessToken) {
-      logger.error('[OAuth] Token exchange failed — no access_token returned');
-      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_token_failed' }, portalBaseUrl));
+      logger.error('oauth_no_access_token', { rid });
+      return redirectLogin('google_token_failed');
     }
 
     const profile = await fetchGoogleProfile(accessToken);
     const profileEmail = profile?.email?.toLowerCase();
     if (!profileEmail) {
-      return c.redirect(buildPortalUrl('/merchant/login', { error: 'google_no_email' }, portalBaseUrl));
+      return redirectLogin('google_no_email');
     }
 
     const now = new Date().toISOString();
-    let account = await findMerchantAccountByEmail(profileEmail);
 
-    if (!account) {
-      account = {
-        id: crypto.randomUUID(),
-        business_name: profile?.name?.trim() || profileEmail.split('@')[0],
-        email: profileEmail,
-        auth_provider: 'google',
-        kyc_status: 'not_started',
-        commission_rate: 0.03,
-        payout_frequency: 'weekly',
-        payout_minimum: 50000,
-        total_earnings: 0,
-        pending_payout: 0,
-        created_at: now,
-        updated_at: now,
-      };
-    } else {
-      account.auth_provider = 'google';
-      account.updated_at = now;
+    let existing: MerchantAccount | null;
+    try {
+      existing = await findMerchantAccountByEmail(profileEmail);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logError({ path: c.req.path, method: c.req.method, flow: 'google_oauth_callback', rid, phase: 'db_read' }, msg);
+      logger.error('oauth_db_read_failed', { rid, err: msg });
+      return redirectLogin('oauth_db_read');
     }
 
-    await upsertMerchantAccount(account);
+    const isNew = !existing;
+    const merchantAccount: MerchantAccount = existing
+      ? { ...existing, auth_provider: 'google', updated_at: now }
+      : {
+          id: crypto.randomUUID(),
+          business_name: profile?.name?.trim() || profileEmail.split('@')[0],
+          email: profileEmail,
+          auth_provider: 'google',
+          kyc_status: 'not_started',
+          commission_rate: 0.03,
+          payout_frequency: 'weekly',
+          payout_minimum: 50000,
+          total_earnings: 0,
+          pending_payout: 0,
+          created_at: now,
+          updated_at: now,
+        };
 
-    const merchantToken = issueMerchantToken(account, getJwtSecret());
-    const cookie = merchantOAuthCookieHeader(merchantToken);
-    if (cookie) {
-      c.header('Set-Cookie', cookie);
-      return c.redirect(buildPortalUrl('/dashboard/merchant', undefined, portalBaseUrl));
+    try {
+      await persistMerchantAccountForOAuth(merchantAccount, isNew);
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logError({ path: c.req.path, method: c.req.method, flow: 'google_oauth_callback', rid, phase: 'db_write' }, msg);
+      logger.error('oauth_db_write_failed', { rid, err: msg });
+      return redirectLogin('oauth_db_write');
     }
-    return c.redirect(buildPortalUrl('/dashboard/merchant', { token: merchantToken }, portalBaseUrl));
+
+    let merchantToken: string;
+    try {
+      merchantToken = issueMerchantToken(merchantAccount, getJwtSecret());
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error('oauth_issue_token_failed', { rid, err: msg });
+      return redirectLogin('oauth_session_failed');
+    }
+
+    try {
+      const cookie = merchantOAuthCookieHeader(merchantToken);
+      if (cookie) {
+        c.header('Set-Cookie', cookie);
+        return c.redirect(buildPortalUrlSafe('/dashboard/merchant', undefined, portalBaseUrl, rid));
+      }
+      return c.redirect(
+        buildPortalUrlSafe('/dashboard/merchant', { token: merchantToken }, portalBaseUrl, rid)
+      );
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      logger.error('oauth_redirect_failed', { rid, err: msg });
+      return redirectLogin('oauth_redirect_failed');
+    }
   } catch (error) {
     const msg = error instanceof Error ? error.message : String(error);
     const stack = error instanceof Error ? error.stack : undefined;
-    logError({ path: c.req.path, method: c.req.method, flow: 'google_oauth_callback' }, msg, stack);
-    logger.error('Google OAuth callback failed', { error: msg });
-    return c.redirect(buildPortalUrl('/merchant/login', { error: 'oauth_failed' }, portalBaseUrl));
+    logError({ path: c.req.path, method: c.req.method, flow: 'google_oauth_callback', rid }, msg, stack);
+    logger.error('oauth_unhandled', { rid, err: msg });
+    return redirectLogin('oauth_failed');
   }
 });

@@ -1,4 +1,5 @@
 import crypto from 'node:crypto';
+import { logger } from '../../lib/logger.js';
 import { signJwt, verifyJwt } from '../shared/jwt.js';
 import { authPortalBaseUrl, getJwtSecret } from '../shared/runtime-config.js';
 
@@ -70,26 +71,52 @@ export const exchangeGoogleCode = async (
     grant_type: 'authorization_code',
   });
 
-  const response = await fetch('https://oauth2.googleapis.com/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: body.toString(),
-  });
+  let response: Response;
+  try {
+    response = await fetch('https://oauth2.googleapis.com/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: body.toString(),
+    });
+  } catch (e) {
+    logger.error('[OAuth] Token exchange network error', { err: String(e) });
+    return null;
+  }
 
   if (!response.ok) {
     const errBody = await response.text().catch(() => 'unable to read error body');
-    console.error('[OAuth] Token exchange failed:', response.status, errBody);
+    logger.error('[OAuth] Token exchange HTTP error', { status: response.status, body: errBody.slice(0, 500) });
     return null;
   }
-  return (await response.json()) as { access_token?: string };
+
+  try {
+    return (await response.json()) as { access_token?: string };
+  } catch (e) {
+    logger.error('[OAuth] Token exchange invalid JSON', { err: String(e) });
+    return null;
+  }
 };
 
 export const fetchGoogleProfile = async (accessToken: string): Promise<{ email?: string; name?: string } | null> => {
-  const response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-    headers: { Authorization: `Bearer ${accessToken}` },
-  });
-  if (!response.ok) return null;
-  return (await response.json()) as { email?: string; name?: string };
+  let response: Response;
+  try {
+    response = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+      headers: { Authorization: `Bearer ${accessToken}` },
+    });
+  } catch (e) {
+    logger.error('[OAuth] Profile fetch network error', { err: String(e) });
+    return null;
+  }
+  if (!response.ok) {
+    logger.error('[OAuth] Profile fetch HTTP error', { status: response.status });
+    return null;
+  }
+  try {
+    return (await response.json()) as { email?: string; name?: string };
+  } catch (e) {
+    logger.error('[OAuth] Profile invalid JSON', { err: String(e) });
+    return null;
+  }
 };
 
 export const buildGoogleState = (portalBaseUrl: string): string => {

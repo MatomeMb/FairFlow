@@ -151,17 +151,22 @@ export const MerchantPortal: React.FC = () => {
     const urlError = params.get('error');
 
     if (urlError) {
+      const rid = params.get('rid');
+      const ref = rid ? ` Ref: ${rid}` : '';
       const messages: Record<string, string> = {
         google_cancelled: 'Google sign-in was cancelled.',
         google_token_failed: 'Could not complete Google sign-in. Please try again.',
         google_profile_failed: 'Could not retrieve your Google profile. Please try again.',
         google_no_email: 'Google account email is required to continue.',
         google_not_configured: 'Google sign-in is not configured yet.',
-        oauth_failed:
-          'We could not finish sign-in due to a server error. Please try again or use email and password.',
+        oauth_db_read: 'Could not load account from database. Check API logs.',
+        oauth_db_write: 'Could not save account (often Supabase schema). Check API logs.',
+        oauth_session_failed: 'Could not issue session token. Check JWT_SECRET.',
+        oauth_redirect_failed: 'Redirect failed. Check AUTH_PORTAL_BASE_URL.',
+        oauth_failed: 'Unexpected server error during Google sign-in.',
         account_exists: 'An account with a different email already exists.',
       };
-      showToast(messages[urlError] || 'Sign-in failed. Please try again.', 'error');
+      showToast((messages[urlError] || 'Sign-in failed. Please try again.') + ref, 'error');
       window.history.replaceState({}, '', '/dashboard/merchant');
     }
   }, []);
