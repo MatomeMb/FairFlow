@@ -316,8 +316,10 @@ export const MerchantPortal: React.FC = () => {
     }
     const data = (await res.json()) as KycStartResponse;
     await fetchMerchantAccount();
+    // FINAL-POLISH: show immediate merchant confirmation after successful KYC submission/start.
+    showToast("KYC documents received — we'll review within 48 hours.", 'success');
     return data;
-  }, [apiBase, merchantFetch, fetchMerchantAccount]);
+  }, [apiBase, merchantFetch, fetchMerchantAccount, showToast]);
 
   const fetchNotifications = useCallback(async () => {
     setNotificationsLoading(true);

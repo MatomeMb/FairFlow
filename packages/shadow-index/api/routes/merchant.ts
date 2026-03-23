@@ -394,6 +394,24 @@ merchantRouter.get('/account', async (c) => {
   return c.json(sanitizeMerchantAccount(account));
 });
 
+merchantRouter.get('/onboarding-status', async (c) => {
+  const { account } = await getMerchantIdentity(c);
+  if (!account) {
+    return c.json({ ok: false, error: 'Unauthorized' }, 401);
+  }
+  // FINAL-POLISH: expose a lightweight onboarding readiness snapshot for merchant UX and support.
+  const hasConnectedPaystack = Boolean(
+    account.bank_account?.bank_name &&
+      account.bank_account?.branch_code &&
+      account.bank_account?.account_number
+  );
+  return c.json({
+    kycStatus: account.kyc_status ?? 'not_started',
+    payoutEligible: Boolean(account.payout_eligible),
+    hasConnectedPaystack,
+  });
+});
+
 merchantRouter.get('/payouts', async (c) => {
   const { merchantIds } = await getMerchantIdentity(c);
   if (merchantIds.length === 0) {
