@@ -159,7 +159,7 @@ describe('MVP-09: Auth when SHADOW_INDEX_API_KEY is set', () => {
     (globalThis as unknown as { __saved_api_key?: string }).__saved_api_key =
       process.env.SHADOW_INDEX_API_KEY;
     process.env.SHADOW_INDEX_API_KEY = 'testkey';
-    const mod = await import('./index');
+    const mod = await import('./index.js');
     appWithKey = mod.default;
   });
 
