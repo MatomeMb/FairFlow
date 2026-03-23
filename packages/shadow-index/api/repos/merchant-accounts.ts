@@ -147,6 +147,39 @@ const merchantAccountToDbRow = (account: MerchantAccount) => ({
   updated_at: account.updated_at ?? new Date().toISOString(),
 });
 
+/**
+ * OAuth new row: only columns present on a typical merchant_accounts table.
+ * Avoids PostgREST errors when prod DB has not run KYC migrations (smile_*, etc.).
+ */
+const merchantAccountToOAuthInsertRow = (account: MerchantAccount): Record<string, unknown> => {
+  const row: Record<string, unknown> = {
+    id: account.id,
+    business_name: account.business_name,
+    email: account.email.toLowerCase(),
+    password_hash: account.password_hash ?? OAUTH_NO_PASSWORD_SENTINEL,
+    kyc_status: account.kyc_status ?? 'not_started',
+    commission_rate: account.commission_rate ?? 0.03,
+    payout_frequency: account.payout_frequency ?? 'weekly',
+    payout_minimum: account.payout_minimum ?? 50000,
+    total_earnings: account.total_earnings ?? 0,
+    pending_payout: account.pending_payout ?? 0,
+    payout_eligible: account.payout_eligible ?? false,
+    created_at: account.created_at ?? new Date().toISOString(),
+    updated_at: account.updated_at ?? new Date().toISOString(),
+  };
+  const uid = process.env.MERCHANT_OAUTH_DEFAULT_USER_ID?.trim();
+  if (uid) row.user_id = uid;
+  return row;
+};
+
+/** OAuth sign-in updates: do not send KYC/smile/null columns (avoids schema mismatch and accidental nulling). */
+const merchantAccountToOAuthUpdatePatch = (account: MerchantAccount) => ({
+  business_name: account.business_name,
+  email: account.email.toLowerCase(),
+  password_hash: account.password_hash ?? OAUTH_NO_PASSWORD_SENTINEL,
+  updated_at: account.updated_at ?? new Date().toISOString(),
+});
+
 /** Persist one account (OAuth, targeted updates) without re-upserting every merchant row. */
 export const upsertMerchantAccount = async (account: MerchantAccount): Promise<void> => {
   const { error } = await db
@@ -168,14 +201,37 @@ export const persistMerchantAccountForOAuth = async (
   if (!isNew) {
     const { error } = await db
       .from('merchant_accounts')
-      .update(merchantAccountToDbRow(account))
+      .update(merchantAccountToOAuthUpdatePatch(account))
       .eq('id', account.id);
     if (error) throw formatPgErr('oauth update merchant_accounts', error);
     return;
   }
 
-  const row = merchantAccountToDbRow(account);
-  const { error: insErr } = await db.from('merchant_accounts').insert(row);
+  const insertRow = merchantAccountToOAuthInsertRow(account);
+  let insErr = (await db.from('merchant_accounts').insert(insertRow)).error;
+
+  if (insErr) {
+    const msg = insErr.message ?? '';
+    const looksLikeMissingColumn =
+      /column|schema|could not find|PGRST204|42703/i.test(msg) && (insErr as PgErr).code !== '23505';
+    if (looksLikeMissingColumn) {
+      const minimal: Record<string, unknown> = {
+        id: account.id,
+        business_name: account.business_name,
+        email: account.email.toLowerCase(),
+        password_hash: account.password_hash ?? OAUTH_NO_PASSWORD_SENTINEL,
+        created_at: account.created_at ?? new Date().toISOString(),
+        updated_at: account.updated_at ?? new Date().toISOString(),
+      };
+      const uid = process.env.MERCHANT_OAUTH_DEFAULT_USER_ID?.trim();
+      if (uid) minimal.user_id = uid;
+      const retry = await db.from('merchant_accounts').insert(minimal);
+      if (!retry.error) {
+        return;
+      }
+    }
+  }
+
   if (!insErr) return;
 
   const code = (insErr as PgErr).code;
@@ -190,13 +246,13 @@ export const persistMerchantAccountForOAuth = async (
       password_hash: existing.password_hash ?? account.password_hash,
       created_at: existing.created_at ?? account.created_at,
       business_name: account.business_name || existing.business_name,
-      updated_at: row.updated_at as string,
+      updated_at: (insertRow.updated_at as string) ?? account.updated_at ?? new Date().toISOString(),
     };
     Object.assign(account, merged);
 
     const { error: upErr } = await db
       .from('merchant_accounts')
-      .update(merchantAccountToDbRow(account))
+      .update(merchantAccountToOAuthUpdatePatch(account))
       .eq('id', account.id);
     if (upErr) throw formatPgErr('oauth reconcile after unique violation', upErr);
     return;
