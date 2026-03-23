@@ -185,9 +185,6 @@ VITE_API_BASE_URL=http://localhost:3000          # Dev
 
 # API Key (optional for local dev)
 VITE_API_KEY=your-shadow-index-api-key
-
-# Admin operations
-VITE_ADMIN_SECRET=your-admin-secret-key
 ```
 
 ## Authentication Flow
@@ -233,7 +230,7 @@ Portals are protected by role-based guards and route configuration:
 The portal communicates with shadow-index via:
 
 - **Merchant routes:** `merchantFetch()` wrapper (includes JWT token)
-- **Admin routes:** Standard `fetch()` with Supabase auth header
+- **Admin routes:** Standard `fetch()` to `/v1/admin-proxy/*` with `Authorization: Bearer <Supabase access_token>` (CEO/CTO validated server-side; no client-side admin secret)
 - **Public routes:** Standard `fetch()` without auth
 
 Example:
@@ -244,13 +241,16 @@ const products = await merchantFetch('/v1/merchant/products', {
   headers: { 'Content-Type': 'application/json' }
 });
 
-// Admin API call (KYC approval)
-const result = await fetch(`${API_BASE}/v1/admin/kyc/approve/${merchantId}`, {
+// Admin API call (KYC approval) — Supabase session token only; shadow-index uses /v1/admin-proxy
+const { data: { session } } = await supabase.auth.getSession();
+const accessToken = session?.access_token ?? '';
+const result = await fetch(`${API_BASE}/v1/admin-proxy/kyc/approve/${merchantId}`, {
   method: 'PATCH',
   headers: {
-    'Authorization': `Bearer ${adminSecret}`,
-    'Content-Type': 'application/json'
-  }
+    Authorization: `Bearer ${accessToken}`,
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({ notes: 'Optional approval notes' }),
 });
 ```
 
