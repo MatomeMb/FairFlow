@@ -143,6 +143,18 @@ export async function ensureOrderFromPaystackChargePayload(
         product.stock_count = stockAfter;
         product.updated_at = now;
         await writeProducts(products);
+      } else {
+        // FINAL-POLISH: emit structured error when atomic stock decrement did not commit successfully.
+        apiLogger.error(
+          {
+            reference,
+            productId: product.id,
+            merchantId: product.merchant_id,
+            stockBefore,
+            stockErr: stockErr ? String(stockErr.message ?? stockErr) : null,
+          },
+          'stock_decrement_conflict'
+        );
       }
       const stockDurationMs = Math.round((performance.now() - stockStartedAt) * 100) / 100;
       emitMetric(apiLogger, 'stock.decrement.duration_ms', stockDurationMs, {
@@ -150,7 +162,8 @@ export async function ensureOrderFromPaystackChargePayload(
         merchantId: product.merchant_id,
         ok: !stockErr,
       });
-      // ALERT: stock decrement > 120ms sustained can indicate DB contention.
+      // FINAL-POLISH: preserve explicit threshold markers for launch monitoring.
+      // ALERT_THRESHOLD: stock_decrement_duration_ms > 120
       if (stockDurationMs > 120) {
         apiLogger.warn({ productId: product.id, stockDurationMs }, 'stock_decrement_slow');
       }

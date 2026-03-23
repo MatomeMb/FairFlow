@@ -1,7 +1,7 @@
 import { Hono } from 'hono';
 import crypto from 'node:crypto';
 import { err } from '../shared/errors.js';
-import { logger } from '../../lib/logger.js';
+import { emitMetric, withRequestContext } from '../shared/logger.js';
 import { ensureOrderFromPaystackChargePayload } from '../services/paystack-order-flow.js';
 import { loadPayoutLogs, savePayoutLogs } from '../services/commerce-store.js';
 
@@ -9,9 +9,13 @@ export const webhooksRouter = new Hono();
 
 // POST /webhooks/paystack - Paystack webhook (charge.success, transfer.success, transfer.failed)
 webhooksRouter.post('/paystack', async (c) => {
+  const startedAt = performance.now();
+  const logger = withRequestContext(c);
   const signature = c.req.header('x-paystack-signature');
   const secret = process.env.PAYSTACK_SECRET_KEY;
   if (!signature || !secret) {
+    // FINAL-POLISH: emit explicit structured error context for webhook auth/config failures.
+    logger.error({ hasSignature: Boolean(signature), hasSecret: Boolean(secret) }, 'paystack_webhook_config_error');
     return c.json(err('webhook_config_error', 'Missing Paystack signature or secret'), 400);
   }
 
@@ -26,6 +30,14 @@ webhooksRouter.post('/paystack', async (c) => {
     }
   }
   if (!sigValid) {
+    // FINAL-POLISH: emit explicit structured error context for invalid HMAC attempts.
+    logger.error(
+      {
+        signatureLength: signature.length,
+        expectedLength: expectedHash.length,
+      },
+      'paystack_webhook_signature_invalid'
+    );
     return c.json(err('webhook_signature_invalid', 'Invalid Paystack signature'), 400);
   }
 
@@ -40,7 +52,7 @@ webhooksRouter.post('/paystack', async (c) => {
     if (event.event === 'charge.success') {
       const data = event.data as { reference?: string; metadata?: unknown; customer?: { email?: string } } | undefined;
       if (!data?.reference) {
-        logger.warn('Paystack charge.success missing reference', { event });
+        logger.warn({ event }, 'paystack_charge_success_missing_reference');
         return c.json({ ok: true }, 200);
       }
       try {
@@ -50,10 +62,10 @@ webhooksRouter.post('/paystack', async (c) => {
           customer: data.customer,
         });
       } catch (error) {
-        logger.error('Paystack charge.success order persistence failed', {
+        logger.error({
           reference: data.reference,
           error: error instanceof Error ? error.message : String(error),
-        });
+        }, 'paystack_charge_success_persistence_failed');
       }
     } else if (event.event === 'transfer.success' || event.event === 'transfer.failed') {
       const data = event.data as { reference?: string; status?: string } | undefined;
@@ -72,7 +84,18 @@ webhooksRouter.post('/paystack', async (c) => {
     return c.json({ ok: true }, 200);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
-    logger.error('Paystack webhook processing failed', { error: message });
+    logger.error({ error: message }, 'paystack_webhook_processing_failed');
     return c.json(err('webhook_processing_failed', message), 500);
+  } finally {
+    const latencyMs = Math.round((performance.now() - startedAt) * 100) / 100;
+    // FINAL-POLISH: keep webhook latency telemetry aligned with operational alert markers.
+    // ALERT_THRESHOLD: webhook_latency_ms > 800
+    emitMetric(logger, 'webhook.paystack.latency_ms', latencyMs, {
+      path: c.req.path,
+      method: c.req.method,
+    });
+    if (latencyMs > 800) {
+      logger.warn({ latencyMs }, 'paystack_webhook_latency_high');
+    }
   }
 });

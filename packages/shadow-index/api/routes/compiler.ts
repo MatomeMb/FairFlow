@@ -5,6 +5,7 @@ import path from 'node:path';
 import { z } from 'zod';
 import { err } from '../shared/errors.js';
 import { logger } from '../../lib/logger.js';
+import { emitMetric, withRequestContext } from '../shared/logger.js';
 import {
   dataRoot,
   thingsDir,
@@ -224,12 +225,17 @@ async function mergeArchivedListingFlag(thing: unknown, thingHash: string): Prom
 }
 // Compile endpoint - transforms product data into .thing file (uses shared compileAndPersistProduct)
 compilerRouter.post('/compile', async (c) => {
+  // FINAL-POLISH: add explicit compile endpoint latency telemetry for launch SLO tracking.
+  const startedAt = performance.now();
+  const reqLogger = withRequestContext(c);
   const body = await c.req.json().catch(() => null);
   if (body === null || body === undefined) {
+    reqLogger.error({ reqId: c.get('requestId') }, 'compile_invalid_json');
     return c.json(err('invalid_json', 'Request body must be valid JSON'), 400);
   }
   const parsed = productSchema.safeParse(body);
   if (!parsed.success) {
+    reqLogger.error({ reqId: c.get('requestId') }, 'compile_invalid_product_payload');
     return c.json(
       err('invalid_product', 'Invalid product payload', parsed.error.flatten()),
       400
@@ -237,22 +243,34 @@ compilerRouter.post('/compile', async (c) => {
   }
 
   const result = await compileAndPersistProduct(parsed.data);
-  return c.json({
+  const response = c.json({
     ...result,
     image_url: parsed.data.image_url,
     checkout_url: parsed.data.checkout_url,
   });
+  const durationMs = Math.round((performance.now() - startedAt) * 100) / 100;
+  emitMetric(reqLogger, 'compiler.compile.duration_ms', durationMs, { status: response.status });
+  reqLogger.info({ reqId: c.get('requestId'), status: response.status, durationMs }, 'compile completed');
+  return response;
 });
 
 // Resolve hash to artifact URL
 compilerRouter.get('/resolve/:hash', async (c) => {
+  // FINAL-POLISH: add explicit resolve endpoint latency telemetry for launch SLO tracking.
+  const startedAt = performance.now();
+  const reqLogger = withRequestContext(c);
   const hash = c.req.param('hash');
   const index = await loadIndex();
   const entry = index[hash];
   if (!entry) {
-    return c.json(err('not_found', `No artifact found for hash: ${hash}`, { hash }), 404);
+    reqLogger.error({ reqId: c.get('requestId'), hash }, 'resolve_not_found');
+    const response = c.json(err('not_found', `No artifact found for hash: ${hash}`, { hash }), 404);
+    const durationMs = Math.round((performance.now() - startedAt) * 100) / 100;
+    emitMetric(reqLogger, 'compiler.resolve.duration_ms', durationMs, { status: response.status });
+    reqLogger.info({ reqId: c.get('requestId'), status: response.status, durationMs, hash }, 'resolve completed');
+    return response;
   }
-  return c.json({
+  const response = c.json({
     hash: entry.hash,
     matter_uri: entry.matter_uri,
     thing_url: entry.thing_url,
@@ -261,6 +279,10 @@ compilerRouter.get('/resolve/:hash', async (c) => {
     checkout_url: entry.checkout_url,
     created_at: entry.created_at,
   });
+  const durationMs = Math.round((performance.now() - startedAt) * 100) / 100;
+  emitMetric(reqLogger, 'compiler.resolve.duration_ms', durationMs, { status: response.status });
+  reqLogger.info({ reqId: c.get('requestId'), status: response.status, durationMs, hash }, 'resolve completed');
+  return response;
 });
 
 // Get gist (minimal product data) by hash

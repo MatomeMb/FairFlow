@@ -84,10 +84,14 @@ merchantRouter.post('/uploads/image', async (c) => {
   const auth = c.req.header('Authorization');
   const bearer = auth?.startsWith('Bearer ') ? auth.slice(7) : null;
   if (!bearer) {
+    // FINAL-POLISH: emit structured auth error context for invalid/missing merchant JWT.
+    logger.error('merchant_jwt_invalid', { path: c.req.path, reason: 'missing_bearer_token' });
     return c.json(err('unauthorized', 'Authentication required'), 401);
   }
   const payload = verifyJwt(bearer, getJwtSecret());
   if (!payload || payload.typ !== 'merchant_auth') {
+    // FINAL-POLISH: emit structured auth error context for invalid/malformed merchant JWT.
+    logger.error('merchant_jwt_invalid', { path: c.req.path, reason: 'token_verify_failed' });
     return c.json(err('unauthorized', 'Invalid merchant token'), 401);
   }
 
@@ -252,7 +256,7 @@ merchantRouter.patch('/orders/:id/delivery-date', async (c) => {
       productTitle: order.product_title ?? 'your order',
       estimatedDeliveryDate,
       merchantBusinessName: account.business_name,
-    }).catch((error) => console.error('[DeliveryDate] Email error:', error));
+    }).catch((error) => logger.error('[DeliveryDate] Email error:', { error: String(error) }));
   }
 
   return c.json({ ok: true, data: updated });
@@ -472,7 +476,7 @@ merchantRouter.post('/kyc/start', async (c) => {
   const levelName = process.env.SUMSUB_FLOW_NAME?.trim() || 'merchant-kyc';
 
   if (!appToken || !secretKey) {
-    console.error('[Sumsub KYC] Missing SUMSUB_APP_TOKEN or SUMSUB_SECRET_KEY', { merchant_id: account.id });
+    logger.error('[Sumsub KYC] Missing SUMSUB_APP_TOKEN or SUMSUB_SECRET_KEY', { merchant_id: account.id });
     return c.json(err('sumsub_config', 'KYC provider is not configured on this server'), 503);
   }
 
@@ -503,7 +507,7 @@ merchantRouter.post('/kyc/start', async (c) => {
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : String(e);
-    console.error('[Sumsub KYC] start failed', { merchant_id: account.id, error: message });
+    logger.error('[Sumsub KYC] start failed', { merchant_id: account.id, error: message });
     return c.json({ ok: false, error: 'KYC provider unavailable' }, 502);
   }
 });
@@ -515,12 +519,12 @@ merchantRouter.post('/kyc/callback', async (c) => {
   const skipSig = process.env.SUMSUB_SKIP_SIGNATURE_VERIFY === 'true';
 
   if (!webhookSecret && !skipSig) {
-    console.error('[Sumsub KYC] callback: missing SUMSUB_WEBHOOK_SECRET');
+    logger.error('[Sumsub KYC] callback: missing SUMSUB_WEBHOOK_SECRET');
     return c.json(err('sumsub_config', 'Not configured'), 503);
   }
 
   if (!skipSig && !verifySumsubWebhookSignature(rawBody, digest, webhookSecret)) {
-    console.error('[Sumsub KYC] Invalid webhook signature');
+    logger.error('[Sumsub KYC] Invalid webhook signature');
     return c.json(err('invalid_signature', 'Signature verification failed'), 400);
   }
 
@@ -544,7 +548,7 @@ merchantRouter.post('/kyc/callback', async (c) => {
   const accounts = await loadMerchantAccounts();
   const merchant = accounts.find((m) => m.id === externalUserId || (applicantId && m.smile_id_session_id === applicantId));
   if (!merchant) {
-    console.error('[Sumsub KYC] Unknown merchant for webhook', { externalUserId, applicantId });
+    logger.error('[Sumsub KYC] Unknown merchant for webhook', { externalUserId, applicantId });
     return c.json(err('not_found', 'Merchant not found'), 404);
   }
 
@@ -612,7 +616,7 @@ merchantRouter.post('/kyc/callback', async (c) => {
         payoutsActivated: true,
         nextPayoutDate: nextPayoutIso,
         dashboardUrl: dash,
-      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+      }).catch((err) => logger.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err: String(err) }));
     } else {
       const notifications = await loadNotifications();
       notifications.push({
@@ -633,7 +637,7 @@ merchantRouter.post('/kyc/callback', async (c) => {
         approved: false,
         notes: merchant.kyc_rejection_reason,
         dashboardUrl: dash,
-      }).catch((err) => console.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err }));
+      }).catch((err) => logger.error('[Sumsub KYC] email error', { merchant_id: merchant.id, err: String(err) }));
     }
   }
 

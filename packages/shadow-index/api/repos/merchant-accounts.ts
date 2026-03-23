@@ -194,6 +194,12 @@ export const upsertMerchantAccount = async (account: MerchantAccount): Promise<v
     .upsert([merchantAccountToDbRow(account)], { onConflict: 'id' });
 
   if (error) {
+    // FINAL-POLISH: emit structured database context for merchant account upsert failures.
+    logger.error('merchant_account_upsert_failed', {
+      merchantId: account.id,
+      email: account.email,
+      code: error.code,
+    });
     throw formatPgErr('upsert merchant_accounts', error);
   }
 };
@@ -210,7 +216,15 @@ export const persistMerchantAccountForOAuth = async (
       .from('merchant_accounts')
       .update(merchantAccountToOAuthUpdatePatch(account))
       .eq('id', account.id);
-    if (error) throw formatPgErr('oauth update merchant_accounts', error);
+    if (error) {
+      // FINAL-POLISH: emit structured database context for OAuth update failures.
+      logger.error('oauth_update_failed', {
+        merchantId: account.id,
+        email: account.email,
+        code: error.code,
+      });
+      throw formatPgErr('oauth update merchant_accounts', error);
+    }
     return;
   }
 
@@ -261,10 +275,24 @@ export const persistMerchantAccountForOAuth = async (
       .from('merchant_accounts')
       .update(merchantAccountToOAuthUpdatePatch(account))
       .eq('id', account.id);
-    if (upErr) throw formatPgErr('oauth reconcile after unique violation', upErr);
+    if (upErr) {
+      // FINAL-POLISH: emit structured database context for OAuth unique-violation reconcile failures.
+      logger.error('oauth_reconcile_failed', {
+        merchantId: account.id,
+        email: account.email,
+        code: upErr.code,
+      });
+      throw formatPgErr('oauth reconcile after unique violation', upErr);
+    }
     return;
   }
 
+  // FINAL-POLISH: emit structured database context for OAuth insert failures.
+  logger.error('oauth_insert_failed', {
+    merchantId: account.id,
+    email: account.email,
+    code: insErr.code,
+  });
   throw formatPgErr('oauth insert merchant_accounts', insErr);
 };
 

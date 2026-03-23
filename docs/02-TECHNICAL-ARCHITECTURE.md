@@ -94,6 +94,29 @@ The Hono application mounts domain routers from `packages/shadow-index/api/index
 - **Shared:** `api/shared/` — errors, **single** JWT implementation (`jwt.ts`), runtime paths and config
 - **Routes:** `api/routes/*` plus `merchant-products.ts`; all mounted from `api/index.ts` (see `api/routes/README.md`)
 
+### Observability and correlation model
+
+- `api/middleware/correlation.ts` sets request correlation IDs and propagates merchant identity from JWT when present.
+- `api/shared/logger.ts` provides structured JSON logging (pino) + metric events.
+- `requestLoggingMiddleware` emits request duration for every endpoint; routes/services emit domain metrics for operational SLOs.
+
+Correlation sequence:
+
+1. Request enters API with optional `x-request-id` / `x-correlation-id`.
+2. Middleware normalizes IDs and sets response headers.
+3. Route/service logs include `requestId`, `correlationId`, `merchantId`.
+4. Incident triage uses one correlation ID across middleware, routes, and services.
+
+<!-- FINAL-POLISH: include representative log examples for launch incident triage. -->
+Representative structured logs:
+
+- `info` (request completion)
+  - `{"level":30,"service":"shadow-index","reqId":"...","method":"POST","path":"/compile","status":200,"durationMs":42.7,"merchantId":"...","msg":"request completed"}`
+- `warn` (latency threshold)
+  - `{"level":40,"service":"shadow-index","path":"/webhooks/paystack","latencyMs":812.4,"msg":"paystack_webhook_latency_high"}`
+- `error` (security/integrity failure)
+  - `{"level":50,"service":"shadow-index","path":"/webhooks/paystack","signatureLength":64,"expectedLength":128,"msg":"paystack_webhook_signature_invalid"}`
+
 ### Email and KYC integrations
 - **Resend** — transactional email (`packages/shadow-index/api/email.ts`); disabled in dev/test when no API key
 - **Sumsub** — KYC webhook and SDK token helpers (`sumsub-kyc.ts`, merchant KYC flows)
