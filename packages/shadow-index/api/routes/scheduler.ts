@@ -10,6 +10,7 @@ import { readProducts } from '../merchant-products.js';
 import { loadMerchantAccounts } from '../repos/merchant-accounts.js';
 import { sendOrderCheckinEmail } from '../email.js';
 import { db } from '../db.js';
+import { logger } from '../../lib/logger.js';
 
 export const schedulerRouter = new Hono();
 
@@ -81,6 +82,6 @@ schedulerRouter.post('/order-checkins', async (c) => {
     }
   }
 
-  console.log(`[Cron] Check-in emails sent: ${sent}/${eligible.length}`);
+  logger.info('Cron order check-ins completed', { sent, eligible: eligible.length });
   return c.json({ ok: true, data: { processed: eligible.length, sent } });
 });

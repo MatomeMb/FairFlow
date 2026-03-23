@@ -49,27 +49,49 @@ async function apiError(res: Response, fallback: string): Promise<string> {
   }
 }
 
+type Pagination = { page: number; limit: number; total: number; pages: number };
+
 export function useMerchantProducts(
   token: string | null,
   merchantFetch: (url: string, options?: RequestInit) => Promise<Response>
 ) {
   const [products, setProducts] = useState<MerchantPortalProduct[]>([]);
   const [isLoadingProducts, setIsLoadingProducts] = useState(false);
+  const [productsPagination, setProductsPagination] = useState<Pagination | null>(null);
 
   const loadProducts = useCallback(async () => {
     setIsLoadingProducts(true);
     try {
-      const res = await merchantFetch(`${apiBase}/v1/merchant/products`, {
-        headers: { Accept: 'application/json', 'x-merchant-id': 'dev-merchant-001' },
+      const res = await merchantFetch(`${apiBase}/v1/merchant/products?page=1&limit=20`, {
+        headers: { Accept: 'application/json' },
       });
       if (!res.ok) throw new Error(await apiError(res, 'Failed to load products'));
-      const data = await res.json();
+      const data = await res.json() as { products?: unknown[]; pagination?: Pagination };
       const list = Array.isArray(data) ? data : (data.products || []);
-      setProducts(list.map(mapProduct));
+      setProducts(list.map((p) => mapProduct(p as MerchantProductApi)));
+      setProductsPagination(data.pagination ?? null);
     } finally {
       setIsLoadingProducts(false);
     }
   }, [merchantFetch, token]);
+
+  const loadMoreProducts = useCallback(async () => {
+    if (!productsPagination || productsPagination.page >= productsPagination.pages) return;
+    const nextPage = productsPagination.page + 1;
+    setIsLoadingProducts(true);
+    try {
+      const res = await merchantFetch(`${apiBase}/v1/merchant/products?page=${nextPage}&limit=20`, {
+        headers: { Accept: 'application/json' },
+      });
+      if (!res.ok) throw new Error(await apiError(res, 'Failed to load products'));
+      const data = await res.json() as { products?: unknown[]; pagination?: Pagination };
+      const list = data.products || [];
+      setProducts((prev) => [...prev, ...list.map((p) => mapProduct(p as MerchantProductApi))]);
+      setProductsPagination(data.pagination ?? null);
+    } finally {
+      setIsLoadingProducts(false);
+    }
+  }, [merchantFetch, token, productsPagination]);
 
   const handleDeleteProduct = useCallback(async (productId: string) => {
     const res = await merchantFetch(`${apiBase}/v1/merchant/products/${productId}`, { method: 'DELETE' });
@@ -90,5 +112,13 @@ export function useMerchantProducts(
     setProducts((prev) => prev.map((product) => (product.id === productId ? { ...product, stock: nextStock } : product)));
   }, [merchantFetch, token]);
 
-  return { products, isLoadingProducts, loadProducts, handleDeleteProduct, handleRestockProduct };
+  return {
+    products,
+    isLoadingProducts,
+    loadProducts,
+    loadMoreProducts,
+    productsPagination,
+    handleDeleteProduct,
+    handleRestockProduct,
+  };
 }

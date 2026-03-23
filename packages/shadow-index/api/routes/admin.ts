@@ -298,7 +298,7 @@ adminRouter.post('/cron/release-escrow', async (c) => {
         logger.error('Auto-release failed', { orderId: order.id, error: String(e) });
       }
     } else if (heldAt < sevenDaysAgo && !order.customer_confirmed_at) {
-      // Day 7 reminder - TODO: send email with confirm link
+      // DEBT: Day-7 escrow reminder email with confirm link — tracked in architectural backlog
       reminders++;
       logger.info('Day 7 reminder due', { orderId: order.id, customer: order.customer?.email });
     }

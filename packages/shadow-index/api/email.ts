@@ -1,4 +1,5 @@
 import { Resend } from 'resend';
+import { logger } from '../lib/logger.js';
 
 let _resend: InstanceType<typeof Resend> | null = null;
 function getResend() {
@@ -483,7 +484,10 @@ export async function sendOrderCheckinEmail(details: OrderCheckinEmailDetails): 
       subject: `Update on your ${details.productTitle} order`,
       html,
     });
-    console.log(`[Email] Check-in #${details.checkinNumber} sent to ${details.customerEmail}`);
+    logger.info('Order check-in email sent', {
+      checkinNumber: details.checkinNumber,
+      customerEmail: details.customerEmail,
+    });
   } catch (error) {
     console.error('[Email] Failed to send order check-in:', error);
     throw error;
@@ -534,7 +538,7 @@ export async function sendDeliveryDateEmail(details: DeliveryDateEmailDetails): 
       subject: `Your delivery date: ${formattedDatePlain} - ${details.productTitle}`,
       html,
     });
-    console.log(`[Email] Delivery date email sent to ${details.customerEmail}`);
+    logger.info('Delivery date email sent', { customerEmail: details.customerEmail });
   } catch (error) {
     console.error('[Email] Failed to send delivery date email:', error);
   }

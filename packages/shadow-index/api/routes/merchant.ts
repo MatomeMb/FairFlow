@@ -374,7 +374,9 @@ merchantRouter.patch('/orders/:orderId/ship', async (c) => {
   order.updated_at = now;
   await saveOrders(orders);
 
-  // TODO: Send customer email "Your order has been shipped. Click here to confirm when it arrives: [link]"
+  // DEBT: Post-ship customer email with confirm-receipt deep link — tracked in architectural backlog
+  // Context: copy and Resend template not finalised for beta
+  // Impact: customers rely on portal / order status until this ships
   const confirmUrl = `${authPortalBaseUrl}/order/${orderId}/confirm?token=${confirmToken}`;
   logger.info('Order marked shipped', { orderId, confirmUrl });
 

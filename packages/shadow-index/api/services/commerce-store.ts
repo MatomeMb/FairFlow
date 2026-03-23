@@ -387,7 +387,7 @@ export async function queueOrderForPayout(orderId: string): Promise<PayoutLog | 
 
 /**
  * Release held funds to merchant (escrow release). Called when customer confirms receipt.
- * TODO: Paystack subaccount creation not built yet — merchants don't have KYC. Payouts processed manually.
+ * DEBT: Paystack subaccount creation not built yet — payouts processed manually; tracked in architectural backlog.
  */
 export async function releaseToMerchant(order: MerchantOrder): Promise<void> {
   const merchantPriceCents = order.merchant_price_cents ?? order.amount ?? 0;
@@ -438,7 +438,7 @@ export async function releaseToMerchant(order: MerchantOrder): Promise<void> {
   });
   await saveNotifications(notifs);
 
-  // TODO: Call Paystack Transfer API when subaccounts are set up
+  // DEBT: Call Paystack Transfer API when subaccounts exist — tracked in architectural backlog
   logger.info('Released to merchant', { orderId: order.id, merchantPriceCents, merchant_id: order.merchant_id });
 }
 
