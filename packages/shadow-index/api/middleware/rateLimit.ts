@@ -23,6 +23,10 @@ function getClientId(c: { req: { header: (n: string) => string | undefined } }):
 }
 
 export const rateLimitMiddleware: MiddlewareHandler = async (c, next) => {
+  // FINAL-POLISH: allow browser CORS preflight to pass through without throttling.
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
   if (c.req.path === '/v1/merchant/kyc/callback') {
     return next();
   }

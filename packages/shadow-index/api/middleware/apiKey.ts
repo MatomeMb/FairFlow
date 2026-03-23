@@ -39,6 +39,11 @@ function isPublicPath(requestPath: string, method: string): boolean {
 }
 
 export const apiKeyMiddleware: MiddlewareHandler = async (c, next) => {
+  // FINAL-POLISH: never challenge CORS preflight with API-key/JWT requirements.
+  if (c.req.method === 'OPTIONS') {
+    return next();
+  }
+
   const requestPath = c.req.path;
   if (isPublicPath(requestPath, c.req.method)) {
     return next();
