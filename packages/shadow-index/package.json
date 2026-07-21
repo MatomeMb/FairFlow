@@ -30,7 +30,7 @@
     "@aws-sdk/client-s3": "^3.490.0",
     "@hono/node-server": "^1.19.9",
     "@paystack/paystack-sdk": "^1.0.0",
-    "@supabase/supabase-js": "^2.99.1",
+    "@supabase/supabase-js": "^2.110.8",
     "hono": "^4.0.0",
     "resend": "^6.9.3",
     "zod": "^3.22.4",
