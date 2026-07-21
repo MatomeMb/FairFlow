@@ -345,15 +345,15 @@ Additional product/ops docs live under [`docs/`](./docs/README.md).
 
 ## Screenshots
 
-Demo and smoke capture assets (anonymized) are under `demo/` and `test-artifacts/`.  
-For a polished portfolio README, replace with fresh screenshots of:
+| Home | Staff login | Merchant login |
+|------|-------------|----------------|
+| ![Portal home](./docs/images/portal-home.png) | ![Staff login](./docs/images/staff-login.png) | ![Merchant login](./docs/images/merchant-login.png) |
 
-1. Merchant dashboard  
-2. Public product / checkout  
-3. Admin KYC queue  
-4. Analytics view  
+| Merchant register | Merchant dashboard |
+|-------------------|--------------------|
+| ![Merchant register](./docs/images/merchant-register.png) | ![Merchant dashboard](./docs/images/merchant-dashboard.png) |
 
-Guide: [docs/SCREENSHOT-GUIDE.md](./docs/SCREENSHOT-GUIDE.md)
+More capture guidance: [docs/SCREENSHOT-GUIDE.md](./docs/SCREENSHOT-GUIDE.md)
 
 ---
 

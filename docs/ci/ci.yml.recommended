@@ -1,4 +1,5 @@
 # CI: type-check, lint, test for shadow-index and auth-portal
+# Copy to .github/workflows/ci.yml when you have workflows permission.
 name: CI
 
 on:

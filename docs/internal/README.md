@@ -1,3 +1,5 @@
+> **Note for public readers:** This folder is historical product/strategy context. It is not required to build or run Fairflow. Start at the root [README](../../README.md).
+
 # Internal documentation
 
 Material here supports **strategy, demos, and leadership context**. It is **not** required to build, deploy, or operate the platform day to day — for that, start at [../README.md](../README.md).
