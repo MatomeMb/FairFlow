@@ -34,7 +34,7 @@
     "hono": "^4.0.0",
     "resend": "^6.9.3",
     "zod": "^3.22.4",
-    "typescript": "^5.9.3"
+    "typescript": "^7.0.2"
   },
   "devDependencies": {
     "@types/node": "^20.10.0",
