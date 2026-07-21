@@ -135,7 +135,7 @@ export function LoginPage() {
                 disabled={isLoading}
                 className="w-full rounded-xl border border-[rgba(255,255,255,0.10)] bg-[#1A2D42] text-white placeholder:text-[#8A99AA] px-4 py-3 focus:outline-none focus:border-emerald-500 disabled:opacity-50"
               />
-              <p className="mt-2 text-xs text-[#8A99AA]">Use full email format, e.g. name@fairflow.co.za</p>
+              <p className="mt-2 text-xs text-[#8A99AA]">Use full email format, e.g. name@example.com</p>
             </div>
             <input
               type="password"

@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability
+    url: https://github.com/MatomeMb/.Things-That-Matter/security/advisories/new
+    about: Report security issues privately — do not file a public bug.
+  - name: Documentation
+    url: https://github.com/MatomeMb/.Things-That-Matter/blob/main/docs/README.md
+    about: Read project docs before asking setup questions.

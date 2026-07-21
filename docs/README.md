@@ -2,6 +2,21 @@
 
 This directory contains the canonical written documentation for engineering, deployment, beta operations, and release readiness.
 
+## Portfolio / open-source entry points
+
+| Document | Purpose |
+|----------|---------|
+| [ARCHITECTURE.md](./ARCHITECTURE.md) | System architecture and design decisions |
+| [SYSTEM_DESIGN.md](./SYSTEM_DESIGN.md) | Components, boundaries, failure modes |
+| [DATABASE.md](./DATABASE.md) | Schema, ER diagram, migrations |
+| [AUTHENTICATION.md](./AUTHENTICATION.md) | Auth actors and flows |
+| [API_REFERENCE.md](./API_REFERENCE.md) | Endpoint catalogue |
+| [DEPLOYMENT.md](./DEPLOYMENT.md) | Vercel + Docker deployment |
+| [SECURITY.md](./SECURITY.md) | Security controls and history scrubbing |
+| [CONTRIBUTING.md](./CONTRIBUTING.md) | Contribution guide |
+| [ROADMAP.md](./ROADMAP.md) | Near-term plan |
+| [OPEN-SOURCE-READINESS-REPORT.md](./OPEN-SOURCE-READINESS-REPORT.md) | Public release audit |
+
 **Internal** (charter, demo scripts): [internal/README.md](./internal/README.md).
 
 ## Start Here

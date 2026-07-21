@@ -24,7 +24,7 @@
     "commerce",
     "shadow-index"
   ],
-  "author": "Matome Mboweni <matome@thingsthatmatter.com>",
+  "author": "Fairflow Contributors",
   "license": "MIT",
   "dependencies": {
     "@aws-sdk/client-s3": "^3.490.0",

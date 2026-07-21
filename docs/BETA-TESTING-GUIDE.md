@@ -44,7 +44,7 @@ VITE_ADMIN_SECRET=mor-admin-secret-local
 
 ### 1.4 Admin access
 
-Admin emails must be in `AuthContext.tsx` (e.g. `matome@fairflow.dev`, `sobuhle@fairflow.dev`). Sign in with one of these to access the Admin Portal.
+Admin emails must be in `AuthContext.tsx` (e.g. `admin@example.com`, `ceo@example.com`). Sign in with one of these to access the Admin Portal.
 
 ---
 
@@ -80,7 +80,7 @@ npm run dev
 
 ### 3.2 Auth (Admin)
 
-1. Sign in with an admin email (e.g. `matome@fairflow.dev`)
+1. Sign in with an admin email (e.g. `admin@example.com`)
 2. Redirect to `/dashboard/admin` (Admin Portal)
 3. Verify dashboard, health, and analytics load
 

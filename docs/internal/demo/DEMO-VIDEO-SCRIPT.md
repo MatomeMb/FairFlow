@@ -60,7 +60,7 @@
 **Actions:**
 1. Sign out from merchant
 2. Open http://localhost:5178/login
-3. Sign in with admin email (matome@fairflow.dev)
+3. Sign in with admin email (admin@example.com)
 4. Show Dashboard
 5. Click KYC Approvals — Refresh to fetch pending
 6. Click Approve on merchant card, confirm in modal
@@ -161,7 +161,7 @@
 **Actions:**
 1. Sign out from merchant (or use incognito)
 2. Open http://localhost:5178/login
-3. Sign in with admin email (e.g. matome@fairflow.dev)
+3. Sign in with admin email (e.g. admin@example.com)
 4. Show redirect to /dashboard/admin
 5. Show Admin sidebar: Dashboard, KYC Approvals, Merchants, Users & Roles, Platform Health, Financials, System, Settings
 6. Show Dashboard overview: Active Merchants, Heap Memory, Storage Used, Pending KYC, Errors
@@ -279,7 +279,7 @@
 - [ ] Portal running on 5178
 - [ ] Supabase configured (admin login)
 - [ ] Stripe test keys (checkout)
-- [ ] Admin email in AuthContext (e.g. matome@fairflow.dev)
+- [ ] Admin email in AuthContext (e.g. admin@example.com)
 - [ ] Screen resolution 1920x1080 or 1280x720
 - [ ] Clear browser cache, no extensions (or use clean profile)
 - [ ] Prepare test data: 1-2 products, 1 order if possible

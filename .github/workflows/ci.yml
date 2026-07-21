@@ -3,9 +3,13 @@ name: CI
 
 on:
   push:
-    branches: [main, develop]
+    branches: [main, develop, 'arena/**']
   pull_request:
     branches: [main, develop]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   shadow-index:
@@ -67,3 +71,8 @@ jobs:
 
       - name: Build
         run: npm run build
+        env:
+          VITE_API_BASE_URL: http://localhost:3000
+          VITE_API_KEY: ci-placeholder-key
+          VITE_SUPABASE_URL: https://example.supabase.co
+          VITE_SUPABASE_ANON_KEY: ci-placeholder-anon-key

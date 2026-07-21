@@ -13,7 +13,7 @@ import { defineConfig, devices } from '@playwright/test';
  * - Portal: cd packages/auth-portal && npm run dev (localhost:5178)
  *
  * Env vars (optional):
- * - DEMO_ADMIN_EMAIL: Admin login (default: matome@fairflow.dev)
+ * - DEMO_ADMIN_EMAIL: Admin login (default: admin@example.com)
  * - DEMO_MERCHANT_EMAIL: Merchant register/login
  * - DEMO_MERCHANT_PASSWORD: Merchant password
  * - DEMO_MERCHANT_BUSINESS: Business name for registration

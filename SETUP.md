@@ -13,7 +13,7 @@
 ## Clone and Install
 
 ```bash
-git clone https://github.com/fairflow/fairflow.git
+git clone https://github.com/MatomeMb/.Things-That-Matter.git
 cd fairflow
 
 # Install dependencies (from repo root)
