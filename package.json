@@ -1,7 +1,7 @@
 {
-  "name": "things-that-matter",
+  "name": "fairflow",
   "private": true,
-  "description": ".things that Matter — Object-Oriented Commerce",
+  "description": "Fairflow \u2014 commerce infrastructure for South African merchants",
   "scripts": {
     "start": "cd packages/shadow-index && npm run build && npm run start",
     "test:e2e": "playwright test",
@@ -11,9 +11,16 @@
     "start:api": "cd packages/shadow-index && npm run start",
     "start:demo": "node scripts/demo-server.mjs",
     "demo": "node scripts/launch-demo.mjs",
-    "git:report": "powershell -ExecutionPolicy Bypass -File scripts/git-version-report.ps1"
+    "git:report": "powershell -ExecutionPolicy Bypass -File scripts/git-version-report.ps1",
+    "lint": "npm run lint --prefix packages/shadow-index && npm run lint --prefix packages/auth-portal",
+    "typecheck": "npm run type-check --prefix packages/shadow-index && npm exec --prefix packages/auth-portal -- tsc --noEmit",
+    "test": "npm test --prefix packages/shadow-index -- --run && npm test --prefix packages/auth-portal",
+    "format": "npm run format --prefix packages/shadow-index",
+    "docker:up": "docker compose up --build",
+    "docker:down": "docker compose down"
   },
   "devDependencies": {
     "@playwright/test": "^1.40.0"
-  }
+  },
+  "license": "MIT"
 }

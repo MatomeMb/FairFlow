@@ -13,7 +13,7 @@ The API runs as a Vercel serverless function via `api/vercel-entry.ts` (Hono + N
 1. Go to [vercel.com](https://vercel.com) and sign up (GitHub).
 2. Click **Add New** → **Project**.
 3. Import your repo.
-4. Set **Root Directory** to `mcj/packages/shadow-index`.
+4. Set **Root Directory** to `packages/shadow-index`.
 5. Vercel will use the `vercel.json` in that directory (routes all traffic through the Hono serverless function).
 
 ### Step 2: Set environment variables
@@ -51,7 +51,7 @@ In Vercel → API project → **Settings** → **Environment Variables**:
 
 1. Click **Add New** → **Project**.
 2. Import the same repo.
-3. Set **Root Directory** to `mcj/packages/auth-portal`.
+3. Set **Root Directory** to `packages/auth-portal`.
 4. Vercel will auto-detect Vite. Build command: `npm run build`, output: `dist`.
 
 ### Step 2: Set environment variables
@@ -104,11 +104,11 @@ In Vercel → Frontend project → **Settings** → **Environment Variables**:
 
 ```bash
 # Deploy API (from repo root)
-cd mcj/packages/shadow-index
+cd packages/shadow-index
 npx vercel --prod
 
 # Deploy frontend (from repo root)
-cd mcj/packages/auth-portal
+cd packages/auth-portal
 npx vercel --prod
 ```
 

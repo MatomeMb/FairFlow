@@ -1,0 +1,53 @@
+# Fairflow local stack
+# Usage:
+#   cp packages/shadow-index/.env.example packages/shadow-index/.env
+#   cp packages/auth-portal/.env.example packages/auth-portal/.env
+#   docker compose up --build
+#
+# Never commit real .env files. Override below with your local values only.
+
+services:
+  api:
+    build:
+      context: ./packages/shadow-index
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000"
+    env_file:
+      - path: ./packages/shadow-index/.env
+        required: false
+    environment:
+      NODE_ENV: production
+      PORT: "3000"
+      STORAGE_MODE: ${STORAGE_MODE:-local}
+      JWT_SECRET: ${JWT_SECRET:-dev-compose-jwt-secret-change-me}
+      ADMIN_SECRET_KEY: ${ADMIN_SECRET_KEY:-dev-compose-admin-secret}
+      SHADOW_INDEX_API_KEY: ${SHADOW_INDEX_API_KEY:-dev-compose-api-key}
+      AUTH_PORTAL_BASE_URL: ${AUTH_PORTAL_BASE_URL:-http://localhost:5178}
+      PUBLIC_API_BASE_URL: ${PUBLIC_API_BASE_URL:-http://localhost:3000}
+    volumes:
+      - shadow-data:/app/data
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:3000/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 5
+      start_period: 25s
+
+  portal:
+    build:
+      context: ./packages/auth-portal
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:3000}
+        VITE_API_KEY: ${VITE_API_KEY:-dev-compose-api-key}
+        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL:-}
+        VITE_SUPABASE_ANON_KEY: ${VITE_SUPABASE_ANON_KEY:-}
+    ports:
+      - "5178:80"
+    depends_on:
+      api:
+        condition: service_healthy
+
+volumes:
+  shadow-data:

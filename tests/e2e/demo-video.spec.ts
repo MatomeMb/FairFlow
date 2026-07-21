@@ -19,7 +19,7 @@ const API_BASE = 'http://localhost:3000';
 const MERCHANT_EMAIL = process.env.DEMO_MERCHANT_EMAIL || 'demo@demo.test';
 const MERCHANT_PASSWORD = process.env.DEMO_MERCHANT_PASSWORD || 'DemoPass123';
 const MERCHANT_BUSINESS = process.env.DEMO_MERCHANT_BUSINESS || 'Demo Store';
-const ADMIN_EMAIL = process.env.DEMO_ADMIN_EMAIL || 'matome@fairflow.dev';
+const ADMIN_EMAIL = process.env.DEMO_ADMIN_EMAIL || 'admin@example.com';
 
 function delay(ms: number) {
   return new Promise((r) => setTimeout(r, ms));

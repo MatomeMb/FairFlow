@@ -1,0 +1,16 @@
+node_modules
+dist
+coverage
+.env
+.env.*
+!.env.example
+data/events
+data/orders.json
+data/payout_logs.json
+*.log
+.git
+.vercel
+tests
+vitest*.ts
+vitest*.json
+**/*.test.ts

@@ -15,7 +15,7 @@
     "commerce",
     "lens"
   ],
-  "author": "Matome Mboweni <matome@thingsthatmatter.com>",
+  "author": "Fairflow Contributors",
   "license": "MIT",
   "devDependencies": {
     "@types/chrome": "^0.0.251",

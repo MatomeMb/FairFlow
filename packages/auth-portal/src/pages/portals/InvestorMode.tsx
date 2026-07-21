@@ -388,7 +388,7 @@ export const InvestorMode: React.FC = () => {
               <div className="flex items-start gap-6">
                 <div className="flex-grow">
                   <div className="flex items-baseline gap-4 mb-2">
-                    <h3 className="text-2xl font-bold text-[var(--ff-ink)]">Matome Mbowene</h3>
+                    <h3 className="text-2xl font-bold text-[var(--ff-ink)]">Matome Mboweni</h3>
                     <span className="px-3 py-1 bg-[var(--ff-success-subtle)] text-[var(--ff-success)] rounded-full text-sm font-semibold">
                       CTO
                     </span>
@@ -430,28 +430,11 @@ export const InvestorMode: React.FC = () => {
                 <h3 className="text-white mb-2">For investor inquiries:</h3>
                 <div className="space-y-1 ml-4">
                   <div className="text-white">
-                    <a 
-                      href="mailto:hello@fairflow.co.za" 
+                    <a
+                      href="mailto:hello@fairflow.co.za"
                       className="text-emerald-400 hover:text-emerald-300 transition-colors"
                     >
                       hello@fairflow.co.za
-                    </a>
-                    <span className="ml-3 text-sm text-[#8A99AA]">(Sprint 7)</span>
-                  </div>
-                  <div>
-                    <a 
-                      href="mailto:matome@fairflow.co.za" 
-                      className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                    >
-                      matome@fairflow.co.za
-                    </a>
-                  </div>
-                  <div>
-                    <a 
-                      href="mailto:sobuhle@fairflow.co.za" 
-                      className="text-emerald-400 hover:text-emerald-300 transition-colors"
-                    >
-                      sobuhle@fairflow.co.za
                     </a>
                   </div>
                 </div>

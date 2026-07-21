@@ -4,18 +4,11 @@ import { jwtDecode } from "jwt-decode";
 import { supabase } from "../lib/supabase";
 import type { AppRole, AuthUser, JWTClaims } from "../types/auth";
 
-// Admin email configuration — emails listed here get CEO role
-const STATIC_ADMIN_EMAILS = [
-  "matome@fairflow.co.za",
-  "sobuhle@fairflow.co.za",
-  "matome@fairflow.com",
-  "sobuhle@fairflow.com",
-  "matome@thingsthatmatter.com",
-  "sobuhle@thingsthatmatter.com",
-  "matome@thingsthatmatter.co.za",
-  "sobuhle@thingsthatmatter.co.za",
-];
-
+/**
+ * Admin emails that receive elevated CEO role in the portal.
+ * Configure via VITE_ADMIN_EMAILS (comma-separated). Never hardcode personal emails.
+ * Example: VITE_ADMIN_EMAILS=ceo@example.com,cto@example.com
+ */
 function normalizeEmail(value: string | null | undefined): string | null {
   if (!value) return null;
   const normalized = value.trim().toLowerCase();
@@ -28,13 +21,9 @@ function normalizeLoginEmail(value: string): string {
     throw new Error("Email is required");
   }
 
-  // Accept known shorthand forms used by internal admins.
-  if (normalized === "sobuhle@fairflow") return "sobuhle@fairflow.co.za";
-  if (normalized === "matome@fairflow") return "matome@fairflow.co.za";
-
   const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailPattern.test(normalized)) {
-    throw new Error("Use your full email address, for example sobuhle@fairflow.co.za");
+    throw new Error("Use your full email address, for example name@example.com");
   }
 
   return normalized;
@@ -46,10 +35,7 @@ function buildAdminEmails(): Set<string> {
     .map((item: string) => normalizeEmail(item))
     .filter((item: string | null): item is string => Boolean(item));
 
-  return new Set([
-    ...STATIC_ADMIN_EMAILS.map((item) => normalizeEmail(item)).filter((item): item is string => Boolean(item)),
-    ...fromEnv,
-  ]);
+  return new Set(fromEnv);
 }
 
 const ADMIN_EMAILS = buildAdminEmails();

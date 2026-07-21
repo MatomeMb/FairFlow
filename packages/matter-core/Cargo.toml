@@ -2,7 +2,7 @@
 name = "matter-core"
 version = "0.3.0"
 edition = "2021"
-authors = ["Matome Mboweni <matome@thingsthatmatter.com>"]
+authors = ["Fairflow Contributors"]
 description = "Commerce Compiler - Transforms product data into Universal Commerce Containers (.thing files)"
 license = "MIT"
 repository = "https://github.com/thingsthatmatter/things-that-matter"

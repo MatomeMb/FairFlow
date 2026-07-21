@@ -1,0 +1,10 @@
+# Default owners — update GitHub usernames before public launch
+*       @MatomeMb
+
+# Critical paths
+/.github/                 @MatomeMb
+/packages/shadow-index/   @MatomeMb
+/packages/auth-portal/    @MatomeMb
+/supabase/                @MatomeMb
+/docs/SECURITY.md         @MatomeMb
+/SECURITY.md              @MatomeMb
