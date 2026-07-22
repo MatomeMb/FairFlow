@@ -31,7 +31,7 @@ flatbuffers = "24.3"
 
 # Cryptography
 ed25519-dalek = { version = "2.1", features = ["rand_core"] }
-sha2 = "0.10"
+sha2 = "0.11"
 
 # Image processing
 image = "0.24"
