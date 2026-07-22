@@ -56,7 +56,7 @@ thiserror = "1.0"
 validator = { version = "0.18", features = ["derive"] }
 
 # Utilities
-base64 = "0.21"
+base64 = "0.22"
 hex = "0.4"
 url = "2.5"
 regex = "1.10"
